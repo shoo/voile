@@ -1,0 +1,23 @@
+﻿/+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Voile The Magic Library は、なくても特に困らない…$(BR)
+というか、使おうと思わない限り使わなそうな小物を集めたもの。$(BR)
+まぁ、ある意味無駄ってやつよ。$(BR)
+それが魔法のあるべき姿ってことね。
+
+
+See_Also:
+$(UL
+    $(LI $(LINK2 _index.html, voile)
+    $(UL
+        $(LI $(LINK2 voile.benchmark.html, benchmark))
+        $(LI $(LINK2 voile.judge.html, judge))
+        $(LI $(LINK2 voile.sync.html, sync))
+        $(LI $(LINK2 voile.dataformatter.html, dataformatter))
+    ))
+)
+Authors: P.Knowledge, SHOO
+License: NYSL ( $(LINK http://www.kmonos.net/nysl/) )
+Macros:
+TITLE =Voile The Magic Library
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/
+module index;
