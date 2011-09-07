@@ -1,0 +1,6 @@
+MODULES =
+	$(MODULE_FULL voile.benchmark)
+	$(MODULE_FULL voile.dataformatter)
+	$(MODULE_FULL index)
+	$(MODULE_FULL voile.judge)
+	$(MODULE_FULL voile.sync)

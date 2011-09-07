@@ -142,37 +142,41 @@ int makedoc(Options opt)
 	if (opt.options) opts ~= opt.options;
 	
 	string modules = "MODULES =\n";
-	foreach (s; opt.src) foreach (ss; listdir(s, "*.d"))
+	static struct FileData
 	{
-		char[] tmp = ss.dup;
-		foreach (ref char c; tmp)
+		string filename;
+		string modname;
+	}
+	FileData[] docmods;
+	foreach (s; opt.src) foreach (ss; listdir(s, "*.{dd,d}"))
+	{
+		if (ss.baseName == "index.dd")
 		{
-			if (c == '\\') c = '/';
+			docmods ~= FileData(ss, "index");
+			modules ~= "	$(MODULE_FULL index)\n";
 		}
-		if (countUntil(tmp, "/_") != -1) continue;
-		foreach (ref char c; tmp)
+		else
 		{
-			if (c == '/') c = '.';
+			char[] tmp = ss.dup;
+			foreach (ref char c; tmp)
+			{
+				if (c == '\\') c = '/';
+			}
+			if (countUntil(tmp, "/_") != -1) continue;
+			foreach (ref char c; tmp)
+			{
+				if (c == '/') c = '.';
+			}
+			string modname = cast(immutable)baseName(tmp, tmp.extension);
+			modules ~= "	$(MODULE_FULL " ~ modname ~ ")\n";
+			docmods ~= FileData(ss, modname);
 		}
-		
-		auto name = cast(immutable)baseName(tmp, ".d");
-		modules ~= "	$(MODULE_FULL " ~ name ~ ")\n";
 	}
 	std.file.write("doc/candydoc/modules.ddoc", modules);
 	
-	foreach (s; opt.src) foreach (ss; listdir(s, "*.d"))
+	foreach (fd; docmods)
 	{
-		char[] tmp = ss.dup;
-		foreach (ref char c; tmp)
-		{
-			if (c == '\\') c = '/';
-		}
-		if (countUntil(tmp, "/_") != -1) continue;
-		foreach (ref char c; tmp)
-		{
-			if (c == '/') c = '.';
-		}
-		auto docopt = ["-Df" ~ cast(immutable)baseName(tmp, ".d") ~ ".html", ss];
+		auto docopt = ["-Df" ~ fd.modname ~ ".html", fd.filename];
 		writeln("dmd " ~ std.string.join(opts ~ docopt, " "));
 		
 		auto res = system("dmd " ~ std.string.join(opts ~ docopt, " "));
@@ -189,6 +193,7 @@ string[] listdir(string path, string wildcard)
 	string[] ret;
 	foreach(DirEntry de; dirEntries(path, SpanMode.shallow))
 	{
+	writeln(de.name);
 		if (isDir(de.name))
 		{
 			if (baseName(de.name)[0] == '.') continue;

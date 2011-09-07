@@ -3,7 +3,7 @@
  * 
  * 複数の要素でチェックを行いたい場合に使用することのできる Judgement が利用可能
  * 
- * Date: December 08, 2008
+ * Date: September 08, 2011
  * Authors:
  *     P.Knowledge, SHOO
  * License:
