@@ -56,7 +56,7 @@ public:
 	}
 	
 	
-	void put(T)(T v)
+	void put(T)(in T v)
 		if (is(Unqual!T == byte))
 	{
 		put!(const ubyte)(cast(const ubyte)v);
@@ -98,7 +98,7 @@ public:
 	}
 	
 	
-	void put(T)(in T v)
+	void put(T)(T v)
 		if (is(Unqual!T == ulong) || is(Unqual!T == long) ||
 		    is(Unqual!T == double) || is(Unqual!T == idouble) )
 	{

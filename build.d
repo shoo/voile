@@ -11,16 +11,8 @@ immutable
 	DEFAULT_OBJDIR  = ".",
 	DEFAULT_GUI     = false;
 
-import std.exception;
-import std.stdio;
-import std.path;
-import std.process;
-import std.file;
-import std.string;
-import std.array;
-import std.algorithm;
-import std.getopt;
-import std.conv;
+import std.exception, std.stdio, std.path, std.process, std.file, std.string,
+	std.array, std.algorithm, std.getopt, std.conv;
 
 version (BUILD_DUMMY)
 {
@@ -33,6 +25,7 @@ void main(string[] args)
 	Options opt;
 	getopt(args,
 		std.getopt.config.bundling,
+		std.getopt.config.caseSensitive,
 		"test|t", &opt.test,
 		"lib|l", &opt.lib,
 		"debug|d", &opt.dbg,
@@ -107,7 +100,10 @@ int compile(Options opt)
 		if (opt.warning)     opts ~= "-w";
 		if (opt.options)     opts ~= opt.options;
 		if (opt.output)      opts ~= ["-of"~opt.output];
-		foreach (s; opt.src) opts ~= listdir(s, "*.d");
+		foreach (s; opt.src) foreach (string ss; dirEntries(s, SpanMode.breadth))
+		{
+			if (!ss.isDir && ss.extension == ".d") opts ~= ss;
+		}
 		if (opt.lib)         opts ~= ["-version=BUILD_DUMMY", "-run", "build.d"];
 	}
 	else
@@ -121,7 +117,10 @@ int compile(Options opt)
 		if (opt.warning) opts ~= ["-w"];
 		if (opt.json)    opts ~= ["-X", "-Xf"~opt.output];
 		if (opt.options) opts ~= opt.options;
-		foreach (s; opt.src) opts ~= listdir(s, "*.d");
+		foreach (s; opt.src) foreach (string ss; dirEntries(s, SpanMode.breadth))
+		{
+			if (!ss.isDir && ss.extension == ".d") opts ~= ss;
+		}
 	}
 	
 	writeln("dmd " ~ std.string.join(opts, " "));
@@ -148,8 +147,10 @@ int makedoc(Options opt)
 		string modname;
 	}
 	FileData[] docmods;
-	foreach (s; opt.src) foreach (ss; listdir(s, "*.{dd,d}"))
+	foreach (s; opt.src) foreach (string ss; dirEntries(s, SpanMode.breadth))
 	{
+		if (ss.isDir) continue;
+		if (ss.extension != ".d" && ss.extension != ".dd") continue;
 		if (ss.baseName == "index.dd")
 		{
 			docmods ~= FileData(ss, "index");
@@ -184,25 +185,4 @@ int makedoc(Options opt)
 	}
 	
 	return 0;
-}
-
-
-
-string[] listdir(string path, string wildcard)
-{
-	string[] ret;
-	foreach(DirEntry de; dirEntries(path, SpanMode.shallow))
-	{
-	writeln(de.name);
-		if (isDir(de.name))
-		{
-			if (baseName(de.name)[0] == '.') continue;
-			ret ~= listdir(de.name, wildcard);
-		}
-		else if (globMatch(de.name, wildcard))
-		{
-			ret ~= de.name;
-		}
-	}
-	return ret;
 }
