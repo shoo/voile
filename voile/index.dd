@@ -13,6 +13,7 @@ $(UL
         $(LI $(LINK2 voile.judge.html, judge))
         $(LI $(LINK2 voile.sync.html, sync))
         $(LI $(LINK2 voile.dataformatter.html, dataformatter))
+        $(LI $(LINK2 voile.stm.html, stm))
     ))
 )
 Authors: P.Knowledge, SHOO
