@@ -20,7 +20,9 @@ import core.bitop;
  * 
  */
 struct DataWriter(Range, Endian rangeEndian = Endian.littleEndian)
-	if (isOutputRange!(Range, const(ubyte)[]) || isOutputRange!(Range, ubyte))
+	if (isOutputRange!(Range, const(ubyte)[])
+	||  isOutputRange!(Range, ubyte)
+	||  isOutputRange!(Range, const(void)[]))
 {
 private:
 	Range range;
@@ -29,11 +31,11 @@ public:
 	
 	
 	void put(T)(in T v)
-		if (is(Unqual!T == ubyte))
+		if (is(Unqual!T == ubyte) || is(Unqual!T == char))
 	{
 		static if (isOutputRange!(Range, ubyte))
 		{
-			.put(range, v);
+			.put(range, cast(ubyte)v);
 		}
 		else
 		{
@@ -43,11 +45,30 @@ public:
 	
 	
 	void put(T)(in T v)
-		if (is(Unqual!T == ubyte[]))
+		if (is(Unqual!T == const(ubyte)[])
+		||  is(Unqual!T == const(char)[])
+		||  is(Unqual!T == const(void)[])
+		||  is(Unqual!T == shared(ubyte)[])
+		||  is(Unqual!T == shared(char)[])
+		||  is(Unqual!T == shared(void)[])
+		||  is(Unqual!T == immutable(ubyte)[])
+		||  is(Unqual!T == immutable(char)[])
+		||  is(Unqual!T == immutable(void)[])
+		||  is(Unqual!T == shared(const ubyte)[])
+		||  is(Unqual!T == shared(const char)[])
+		||  is(Unqual!T == shared(const void)[])
+		||  is(Unqual!T == ubyte[])
+		||  is(Unqual!T == char[])
+		||  is(Unqual!T == void[])
+		)
 	{
-		static if (isOutputRange!(Range, typeof(v)))
+		static if (isOutputRange!(Range, ubyte[]))
 		{
-			.put(range, v);
+			.put(range, cast(ubyte[])v);
+		}
+		else static if (isOutputRange!(Range, void[]))
+		{
+			.put(range, cast(void[])v);
 		}
 		else
 		{
@@ -57,14 +78,16 @@ public:
 	
 	
 	void put(T)(in T v)
-		if (is(Unqual!T == byte))
+		if (is(Unqual!T == byte) || is(Unqual!T == char))
 	{
 		put!(const ubyte)(cast(const ubyte)v);
 	}
 	
 	
 	void put(T)(in T v)
-		if (is(Unqual!T == ushort) || is(Unqual!T == short))
+		if (is(Unqual!T == ushort)
+		||  is(Unqual!T == short)
+		||  is(Unqual!T == wchar))
 	{
 		static if (rangeEndian == endian)
 		{
@@ -84,7 +107,8 @@ public:
 	
 	void put(T)(in T v)
 		if (is(Unqual!T == uint) || is(Unqual!T == int)
-		||  is(Unqual!T == float) || is(Unqual!T == ifloat) )
+		||  is(Unqual!T == float) || is(Unqual!T == ifloat)
+		||  is(Unqual!T == dchar) )
 	{
 		static if (rangeEndian == endian)
 		{
@@ -99,8 +123,8 @@ public:
 	
 	
 	void put(T)(T v)
-		if (is(Unqual!T == ulong) || is(Unqual!T == long) ||
-		    is(Unqual!T == double) || is(Unqual!T == idouble) )
+		if (is(Unqual!T == ulong) || is(Unqual!T == long)
+		||  is(Unqual!T == double) || is(Unqual!T == idouble) )
 	{
 		
 		static if (rangeEndian == endian)
@@ -119,16 +143,30 @@ public:
 	}
 	
 	
-	void put(SrcRange)(ref const(SrcRange) r)
-		if (isStaticArray!(SrcRange))
+	void put(SrcRange)(ref SrcRange r)
+		if (isStaticArray!(Unqual!(SrcRange)))
 	{
 		put!(typeof(r[]))(r[]);
 	}
 	
 	
-	void put(SrcRange)(const(SrcRange) r)
-		if (isInputRange!(SrcRange)
-		&& !is(ElementType!(SrcRange) == ubyte)
+	void put(SrcRange)(SrcRange r)
+		if (isInputRange!(Unqual!(SrcRange))
+		&& !is(Unqual!SrcRange == const(ubyte)[])
+		&& !is(Unqual!SrcRange == const(char)[])
+		&& !is(Unqual!SrcRange == const(void)[])
+		&& !is(Unqual!SrcRange == shared(ubyte)[])
+		&& !is(Unqual!SrcRange == shared(char)[])
+		&& !is(Unqual!SrcRange == shared(void)[])
+		&& !is(Unqual!SrcRange == immutable(ubyte)[])
+		&& !is(Unqual!SrcRange == immutable(char)[])
+		&& !is(Unqual!SrcRange == immutable(void)[])
+		&& !is(Unqual!SrcRange == shared(const ubyte)[])
+		&& !is(Unqual!SrcRange == shared(const char)[])
+		&& !is(Unqual!SrcRange == shared(const void)[])
+		&& !is(Unqual!SrcRange == ubyte[])
+		&& !is(Unqual!SrcRange == char[])
+		&& !is(Unqual!SrcRange == void[])
 		&& is(typeof( {foreach (e; r) put(e);}() )))
 	{
 		foreach (e; r) put(e);
@@ -264,6 +302,7 @@ unittest
 	static assert(isOutputRange!(ob, immutable long[]));
 	static assert(isOutputRange!(ob, immutable float[]));
 	static assert(isOutputRange!(ob, immutable double[]));
+	static assert(isOutputRange!(ob, string));
 	ubyte[16] obuf1;
 	ubyte[16] obuf2;
 	{
