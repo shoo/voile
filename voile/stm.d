@@ -15,8 +15,9 @@
 module voile.stm;
 
 
+import core.memory;
 import std.traits, std.typecons, std.typetuple,
-       std.string, std.conv, std.range, std.container;
+       std.string, std.conv, std.range, std.container, std.signals;
 
 
 private template isStraight(int start, Em...)
@@ -169,14 +170,66 @@ struct Stm(TState, TEvent, TState defaultStateParam = TState.init)
 	 */
 	alias void delegate(State oldstate, State newstate) StateChangedCallback;
 	
-	
 	/***************************************************************************
 	 * イベントが実行される直前に呼ばれるハンドラ
 	 */
 	alias void delegate(Event ev) EventCallback;
 	
+	/***************************************************************************
+	 * 例外発生時に呼ばれるハンドラ
+	 */
+	alias void delegate(Throwable e) nothrow ExceptionCallback;
+	
 	
 private:
+	
+	static struct Handler(CallbackFunc)
+	{
+	private:
+		static class Impl
+		{
+			mixin Signal!(ParameterTypeTuple!CallbackFunc);
+		}
+		Impl _impl;
+	public:
+		this(this)
+		{
+			if (_impl)
+			{
+				auto old = _impl;
+				_impl = new Impl;
+				foreach (s; old.slots)
+				{
+					_impl.connect(s);
+				}
+			}
+		}
+		
+		void connect(CallbackFunc dg)
+		{
+			if (!_impl) _impl = new Impl;
+			_impl.connect(dg);
+		}
+		
+		void disconnect(CallbackFunc dg)
+		{
+			assert(_impl);
+			_impl.disconnect(dg);
+		}
+		
+		void emit(ParameterTypeTuple!CallbackFunc params)
+		{
+			if (!_impl) _impl = new Impl;
+			_impl.emit(params);
+		}
+		
+		void clear()
+		{
+			.clear(_impl);
+			GC.free(cast(void*)_impl);
+			_impl = null;
+		}
+	}
 	
 	
 	// 状態遷移表
@@ -189,13 +242,6 @@ private:
 	
 	// 処理すべきイベントのFIFO
 	SList!Event events;
-	
-	// 状態が変更されたときに呼ばれるハンドラ
-	StateChangedCallback _onStateChanged;
-	
-	
-	// イベントが処理される直前に呼ばれるハンドラ
-	EventCallback _onEvent;
 	
 	
 public:
@@ -218,6 +264,9 @@ public:
 		{
 			_table[m][n].set(table[m][n][0], table[m][n][1]);
 		}
+		onStateChanged.clear();
+		onEvent.clear();
+		onException.clear();
 	}
 	
 	
@@ -257,15 +306,19 @@ public:
 		}
 		while (!events.empty)
 		{
-			auto ev = events.front;
-			if (_onEvent) _onEvent(ev);
-			events.removeFront();
-			_table[ev][_state].handler();
-			auto oldstate = _state;
-			_state = _table[ev][_state].next;
-			if (_onStateChanged && _state != oldstate)
+			try
 			{
-				_onStateChanged(oldstate, _state);
+				auto ev = events.front;
+				onEvent.emit(ev);
+				_table[ev][_state].handler();
+				auto oldstate = _state;
+				_state = _table[ev][_state].next;
+				events.removeFront();
+				onStateChanged.emit(oldstate, _state);
+			}
+			catch (Throwable e)
+			{
+				onException.emit(e);
 			}
 		}
 	}
@@ -274,36 +327,18 @@ public:
 	/***************************************************************************
 	 * 状態が変更された際に呼ばれるハンドラを設定/取得する
 	 */
-	@property
-	void stateChangedCallback(StateChangedCallback dg)
-	{
-		_onStateChanged = dg;
-	}
-	
-	/// ditto
-	@property
-	StateChangedCallback stateChangedCallback()
-	{
-		return _onStateChanged;
-	}
+	Handler!StateChangedCallback onStateChanged;
 	
 	
 	/***************************************************************************
 	 * イベントを処理する際に呼ばれるハンドラを設定/取得する
 	 */
-	@property
-	void eventCallback(EventCallback dg)
-	{
-		_onEvent = dg;
-	}
+	Handler!EventCallback onEvent;
 	
-	
-	/// ditto
-	@property
-	EventCallback eventCallback()
-	{
-		return _onEvent;
-	}
+	/***************************************************************************
+	 * イベントを処理する際に呼ばれるハンドラを設定/取得する
+	 */
+	Handler!ExceptionCallback onException;
 }
 
 
@@ -327,7 +362,6 @@ unittest
 	
 	alias SHPair!(State) SH;
 	string msg;
-	
 	// 状態遷移表
 	auto sm = Stm!(State, Event)(
 		// イベント  状態A                           状態B
@@ -335,11 +369,12 @@ unittest
 		/* e2:   */ [SH(State.a, ignoreEvent),    SH(State.a, {msg = "b-2";})],
 		/* e3:   */ [SH(State.a, {msg = "a-3";}), SH(State.a, forbiddenEvent)]
 	);
-	static assert(isOutputRange!(typeof(sm), Event));
+	//static assert(isOutputRange!(typeof(sm), Event));
 	static assert(isStm!(typeof(sm)));
+	static assert(isOutputRange!(typeof(sm), Event));
 	
 	assert(sm.currentState == State.a);
-	sm.put(Event.e1);
+	std.range.put(sm, Event.e1);
 	assert(sm.currentState == State.b);
 	assert(msg == "a-1");
 	sm.put(Event.e2);
