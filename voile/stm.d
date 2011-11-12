@@ -316,12 +316,20 @@ public:
 				_table[ev][_state].handler();
 				auto oldstate = _state;
 				_state = _table[ev][_state].next;
-				events.removeFront();
 				onStateChanged.emit(oldstate, _state);
 			}
 			catch (Throwable e)
 			{
 				onException.emit(e);
+			}
+			assert(!events.empty);
+			try
+			{
+				events.removeFront();
+			}
+			catch (Throwable e)
+			{
+				assert(0);
 			}
 		}
 	}
