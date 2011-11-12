@@ -40,6 +40,15 @@ private template isStraightEnum(E)
 }
 
 
+private template ToField(Tuple...)
+{
+	static if (Tuple.length)
+	{
+		mixin("alias Tuple[0] " ~ Tuple[0].stringof ~ ";");
+		mixin ToField!(Tuple[1..$]);
+	}
+}
+
 
 /*******************************************************************************
  * イベントハンドラー
@@ -52,7 +61,15 @@ enum EventHandler forbiddenEvent = cast(EventHandler)null;
 
 
 /// 無視するイベントハンドラー
-EventHandler ignoreEvent()
+@property EventHandler ignoreEvent()
+{
+	void dg(){}
+	return &dg;
+}
+
+
+/// 何もしないイベント(状態遷移のみ)
+@property EventHandler doNothingEvent()
 {
 	void dg(){}
 	return &dg;
@@ -280,6 +297,103 @@ public:
 	{
 		return _state;
 	}
+	
+	/***************************************************************************
+	 * STMを初期化するためのクラスが返る
+	 * 
+	 * 以下のような書式にしたがって初期化用のデータを設定する。
+	 * 
+	 * Examples:
+	 *--------------------------------------------------------------------------
+	 *class Foo
+	 *{
+	 *	enum State
+	 *	{
+	 *		initializing,
+	 *		stead,
+	 *		disposed
+	 *	}
+	 *	enum Event
+	 *	{
+	 *		start,
+	 *		changed,
+	 *		end
+	 *	}
+	 *	
+	 *	Stm!(State, Event) _stm;
+	 *	
+	 *	this()
+	 *	{
+	 *		with (_stm.initializer)
+	 *		{
+	 *			//          | initializing     | stead         | disposed
+	 *			set(start)   (stead,             invalid,        invalid       )
+	 *			    =        [doNothing,         forbidden,      forbidden     ];
+	 *			
+	 *			set(changed) (invalid,           stead,          invalid       )
+	 *			    =        [forbidden,         forbidden,      forbidden     ];
+	 *			
+	 *			set(end)     (disposed,          disposed,       invalid       )
+	 *			    =        [doNothing,         doNothing,      forbidden     ];
+	 *		}
+	 *	}
+	 *}
+	 *--------------------------------------------------------------------------
+	 * この返値はwithとともに使用すると良い。メンバとして以下が使用可能。
+	 * $(DL
+	 *    $(DT invalid)   $(DD 無効な状態)
+	 *    $(DT forbidden) $(DD 到達不可能イベントハンドラ)
+	 *    $(DT ignore)    $(DD 無視イベントハンドラ)
+	 *    $(DT doNothing) $(DD 特に何もすることはないイベントハンドラ)
+	 *    $(DT State.*)   $(DD 状態の一覧はすべてenum名なしでアクセス可能)
+	 *    $(DT Event.*)   $(DD イベントの一覧はすべてenum名なしでアクセス可能)
+	 *    $(DT set)       $(DD &#40;state1, state2, state3...&#41;な引数をとり、設定する関数。その返値に = でイベントハンドラの配列を渡し、イベントハンドラを設定する)
+	 * )
+	 */
+	@property auto initializer()
+	{
+		enum Dummy { dummy };
+		struct HandlerSetter
+		{
+			Cell[] cells;
+			@disable this();
+			@disable static HandlerSetter init();
+			@disable this(this);
+			private this(Cell[] c){cells = c;}
+			void opAssign(EventHandler[stateCount] handlers)
+			{
+				foreach (i, h; handlers)
+				{
+					cells[i].handler = h;
+				}
+			}
+		}
+		class StateSetter
+		{
+			private this(Dummy dummy) {  }
+			alias doNothingEvent doNothing;
+			alias forbiddenEvent forbidden;
+			alias ignoreEvent    ignore;
+			alias EnumMembers!(State)[0] invalid;
+			mixin ToField!(EnumMembers!Event);
+			mixin ToField!(EnumMembers!State);
+			auto set(Event e)
+			{
+				auto cells = _table[e][];
+				return delegate HandlerSetter(State[] nextstates...)
+				{
+					assert(nextstates.length == stateCount);
+					foreach (i, s; nextstates)
+					{
+						cells[i].next = s;
+					}
+					return HandlerSetter(cells[]);
+				};
+			}
+		}
+		return new StateSetter(Dummy.dummy);
+	}
+	
 	
 	
 	/***************************************************************************
