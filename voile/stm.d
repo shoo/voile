@@ -225,9 +225,12 @@ private:
 		
 		void clear()
 		{
-			.clear(_impl);
-			GC.free(cast(void*)_impl);
-			_impl = null;
+			if (_impl)
+			{
+				.clear(_impl);
+				GC.free(cast(void*)_impl);
+				_impl = null;
+			}
 		}
 	}
 	
