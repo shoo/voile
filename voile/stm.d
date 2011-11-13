@@ -19,7 +19,6 @@ import core.memory;
 import std.traits, std.typecons, std.typetuple,
        std.string, std.conv, std.range, std.container, std.signals;
 
-
 private template isStraight(int start, Em...)
 {
 	static if (Em.length == 1)
@@ -228,6 +227,11 @@ private:
 			_impl.connect(dg);
 		}
 		
+		void opOpAssign(string op)(CallbackFunc dg) if (op == "~")
+		{
+			connect(dg);
+		}
+		
 		void disconnect(CallbackFunc dg)
 		{
 			assert(_impl);
@@ -341,13 +345,17 @@ public:
 	 *--------------------------------------------------------------------------
 	 * この返値はwithとともに使用すると良い。メンバとして以下が使用可能。
 	 * $(DL
-	 *    $(DT invalid)   $(DD 無効な状態)
-	 *    $(DT forbidden) $(DD 到達不可能イベントハンドラ)
-	 *    $(DT ignore)    $(DD 無視イベントハンドラ)
-	 *    $(DT doNothing) $(DD 特に何もすることはないイベントハンドラ)
-	 *    $(DT State.*)   $(DD 状態の一覧はすべてenum名なしでアクセス可能)
-	 *    $(DT Event.*)   $(DD イベントの一覧はすべてenum名なしでアクセス可能)
-	 *    $(DT set)       $(DD &#40;state1, state2, state3...&#41;な引数をとり、設定する関数。その返値に = でイベントハンドラの配列を渡し、イベントハンドラを設定する)
+	 *    $(DT invalid)        $(DD 無効な状態)
+	 *    $(DT forbidden)      $(DD 到達不可能イベントハンドラ)
+	 *    $(DT ignore)         $(DD 無視イベントハンドラ)
+	 *    $(DT doNothing)      $(DD 特に何もすることはないイベントハンドラ)
+	 *    $(DT State.*)        $(DD 状態の一覧はすべてenum名なしでアクセス可能)
+	 *    $(DT Event.*)        $(DD イベントの一覧はすべてenum名なしでアクセス可能)
+	 *    $(DT set)            $(DD &#40;state1, state2, state3...&#41;な引数をとり、設定するデリゲートを返す。
+	 *                              その返値に = でイベントハンドラの配列を渡し、イベントハンドラを設定する。)
+	 *    $(DT onException)    $(DD onException アクティビティ)
+	 *    $(DT onStateChanged) $(DD onStateChanged アクティビティ)
+	 *    $(DT onEvent)        $(DD onEvent アクティビティ)
 	 * )
 	 */
 	@property auto initializer()
@@ -368,6 +376,9 @@ public:
 				}
 			}
 		}
+		alias onException    _onException;
+		alias onStateChanged _onStateChanged;
+		alias onEvent        _onEvent;
 		class StateSetter
 		{
 			private this(Dummy dummy) {  }
@@ -377,6 +388,9 @@ public:
 			alias EnumMembers!(State)[0] invalid;
 			mixin ToField!(EnumMembers!Event);
 			mixin ToField!(EnumMembers!State);
+			ref Handler!ExceptionCallback    onException()    @property { return _onException; }
+			ref Handler!StateChangedCallback onStateChanged() @property { return _onStateChanged; }
+			ref Handler!EventCallback        onEvent()        @property { return _onEvent; }
 			auto set(Event e)
 			{
 				auto cells = _table[e][];
