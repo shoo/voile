@@ -18,7 +18,8 @@
 
 module voile.benchmark;
 
-import std.exception, std.string, std.datetime;
+import std.exception, std.string, std.datetime, std.array, std.bigint, std.conv;
+import core.thread;
 
 
 /*******************************************************************************
@@ -55,7 +56,7 @@ struct FootPrintBenchmark
 	/***************************************************************************
 	 * 記録されるデータ
 	 */
-	static immutable struct Data
+	static struct Data
 	{
 		/// 時間
 		TickDuration time;
@@ -82,7 +83,7 @@ struct FootPrintBenchmark
 	private StopWatch _sw;
 	
 	
-	private immutable(Data)[] _datas;
+	private Appender!(immutable(Data)[]) _datas;
 	
 	
 	/***************************************************************************
@@ -120,6 +121,32 @@ struct FootPrintBenchmark
 	
 	
 	/***************************************************************************
+	 * ストップウォッチリセット
+	 */
+	void reset()
+		in
+		{
+			assert(_datas.data.length == 0);
+		}
+		body
+	{
+		_sw.reset();
+	}
+	
+	
+	/***************************************************************************
+	 * データをクリアします。
+	 * 
+	 * ストップウォッチの状態はそのままです。
+	 * ストップウォッチをリセットする場合はresetをコールしてください
+	 */
+	void clear()
+	{
+		_datas = typeof(_datas)();
+	}
+	
+	
+	/***************************************************************************
 	 * 足跡を記録します。
 	 * 
 	 * この関数を呼び出した時点での時間と、呼び出し元を記録してデータに追加しま
@@ -127,7 +154,7 @@ struct FootPrintBenchmark
 	 */
 	void stamp(string f = __FILE__, uint l = __LINE__)
 	{
-		_datas ~= immutable(Data)(_sw.peek(), f, l);
+		_datas.put(immutable(Data)(_sw.peek(), f, l));
 	}
 	
 	
@@ -138,7 +165,7 @@ struct FootPrintBenchmark
 	{
 		real[] ret;
 		real last;
-		foreach (i, d; _datas)
+		foreach (i, d; _datas.data)
 		{
 			auto r = d.time.seconds;
 			ret ~= last <>= 0 ? r - last : r;
@@ -153,7 +180,26 @@ struct FootPrintBenchmark
 	 */
 	immutable(Data)[] datas()
 	{
-		return _datas;
+		return _datas.data;
+	}
+	
+	
+	/***************************************************************************
+	 * 記録されたデータそのものを返します
+	 */
+	immutable(Data)[] intervalDatas()
+	{
+		Data[] ret;
+		auto alldatas = _datas.data;
+		if (alldatas.length == 0) return null;
+		TickDuration last = alldatas[0].time;
+		foreach (i, d; alldatas)
+		{
+			TickDuration r = d.time;
+			ret ~= Data(r - last, d.file, d.line);
+			last = r;
+		}
+		return assumeUnique(ret);
 	}
 	
 	alias datas opSlice;
@@ -166,7 +212,7 @@ struct FootPrintBenchmark
  * このクラスは呼び出した回数を記録する。呼び出された回数が多いほどその周囲は
  * 時間に気をつけるようにするとよい。
  */
-public class CallCounter
+class CallCounter
 {
 	/***************************************************************************
 	 * 記録されるデータ
@@ -229,3 +275,120 @@ public class CallCounter
 		return ret;
 	}
 }
+
+
+/*******************************************************************************
+ * 
+ */
+struct ProfileData
+{
+	Thread       thread;
+	string       file;
+	uint         line;
+	TickDuration time;
+	TickDuration duration;
+}
+
+/+
+/*******************************************************************************
+ * 
+ */
+shared class Profiler(OutputRange = Appender!(ProfileData[]))
+{
+public:
+	
+private:
+	OutputRange datas;
+	
+	struct ScopeEndFinder
+	{
+	private:
+		@disable this();
+		@disable this(this);
+		@disable @property Profiler init();
+		size_t _idx;
+		Profiler _p;
+		this(Profiler p, size_t i)
+		{
+			_idx = i;
+			_p   = p;
+		}
+	public:
+		~this()
+		{
+			synchronized (_p)
+			{
+				auto data = (cast(OutputRange*)&_p.datas).data[_idx];
+				data.duration = Clock.currAppTick() - data.time;
+			}
+		}
+	}
+	
+public:
+	
+	/***************************************************************************
+	 * 
+	 */
+	synchronized @property
+	auto stamp(string file = __FILE__, uint line = __LINE__)()
+	{
+		thread = Thread.getThis();
+		auto app = cast(OutputRange*)&datas;
+		app.put(Data(name, file, line, Clock.currAppTick()));
+		return ScopeEndFinder(this, app.data.length-1);
+	}
+	
+	
+	/***************************************************************************
+	 * 
+	 */
+	synchronized immutable(ProfileData)[] data()
+	{
+		return (cast(OutputRange*)&datas).data.idup;
+	}
+}
+
+private shared Profiler!() _sharedInstance;
+
+shared static this()
+{
+	_sharedInstance = new Profiler!();
+}
+
+
+/*******************************************************************************
+ * 
+ */
+shared Profiler!() profiler() nothrow @safe @property
+{
+	return _sharedInstance;
+}
+
+unittest
+{
+	auto prof = new Profiler;
+	uint line;
+	
+	{
+		auto stamp1 = prof.stamp("unittest"); line = __LINE__;
+	}
+	
+	auto d = prof.data;
+	assert(d.length == 1);
+	assert(d[0].name == "unittest");
+	assert(d[0].file == __FILE__);
+	assert(d[0].line == line);
+	
+	{
+		auto stamp1 = prof.stamp("unittest"); line = __LINE__;
+	}
+	
+	d = prof.data;
+	assert(d.length == 2);
+	assert(d[1].name == "unittest");
+	assert(d[1].file == __FILE__);
+	assert(d[1].line == line);
+	import std.stdio;
+}
+
++/

@@ -17,7 +17,8 @@ module voile.stm;
 
 import core.memory;
 import std.traits, std.typecons, std.typetuple,
-       std.string, std.conv, std.range, std.container, std.signals;
+       std.string, std.conv, std.range, std.container;
+import voile.misc;
 
 private template isStraight(int start, Em...)
 {
@@ -199,63 +200,6 @@ struct Stm(TState, TEvent, TState defaultStateParam = TState.init)
 	
 private:
 	
-	static struct Handler(CallbackFunc)
-	{
-	private:
-		static class Impl
-		{
-			mixin Signal!(ParameterTypeTuple!CallbackFunc);
-		}
-		Impl _impl;
-	public:
-		this(this)
-		{
-			if (_impl)
-			{
-				auto old = _impl;
-				_impl = new Impl;
-				foreach (s; old.slots)
-				{
-					_impl.connect(s);
-				}
-			}
-		}
-		
-		void connect(CallbackFunc dg)
-		{
-			if (!_impl) _impl = new Impl;
-			_impl.connect(dg);
-		}
-		
-		void opOpAssign(string op)(CallbackFunc dg) if (op == "~")
-		{
-			connect(dg);
-		}
-		
-		void disconnect(CallbackFunc dg)
-		{
-			assert(_impl);
-			_impl.disconnect(dg);
-		}
-		
-		void emit(ParameterTypeTuple!CallbackFunc params)
-		{
-			if (!_impl) _impl = new Impl;
-			_impl.emit(params);
-		}
-		
-		void clear()
-		{
-			if (_impl)
-			{
-				.clear(_impl);
-				GC.free(cast(void*)_impl);
-				_impl = null;
-			}
-		}
-	}
-	
-	
 	// 状態遷移表
 	Cell[stateCount][eventCount] _table;
 	
@@ -297,7 +241,7 @@ public:
 	/***************************************************************************
 	 * 現在のステート
 	 */
-	State currentState()
+	@property State currentState()
 	{
 		return _state;
 	}
@@ -388,9 +332,9 @@ public:
 			alias EnumMembers!(State)[0] invalid;
 			mixin ToField!(EnumMembers!Event);
 			mixin ToField!(EnumMembers!State);
-			ref Handler!ExceptionCallback    onException()    @property { return _onException; }
-			ref Handler!StateChangedCallback onStateChanged() @property { return _onStateChanged; }
-			ref Handler!EventCallback        onEvent()        @property { return _onEvent; }
+			ref Handler!(ExceptionCallback)    onException()    @property { return _onException; }
+			ref Handler!(StateChangedCallback) onStateChanged() @property { return _onStateChanged; }
+			ref Handler!(EventCallback)        onEvent()        @property { return _onEvent; }
 			auto set(Event e)
 			{
 				auto cells = _table[e][];
@@ -413,18 +357,11 @@ public:
 	/***************************************************************************
 	 * イベントの通知
 	 */
-	void put(string f = __FILE__, size_t l = __LINE__)(Event e)
+	void put(Event e)
 	{
 		if (_table[e][_state].handler is null)
 		{
-			debug
-			{
-				throw new ForbiddenHandlingException(_state, e, f, l);
-			}
-			else
-			{
-				throw new ForbiddenHandlingException(_state, e);
-			}
+			throw new ForbiddenHandlingException(_state, e);
 		}
 		if (!events.empty)
 		{
@@ -462,22 +399,21 @@ public:
 		}
 	}
 	
-	
 	/***************************************************************************
 	 * 状態が変更された際に呼ばれるハンドラを設定/取得する
 	 */
-	Handler!StateChangedCallback onStateChanged;
+	Handler!(StateChangedCallback) onStateChanged;
 	
 	
 	/***************************************************************************
 	 * イベントを処理する際に呼ばれるハンドラを設定/取得する
 	 */
-	Handler!EventCallback onEvent;
+	Handler!(EventCallback) onEvent;
 	
 	/***************************************************************************
 	 * イベントを処理する際に呼ばれるハンドラを設定/取得する
 	 */
-	Handler!ExceptionCallback onException;
+	Handler!(ExceptionCallback) onException;
 }
 
 

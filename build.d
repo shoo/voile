@@ -1,15 +1,16 @@
 immutable
-	DEFAULT_SRCDIR  = ["voile"],
-	DEFAULT_OUTPUT  = "voile",
-	DEFAULT_DOC     = false,
-	DEFAULT_TEST    = false,
-	DEFAULT_LIB     = true,
-	DEFAULT_DEBUG   = false,
-	DEFAULT_JSON    = true,
-	DEFAULT_RELEASE = true,
-	DEFAULT_WARNING = true,
-	DEFAULT_OBJDIR  = ".",
-	DEFAULT_GUI     = false;
+	DEFAULT_SRCDIR   = ["voile"],
+	DEFAULT_OUTPUT   = "voile",
+	DEFAULT_DOC      = false,
+	DEFAULT_TEST     = false,
+	DEFAULT_LIB      = true,
+	DEFAULT_DEBUG    = false,
+	DEFAULT_JSON     = true,
+	DEFAULT_RELEASE  = true,
+	DEFAULT_WARNING  = true,
+	DEFAULT_PROPERTY = true,
+	DEFAULT_OBJDIR   = ".",
+	DEFAULT_GUI      = false;
 
 import std.exception, std.stdio, std.path, std.process, std.file, std.string,
 	std.array, std.algorithm, std.getopt, std.conv;
@@ -35,6 +36,7 @@ void main(string[] args)
 		"doc|D", &opt.doc,
 		"json|j", &opt.json,
 		"warn|w", &opt.warning,
+		"property|prop|p", &opt.property,
 		std.getopt.config.noBundling,
 		"src|s", &srcdir);
 	if (srcdir) opt.src = srcdir;
@@ -83,6 +85,7 @@ struct Options
 	bool doc      = DEFAULT_DOC;
 	bool json     = DEFAULT_JSON;
 	bool warning  = DEFAULT_WARNING;
+	bool property = DEFAULT_PROPERTY;
 	string[] src  = DEFAULT_SRCDIR;
 	string obj    = DEFAULT_OBJDIR;
 	string output = DEFAULT_OUTPUT;
@@ -98,6 +101,7 @@ int compile(Options opt)
 	{
 		opts ~= ["-debug", "-g", "-unittest", "-I."];
 		if (opt.warning)     opts ~= "-w";
+		if (opt.property)    opts ~= "-property";
 		if (opt.options)     opts ~= opt.options;
 		if (opt.output)      opts ~= ["-of"~opt.output];
 		foreach (s; opt.src) foreach (string ss; dirEntries(s, SpanMode.breadth))
@@ -108,15 +112,16 @@ int compile(Options opt)
 	}
 	else
 	{
-		if (opt.lib)     opts ~= ["-lib"];
-		if (opt.dbg)     opts ~= ["-debug", "-g"];
-		if (!opt.dbg)    opts ~= ["-release", "-inline", "-O"];
-		if (opt.gui)     opts ~= ["-L/exet:nt/su:windows:4.0"];
-		if (opt.output)  opts ~= ["-of"~opt.output];
-		if (opt.obj)     opts ~= ["-od"~opt.obj];
-		if (opt.warning) opts ~= ["-w"];
-		if (opt.json)    opts ~= ["-X", "-Xf"~opt.output];
-		if (opt.options) opts ~= opt.options;
+		if (opt.lib)      opts ~= ["-lib", "-nofloat"];
+		if (opt.dbg)      opts ~= ["-debug", "-g"];
+		if (!opt.dbg)     opts ~= ["-release", "-inline", "-O"];
+		if (opt.gui)      opts ~= ["-L/exet:nt/su:windows:4.0"];
+		if (opt.output)   opts ~= ["-of"~opt.output];
+		if (opt.obj)      opts ~= ["-od"~opt.obj];
+		if (opt.warning)  opts ~= ["-w"];
+		if (opt.property) opts ~= ["-property"];
+		if (opt.json)     opts ~= ["-X", "-Xf"~opt.output];
+		if (opt.options)  opts ~= opt.options;
 		foreach (s; opt.src) foreach (string ss; dirEntries(s, SpanMode.breadth))
 		{
 			if (!ss.isDir && ss.extension == ".d") opts ~= ss;

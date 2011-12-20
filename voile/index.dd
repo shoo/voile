@@ -14,6 +14,7 @@ $(UL
         $(LI $(LINK2 voile.sync.html, sync))
         $(LI $(LINK2 voile.dataformatter.html, dataformatter))
         $(LI $(LINK2 voile.stm.html, stm))
+        $(LI $(LINK2 voile.misc.html, misc))
     ))
 )
 Authors: P.Knowledge, SHOO

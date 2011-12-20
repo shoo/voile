@@ -60,7 +60,7 @@ class JudgementException: Exception
 	/// コンストラクタ
 	this(Judgement aJudge, string file = null, int line = 0)
 	{
-		super(aJudge.toString, file, line);
+		super(aJudge.toString(), file, line);
 		judgement = aJudge;
 	}
 	/// See_Also: Judgement.result()
@@ -223,8 +223,8 @@ final:
 			{
 				auto x = args[0]();
 				if (x !is null
-					&& x.toString !is null
-					&& x.toString.length != 0)
+					&& x.toString() !is null
+					&& x.toString().length != 0)
 				{
 					_results ~= x;
 				}
@@ -257,8 +257,7 @@ final:
 	/***************************************************************************
 	 * 合格しているか
 	 */
-	@property
-	bool certified()
+	@property bool certified()
 	{
 		return _results.length == 0;
 	}
@@ -275,8 +274,7 @@ final:
 	/***************************************************************************
 	 * 否決されているか
 	 */
-	@property
-	bool rejected()
+	@property bool rejected()
 	{
 		return !certified();
 	}
@@ -295,7 +293,7 @@ final:
 	 * 生じた Object のリストを返します。$(BR)
 	 * 審判ではこの戻り値がnullであることが望ましい。
 	 */
-	Object[] results()
+	@property Object[] results()
 	{
 		return _results;
 	}
@@ -342,7 +340,7 @@ final:
 		char[] ret;
 		foreach (o; results)
 		{
-			ret ~= o.toString ~ '\n';
+			ret ~= o.toString() ~ '\n';
 		}
 		version (Tango)
 		{
@@ -425,7 +423,7 @@ unittest
 	
 	
 	
-	with (judge(func1, &func2, func3, func4, &func5, func6, func7))
+	with (judge(func1(), &func2, func3(), func4(), &func5, func6(), func7()))
 	{
 		if (ok)
 		{
@@ -439,7 +437,7 @@ unittest
 			if (auto r = results[0])
 			{
 				// 結果の参照
-				assert(r.toString == "1", to!string(results[0]));
+				assert(r.toString() == "1", to!string(results[0]));
 			}
 			else
 			{
@@ -448,7 +446,7 @@ unittest
 			if (auto r = results[1])
 			{
 				// 遅延評価によりfunc3より先にfunc2が呼ばれる
-				assert(r.toString == "2xx2");
+				assert(r.toString() == "2xx2");
 			}
 			else
 			{

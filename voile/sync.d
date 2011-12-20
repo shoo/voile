@@ -23,12 +23,12 @@ version (Windows)
 {
 	private enum uint INFINITE = 0xFFFFFFFF;
 	private enum uint WAIT_OBJECT_0 = 0x00000000;
-	private typedef void* HANDLE;
-	private extern(Windows) uint WaitForSingleObject(HANDLE, uint);
-	private extern(Windows) int CloseHandle(HANDLE);
+	private alias void* HANDLE;
+	private extern(Windows) uint WaitForSingleObject(in HANDLE, uint);
+	private extern(Windows) int CloseHandle(in HANDLE);
 	private extern(Windows) HANDLE CreateEventW(void*, int, int, void*);
-	private extern(Windows) int SetEvent(HANDLE);
-	private extern(Windows) int ResetEvent(HANDLE);
+	private extern(Windows) int SetEvent(in HANDLE);
+	private extern(Windows) int ResetEvent(in HANDLE);
 }
 
 /*******************************************************************************
@@ -128,7 +128,7 @@ class SyncEvent
 		 *     falseなら非シグナル状態で、waitしたらシグナル状態になるか、時間が
 		 *     過ぎるまで制御を返さない状態であることを示す。
 		 */
-		bool signaled()
+		@property bool signaled()
 		{
 			return WaitForSingleObject(_handle, 0) == WAIT_OBJECT_0;
 		}
@@ -140,7 +140,7 @@ class SyncEvent
 		 *     falseなら非シグナル状態で、waitしたらシグナル状態になるまで制御を
 		 *     返さない状態にする。
 		 */
-		void signaled(bool cond)
+		@property void signaled(bool cond)
 		{
 			if (cond && signaled == false)
 			{
@@ -299,15 +299,15 @@ unittest
 	scope t = new ThreadGroup;
 	data = 0;
 	t.create(&run1);
-	ev[0].wait;
+	ev[0].wait();
 	assert(data == 1);
 	data = 0;
 	t.create(&run2);
-	ev[1].wait;
+	ev[1].wait();
 	assert(data == 2);
 	data = 0;
 	t.create(&run3);
-	ev[2].wait;
+	ev[2].wait();
 	assert(data == 3);
 }
 
@@ -343,7 +343,7 @@ else version (Windows)
 	else
 	{
 		private extern (Windows) HANDLE CreateMutexW(void*,int,in wchar*);
-		private extern (Windows) int ReleaseMutex(HANDLE);
+		private extern (Windows) int ReleaseMutex(in HANDLE);
 	}
 }
 else
@@ -455,21 +455,9 @@ public:
 	/***************************************************************************
 	 * 名前を返す。
 	 */
-	version (D_Version2)
+	@property const string name()
 	{
-		mixin(`
-		const string name()
-		{
-			return m_Name;
-		}
-		`);
-	}
-	else
-	{
-		string name()
-		{
-			return m_Name;
-		}
+		return m_Name;
 	}
 	
 	/***************************************************************************
