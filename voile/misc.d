@@ -882,7 +882,7 @@ public:
 		return _procs.begin;
 	}
 	/// ditto
-	void opOpAssign(string op)(CallbackFunc dg) if (op == "~")
+	void opOpAssign(string op)(F dg) if (op == "~" && is(typeof(connect(dg))))
 	{
 		connect(dg);
 	}
