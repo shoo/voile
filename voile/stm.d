@@ -304,7 +304,7 @@ public:
 	 */
 	@property auto initializer()
 	{
-		enum Dummy { dummy };
+		enum Dummy { dummy }
 		struct HandlerSetter
 		{
 			Cell[] cells;
