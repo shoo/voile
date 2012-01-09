@@ -1078,34 +1078,17 @@ private:
 	 *Unique!(Foo) f = new Foo;
 	 *----
 	 */
-	this(RefT p)
+	this(RefT p, size_t sz)
 	{
 		debug (Unique) writefln("%d: Unique [%08x] constructor with rvalue [%08x]", __LINE__, cast(void*)&this, cast(void*)p);
-		attach(p);
+		attach(p, sz);
 		assert(_p);
 	}
-	
-	
-	/***************************************************************************
-	 * Constructor that takes an lvalue. It nulls its source.
-	 * The nulling will ensure uniqueness as long as there
-	 * are no previous aliases to the source.
-	 */
-	this(ref RefT p)
-	{
-		debug (Unique) writefln("%d: Unique [%08x] constructor nulling source [%08x]", __LINE__ , cast(void*)&this, cast(void*)p);
-		attach(p);
-		p = null;
-		assert(_p);
-	}
-	
-	
-	
 	
 	/***************************************************************************
 	 * 
 	 */
-	void attach(RefT p)
+	void attach(RefT p, size_t sz)
 		in
 		{
 			assert(_p is null);
@@ -1114,7 +1097,7 @@ private:
 	{
 		debug (Unique) writefln("%d: Unique Attach [%08x]", __LINE__,  cast(void*)p);
 		_p = p;
-		core.memory.GC.addRoot(cast(void*)_p);
+		core.memory.GC.addRange(cast(void*)_p, sz);
 	}
 	
 	
@@ -1131,7 +1114,7 @@ private:
 		debug (Unique) writefln("%d: Unique Detach [%08x]", __LINE__, cast(void*)_p);
 		scope (exit)
 		{
-			core.memory.GC.removeRoot(cast(void*)_p);
+			core.memory.GC.removeRange(cast(void*)_p);
 			_p = null;
 		}
 		return _p;
@@ -1295,7 +1278,18 @@ public:
  * 
  */
 @trusted @property
+Unique!T unique(T)()
+{
+	return uniqueImpl!(T)();
+}
+/// ditto
+@trusted
 Unique!T unique(T, Args...)(Args args)
+{
+	return uniqueImpl!(T)(args);
+}
+
+Unique!T uniqueImpl(T, Args...)(Args args)
 	if (is(Unique!T))
 {
 	alias Unique!(T).RefT RefT;
@@ -1323,7 +1317,7 @@ Unique!T unique(T, Args...)(Args args)
 		emplace!T(cast(void[])payload, args);
 	}
 	
-	return Unique!T(cast(RefT)payload.ptr);
+	return Unique!T(cast(RefT)payload.ptr, instSize);
 }
 
 
