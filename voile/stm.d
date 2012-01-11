@@ -86,6 +86,8 @@ template SHPair(State)
 	alias Tuple!(State, EventHandler) SHPair;
 }
 
+
+
 /*******************************************************************************
  * 状態遷移を管理するクラスです
  */
@@ -120,6 +122,20 @@ struct Stm(TState, TEvent, TState defaultStateParam = TState.init)
 			event = e;
 			super(format("This handling is forbidden [State = %s, Event = %s]",
 				         to!string(state), to!string(event)), f, l);
+		}
+	}
+	
+	/***************************************************************************
+	 * イベントをキャンセルする場合に投げる
+	 * 
+	 * イベントを処理する際、イベントを無視して状態遷移を行わなくする場合に
+	 * 投げる例外です。
+	 */
+	static class EventCancelException: Exception
+	{
+		this()
+		{
+			super(null, __FILE__, __LINE__);
 		}
 	}
 	
@@ -245,6 +261,16 @@ public:
 	{
 		return _state;
 	}
+	
+	
+	/***************************************************************************
+	 * ステートを強制的に変更
+	 */
+	@property void enforceState(State sts)
+	{
+		_state = sts;
+	}
+	
 	
 	/***************************************************************************
 	 * STMを初期化するためのクラスが返る
@@ -377,11 +403,22 @@ public:
 			try
 			{
 				auto ev = events.front;
-				onEvent.emit(ev);
-				_table[ev][_state].handler();
-				auto oldstate = _state;
-				_state = _table[ev][_state].next;
-				onStateChanged.emit(oldstate, _state);
+				bool cancel = false;
+				try
+				{
+					onEvent.emit(ev);
+					_table[ev][_state].handler();
+				}
+				catch (EventCancelException e)
+				{
+					cancel = true;
+				}
+				if (!cancel)
+				{
+					auto oldstate = _state;
+					_state = _table[ev][_state].next;
+					onStateChanged.emit(oldstate, _state);
+				}
 			}
 			catch (Throwable e)
 			{
