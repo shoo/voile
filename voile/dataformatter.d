@@ -48,15 +48,15 @@ public:
 		if (is(Unqual!T == const(ubyte)[])
 		||  is(Unqual!T == const(char)[])
 		||  is(Unqual!T == const(void)[])
-		||  is(Unqual!T == shared(ubyte)[])
-		||  is(Unqual!T == shared(char)[])
-		||  is(Unqual!T == shared(void)[])
+		//||  is(Unqual!T == shared(ubyte)[])
+		//||  is(Unqual!T == shared(char)[])
+		//||  is(Unqual!T == shared(void)[])
 		||  is(Unqual!T == immutable(ubyte)[])
 		||  is(Unqual!T == immutable(char)[])
 		||  is(Unqual!T == immutable(void)[])
-		||  is(Unqual!T == shared(const ubyte)[])
-		||  is(Unqual!T == shared(const char)[])
-		||  is(Unqual!T == shared(const void)[])
+		//||  is(Unqual!T == shared(const ubyte)[])
+		//||  is(Unqual!T == shared(const char)[])
+		//||  is(Unqual!T == shared(const void)[])
 		||  is(Unqual!T == ubyte[])
 		||  is(Unqual!T == char[])
 		||  is(Unqual!T == void[])
@@ -143,6 +143,13 @@ public:
 	}
 	
 	
+	void put(T)(in T v)
+		if (is(Unqual!T U == enum) && isOutputRange!(typeof(this), OriginalType!(T)))
+	{
+		put!(OriginalType!(T))(cast(OriginalType!(T))v);
+	}
+	
+	
 	void put(SrcRange)(ref SrcRange r)
 		if (isStaticArray!(Unqual!(SrcRange)))
 	{
@@ -155,15 +162,15 @@ public:
 		&& !is(Unqual!SrcRange == const(ubyte)[])
 		&& !is(Unqual!SrcRange == const(char)[])
 		&& !is(Unqual!SrcRange == const(void)[])
-		&& !is(Unqual!SrcRange == shared(ubyte)[])
-		&& !is(Unqual!SrcRange == shared(char)[])
-		&& !is(Unqual!SrcRange == shared(void)[])
+		//&& !is(Unqual!SrcRange == shared(ubyte)[])
+		//&& !is(Unqual!SrcRange == shared(char)[])
+		//&& !is(Unqual!SrcRange == shared(void)[])
 		&& !is(Unqual!SrcRange == immutable(ubyte)[])
 		&& !is(Unqual!SrcRange == immutable(char)[])
 		&& !is(Unqual!SrcRange == immutable(void)[])
-		&& !is(Unqual!SrcRange == shared(const ubyte)[])
-		&& !is(Unqual!SrcRange == shared(const char)[])
-		&& !is(Unqual!SrcRange == shared(const void)[])
+		//&& !is(Unqual!SrcRange == shared(const ubyte)[])
+		//&& !is(Unqual!SrcRange == shared(const char)[])
+		//&& !is(Unqual!SrcRange == shared(const void)[])
 		&& !is(Unqual!SrcRange == ubyte[])
 		&& !is(Unqual!SrcRange == char[])
 		&& !is(Unqual!SrcRange == void[])
@@ -303,6 +310,18 @@ unittest
 	static assert(isOutputRange!(ob, immutable float[]));
 	static assert(isOutputRange!(ob, immutable double[]));
 	static assert(isOutputRange!(ob, string));
+	enum E: uint { e }
+	static assert(isOutputRange!(ob, E));
+	static assert(isOutputRange!(ob, const E));
+	static assert(isOutputRange!(ob, immutable E));
+	//static assert(isOutputRange!(ob, shared E));
+	//static assert(isOutputRange!(ob, const(shared(E))));
+	static assert(isOutputRange!(ob, E[]));
+	static assert(isOutputRange!(ob, const E[]));
+	static assert(isOutputRange!(ob, immutable E[]));
+	//static assert(isOutputRange!(ob, shared E[]));
+	//static assert(isOutputRange!(ob, const(shared(E))[]));
+	
 	ubyte[16] obuf1;
 	ubyte[16] obuf2;
 	{
@@ -582,6 +601,13 @@ public:
 	}
 	
 	
+	void pick(T)(ref T v)
+		if (is(Unqual!T U == enum) && isEntryRange!(typeof(this), OriginalType!(T)))
+	{
+		pick!(OriginalType!(T))(*cast(OriginalType!(T)*)&v);
+	}
+	
+	
 	void pick(SrcRange)(ref SrcRange r)
 		if (isStaticArray!(SrcRange))
 	{
@@ -657,6 +683,11 @@ unittest
 	static assert(isEntryRange!(ib, long[]));
 	static assert(isEntryRange!(ib, float[]));
 	static assert(isEntryRange!(ib, double[]));
+	enum E: uint { e }
+	static assert(isEntryRange!(ib, E));
+	//static assert(isEntryRange!(ib, shared E));
+	static assert(isEntryRange!(ib, E[]));
+	//static assert(isEntryRange!(ib, shared E[]));
 	ubyte[16] obuf1;
 	ubyte[16] obuf2;
 	{
