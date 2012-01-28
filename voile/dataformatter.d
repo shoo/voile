@@ -31,7 +31,9 @@ public:
 	
 	
 	void put(T)(in T v)
-		if (is(Unqual!T == ubyte) || is(Unqual!T == char))
+		if (is(Unqual!T == ubyte)
+		||  is(Unqual!T == char)
+		||  is(Unqual!T == byte) )
 	{
 		static if (isOutputRange!(Range, ubyte))
 		{
@@ -46,18 +48,23 @@ public:
 	
 	void put(T)(in T v)
 		if (is(Unqual!T == const(ubyte)[])
+		||  is(Unqual!T == const(byte)[])
 		||  is(Unqual!T == const(char)[])
 		||  is(Unqual!T == const(void)[])
 		//||  is(Unqual!T == shared(ubyte)[])
+		//||  is(Unqual!T == shared(byte)[])
 		//||  is(Unqual!T == shared(char)[])
 		//||  is(Unqual!T == shared(void)[])
 		||  is(Unqual!T == immutable(ubyte)[])
+		||  is(Unqual!T == immutable(byte)[])
 		||  is(Unqual!T == immutable(char)[])
 		||  is(Unqual!T == immutable(void)[])
 		//||  is(Unqual!T == shared(const ubyte)[])
+		//||  is(Unqual!T == shared(const byte)[])
 		//||  is(Unqual!T == shared(const char)[])
 		//||  is(Unqual!T == shared(const void)[])
 		||  is(Unqual!T == ubyte[])
+		||  is(Unqual!T == byte[])
 		||  is(Unqual!T == char[])
 		||  is(Unqual!T == void[])
 		)
@@ -70,17 +77,16 @@ public:
 		{
 			.put(range, cast(void[])v);
 		}
+		else static if ( is(Unqual!T == void[])
+		              || is(Unqual!T == const(void)[])
+		              || is(Unqual!T == immutable(void)[]) )
+		{
+			put!(const(ubyte)[])(cast(const(ubyte)[])v);
+		}
 		else
 		{
 			foreach (ref e; v) .put(range, e);
 		}
-	}
-	
-	
-	void put(T)(in T v)
-		if (is(Unqual!T == byte) || is(Unqual!T == char))
-	{
-		put(cast(const ubyte)v);
 	}
 	
 	
@@ -156,27 +162,38 @@ public:
 		put!(typeof(r[]))(r[]);
 	}
 	
-	
 	void put(SrcRange)(SrcRange r)
 		if (isInputRange!(Unqual!(SrcRange))
 		&& !is(Unqual!SrcRange == const(ubyte)[])
+		&& !is(Unqual!SrcRange == const(byte)[])
 		&& !is(Unqual!SrcRange == const(char)[])
 		&& !is(Unqual!SrcRange == const(void)[])
 		//&& !is(Unqual!SrcRange == shared(ubyte)[])
+		//&& !is(Unqual!SrcRange == shared(byte)[])
 		//&& !is(Unqual!SrcRange == shared(char)[])
 		//&& !is(Unqual!SrcRange == shared(void)[])
 		&& !is(Unqual!SrcRange == immutable(ubyte)[])
+		&& !is(Unqual!SrcRange == immutable(byte)[])
 		&& !is(Unqual!SrcRange == immutable(char)[])
 		&& !is(Unqual!SrcRange == immutable(void)[])
 		//&& !is(Unqual!SrcRange == shared(const ubyte)[])
+		//&& !is(Unqual!SrcRange == shared(const byte)[])
 		//&& !is(Unqual!SrcRange == shared(const char)[])
 		//&& !is(Unqual!SrcRange == shared(const void)[])
 		&& !is(Unqual!SrcRange == ubyte[])
+		&& !is(Unqual!SrcRange == byte[])
 		&& !is(Unqual!SrcRange == char[])
 		&& !is(Unqual!SrcRange == void[])
 		&& is(typeof( {foreach (e; r) put(e);}() )))
 	{
-		foreach (e; r) put(e);
+		static if ((rangeEndian == endian) && isDynamicArray!SrcRange)
+		{
+			put!(const(ubyte)[])(cast(const(ubyte)[])r);
+		}
+		else
+		{
+			foreach (e; r) put(e);
+		}
 	}
 }
 
@@ -209,6 +226,7 @@ DataWriter!(Range, Endian.bigEndian) beWriter(Range)(Range r)
 unittest
 {
 	alias DataWriter!(ubyte[]) ob;
+	enum E: uint { e }
 	static assert(isOutputRange!(ob, ubyte));
 	static assert(isOutputRange!(ob, byte));
 	static assert(isOutputRange!(ob, ushort));
@@ -219,6 +237,10 @@ unittest
 	static assert(isOutputRange!(ob, long));
 	static assert(isOutputRange!(ob, float));
 	static assert(isOutputRange!(ob, double));
+	static assert(isOutputRange!(ob, char));
+	static assert(isOutputRange!(ob, wchar));
+	static assert(isOutputRange!(ob, dchar));
+	static assert(isOutputRange!(ob, E));
 	static assert(isOutputRange!(ob, ubyte[]));
 	static assert(isOutputRange!(ob, byte[]));
 	static assert(isOutputRange!(ob, ushort[]));
@@ -229,6 +251,10 @@ unittest
 	static assert(isOutputRange!(ob, long[]));
 	static assert(isOutputRange!(ob, float[]));
 	static assert(isOutputRange!(ob, double[]));
+	static assert(isOutputRange!(ob, char[]));
+	static assert(isOutputRange!(ob, wchar[]));
+	static assert(isOutputRange!(ob, dchar[]));
+	static assert(isOutputRange!(ob, E[]));
 	static assert(isOutputRange!(ob, const ubyte));
 	static assert(isOutputRange!(ob, const byte));
 	static assert(isOutputRange!(ob, const ushort));
@@ -239,6 +265,10 @@ unittest
 	static assert(isOutputRange!(ob, const long));
 	static assert(isOutputRange!(ob, const float));
 	static assert(isOutputRange!(ob, const double));
+	static assert(isOutputRange!(ob, const char));
+	static assert(isOutputRange!(ob, const wchar));
+	static assert(isOutputRange!(ob, const dchar));
+	static assert(isOutputRange!(ob, const E));
 	static assert(isOutputRange!(ob, const ubyte[]));
 	static assert(isOutputRange!(ob, const byte[]));
 	static assert(isOutputRange!(ob, const ushort[]));
@@ -249,6 +279,10 @@ unittest
 	static assert(isOutputRange!(ob, const long[]));
 	static assert(isOutputRange!(ob, const float[]));
 	static assert(isOutputRange!(ob, const double[]));
+	static assert(isOutputRange!(ob, const char[]));
+	static assert(isOutputRange!(ob, const wchar[]));
+	static assert(isOutputRange!(ob, const dchar[]));
+	static assert(isOutputRange!(ob, const E[]));
 	// static assert(isOutputRange!(ob, shared ubyte));
 	// static assert(isOutputRange!(ob, shared byte));
 	// static assert(isOutputRange!(ob, shared ushort));
@@ -259,6 +293,10 @@ unittest
 	// static assert(isOutputRange!(ob, shared long));
 	// static assert(isOutputRange!(ob, shared float));
 	// static assert(isOutputRange!(ob, shared double));
+	// static assert(isOutputRange!(ob, shared char));
+	// static assert(isOutputRange!(ob, shared wchar));
+	// static assert(isOutputRange!(ob, shared dchar));
+	// static assert(isOutputRange!(ob, shared E));
 	// static assert(isOutputRange!(ob, shared ubyte[]));
 	// static assert(isOutputRange!(ob, shared byte[]));
 	// static assert(isOutputRange!(ob, shared ushort[]));
@@ -269,6 +307,10 @@ unittest
 	// static assert(isOutputRange!(ob, shared long[]));
 	// static assert(isOutputRange!(ob, shared float[]));
 	// static assert(isOutputRange!(ob, shared double[]));
+	// static assert(isOutputRange!(ob, shared char[]));
+	// static assert(isOutputRange!(ob, shared wchar[]));
+	// static assert(isOutputRange!(ob, shared dchar[]));
+	// static assert(isOutputRange!(ob, shared E[]));
 	// static assert(isOutputRange!(ob, shared(const(ubyte))));
 	// static assert(isOutputRange!(ob, shared(const(byte))));
 	// static assert(isOutputRange!(ob, shared(const(ushort))));
@@ -279,6 +321,10 @@ unittest
 	// static assert(isOutputRange!(ob, shared(const(long))));
 	// static assert(isOutputRange!(ob, shared(const(float))));
 	// static assert(isOutputRange!(ob, shared(const(double))));
+	// static assert(isOutputRange!(ob, shared(const(char))));
+	// static assert(isOutputRange!(ob, shared(const(wchar))));
+	// static assert(isOutputRange!(ob, shared(const(dchar))));
+	// static assert(isOutputRange!(ob, shared(const(E))));
 	// static assert(isOutputRange!(ob, shared(const(ubyte[]))));
 	// static assert(isOutputRange!(ob, shared(const(byte[]))));
 	// static assert(isOutputRange!(ob, shared(const(ushort[]))));
@@ -299,6 +345,7 @@ unittest
 	static assert(isOutputRange!(ob, immutable long));
 	static assert(isOutputRange!(ob, immutable float));
 	static assert(isOutputRange!(ob, immutable double));
+	static assert(isOutputRange!(ob, immutable E));
 	static assert(isOutputRange!(ob, immutable ubyte[]));
 	static assert(isOutputRange!(ob, immutable byte[]));
 	static assert(isOutputRange!(ob, immutable ushort[]));
@@ -309,18 +356,15 @@ unittest
 	static assert(isOutputRange!(ob, immutable long[]));
 	static assert(isOutputRange!(ob, immutable float[]));
 	static assert(isOutputRange!(ob, immutable double[]));
-	static assert(isOutputRange!(ob, string));
-	enum E: uint { e }
-	static assert(isOutputRange!(ob, E));
-	static assert(isOutputRange!(ob, const E));
-	static assert(isOutputRange!(ob, immutable E));
-	//static assert(isOutputRange!(ob, shared E));
-	//static assert(isOutputRange!(ob, const(shared(E))));
-	static assert(isOutputRange!(ob, E[]));
-	static assert(isOutputRange!(ob, const E[]));
+	static assert(isOutputRange!(ob, immutable char[]));
+	static assert(isOutputRange!(ob, immutable wchar[]));
+	static assert(isOutputRange!(ob, immutable dchar[]));
 	static assert(isOutputRange!(ob, immutable E[]));
-	//static assert(isOutputRange!(ob, shared E[]));
-	//static assert(isOutputRange!(ob, const(shared(E))[]));
+	static assert(isOutputRange!(ob, string));
+	static assert(isOutputRange!(ob, wstring));
+	static assert(isOutputRange!(ob, dstring));
+	static assert(isOutputRange!(ob, const string));
+	static assert(isOutputRange!(ob, immutable wstring));
 	
 	ubyte[16] obuf1;
 	ubyte[16] obuf2;
@@ -489,7 +533,9 @@ static assert(isEntryRange!(ubyte[],ubyte[]));
 static assert(isEntryRange!(ubyte[],ubyte));
 
 struct DataReader(Range, Endian rangeEndian = Endian.littleEndian)
-	if (isEntryRange!(Range, ubyte[]) || isEntryRange!(Range, ubyte))
+	if (isEntryRange!(Range, ubyte[])
+	||  isEntryRange!(Range, ubyte)
+	||  isEntryRange!(Range, void[]))
 {
 private:
 	Range range;
@@ -500,14 +546,12 @@ public:
 	}
 	
 	
-	
-	
 	void pick(T)(ref T v)
-		if (is(Unqual!T == ubyte))
+		if (is(T == ubyte) || is(T == char) || is(T == byte))
 	{
 		static if (isEntryRange!(Range, typeof(v)))
 		{
-			.pick(range, v);
+			.pick(range, *cast(ubyte*)&v);
 		}
 		else
 		{
@@ -517,35 +561,34 @@ public:
 	
 	
 	void pick(T)(T v)
-		if (is(Unqual!T == ubyte[]))
+		if (is(T == ubyte[])
+		||  is(T == void[])
+		||  is(T == char[])
+		||  is(T == byte[]) )
 	{
-		static if (isEntryRange!(Range, typeof(v)))
+		static if (isEntryRange!(Range, ubyte[]))
 		{
-			.pick(range, v);
+			.pick(range, cast(ubyte[])v);
+		}
+		else static if (isEntryRange!(Range, void[]))
+		{
+			.pick(range, cast(void[])v);
+		}
+		else static if ( is(Unqual!T == void[]) )
+		{
+			pick!(ubyte[])(cast(ubyte[])v);
 		}
 		else
 		{
-			foreach (ref e; v) .pick(range, e);
+			foreach (ref e; v) .put(range, e);
 		}
 	}
 	
 	
 	void pick(T)(ref T v)
-		if (is(Unqual!T == byte))
-	{
-		static if (isEntryRange!(Range, typeof(v)))
-		{
-			.pick(range, v);
-		}
-		else
-		{
-			foreach (ref e; v) .pick(range, e);
-		}
-	}
-	
-	
-	void pick(T)(ref T v)
-		if (is(Unqual!T == ushort) || is(Unqual!T == short))
+		if (is(T == ushort)
+		||  is(T == short)
+		||  is(T == wchar))
 	{
 		static if (rangeEndian == endian)
 		{
@@ -564,8 +607,11 @@ public:
 	
 	
 	void pick(T)(ref T v)
-		if (is(Unqual!T == uint) || is(Unqual!T == int)
-		||  is(Unqual!T == float) || is(Unqual!T == ifloat) )
+		if (is(T == uint)
+		||  is(T == int)
+		||  is(T == float)
+		||  is(T == ifloat) 
+		||  is(T == dchar))
 	{
 		static if (rangeEndian == endian)
 		{
@@ -580,8 +626,10 @@ public:
 	
 	
 	void pick(T)(ref T v)
-		if (is(Unqual!T == ulong) || is(Unqual!T == long) ||
-		    is(Unqual!T == double) || is(Unqual!T == idouble) )
+		if (is(T == ulong)
+		||  is(T == long)
+		||  is(T == double)
+		||  is(T == idouble))
 	{
 		
 		static if (rangeEndian == endian)
@@ -617,6 +665,9 @@ public:
 	void pick(DstRange)(DstRange r)
 		if (isInputRange!(DstRange)
 		&& !is(ElementType!(DstRange) == ubyte)
+		&& !is(DstRange == void[])
+		&& !is(ElementType!(DstRange) == byte)
+		&& !is(DstRange == char[])
 		&& is(typeof( {foreach (ref e; r) pick(e);}() )))
 	{
 		static if (rangeEndian == endian && isDynamicArray!DstRange)
@@ -663,6 +714,7 @@ DataReader!(Range, Endian.bigEndian) beReader(Range)(Range r)
 unittest
 {
 	alias DataReader!(ubyte[]) ib;
+	enum E: uint { e }
 	static assert(isEntryRange!(ib, ubyte));
 	static assert(isEntryRange!(ib, byte));
 	static assert(isEntryRange!(ib, ushort));
@@ -673,8 +725,13 @@ unittest
 	static assert(isEntryRange!(ib, long));
 	static assert(isEntryRange!(ib, float));
 	static assert(isEntryRange!(ib, double));
+	static assert(isEntryRange!(ib, char));
+	static assert(isEntryRange!(ib, wchar));
+	static assert(isEntryRange!(ib, dchar));
+	static assert(isEntryRange!(ib, E));
 	static assert(isEntryRange!(ib, ubyte[]));
 	static assert(isEntryRange!(ib, byte[]));
+	static assert(isEntryRange!(ib, char[]));
 	static assert(isEntryRange!(ib, ushort[]));
 	static assert(isEntryRange!(ib, short[]));
 	static assert(isEntryRange!(ib, uint[]));
@@ -683,11 +740,11 @@ unittest
 	static assert(isEntryRange!(ib, long[]));
 	static assert(isEntryRange!(ib, float[]));
 	static assert(isEntryRange!(ib, double[]));
-	enum E: uint { e }
-	static assert(isEntryRange!(ib, E));
-	//static assert(isEntryRange!(ib, shared E));
+	static assert(isEntryRange!(ib, char[]));
+	static assert(isEntryRange!(ib, wchar[]));
+	static assert(isEntryRange!(ib, dchar[]));
 	static assert(isEntryRange!(ib, E[]));
-	//static assert(isEntryRange!(ib, shared E[]));
+	
 	ubyte[16] obuf1;
 	ubyte[16] obuf2;
 	{
