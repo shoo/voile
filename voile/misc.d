@@ -6,7 +6,7 @@ module voile.misc;
 import core.memory;
 import std.concurrency, std.parallelism;
 import core.thread;
-import std.stdio, std.conv;
+import std.stdio, std.conv, std.variant;
 import std.range, std.container, std.functional;
 import std.typecons, std.traits, std.exception, std.typetuple;
 import std.metastrings;
@@ -1480,4 +1480,72 @@ unittest
 	}
 	testary ~= 3;
 	assert(testary == [1,-3,-1,2,-4,-2,3]);
+}
+
+
+
+/*******************************************************************************
+ * 
+ */
+void variantSwitch(T...)(Variant var, T caseFunctions)
+{
+	static assert( T.length );
+	foreach (i, t1; T)
+	{
+		static assert( isFunctionPointer!t1 || isDelegate!t1 );
+		alias ParameterTypeTuple!(t1) a1;
+		alias ReturnType!(t1) r1;
+		static assert(is(r1 == void), "case function must return void");
+		
+		static assert( a1.length != 1 || !is( a1[0] == Variant ),
+			"case function with argument types " ~ a1.stringof ~
+			" occludes successive function" );
+		
+		foreach ( t2; T[i+1 .. $] )
+		{
+			static assert( isFunctionPointer!t2 || isDelegate!t2 );
+			alias ParameterTypeTuple!(t2) a2;
+			static assert( !is( a1 == a2 ),
+				"case function with argument types " ~ a1.stringof ~
+				" occludes successive function" );
+			static assert( !isImplicitlyConvertible!( a2, a1 ),
+				"case function with argument types " ~ a2.stringof ~
+				" is hidden by " ~ a1.stringof );
+		}
+	}
+	foreach (fn; caseFunctions)
+	{
+		alias ParameterTypeTuple!fn Args;
+		if (var.convertsTo!Args)
+		{
+			fn(var.get!Args);
+			return;
+		}
+	}
+	return;
+}
+
+unittest
+{
+	void test(Variant v)
+	{
+		variantSwitch(v,
+		(ubyte a)
+		{
+			assert(0);
+		},
+		(int a)
+		{
+			assert(a == 1);
+		},
+		(double a)
+		{
+			assert(a == 3.5);
+		}
+		);
+	}
+	Variant var1 = 1;
+	Variant var2 = 3.5;
+	test(var1);
+	test(var2);
 }
