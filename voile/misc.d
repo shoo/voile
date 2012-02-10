@@ -3,13 +3,11 @@
  */
 module voile.misc;
 
-import core.memory;
+import core.memory, core.thread, core.exception;
 import std.concurrency, std.parallelism;
-import core.thread;
-import std.stdio, std.conv, std.variant;
-import std.range, std.container, std.functional;
-import std.typecons, std.traits, std.exception, std.typetuple;
-import std.metastrings;
+import std.stdio, std.exception, std.conv, std.variant;
+import std.range, std.container;
+import std.functional, std.typecons, std.traits, std.typetuple, std.metastrings;
 
 
 /* This template based from std.typecons.MemberFunctionGenerator */
@@ -1487,15 +1485,15 @@ unittest
 /*******************************************************************************
  * 
  */
-void variantSwitch(T...)(Variant var, T caseFunctions)
+CommonType!(staticMap!(ReturnType, T))
+	variantSwitch(T...)(Variant var, T caseFunctions)
 {
-	static assert( T.length );
+	static assert(allSatisfy!(isCallable, T),
+		"variantSwitch ascepts only callable");
 	foreach (i, t1; T)
 	{
-		static assert( isFunctionPointer!t1 || isDelegate!t1 );
 		alias ParameterTypeTuple!(t1) a1;
 		alias ReturnType!(t1) r1;
-		static assert(is(r1 == void), "case function must return void");
 		
 		static assert( a1.length != 1 || !is( a1[0] == Variant ),
 			"case function with argument types " ~ a1.stringof ~
@@ -1503,7 +1501,6 @@ void variantSwitch(T...)(Variant var, T caseFunctions)
 		
 		foreach ( t2; T[i+1 .. $] )
 		{
-			static assert( isFunctionPointer!t2 || isDelegate!t2 );
 			alias ParameterTypeTuple!(t2) a2;
 			static assert( !is( a1 == a2 ),
 				"case function with argument types " ~ a1.stringof ~
@@ -1518,11 +1515,10 @@ void variantSwitch(T...)(Variant var, T caseFunctions)
 		alias ParameterTypeTuple!fn Args;
 		if (var.convertsTo!Args)
 		{
-			fn(var.get!Args);
-			return;
+			return fn(var.get!Args);
 		}
 	}
-	return;
+	throw new SwitchError("No appropriate switch clause found");
 }
 
 unittest
@@ -1544,8 +1540,46 @@ unittest
 		}
 		);
 	}
+	auto test2(Variant v)
+	{
+		return variantSwitch(v,
+		(ubyte a)
+		{
+			assert(a);
+			return 0;
+		},
+		(int a)
+		{
+			assert(a == 1);
+			return 1;
+		},
+		(double a)
+		{
+			assert(a == 3.5);
+			return 2;
+		}
+		);
+	}
 	Variant var1 = 1;
 	Variant var2 = 3.5;
+	Variant var3 = "test";
+	
 	test(var1);
+	assert(test2(var1) == 1);
+	
 	test(var2);
+	assert(test2(var2) == 2);
+	
+	try
+	{
+		test(var3);
+		assert(0);
+	}
+	catch (SwitchError)
+	{
+	}
+	catch (Throwable e)
+	{
+		assert(0);
+	}
 }
