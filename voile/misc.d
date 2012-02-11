@@ -5,8 +5,8 @@ module voile.misc;
 
 import core.memory, core.thread, core.exception;
 import std.concurrency, std.parallelism;
-import std.stdio, std.exception, std.conv, std.variant;
-import std.range, std.container;
+import std.stdio, std.exception, std.conv, std.string, std.variant;
+import std.range, std.container, std.array;
 import std.functional, std.typecons, std.traits, std.typetuple, std.metastrings;
 
 
@@ -1582,4 +1582,105 @@ unittest
 	{
 		assert(0);
 	}
+}
+
+
+private S indentRuntime(S)(S s, S indentStr = " ")
+{
+	auto app = appender!(S)();
+	// Overflow is no problem for this line.
+	app.reserve((s.length * 17)/16);
+	
+	version (ctfe) if (__ctfe)
+	{
+		auto lines = s.splitLines(KeepTerminator.yes);
+		foreach (l; lines)
+		{
+			app.put(indentStr);
+			app.put(l);
+		}
+		return app.data;
+	}
+	
+	immutable pend = s.ptr + s.length;
+	auto p = s.ptr;
+	auto pHead = p;
+	
+	void putLine()
+	{
+		assert(s.ptr <= pHead);
+		assert(pHead <= p);
+		assert(p <= pend);
+		app.put(indentStr);
+		app.put(pHead[0..p - pHead]);
+		if (p !is pend)
+		{
+			pHead = p + 1;
+		}
+	}
+	
+	for (; p != pend; ++p)
+	{
+		if (*p == '\n')
+		{
+			putLine();
+			app.put('\n');
+		}
+	}
+	if (pHead != pend)
+	{
+		assert(p is pend);
+		putLine();
+	}
+	return app.data;
+}
+
+private S indentCtfe(S)(S s, S indentStr = " ")
+{
+	auto app = appender!(S)();
+	// Overflow is no problem for this line.
+	app.reserve((s.length * 17)/16);
+	
+	auto lines = s.splitLines(KeepTerminator.yes);
+	foreach (l; lines)
+	{
+		app.put(indentStr);
+		app.put(l);
+	}
+	return app.data;
+}
+
+/*******************************************************************************
+ * 
+ */
+S indent(S)(S s, S indentStr = "\t")
+	out(r)
+	{
+		debug version(D_unittest)
+		{
+			assert(r == s.indentCtfe(indentStr));
+		}
+	}
+	body
+{
+	return __ctfe ? s.indentCtfe(indentStr) : s.indentRuntime(indentStr);
+}
+
+unittest
+{
+	static assert(`<
+		a b c
+		d
+			e
+		f
+			g
+				h
+	>`.indent() == `	<
+			a b c
+			d
+				e
+			f
+				g
+					h
+		>`);
 }
