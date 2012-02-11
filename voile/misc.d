@@ -1501,10 +1501,6 @@ CommonType!(staticMap!(ReturnType, T))
 				"case function with argument types " ~ a1.stringof ~
 				" occludes successive function" );
 		}
-		else
-		{
-			static assert(a1.length != 0 || is(typeof(return) == void));
-		}
 		foreach (t2; T[i+1 .. $] )
 		{
 			alias ParameterTypeTuple!(t2) a2;
