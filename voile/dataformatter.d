@@ -526,12 +526,21 @@ void pick(R, E)(ref R r, ref E e)
 
 template isEntryRange(R, E)
 {
-	enum isEntryRange = is(typeof({ R r = void; E e = void; pick!(R, E)(r, e); }()));
+	enum isEntryRange = is(typeof(
+	{
+		R r = void;
+		E e = void;
+		bool b = r.empty;
+		pick!(R, E)(r, e);
+	}()));
 }
 
 static assert(isEntryRange!(ubyte[],ubyte[]));
 static assert(isEntryRange!(ubyte[],ubyte));
 
+/*******************************************************************************
+ * 
+ */
 struct DataReader(Range, Endian rangeEndian = Endian.littleEndian)
 	if (isEntryRange!(Range, ubyte[])
 	||  isEntryRange!(Range, ubyte)
@@ -546,6 +555,7 @@ public:
 	}
 	
 	
+	/// EntryRange Primitive
 	void pick(T)(ref T v)
 		if (is(T == ubyte) || is(T == char) || is(T == byte))
 	{
@@ -560,6 +570,7 @@ public:
 	}
 	
 	
+	/// ditto
 	void pick(T)(T v)
 		if (is(T == ubyte[])
 		||  is(T == void[])
@@ -585,6 +596,7 @@ public:
 	}
 	
 	
+	/// ditto
 	void pick(T)(ref T v)
 		if (is(T == ushort)
 		||  is(T == short)
@@ -606,6 +618,7 @@ public:
 	}
 	
 	
+	/// ditto
 	void pick(T)(ref T v)
 		if (is(T == uint)
 		||  is(T == int)
@@ -648,7 +661,7 @@ public:
 		}
 	}
 	
-	
+	/// ditto
 	void pick(T)(ref T v)
 		if (is(Unqual!T U == enum) && isEntryRange!(typeof(this), OriginalType!(T)))
 	{
@@ -656,12 +669,14 @@ public:
 	}
 	
 	
+	/// ditto
 	void pick(SrcRange)(ref SrcRange r)
 		if (isStaticArray!(SrcRange))
 	{
 		pick!(typeof(r[]))(r[]);
 	}
 	
+	/// ditto
 	void pick(DstRange)(DstRange r)
 		if (isInputRange!(DstRange)
 		&& !is(ElementType!(DstRange) == ubyte)
@@ -681,6 +696,12 @@ public:
 				pick(e);
 			}
 		}
+	}
+	
+	/// Range primitive
+	bool empty() @property
+	{
+		return range.empty;
 	}
 }
 
