@@ -1495,27 +1495,48 @@ CommonType!(staticMap!(ReturnType, T))
 		alias ParameterTypeTuple!(t1) a1;
 		alias ReturnType!(t1) r1;
 		
-		static assert( a1.length != 1 || !is( a1[0] == Variant ),
-			"case function with argument types " ~ a1.stringof ~
-			" occludes successive function" );
-		
-		foreach ( t2; T[i+1 .. $] )
+		static if (i < T.length-1)
+		{
+			static assert(a1.length != 1 || !is( a1[0] == Variant ),
+				"case function with argument types " ~ a1.stringof ~
+				" occludes successive function" );
+		}
+		else
+		{
+			static assert(a1.length != 0 || is(typeof(return) == void));
+		}
+		foreach (t2; T[i+1 .. $] )
 		{
 			alias ParameterTypeTuple!(t2) a2;
 			static assert( !is( a1 == a2 ),
 				"case function with argument types " ~ a1.stringof ~
 				" occludes successive function" );
-			static assert( !isImplicitlyConvertible!( a2, a1 ),
-				"case function with argument types " ~ a2.stringof ~
-				" is hidden by " ~ a1.stringof );
+			static assert(a1.length);
+			static if (a2.length)
+			{
+				static assert(!isImplicitlyConvertible!( a2, a1 ),
+					"case function with argument types " ~ a2.stringof ~
+					" is hidden by " ~ a1.stringof );
+			}
 		}
 	}
 	foreach (fn; caseFunctions)
 	{
 		alias ParameterTypeTuple!fn Args;
-		if (var.convertsTo!Args)
+		static if (Args.length == 0)
 		{
-			return fn(var.get!Args);
+			return fn();
+		}
+		else static if (is(Args[0] == Variant))
+		{
+			return fn(var);
+		}
+		else
+		{
+			if (var.convertsTo!Args)
+			{
+				return fn(var.get!Args);
+			}
 		}
 	}
 	throw new SwitchError("No appropriate switch clause found");
@@ -1523,6 +1544,10 @@ CommonType!(staticMap!(ReturnType, T))
 
 unittest
 {
+	Variant var1 = 1;
+	Variant var2 = 3.5;
+	Variant var3 = "test";
+	
 	void test(Variant v)
 	{
 		variantSwitch(v,
@@ -1540,6 +1565,10 @@ unittest
 		}
 		);
 	}
+	test(var1);
+	test(var2);
+	
+	
 	auto test2(Variant v)
 	{
 		return variantSwitch(v,
@@ -1560,16 +1589,34 @@ unittest
 		}
 		);
 	}
-	Variant var1 = 1;
-	Variant var2 = 3.5;
-	Variant var3 = "test";
-	
-	test(var1);
 	assert(test2(var1) == 1);
-	
-	test(var2);
 	assert(test2(var2) == 2);
 	
+	
+	auto test3(Variant v)
+	{
+		return variantSwitch(v,
+		(ubyte a)
+		{
+			assert(a);
+			return 0;
+		},
+		(int a)
+		{
+			assert(a == 1);
+			return 1;
+		},
+		(double a)
+		{
+			assert(a == 3.5);
+			return 2;
+		},
+		(Variant a)
+		{
+			return 3;
+		}
+		);
+	}
 	try
 	{
 		test(var3);
@@ -1582,6 +1629,111 @@ unittest
 	{
 		assert(0);
 	}
+	assert(test3(var3) == 3);
+	
+	
+	auto test4(Variant v)
+	{
+		int x;
+		variantSwitch(v,
+		(int a)
+		{
+			x = 0;
+		},
+		()
+		{
+			x = 1;
+		}
+		);
+		return x;
+	}
+	
+	assert(test4(var1) == 0);
+	assert(test4(var3) == 1);
+	
+	static assert(!__traits(compiles,
+	{
+		variantSwitch(var1,
+		(ubyte a)
+		{
+		},
+		// !
+		(Variant a)
+		{
+		},
+		(double a)
+		{
+		}
+		);
+	}));
+	
+	static assert(!__traits(compiles,
+	{
+		variantSwitch(var1,
+		// !
+		{
+		},
+		(int a)
+		{
+		}
+		);
+	}));
+	
+	static assert(!__traits(compiles,
+	{
+		variantSwitch(var1,
+		(ubyte a)
+		{
+			return 0;
+		},
+		// !
+		(ubyte a)
+		{
+			return 0;
+		},
+		{
+			return 1;
+		}
+		);
+	}));
+	
+	static assert(!__traits(compiles,
+	{
+		variantSwitch(var1,
+		(int a)
+		{
+			return 0;
+		},
+		// !
+		(ubyte a)
+		{
+			return 0;
+		},
+		{
+			return 1;
+		}
+		);
+	}));
+	
+	static assert(!__traits(compiles,
+	{
+		variantSwitch(v,
+		(ubyte a)
+		{
+			return 0;
+		},
+		// !
+		{
+			return 1;
+		},
+		(ubyte a)
+		{
+			return 0;
+		}
+		);
+	}));
+	
+	
 }
 
 
