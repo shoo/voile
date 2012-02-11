@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  * 
  */
 module voile.misc;
@@ -1497,6 +1497,7 @@ CommonType!(staticMap!(ReturnType, T))
 		
 		static if (i < T.length-1)
 		{
+			// 最後のcase function以外では引数が1つでVariantというcaseは認められない
 			static assert(a1.length != 1 || !is( a1[0] == Variant ),
 				"case function with argument types " ~ a1.stringof ~
 				" occludes successive function" );
@@ -1729,6 +1730,246 @@ unittest
 		);
 	}));
 	
+	
+}
+
+
+
+/*******************************************************************************
+ * 
+ */
+CommonType!(staticMap!(ReturnType, T))
+	castSwitch(Base, T...)(Base inst, T caseFunctions)
+{
+	static assert(allSatisfy!(isCallable, T),
+		"classSwitch ascepts only callable");
+	foreach (i, t1; T)
+	{
+		alias ParameterTypeTuple!(t1) a1;
+		alias ReturnType!(t1) r1;
+		
+		static if (i < T.length-1)
+		{
+			// 最後じゃなければBaseに暗黙変換可能な型のみが許される
+			// 必ず引数は1つとること
+			static assert(a1.length == 1
+			          && isImplicitlyConvertible!( a1[0], Base ),
+				"case function with argument types " ~ a1.stringof ~
+				" occludes successive function" );
+		}
+		else
+		{
+			// 最後なら引数なしか、Baseに暗黙変換可能な型か、Baseが暗黙変換可能な型が許される
+			static if (a1.length != 0)
+			{
+				static assert(isImplicitlyConvertible!( a1[0], Base )
+				           || isImplicitlyConvertible!( Base, a1[0] ),
+					"case function with argument types " ~ a1.stringof ~
+					" occludes successive function");
+			}
+		}
+		foreach (t2; T[i+1 .. $] )
+		{
+			alias ParameterTypeTuple!(t2) a2;
+			// 同じ型があってはならない
+			static assert( !is( a1 == a2 ),
+				"case function with argument types " ~ a1.stringof ~
+				" occludes successive function" );
+			static assert(a1.length);
+			static if (a2.length)
+			{
+				// 引数があるなら、あとに書かれたcaseの型が先に書かれたcaseの型に暗黙変換不可能
+				static assert(!isImplicitlyConvertible!( a2, a1 ),
+					"case function with argument types " ~ a2.stringof ~
+					" is hidden by " ~ a1.stringof );
+			}
+		}
+	}
+	foreach (fn; caseFunctions)
+	{
+		alias ParameterTypeTuple!fn Args;
+		static if (Args.length == 0)
+		{
+			return fn();
+		}
+		else static if (isImplicitlyConvertible!( Base, Args[0]))
+		{
+			return fn(inst);
+		}
+		else
+		{
+			if (auto casted = cast(Args[0])inst)
+			{
+				return fn(casted);
+			}
+		}
+	}
+	throw new SwitchError("No appropriate switch clause found");
+}
+
+unittest
+{
+	class A
+	{
+	}
+	class B: A
+	{
+	}
+	class C
+	{
+	}
+	
+	A a = new A;
+	B b = new B;
+	A a_b = new B;
+	C c = new C;
+	
+	int test(Object o)
+	{
+		int x;
+		castSwitch(o,
+		(B a)
+		{
+			x = 0;
+		},
+		(A a)
+		{
+			x = 1;
+		},
+		(C a)
+		{
+			x = 2;
+		}
+		);
+		return x;
+	}
+	assert(test(a) == 1);
+	assert(test(b) == 0);
+	assert(test(c) == 2);
+	
+	auto test2(Object o)
+	{
+		return castSwitch(o,
+		(B a)
+		{
+			return 0;
+		},
+		(A a)
+		{
+			return 1;
+		},
+		(C a)
+		{
+			return 2;
+		}
+		);
+	}
+	assert(test2(a) == 1);
+	assert(test2(b) == 0);
+	assert(test2(c) == 2);
+	
+	
+	class D
+	{
+	}
+	D d = new D;
+	auto test3(Object o)
+	{
+		return castSwitch(o,
+		(B a)
+		{
+			return 0;
+		},
+		(A a)
+		{
+			return 1;
+		},
+		(C a)
+		{
+			return 2;
+		},
+		(Object a)
+		{
+			return 3;
+		}
+		);
+	}
+	try
+	{
+		test(d);
+		assert(0);
+	}
+	catch (SwitchError)
+	{
+	}
+	catch (Throwable e)
+	{
+		assert(0);
+	}
+	assert(test3(d) == 3);
+	
+	
+	auto test4(Object o)
+	{
+		int x;
+		castSwitch(o,
+		(A a)
+		{
+			x = 0;
+		},
+		()
+		{
+			x = 1;
+		}
+		);
+		return x;
+	}
+	
+	assert(test4(a) == 0);
+	assert(test4(d) == 1);
+	
+	static assert(!__traits(compiles,
+	{
+		caseSwitch(a,
+		// !
+		(A a)
+		{
+		},
+		(B a)
+		{
+		}
+		);
+	}));
+	
+	static assert(!__traits(compiles,
+	{
+		caseSwitch(a,
+		// !
+		{
+		},
+		(A a)
+		{
+		}
+		);
+	}));
+	
+	static assert(!__traits(compiles,
+	{
+		caseSwitch(a,
+		(B a)
+		{
+			return 0;
+		},
+		// !
+		{
+			return 1;
+		},
+		(C a)
+		{
+			return 0;
+		}
+		);
+	}));
 	
 }
 
