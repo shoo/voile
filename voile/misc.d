@@ -814,6 +814,19 @@ private:
 		alias isAbstractFunction!(Func)         abst;
 	}
 	alias _ExFuncInfo!(F) _exFuncInfo;
+	static private struct DummyData
+	{
+		alias _ExFuncInfo!(F) _exFuncInfo;
+		template _EmitGeneratingPolicy()
+		{
+			template generateFunctionBody(unused...)
+			{
+				enum generateFunctionBody = "";
+			}
+		}
+		mixin( MemberFunctionGeneratorEx!(_EmitGeneratingPolicy!())
+				.generateFunction!("_exFuncInfo", _exFuncInfo, "emit")() );
+	}
 	template _EmitGeneratingPolicy()
 	{
 		template generateFunctionBody(unused...)
@@ -855,7 +868,7 @@ public:
 	/// ditto
 	alias emit opCall;
 private:
-	alias typeof(&typeof(this).init.emit) Proc;
+	alias typeof(&DummyData.init.emit) Proc;
 	alias _exFuncInfo.PT Args;
 	alias List!Proc ProcList;
 	ProcList.Range end;
