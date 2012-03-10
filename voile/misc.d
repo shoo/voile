@@ -1051,12 +1051,20 @@ private void destroy(T)(T obj)
 }
 
 
-/*******************************************************************************
- * 
- */
-struct Unique(T)
+private template uniqueMemberName(T, string name = "_uniqueMemberName")
 {
-private:
+	static if (__traits(hasMember, T, name))
+	{
+		enum uniqueMemberName = uniqueMemberName!(T, name~"_");
+	}
+	else
+	{
+		enum uniqueMemberName = name;
+	}
+}
+
+private struct UniqueDataImpl(T)
+{
 	static if ((is(T==class)||is(T==interface)))
 	{
 		alias std.traits.Unqual!T RefT;
@@ -1066,35 +1074,8 @@ private:
 		alias std.traits.Unqual!T InstT;
 		alias InstT* RefT;
 	}
-	
-	
 	RefT _p;
-	
 	enum Dummy { init }
-	/***************************************************************************
-	 * Constructor
-	 */
-	this(RefT p, Dummy dummy)
-	{
-		debug (Unique) writefln("%d: Unique constructor [%08x]", __LINE__, cast(void*)&this, cast(void*)_p);
-		_p = p;
-	}
-	
-	/***************************************************************************
-	 * Constructor that takes an rvalue.
-	 * It will ensure uniqueness, as long as the rvalue
-	 * isn't just a view on an lvalue (e.g., a cast)
-	 * Typical usage:
-	 *----
-	 *Unique!(Foo) f = new Foo;
-	 *----
-	 */
-	this(RefT p, size_t sz)
-	{
-		debug (Unique) writefln("%d: Unique [%08x] constructor with rvalue [%08x]", __LINE__, cast(void*)&this, cast(void*)p);
-		attach(p, sz);
-		assert(_p);
-	}
 	
 	/***************************************************************************
 	 * 
@@ -1131,7 +1112,6 @@ private:
 		return _p;
 	}
 	
-public:
 	
 	
 	/** Forwards member access to contents */
@@ -1140,22 +1120,22 @@ public:
 		static if (is(T == const) && !is(T==shared))
 		{
 			@property @trusted nothrow pure
-			T instance() const { return cast(T)_p; }
+			T _instance() const { return cast(T)_p; }
 		}
 		else static if (!is(T == const) && is(T==shared))
 		{
 			@property @trusted nothrow pure
-			T instance() shared { return cast(T)_p; }
+			T _instance() shared { return cast(T)_p; }
 		}
 		else static if (is(T == const) && is(T==shared))
 		{
 			@property @trusted nothrow pure
-			T instance() const shared { return cast(T)_p; }
+			T _instance() const shared { return cast(T)_p; }
 		}
 		else
 		{
 			@property nothrow pure
-			T instance() { return _p; }
+			T _instance() { return _p; }
 		}
 	}
 	else
@@ -1163,49 +1143,23 @@ public:
 		static if (is(T == const) && !is(T==shared))
 		{
 			@property @trusted nothrow pure
-			ref T instance() const { return *cast(T*)_p; }
+			ref T _instance() const { return *cast(T*)_p; }
 		}
 		else static if (!is(T == const) && is(T==shared))
 		{
 			@property @trusted nothrow pure
-			ref T instance() shared { return *cast(T*)_p; }
+			ref T _instance() shared { return *cast(T*)_p; }
 		}
 		else static if (is(T == const) && is(T==shared))
 		{
 			@property @trusted nothrow pure
-			ref T instance() const shared { return *cast(T*)_p; }
+			ref T _instance() const shared { return *cast(T*)_p; }
 		}
 		else
 		{
 			@property @safe nothrow pure
-			ref T instance() { return *_p; }
+			ref T _instance() { return *_p; }
 		}
-	}
-	
-	
-	
-	
-	/***************************************************************************
-	 * Postblit operator is undefined to prevent the cloning of $(D Unique)
-	 * objects
-	 */
-	@disable this(this);
-	
-	
-	~this()
-	{
-		debug (Unique) writefln("%d: Unique [%08x] destructor [%08x]", __LINE__, cast(void*)&this, cast(void*)_p);
-		release();
-	}
-	
-	
-	/***************************************************************************
-	 * Nullifies the current contents.
-	 */
-	@property @safe
-	bool isEmpty() const
-	{
-		return _p is null;
 	}
 	
 	
@@ -1237,52 +1191,175 @@ public:
 		free(cast(void*)p);
 	}
 	
+	
 	/***************************************************************************
-	 * Returns a unique rvalue. Nullifies the current contents
+	 * Nullifies the current contents.
 	 */
-	@trusted @property
-	Unique!(R) move(R = T)()
-		if (is(T: R))
+	@property @safe
+	bool isEmpty() const
 	{
-		debug (Unique) writefln("%d: Unique move [%08x]", __LINE__, cast(void*)_p);
-		auto tmp = _p;
-		_p = null;
-		debug (Unique) writefln("%d: Unique return from move [%08x]", __LINE__, cast(void*)tmp);
-		return Unique!R(cast(Unique!(R).RefT)tmp, Unique!(R).Dummy.init);
+		return _p is null;
+	}
+}
+
+
+/*******************************************************************************
+ * 
+ */
+struct Unique(T)
+{
+private:
+	mixin("UniqueDataImpl!(T) "~uniqueMemberName!T~";");
+	/***************************************************************************
+	 * Constructor
+	 */
+	this(U)(U p, typeof(__traits(getMember, Unique, uniqueMemberName!T)).Dummy dummy) if (is(U == typeof(__traits(getMember, Unique, uniqueMemberName!T)).RefT))
+	{
+		debug (Unique) writefln("%d: Unique constructor [%08x]", __LINE__, cast(void*)&this, cast(void*)_p);
+		__traits(getMember, this, uniqueMemberName!T)._p = p;
+	}
+	
+	/***************************************************************************
+	 * Constructor that takes an rvalue.
+	 * It will ensure uniqueness, as long as the rvalue
+	 * isn't just a view on an lvalue (e.g., a cast)
+	 * Typical usage:
+	 *----
+	 *Unique!(Foo) f = new Foo;
+	 *----
+	 */
+	this(U)(U p, size_t sz) if (is(U == typeof(__traits(getMember, Unique, uniqueMemberName!T)).RefT))
+	{
+		debug (Unique) writefln("%d: Unique [%08x] constructor with rvalue [%08x]", __LINE__, cast(void*)&this, cast(void*)p);
+		__traits(getMember, this, uniqueMemberName!T).attach(p, sz);
+		assert(__traits(getMember, this, uniqueMemberName!T)._p);
+	}
+	
+public:
+	
+	
+	
+	/***************************************************************************
+	 * Postblit operator is undefined to prevent the cloning of $(D Unique)
+	 * objects
+	 */
+	@disable this(this);
+	
+	
+	/***************************************************************************
+	 * Constructor that takes an rvalue.
+	 * It will ensure uniqueness, as long as the rvalue
+	 * isn't just a view on an lvalue (e.g., a cast)
+	 * Typical usage:
+	 *----
+	 *Unique!(Foo) f = unique!Bar;
+	 *----
+	 */
+	this(U)(Unique!U u)
+		if (!is(U == T) && is(U: T))
+	{
+		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!U)._p;
+		__traits(getMember, u, uniqueMemberName!U)._p = null;
+	}
+	
+	
+	~this()
+	{
+		debug (Unique) writefln("%d: Unique [%08x] destructor [%08x]", __LINE__, cast(void*)&this, cast(void*)__traits(getMember, this, uniqueMemberName!T)._p);
+		__traits(getMember, this, uniqueMemberName!T).release();
 	}
 	
 	/***************************************************************************
 	 * 
 	 */
 	@safe
-	void swap(ref Unique u)
+	void proxySwap()(ref Unique u)
+		if (!is(typeof(T.init.proxySwap(T.init))))
 	{
-		auto tmp = _p;
-		_p = u._p;
-		u._p = tmp;
+		auto tmp = __traits(getMember, this, uniqueMemberName!T)._p;
+		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!T)._p;
+		__traits(getMember, u, uniqueMemberName!T)._p = tmp;
 	}
 	
-	
-	
 	//
-	ref Unique!T opAssign(Unique!T u)
+	ref Unique opAssign(Unique u)
 		in
 		{
-			assert(_p is null);
+			assert(__traits(getMember, this, uniqueMemberName!T)._p is null);
 		}
 		body
 	{
-		_p = u._p;
-		u._p = null;
+		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!T)._p;
+		__traits(getMember, u, uniqueMemberName!T)._p = null;
 		return this;
 	}
 	
+	/** Forwards member access to contents */
+	static if ((is(T==class)||is(T==interface)))
+	{
+		static if (is(T == const) && !is(T==shared))
+		{
+			mixin(`
+			@property @trusted nothrow pure 
+			T `~uniqueMemberName!(T, "_uniqueInstance")~`() const { return cast(T)`~uniqueMemberName!T~`._p; }
+			`);
+		}
+		else static if (!is(T == const) && is(T==shared))
+		{
+			mixin(`
+			@property @trusted nothrow pure
+			T `~uniqueMemberName!(T, "_uniqueInstance")~`() shared { return cast(T)`~uniqueMemberName!T~`._p; }
+			`);
+		}
+		else static if (is(T == const) && is(T==shared))
+		{
+			mixin(`
+			@property @trusted nothrow pure
+			T `~uniqueMemberName!(T, "_uniqueInstance")~`() const shared { return cast(T)`~uniqueMemberName!T~`._p; }
+			`);
+		}
+		else
+		{
+			mixin(`
+			@property nothrow pure
+			T `~uniqueMemberName!(T, "_uniqueInstance")~`() { return `~uniqueMemberName!T~`._p; }
+			`);
+		}
+	}
+	else
+	{
+		static if (is(T == const) && !is(T==shared))
+		{
+			mixin(`
+			@property @trusted nothrow pure
+			ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() const { return *cast(T*)`~uniqueMemberName!T~`._p; }
+			`);
+		}
+		else static if (!is(T == const) && is(T==shared))
+		{
+			mixin(`
+			@property @trusted nothrow pure
+			ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() shared { return *cast(T*)`~uniqueMemberName!T~`._p; }
+			`);
+		}
+		else static if (is(T == const) && is(T==shared))
+		{
+			mixin(`
+			@property @trusted nothrow pure
+			ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() const shared { return *cast(T*)`~uniqueMemberName!T~`._p; }
+			`);
+		}
+		else
+		{
+			mixin(`
+			@property @safe nothrow pure
+			ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() { return *`~uniqueMemberName!T~`._p; }
+			`);
+		}
+	}
 	
-	
-	// todo to PrxyOf
-	alias instance this;
+	mixin Proxy!(__traits(getMember, Unique, uniqueMemberName!(T, "_uniqueInstance")));
 }
-
 
 
 /*******************************************************************************
@@ -1300,10 +1377,10 @@ Unique!T unique(T, Args...)(Args args)
 	return uniqueImpl!(T)(args);
 }
 
-Unique!T uniqueImpl(T, Args...)(Args args)
+private Unique!T uniqueImpl(T, Args...)(Args args)
 	if (is(Unique!T))
 {
-	alias Unique!(T).RefT RefT;
+	alias typeof(__traits(getMember, Unique!T, uniqueMemberName!T)).RefT RefT;
 	static if (is(T == class))
 	{
 		enum instSize = __traits(classInstanceSize, T);
@@ -1331,6 +1408,16 @@ Unique!T uniqueImpl(T, Args...)(Args args)
 	return Unique!T(cast(RefT)payload.ptr, instSize);
 }
 
+void release(T)(ref Unique!T u)
+{
+	return __traits(getMember, u, uniqueMemberName!T).release();
+}
+
+bool isEmpty(T)(ref Unique!T u)
+{
+	return __traits(getMember, u, uniqueMemberName!T).isEmpty;
+}
+
 
 unittest
 {
@@ -1352,7 +1439,7 @@ unittest
 		testary ~= 1;
 		auto uf = unique!Foo;
 		testary ~= 2;
-		assert(!uf.isEmpty);
+		assert(!isEmpty(uf));
 		assert(uf.val() == 3);
 		// should not compile
 		static assert(!__traits(compiles,
@@ -1369,10 +1456,15 @@ unittest
 		{
 			auto uf2 = uf;
 		}));
+		// should not compile
+		static assert(!__traits(compiles,
+		{
+			Foo x = uf;
+		}));
 		auto uf2 = f(move(uf));
 		testary ~= 3;
-		assert(uf.isEmpty);
-		assert(!uf2.isEmpty);
+		assert(isEmpty(uf));
+		assert(!isEmpty(uf2));
 	}
 	testary ~= 4;
 	assert(testary == [1,2,-2,3,-1,4]);
@@ -1396,7 +1488,7 @@ unittest
 		testary ~= 1;
 		auto ub = unique!Bar;
 		testary ~= 2;
-		assert(!ub.isEmpty);
+		assert(!isEmpty(ub));
 		assert(ub.val == 4);
 		// should not compile
 		static assert(!__traits(compiles,
@@ -1413,10 +1505,15 @@ unittest
 		{
 			auto ub2 = ub;
 		}));
+		// should not compile
+		static assert(!__traits(compiles,
+		{
+			Bar x = ub;
+		}));
 		auto ub2 = g(move(ub));
 		testary ~= 3;
-		assert(ub.isEmpty);
-		assert(!ub2.isEmpty);
+		assert(isEmpty(ub));
+		assert(!isEmpty(ub2));
 	}
 	testary ~= 4;
 	assert(testary == [1,2,-2,3,-1,4]);
@@ -1438,22 +1535,41 @@ unittest
 		}
 		testary ~= 1;
 		auto b = unique!B;
+		// should compile
+		static assert(__traits(compiles,
+		{
+			Unique!A a3 = move(b);
+		}));
+		// should not compile
+		static assert(!__traits(compiles,
+		{
+			Unique!A a3 = b;
+		}));
+		// should compile
+		static assert(__traits(compiles,
+		{
+			Unique!A a3 = unique!B;
+		}));
+		// should not compile
+		static assert(!__traits(compiles,
+		{
+			B bb = b;
+		}));
+		// should not compile
+		static assert(!__traits(compiles,
+		{
+			A bb = b;
+		}));
 		testary ~= 2;
-		auto a = b.move!A;
+		Unique!A a = move(b);
 		testary ~= 3;
-		assert(b.isEmpty);
-		assert(!a.isEmpty);
+		assert(isEmpty(b));
+		assert(!isEmpty(a));
 		assert(a.val == 5);
 		Unique!A a2;
 		testary ~= 4;
 		a2 = unique!A;
 		testary ~= 5;
-		static assert(!__traits(compiles,
-		{
-	//@@@TODO@@@
-	//		A a3 = a2;
-			A a3 = x;
-		}));
 	}
 	testary ~= 6;
 	assert(testary == [1,2,3,4,5,-1,-2,-1,6]);
@@ -1481,7 +1597,7 @@ unittest
 			~this()
 			{
 				testary ~= -4;
-				a.release();
+				release(a);
 			}
 		}
 		testary ~= 1;
