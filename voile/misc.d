@@ -6,7 +6,7 @@ module voile.misc;
 import core.memory, core.thread, core.exception;
 import std.concurrency, std.parallelism;
 import std.stdio, std.exception, std.conv, std.string, std.variant;
-import std.range, std.container, std.array;
+import std.range, std.container, std.array, std.typetuple;
 import std.functional, std.typecons, std.traits, std.typetuple, std.metastrings;
 
 
@@ -1611,11 +1611,17 @@ unittest
 
 
 
+private template _isNotRefPSC(uint pcs)
+{
+	enum _isNotRefPSC = (pcs & ParameterStorageClass.ref_) == 0;
+}
+
+
 /*******************************************************************************
  * 
  */
 CommonType!(staticMap!(ReturnType, T))
-	variantSwitch(T...)(Variant var, T caseFunctions)
+	variantSwitch(T...)(auto ref Variant var, T caseFunctions)
 {
 	static assert(allSatisfy!(isCallable, T),
 		"variantSwitch ascepts only callable");
@@ -1634,6 +1640,7 @@ CommonType!(staticMap!(ReturnType, T))
 		foreach (t2; T[i+1 .. $] )
 		{
 			alias ParameterTypeTuple!(t2) a2;
+			alias ParameterStorageClassTuple!(t2) psc2;
 			static assert( !is( a1 == a2 ),
 				"case function with argument types " ~ a1.stringof ~
 				" occludes successive function" );
@@ -1644,11 +1651,18 @@ CommonType!(staticMap!(ReturnType, T))
 					"case function with argument types " ~ a2.stringof ~
 					" is hidden by " ~ a1.stringof );
 			}
+			alias ParameterStorageClass PSC;
+			static if (!allSatisfy!(_isNotRefPSC, psc2))
+			{
+				alias ParameterStorageClassTuple!(variantSwitch) psc;
+				static assert(psc[0] & PSC.ref_);
+			}
 		}
 	}
 	foreach (fn; caseFunctions)
 	{
 		alias ParameterTypeTuple!fn Args;
+		alias ParameterStorageClassTuple!fn psc2;
 		static if (Args.length == 0)
 		{
 			return fn();
@@ -1659,14 +1673,27 @@ CommonType!(staticMap!(ReturnType, T))
 		}
 		else
 		{
-			if (var.convertsTo!Args)
+			static if (allSatisfy!(_isNotRefPSC, psc2))
 			{
-				return fn(var.get!Args);
+				if (var.convertsTo!(typeof(Args.init)))
+				{
+					return fn(var.get!(typeof(Args.init)));
+				}
+			}
+			else
+			{
+				if (var.convertsTo!(typeof(Args.init)))
+				{
+					auto v = var.get!(typeof(Args.init));
+					scope (exit) var = v;
+					return fn(v);
+				}
 			}
 		}
 	}
 	throw new SwitchError("No appropriate switch clause found");
 }
+
 
 unittest
 {
@@ -1758,13 +1785,15 @@ unittest
 	assert(test3(var3) == 3);
 	
 	
-	auto test4(Variant v)
+	auto test4(ref Variant v)
 	{
 		int x;
 		variantSwitch(v,
-		(int a)
+		(ref int a)
 		{
+			assert(a == 1);
 			x = 0;
+			a = 10;
 		},
 		()
 		{
@@ -1774,8 +1803,11 @@ unittest
 		return x;
 	}
 	
+	assert(var1 == 1);
 	assert(test4(var1) == 0);
+	assert(var1 == 10);
 	assert(test4(var3) == 1);
+	var1 = 1;
 	
 	static assert(!__traits(compiles,
 	{
