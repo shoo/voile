@@ -862,9 +862,15 @@ public:
 	/***************************************************************************
 	 * 
 	 */
-	version (D_Ddoc) void emit(Args args);
-	mixin( MemberFunctionGeneratorEx!(_EmitGeneratingPolicy!())
-			.generateFunction!("_exFuncInfo", _exFuncInfo, "emit")() );
+	version (D_Ddoc)
+	{
+		void emit(Args args);
+	}
+	else
+	{
+		mixin( MemberFunctionGeneratorEx!(_EmitGeneratingPolicy!())
+		       .generateFunction!("_exFuncInfo", _exFuncInfo, "emit")() );
+	}
 	/// ditto
 	alias emit opCall;
 private:
@@ -1050,6 +1056,11 @@ private void destroy(T)(T obj)
 	}
 }
 
+private template TypeOf(T)
+{
+	alias T TypeOf;
+}
+
 
 private template uniqueMemberName(T, string name = "_uniqueMemberName")
 {
@@ -1173,6 +1184,7 @@ private struct UniqueDataImpl(T)
 		debug (Unique) writefln("%d: Unique [%08x] release of [%08x]", __LINE__, cast(void*)&this, cast(void*)_p);
 		auto p = detach();
 		assert(_p is null);
+		assert(p !is null);
 		static if (is(T==interface))
 		{
 			if (auto o = cast(Object)p)
@@ -1213,7 +1225,7 @@ private:
 	/***************************************************************************
 	 * Constructor
 	 */
-	this(U)(U p, typeof(__traits(getMember, Unique, uniqueMemberName!T)).Dummy dummy) if (is(U == typeof(__traits(getMember, Unique, uniqueMemberName!T)).RefT))
+	this(U)(U p, TypeOf!(__traits(getMember, Unique, uniqueMemberName!T).Dummy) dummy) if (is(U == TypeOf!((__traits(getMember, Unique, uniqueMemberName!T).RefT))))
 	{
 		debug (Unique) writefln("%d: Unique constructor [%08x]", __LINE__, cast(void*)&this, cast(void*)_p);
 		__traits(getMember, this, uniqueMemberName!T)._p = p;
@@ -1228,7 +1240,7 @@ private:
 	 *Unique!(Foo) f = new Foo;
 	 *----
 	 */
-	this(U)(U p, size_t sz) if (is(U == typeof(__traits(getMember, Unique, uniqueMemberName!T)).RefT))
+	this(U)(U p, size_t sz) if (is(U == TypeOf!(__traits(getMember, Unique, uniqueMemberName!T).RefT)))
 	{
 		debug (Unique) writefln("%d: Unique [%08x] constructor with rvalue [%08x]", __LINE__, cast(void*)&this, cast(void*)p);
 		__traits(getMember, this, uniqueMemberName!T).attach(p, sz);
@@ -1258,6 +1270,7 @@ public:
 	this(U)(Unique!U u)
 		if (!is(U == T) && is(U: T))
 	{
+		debug (Unique) writefln("%d: Unique [%08x] other type constructor with rvalue [%08x]", __LINE__, cast(void*)&this, __traits(getMember, u, uniqueMemberName!U)._p);
 		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!U)._p;
 		__traits(getMember, u, uniqueMemberName!U)._p = null;
 	}
@@ -1276,6 +1289,7 @@ public:
 	void proxySwap()(ref Unique u)
 		if (!is(typeof(T.init.proxySwap(T.init))))
 	{
+		debug (Unique) writefln("%d: Unique [%08x] swap [%08x]", __LINE__, cast(void*)&this, __traits(getMember, u, uniqueMemberName!T)._p);
 		auto tmp = __traits(getMember, this, uniqueMemberName!T)._p;
 		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!T)._p;
 		__traits(getMember, u, uniqueMemberName!T)._p = tmp;
@@ -1289,6 +1303,7 @@ public:
 		}
 		body
 	{
+		debug (Unique) writefln("%d: Unique [%08x] assign [%08x]", __LINE__, cast(void*)&this, __traits(getMember, u, uniqueMemberName!T)._p);
 		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!T)._p;
 		__traits(getMember, u, uniqueMemberName!T)._p = null;
 		return this;
@@ -1380,7 +1395,7 @@ Unique!T unique(T, Args...)(Args args)
 private Unique!T uniqueImpl(T, Args...)(Args args)
 	if (is(Unique!T))
 {
-	alias typeof(__traits(getMember, Unique!T, uniqueMemberName!T)).RefT RefT;
+	alias TypeOf!(__traits(getMember, Unique!T, uniqueMemberName!T).RefT) RefT;
 	static if (is(T == class))
 	{
 		enum instSize = __traits(classInstanceSize, T);
@@ -1432,12 +1447,13 @@ unittest
 	
 		UFoo f(UFoo u)
 		{
+			debug (Unique) writefln("%d: Unique [%08x] enter foo", __LINE__, cast(void*)&u);
 			testary ~= -2;
 			return move(u);
 		}
-		
 		testary ~= 1;
 		auto uf = unique!Foo;
+		debug (Unique) writefln("%d: Unique [%08x] make", __LINE__, cast(void*)&uf);
 		testary ~= 2;
 		assert(!isEmpty(uf));
 		assert(uf.val() == 3);
@@ -1462,6 +1478,8 @@ unittest
 			Foo x = uf;
 		}));
 		auto uf2 = f(move(uf));
+		debug (Unique) writefln("%d: Unique [%08x] returned foo", __LINE__, cast(void*)&uf);
+		debug (Unique) writefln("%d: Unique [%08x] returned foo", __LINE__, cast(void*)&uf2);
 		testary ~= 3;
 		assert(isEmpty(uf));
 		assert(!isEmpty(uf2));
