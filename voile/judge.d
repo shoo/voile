@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  * judgement モジュール
  * 
  * 複数の要素でチェックを行いたい場合に使用することのできる Judgement が利用可能
@@ -21,7 +21,7 @@ private class MessageText(String)
 	{
 		_text = str;
 	}
-	final override string toString()
+	final override string toString() const
 	{
 		static if (is(String == string))
 		{
@@ -64,7 +64,7 @@ class JudgementException: Exception
 		judgement = aJudge;
 	}
 	/// See_Also: Judgement.result()
-	Object[] results()
+	const(Object)[] results() const
 	{
 		return judgement.results;
 	}
@@ -293,7 +293,7 @@ final:
 	 * 生じた Object のリストを返します。$(BR)
 	 * 審判ではこの戻り値がnullであることが望ましい。
 	 */
-	@property Object[] results()
+	@property const(Object)[] results() const
 	{
 		return _results;
 	}
@@ -335,21 +335,14 @@ final:
 	 *     results のそれぞれのオブジェクトのtoStringで得られる文字列を改行でつ
 	 *     ないだ文字列を返します。
 	 */
-	override string toString()
+	override string toString() const
 	{
-		char[] ret;
+		string ret;
 		foreach (o; results)
 		{
 			ret ~= o.toString() ~ '\n';
 		}
-		version (Tango)
-		{
-			return ret;
-		}
-		else
-		{
-			return cast(immutable)ret;
-		}
+		return cast(immutable)ret;
 	}
 	
 	

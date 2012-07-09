@@ -754,6 +754,7 @@ public:
 	}
 }
 
+
 unittest
 {
 	auto list = new List!int;
@@ -792,11 +793,15 @@ unittest
 	assert(ary == [-1,0,1,2,4]);
 }
 
-
-
-
 /*******************************************************************************
  * Generic Handler
+ * 
+ * 
+ * $(__123 a, bbb) = xxx
+ * 
+ * Macros:
+ *     bbb  = cccccc
+ *     _123 = [$1 ::: $($2)]
  */
 struct Handler(F)
 	if (isCallable!F && is(ReturnType!(F) == void))
@@ -2252,3 +2257,4 @@ unittest
 					h
 		>`);
 }
+

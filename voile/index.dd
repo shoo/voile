@@ -7,19 +7,19 @@ Voile The Magic Library は、なくても特に困らない…$(BR)
 
 See_Also:
 $(UL
-    $(LI $(LINK2 _index.html, voile)
-    $(UL
-        $(LI $(LINK2 voile.benchmark.html, benchmark))
-        $(LI $(LINK2 voile.judge.html, judge))
-        $(LI $(LINK2 voile.sync.html, sync))
-        $(LI $(LINK2 voile.dataformatter.html, dataformatter))
-        $(LI $(LINK2 voile.stm.html, stm))
-        $(LI $(LINK2 voile.misc.html, misc))
-    ))
+	$(LI $(LINK2 _index.html, voile)
+	$(UL
+		$(LI $(LINK2 voile.benchmark.html, benchmark))
+		$(LI $(LINK2 voile.judge.html, judge))
+		$(LI $(LINK2 voile.sync.html, sync))
+		$(LI $(LINK2 voile.dataformatter.html, dataformatter))
+		$(LI $(LINK2 voile.stm.html, stm))
+		$(LI $(LINK2 voile.misc.html, misc))
+	))
 )
 Authors: P.Knowledge, SHOO
 License: NYSL ( $(LINK http://www.kmonos.net/nysl/) )
 Macros:
-TITLE =Voile The Magic Library
+	TITLE =Voile The Magic Library
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/
 module index;
