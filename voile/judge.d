@@ -21,7 +21,7 @@ private class MessageText(String)
 	{
 		_text = str;
 	}
-	final override string toString() const
+	final override string toString()
 	{
 		static if (is(String == string))
 		{
@@ -64,7 +64,7 @@ class JudgementException: Exception
 		judgement = aJudge;
 	}
 	/// See_Also: Judgement.result()
-	const(Object)[] results() const
+	Object[] results()
 	{
 		return judgement.results;
 	}
@@ -293,7 +293,7 @@ final:
 	 * 生じた Object のリストを返します。$(BR)
 	 * 審判ではこの戻り値がnullであることが望ましい。
 	 */
-	@property const(Object)[] results() const
+	@property Object[] results()
 	{
 		return _results;
 	}
@@ -335,14 +335,14 @@ final:
 	 *     results のそれぞれのオブジェクトのtoStringで得られる文字列を改行でつ
 	 *     ないだ文字列を返します。
 	 */
-	override string toString() const
+	override string toString()
 	{
 		string ret;
-		foreach (o; results)
+		foreach (o; _results)
 		{
 			ret ~= o.toString() ~ '\n';
 		}
-		return cast(immutable)ret;
+		return ret;
 	}
 	
 	
