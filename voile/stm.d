@@ -17,7 +17,8 @@ module voile.stm;
 
 import core.memory;
 import std.traits, std.typecons, std.typetuple,
-       std.string, std.conv, std.range, std.container;
+       std.string, std.conv, std.range, std.container,
+       std.csv, std.array, std.format, std.algorithm;
 import voile.misc;
 
 private template isStraight(int start, Em...)
@@ -502,3 +503,338 @@ unittest
 	assert(sm.currentState == State.b);
 	assert(msg == "a-1");
 }
+
+
+
+private struct CsvStmParsedData
+{
+	string[string] map;
+	
+	string[]       statesRaw;
+	string[]       eventsRaw;
+	string[][]     cellsRaw;
+	string[]       stactsRaw;
+	string[]       edactsRaw;
+	
+	string[]       states;
+	string[]       events;
+	string[][][]   procs;
+	string[][]     nextsts;
+	string[][]     stacts;
+	string[][]     edacts;
+	
+	// 状態の書き出し。 State という名前の enum を書き出す
+	void makeEnumStates(Range)(ref Range srcstr)
+	{
+		auto app = appender!(string[])();
+		foreach (s; statesRaw)
+		{
+			app.put( map.get(s, s) );
+		}
+		
+		states = app.data;
+		
+		srcstr.put("enum State\n{\n");
+		srcstr.formattedWrite("%-(\t%s, \n%)", states);
+		srcstr.put("\n}\n");
+	}
+	
+	// イベントの書き出し。 Event という名前の enum を書き出す。
+	void makeEnumEvents(Range)(ref Range srcstr)
+	{
+		auto app = appender!(string[])();
+		foreach (s; eventsRaw)
+		{
+			app.put( map.get(s, s) );
+		}
+		
+		events = app.data;
+		
+		srcstr.put("enum Event\n{\n");
+		srcstr.formattedWrite("%-(\t%s, \n%)", events);
+		srcstr.put("\n}\n");
+	}
+	
+	private static void replaceProcContents(Range)(ref Range srcstr, ref string[] procs, string[string] map)
+	{
+		auto app = appender!(string[])();
+		foreach (s; procs)
+		{
+			app.put(map.get(s, s));
+		}
+		procs = app.data;
+	}
+	
+	// 
+	void makeProcs(Range)(ref Range srcstr)
+	{
+		procs   = new string[][][](events.length, states.length, 0);
+		nextsts = new string[][](events.length, states.length);
+		foreach (i, rows; cellsRaw)
+		{
+			foreach (j, cell; rows)
+			{
+				auto lines = cell.splitLines();
+				string nextState;
+				string[] proclines;
+				if (lines.length && lines[0].startsWith("▽"))
+				{
+					nextState = map.get(lines[0], lines[0]);
+					proclines = lines[1..$];
+				}
+				else
+				{
+					nextState = states[j];
+					proclines = lines;
+				}
+				
+				replaceProcContents(srcstr, proclines, map);
+				procs[i][j] = proclines;
+				nextsts[i][j] = nextState;
+				if (proclines.length == 0 || proclines[0] == "x")
+				{
+					continue;
+				}
+				srcstr.formattedWrite("void _stmProcE%dS%d()\n{\n", i, j);
+				srcstr.formattedWrite("%-(\t%s\n%)", proclines);
+				srcstr.put("\n}\n");
+			}
+		}
+	}
+	
+	// アクティビティ用の関数を作成する _stmStEdActivity という関数名で作成
+	void makeActivities(Range)(ref Range srcstr)
+	{
+		auto apped = appender!string();
+		auto appst = appender!string();
+		
+		stacts.length = stactsRaw.length;
+		edacts.length = edactsRaw.length;
+		
+		appst.put("\tswitch (newsts)\n\t{\n");
+		foreach (i, act; stactsRaw)
+		{
+			auto proclines = act.splitLines();
+			if (proclines.length == 0)
+				continue;
+			auto name = xformat("_stmStartActS%d", i);
+			srcstr.put("void ");
+			srcstr.put(name);
+			srcstr.put("()\n{\n");
+			replaceProcContents(srcstr, proclines, map);
+			srcstr.formattedWrite("%-(\t%s\n%)", proclines);
+			srcstr.put("\n}\n");
+			appst.formattedWrite(
+				"\tcase cast(typeof(newsts))%d:\n"
+				"\t\t%s();\n"
+				"\t\tbreak;\n", i, name);
+			stacts[i] = proclines;
+		}
+		appst.put(
+			"\tdefault:\n"
+			"\t}\n");
+		
+		apped.put("\tswitch (oldsts)\n\t{\n");
+		foreach (i, act; edactsRaw)
+		{
+			auto proclines = act.splitLines();
+			if (proclines.length == 0)
+				continue;
+			auto name = xformat("_stmEndActS%d", i);
+			srcstr.put("void ");
+			srcstr.put(name);
+			srcstr.put("()\n{\n");
+			replaceProcContents(srcstr, proclines, map);
+			srcstr.formattedWrite("%-(\t%s\n%)", proclines);
+			srcstr.put("\n}\n");
+			apped.formattedWrite(
+				"\tcase cast(typeof(oldsts))%d:\n"
+				"\t\t%s();\n"
+				"\t\tbreak;\n", i, name);
+			edacts[i] = proclines;
+		}
+		apped.put(
+			"\tdefault:\n"
+			"\t}\n");
+		if (appst.data.length != 0 || apped.data.length != 0)
+		{
+			srcstr.put(
+				"void _onStEdActivity(State oldsts, State newsts)\n"
+				"{\n"
+				"\tif (oldsts == newsts)\n"
+				"\t\treturn;\n");
+			srcstr.put( apped.data );
+			srcstr.put( appst.data );
+			srcstr.put("}\n");
+		}
+	}
+	
+	
+	// 
+	void makeFactory(Range)(ref Range srcstr)
+	{
+		auto app = appender!(string[][])();
+		auto app2 = appender!(string[])();
+		
+		foreach (i; 0..events.length)
+		{
+			app2.shrinkTo(0);
+			foreach (j; 0..states.length)
+			{
+				string proc;
+				if (procs[i][j].length == 0)
+				{
+					proc = "ignoreEvent";
+				}
+				else if (procs[i][j].length == 1 && procs[i][j][0] == "x")
+				{
+					proc = "forbiddenEvent";
+				}
+				else
+				{
+					proc = xformat("&_stmProcE%dS%d", i, j);
+				}
+				app2.put(xformat("SH(State.%s, %s)", nextsts[i][j], proc));
+			}
+			app.put(app2.data);
+		}
+		
+		srcstr.formattedWrite(
+			"Stm!(State, Event) stmFactory()\n"
+			"{\n"
+			"\talias SHPair!(State) SH;\n"
+			"\tauto stm = Stm!(State, Event)(%([%-(%s, %)]%|, \n\t\t%));\n", app.data);
+		alias reduce!"a | (b.length != 0)" existsAct;
+		if (existsAct(false, stacts) || existsAct(false, edacts))
+		{
+			srcstr.put("\tstm.onStateChanged ~= &_onStEdActivity;\n");
+		}
+		srcstr.put(
+			"\treturn stm;\n"
+			"}\n");
+	}
+	
+}
+/*******************************************************************************
+ * スプレッドシート(CSV)で記述されたSTMをD言語コードへ変換する
+ * 
+ * このCSVによるSTMは以下のルールに従って変換される。
+ * $(UL
+ *   $(LI CSVの1行目は状態を記述する)
+ *   $(LI 「状態」は必ず▽で始まる文字列を指定する)
+ *   $(LI CSVの2行目は「スタートアクティビティ」を記述する)
+ *   $(LI CSVの3行目は「エンドアクティビティ」を記述する)
+ *   $(LI スタートアクティビティとエンドアクティビティには「処理」を記述する)
+ *   $(LI スタートアクティビティは状態が遷移した際に、遷移後の状態の最初に実行される)
+ *   $(LI エンドアクティビティは状態が遷移した際に、遷移前の状態の最後に実行される)
+ *   $(LI CSVの1から3行目の1列目は無視される)
+ *   $(LI CSVの4行目以降の1列目は「イベント」を記述する)
+ *   $(LI CSVの4行目以降は「セル」としてイベント発生時の「状態遷移」と「処理」を記述する)
+ *   $(LI セルは複数行にわたって記述することができる)
+ *   $(LI 状態遷移はセルの先頭行に▽で始まる状態名を指定する)
+ * )
+ * また、第二引数は置換情報を指定するCSVが記述された文字列を指定する。
+ * $(UL
+ *   $(LI 置換用CSVの置換対象はSTMの状態とイベントと状態遷移と処理)
+ *   $(LI CSVの1列目は変換前の文字列を記述する)
+ *   $(LI CSVの2列目は変換後の文字列を記述する)
+ * )
+ */
+string parseCsvStm(string csvstm, string csvmap = "")
+{
+	auto app = appender!(string[][])();
+	foreach (data; csvReader!(string)(csvstm))
+	{
+		app.put(array(data));
+	}
+	static struct Layout
+	{
+		string key;
+		string val;
+	}
+	string[string] map;
+	foreach (data; csvReader!Layout(csvmap))
+	{
+		map[data.key] = data.val;
+	}
+	CsvStmParsedData pd;
+	pd.map = map;
+	pd.statesRaw = app.data[0][1..$];
+	pd.stactsRaw = app.data[1][1..$];
+	pd.edactsRaw = app.data[2][1..$];
+	pd.eventsRaw.length = app.data.length-3;
+	pd.cellsRaw.length = app.data.length-3;
+	foreach (i, r; app.data[3..$])
+	{
+		pd.eventsRaw[i] = r[0];
+		pd.cellsRaw[i]  = r[1..$];
+	}
+	
+	auto srcstr = appender!string();
+	pd.makeEnumStates(srcstr);
+	pd.makeEnumEvents(srcstr);
+	pd.makeActivities(srcstr);
+	pd.makeProcs(srcstr);
+	pd.makeFactory(srcstr);
+	return srcstr.data();
+}
+
+
+unittest
+{
+enum stmcsv = `,▽初期,▽接続中,▽通信中,▽切断中
+スタートアクティビティ,,接続要求を開始,,切断要求を開始
+エンドアクティビティ,,接続要求を停止,,切断要求を停止
+接続の開始指示を受けたら,▽接続中,,x,x
+接続の停止指示を受けたら,,▽切断中,▽切断中,
+通信が開始されたら,▽切断中,▽通信中,x,x
+通信が切断されたら,x,▽初期,▽初期,▽初期`;
+
+enum replaceData = `▽初期,init
+▽接続中,connectBeginning
+▽通信中,connecting
+▽切断中,connectClosing
+通信が開始されたら,openedConnection
+通信が切断されたら,closedConnection
+接続の開始指示を受けたら,openConnection
+接続の停止指示を受けたら,closeConnection
+接続要求を開始,startBeginConnect();
+接続要求を停止,endBeginConnect();
+切断要求を開始,startCloseConnect();
+切断要求を停止,endCloseConnect();`;
+
+	enum stmcode = parseCsvStm(stmcsv, replaceData);
+	int x;
+	void startBeginConnect()
+	{
+		x = 1;
+	}
+	void endBeginConnect()
+	{
+		x = 2;
+	}
+	void startCloseConnect()
+	{
+		x = 3;
+	}
+	void endCloseConnect()
+	{
+		x = 4;
+	}
+	mixin(stmcode);
+	auto stm = stmFactory();
+	assert(x == 0);
+	stm.put(Event.openConnection);
+	assert(x == 1);
+	assert(stm.currentState == State.connectBeginning);
+	stm.put(Event.openedConnection);
+	assert(x == 2);
+	assert(stm.currentState == State.connecting);
+	stm.put(Event.closeConnection);
+	assert(x == 3);
+	assert(stm.currentState == State.connectClosing);
+	stm.put(Event.closedConnection);
+	assert(x == 4);
+	assert(stm.currentState == State.init);
+}
+
