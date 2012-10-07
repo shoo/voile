@@ -754,6 +754,21 @@ private struct CsvStmParsedData
  *mixin(stmcode);
  *auto stm = stmFactory();
  *------------------------------------------------------------------------------
+ *Examples:
+ *------------------------------------------------------------------------------
+ *class Foo
+ *{
+ *private:
+ *    mixin(parseCsvStm(import("test.stm.csv"), import("test.gcd.csv")));
+ *public:
+ *    Stm!(State, Event) stm;
+ *    alias stm this;
+ *    this()
+ *    {
+ *        stm = stmFactory();
+ *    }
+ *}
+ *------------------------------------------------------------------------------
  */
 string parseCsvStm(string csvstm, string csvmap = "")
 {
