@@ -41,6 +41,33 @@ table
 	text-align: justify;
 }
 
+table.table
+{
+	border: solid 1px #e3bebe;
+	border-collapse: collapse;
+	border-spacing: 0px;
+}
+
+table.table tr td
+{
+	empty-cells: show;
+	padding: 5px;
+	border: solid 1px #dfaaaa;
+	border-width: 0 0 1px 1px;
+	text-align: center;
+}
+
+table.table tr th
+{
+	empty-cells: show;
+	padding: 5px;
+	border: solid 1px #fee0e0;
+	border-width: 0 0 1px 1px;
+	background-color: #a06060;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+}
 
 /* Style used for all hyperlinks. */
 a:link {  color: #801000; text-decoration: none }

@@ -755,10 +755,52 @@ private struct CsvStmParsedData
  *auto stm = stmFactory();
  *------------------------------------------------------------------------------
  *Examples:
+ * test.stm.csv
+ * $(TABLE
+ *   $(TR $(TH )                           $(TH ▽初期)   $(TH ▽接続中)       $(TH ▽通信中) $(TH ▽切断中) )
+ *   $(TR $(TH スタートアクティビティ)     $(TD )         $(TD 接続要求を開始) $(TD )         $(TD 切断要求を開始) )
+ *   $(TR $(TH エンドアクティビティ)       $(TD )         $(TD 接続要求を停止) $(TD )         $(TD 切断要求を停止) )
+ *   $(TR $(TH 接続の開始指示を受けたら)   $(TD ▽接続中) $(TD )               $(TD x)        $(TD x) )
+ *   $(TR $(TH 接続の停止指示を受けたら)   $(TD )         $(TD ▽切断中)       $(TD ▽切断中) $(TD ) )
+ *   $(TR $(TH 通信が開始されたら)         $(TD ▽切断中) $(TD ▽通信中)       $(TD x)        $(TD x) )
+ *   $(TR $(TH 通信が切断されたら)         $(TD x)        $(TD ▽初期)         $(TD ▽初期)   $(TD ▽初期) )
+ * )
+ * test.gcd.csv
+ * $(TABLE
+ *   $(TR $(TD ▽初期)   $(TD init) )
+ *   $(TR $(TD ▽接続中) $(TD connectBeginning) )
+ *   $(TR $(TD ▽通信中) $(TD connecting) )
+ *   $(TR $(TD ▽切断中) $(TD connectClosing) )
+ *   $(TR $(TD 通信が開始されたら )$(TD openedConnection) )
+ *   $(TR $(TD 通信が切断されたら )$(TD closedConnection) )
+ *   $(TR $(TD 接続の開始指示を受けたら )$(TD openConnection) )
+ *   $(TR $(TD 接続の停止指示を受けたら )$(TD closeConnection) )
+ *   $(TR $(TD 接続要求を開始 )$(TD startBeginConnect();) )
+ *   $(TR $(TD 接続要求を停止 )$(TD endBeginConnect();) )
+ *   $(TR $(TD 切断要求を開始 )$(TD startCloseConnect();) )
+ *   $(TR $(TD 切断要求を停止 )$(TD endCloseConnect();) )
+ * )
  *------------------------------------------------------------------------------
  *class Foo
  *{
  *private:
+ *    void startBeginConnect()
+ *    {
+ *        writeln("startBeginConnect");
+ *    }
+ *    void endBeginConnect()
+ *    {
+ *        writeln("endBeginConnect");
+ *    }
+ *    void startCloseConnect()
+ *    {
+ *        writeln("startCloseConnect");
+ *    }
+ *    void endCloseConnect()
+ *    {
+ *        writeln("endCloseConnect");
+ *    }
+ *    
  *    mixin(parseCsvStm(import("test.stm.csv"), import("test.gcd.csv")));
  *public:
  *    Stm!(State, Event) stm;

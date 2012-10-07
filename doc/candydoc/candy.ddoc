@@ -52,3 +52,5 @@ ADD_MODULES =<script>$(MODULES)</script>
 MODULE_FULL =explorer.packageExplorer.addModule("$0");
 
 D = <span class="decl">$0</span>
+
+TABLE = <table class="table">$0</table>
