@@ -50,3 +50,5 @@ DDOC_PARAM_ROW = $(TR $0)
 DDOC_PARAM =<span class="funcparam">$0</span>
 ADD_MODULES =<script>$(MODULES)</script>
 MODULE_FULL =explorer.packageExplorer.addModule("$0");
+
+D = <span class="decl">$0</span>
