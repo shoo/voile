@@ -529,7 +529,9 @@ private struct CsvStmParsedData
 		auto app = appender!(string[])();
 		foreach (s; statesRaw)
 		{
-			app.put( map.get(s, s) );
+			auto str = map.get(s, s);
+			if (str.length)
+				app.put( str );
 		}
 		
 		states = app.data;
@@ -545,7 +547,9 @@ private struct CsvStmParsedData
 		auto app = appender!(string[])();
 		foreach (s; eventsRaw)
 		{
-			app.put( map.get(s, s) );
+			auto str = map.get(s, s);
+			if (str.length)
+				app.put( str );
 		}
 		
 		events = app.data;
@@ -560,7 +564,9 @@ private struct CsvStmParsedData
 		auto app = appender!(string[])();
 		foreach (s; procs)
 		{
-			app.put(map.get(s, s));
+			auto str = map.get(s, s);
+			if (str.length)
+				app.put( str );
 		}
 		procs = app.data;
 	}
@@ -580,6 +586,7 @@ private struct CsvStmParsedData
 				if (lines.length && lines[0].startsWith("▽"))
 				{
 					nextState = map.get(lines[0], lines[0]);
+					assert(nextState.length);
 					proclines = lines[1..$];
 				}
 				else
@@ -675,7 +682,7 @@ private struct CsvStmParsedData
 	{
 		auto app = appender!(string[][])();
 		auto app2 = appender!(string[])();
-		
+import std.stdio;		
 		foreach (i; 0..events.length)
 		{
 			app2.shrinkTo(0);
@@ -696,14 +703,15 @@ private struct CsvStmParsedData
 				}
 				app2.put(xformat("SH(State.%s, %s)", nextsts[i][j], proc));
 			}
-			app.put(app2.data);
+			app.put(app2.data.dup);
 		}
 		
 		srcstr.formattedWrite(
 			"Stm!(State, Event) stmFactory()\n"
 			"{\n"
 			"\talias SHPair!(State) SH;\n"
-			"\tauto stm = Stm!(State, Event)(%([%-(%s, %)]%|, \n\t\t%));\n", app.data);
+			"\tauto stm = Stm!(State, Event)(\n"
+			"\t\t%([%-(%s, %)]%|, \n\t\t%));\n", app.data);
 		alias reduce!"a | (b.length != 0)" existsAct;
 		if (existsAct(false, stacts) || existsAct(false, edacts))
 		{
@@ -817,7 +825,7 @@ string parseCsvStm(string csvstm, string csvmap = "")
 	auto app = appender!(string[][])();
 	foreach (data; csvReader!(string)(csvstm))
 	{
-		app.put(array(data));
+		app.put(array(data).dup);
 	}
 	static struct Layout
 	{
@@ -893,8 +901,10 @@ enum replaceData = `▽初期,init
 	{
 		x = 4;
 	}
+	
 	mixin(stmcode);
 	auto stm = stmFactory();
+	assert(stm._table[Event.openConnection][State.init].handler !is null);
 	assert(x == 0);
 	stm.put(Event.openConnection);
 	assert(x == 1);
