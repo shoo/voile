@@ -838,12 +838,13 @@ private:
 		{
 			enum generateFunctionBody =
 			q{
+				#line 842
 				if (!_procs) return;
 				static if (_exFuncInfo.attrib & FunctionAttribute.nothrow_)
 				{
 					try
 					{
-						foreach (proc; _procs[])
+						foreach (proc; (cast()_procs)[])
 						{
 							proc(args);
 						}
@@ -855,7 +856,7 @@ private:
 				}
 				else
 				{
-					foreach (proc; _procs[])
+					foreach (proc; (cast()_procs)[])
 					{
 						proc(args);
 					}
@@ -870,6 +871,8 @@ public:
 	version (D_Ddoc)
 	{
 		void emit(Args args);
+		void emit(Args args) const;
+		void emit(Args args) shared const;
 	}
 	else
 	{
@@ -909,6 +912,7 @@ public:
 		connect(dg);
 	}
 	
+	
 	/***************************************************************************
 	 * 
 	 */
@@ -942,7 +946,7 @@ public:
 	
 	static if (Args.length == 0)
 	{
-		static void _FiberCaller(Fiber fb)
+		private static void _FiberCaller(Fiber fb)
 		{
 			fb.call();
 		}
@@ -955,6 +959,20 @@ public:
 			if (is(Func: Fiber))
 		{
 			return connectedId(toDelegateEx(fib, &_FiberCaller));
+		}
+	}
+	
+	/***************************************************************************
+	 * Concut
+	 * 
+	 * Params:
+	 *     hnd = other Handler
+	 */
+	void opOpAssign(string op)(Handler hnd) if (op == "~")
+	{
+		foreach (p; hnd._procs[])
+		{
+			_procs.stableInsertBack(p);
 		}
 	}
 	
@@ -974,6 +992,16 @@ public:
 		enforce(id);
 		enforce(_procs);
 		_procs.stableLinearRemove(id);
+	}
+	
+	/// ditto
+	void disconnect(Func)(Func hnd)
+		if (is(Func == Handler))
+	{
+		foreach (p; hnd._procs[])
+		{
+			_procs.stableLinearRemove(p);
+		}
 	}
 	
 	
@@ -1023,7 +1051,15 @@ unittest
 	
 	void bar()
 	{
-		teststr ~= "bar";
+		while (1)
+		{
+			teststr ~= "bar";
+			Fiber.yield();
+		}
+	}
+	void bar2()
+	{
+		teststr ~= "bar2";
 	}
 	Handler!(typeof(bar)) h2;
 	Fiber fib = new Fiber(&bar);
@@ -1031,7 +1067,69 @@ unittest
 	teststr = "";
 	h2();
 	assert(teststr == "bar");
+	h2();
+	assert(teststr == "barbar");
+	
+	Handler!(typeof(bar)) h3;
+	h3.connect(&bar2);
+	static assert(__traits(compiles, h2 ~= h3));
+	h2 ~= h3;
+	teststr = "";
+	h2();
+	assert(teststr == "barbar2");
 }
+
+unittest
+{
+    Handler!(void delegate() const) hndConst;
+    Handler!(void delegate() immutable) hndImmutable;
+    Handler!(void delegate() shared) hndShared;
+    Handler!(void delegate() shared const) hndSharedConst;
+    /* test for qualifier */
+    {
+        struct SQual
+        {
+            void fnConst() const {}
+            void fnImmutable() immutable {}
+            void fnShared() shared {}
+            void fnSharedConst() shared const {}
+        }
+        SQual sq;
+        auto dgConst       = toDelegate(&sq.fnConst);
+        auto dgImmutable   = toDelegate(&sq.fnImmutable);
+        auto dgShared      = toDelegate(&sq.fnShared);
+        auto dgSharedConst = toDelegate(&sq.fnSharedConst);
+        static assert(is(FunctionTypeOf!dgConst       == const));
+        static assert(is(FunctionTypeOf!dgImmutable   == immutable));
+        static assert(is(FunctionTypeOf!dgShared      == shared));
+        static assert(is(FunctionTypeOf!dgSharedConst == shared));
+        static assert(is(FunctionTypeOf!dgSharedConst == const));
+        hndConst.connect(&sq.fnConst);
+        hndConst.disconnect(&sq.fnConst);
+        hndImmutable.connect(&sq.fnImmutable);
+        hndImmutable.disconnect(&sq.fnImmutable);
+        hndShared.connect(&sq.fnShared);
+        hndShared.disconnect(&sq.fnShared);
+        hndSharedConst.connect(&sq.fnSharedConst);
+        hndSharedConst.disconnect(&sq.fnSharedConst);
+     }
+     {
+        struct SConst       { void opCall() const {} }
+        struct SImmutable   { void opCall() immutable {} }
+        struct SShared      { void opCall() shared {} }
+        struct SSharedConst { void opCall() shared const {} }
+        auto idConst = hndConst.connect(SConst.init);
+        hndConst.disconnect(idConst);
+        auto idImmutable = hndImmutable.connect(SImmutable.init);
+        hndImmutable.disconnect(idImmutable);
+        auto idShared = hndShared.connect(SShared.init);
+        hndShared.disconnect(idShared);
+        auto idSharedConst = hndSharedConst.connect(SSharedConst.init);
+        hndSharedConst.disconnect(idSharedConst);
+    }
+
+}
+
 
 import std.stdio, std.algorithm, std.traits;
 import core.memory;
