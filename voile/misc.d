@@ -7,7 +7,7 @@ import core.memory, core.thread, core.exception;
 import std.concurrency, std.parallelism;
 import std.stdio, std.exception, std.conv, std.string, std.variant;
 import std.range, std.container, std.array, std.typetuple;
-import std.functional, std.typecons, std.traits, std.typetuple, std.metastrings;
+import std.functional, std.typecons, std.traits, std.typetuple;
 
 
 /* This template based from std.typecons.MemberFunctionGenerator */
@@ -35,7 +35,7 @@ private static:
 	{
 		template PARAMETER_VARIABLE_ID(size_t i)
 		{
-			enum string PARAMETER_VARIABLE_ID = "a" ~ toStringNow!(i);
+			enum string PARAMETER_VARIABLE_ID = "a" ~ to!string(i);
 				// default: a0, a1, ...
 		}
 	}
@@ -75,7 +75,7 @@ private static:
 				// The generated function declarations may hide existing ones
 				// in the base class (cf. HiddenFuncError), so we put an alias
 				// declaration here to reveal possible hidden functions.
-				code ~= Format!("alias %s.%s %s;\n",
+				code ~= format("alias %s.%s %s;\n",
 							Policy.BASE_CLASS_ID, // [BUG 2540] super.
 							oset.name, oset.name );
 			}
@@ -160,7 +160,7 @@ private static:
 			//
 			if (exFuncInfo.abst)
 				code ~= "override ";
-			code ~= Format!("extern(%s) %s %s(%s) %s %s\n",
+			code ~= format("extern(%s) %s %s(%s) %s %s\n",
 					exFuncInfo.linkage,
 					returnType,
 					realName,
@@ -223,7 +223,7 @@ private static:
 			if (stc & STC.lazy_ ) params ~= "lazy ";
 
 			// Take parameter type from the FuncInfo.
-			params ~= myFuncInfo ~ ".PT[" ~ toStringNow!(i) ~ "]";
+			params ~= myFuncInfo ~ ".PT[" ~ to!string(i) ~ "]";
 
 			// Declare a parameter variable.
 			params ~= " " ~ PARAMETER_VARIABLE_ID!(i);
@@ -1231,49 +1231,21 @@ private struct UniqueDataImpl(T)
 	/** Forwards member access to contents */
 	static if ((is(T==class)||is(T==interface)))
 	{
-		static if (is(T == const) && !is(T==shared))
-		{
-			@property @trusted nothrow pure
-			T _instance() const { return cast(T)_p; }
-		}
-		else static if (!is(T == const) && is(T==shared))
-		{
-			@property @trusted nothrow pure
-			T _instance() shared { return cast(T)_p; }
-		}
-		else static if (is(T == const) && is(T==shared))
-		{
-			@property @trusted nothrow pure
-			T _instance() const shared { return cast(T)_p; }
-		}
-		else
-		{
-			@property nothrow pure
-			T _instance() { return _p; }
-		}
+		@property @trusted nothrow pure
+		T _instance() inout { return cast(T)_p; }
+		@property @trusted nothrow pure
+		T _instance() shared { return cast(T)_p; }
+		@property @trusted nothrow pure
+		T _instance() const shared { return cast(T)_p; }
 	}
 	else
 	{
-		static if (is(T == const) && !is(T==shared))
-		{
-			@property @trusted nothrow pure
-			ref T _instance() const { return *cast(T*)_p; }
-		}
-		else static if (!is(T == const) && is(T==shared))
-		{
-			@property @trusted nothrow pure
-			ref T _instance() shared { return *cast(T*)_p; }
-		}
-		else static if (is(T == const) && is(T==shared))
-		{
-			@property @trusted nothrow pure
-			ref T _instance() const shared { return *cast(T*)_p; }
-		}
-		else
-		{
-			@property @safe nothrow pure
-			ref T _instance() { return *_p; }
-		}
+		@property @trusted nothrow pure
+		ref T _instance() inout { return *cast(T*)_p; }
+		@property @trusted nothrow pure
+		ref T _instance() shared { return *cast(T*)_p; }
+		@property @trusted nothrow pure
+		ref T _instance() const shared { return *cast(T*)_p; }
 	}
 	
 	
@@ -1415,65 +1387,25 @@ public:
 	/** Forwards member access to contents */
 	static if ((is(T==class)||is(T==interface)))
 	{
-		static if (is(T == const) && !is(T==shared))
-		{
-			mixin(`
-			@property @trusted nothrow pure 
-			T `~uniqueMemberName!(T, "_uniqueInstance")~`() const { return cast(T)`~uniqueMemberName!T~`._p; }
-			`);
-		}
-		else static if (!is(T == const) && is(T==shared))
-		{
-			mixin(`
-			@property @trusted nothrow pure
-			T `~uniqueMemberName!(T, "_uniqueInstance")~`() shared { return cast(T)`~uniqueMemberName!T~`._p; }
-			`);
-		}
-		else static if (is(T == const) && is(T==shared))
-		{
-			mixin(`
-			@property @trusted nothrow pure
-			T `~uniqueMemberName!(T, "_uniqueInstance")~`() const shared { return cast(T)`~uniqueMemberName!T~`._p; }
-			`);
-		}
-		else
-		{
-			mixin(`
-			@property nothrow pure
-			T `~uniqueMemberName!(T, "_uniqueInstance")~`() { return `~uniqueMemberName!T~`._p; }
-			`);
-		}
+		mixin(`
+		@property @trusted nothrow pure
+		T `~uniqueMemberName!(T, "_uniqueInstance")~`() inout { return cast(T)`~uniqueMemberName!T~`._p; }
+		@property @trusted nothrow pure
+		T `~uniqueMemberName!(T, "_uniqueInstance")~`() shared { return cast(T)`~uniqueMemberName!T~`._p; }
+		@property @trusted nothrow pure
+		T `~uniqueMemberName!(T, "_uniqueInstance")~`() const shared { return cast(T)`~uniqueMemberName!T~`._p; }
+		`);
 	}
 	else
 	{
-		static if (is(T == const) && !is(T==shared))
-		{
-			mixin(`
-			@property @trusted nothrow pure
-			ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() const { return *cast(T*)`~uniqueMemberName!T~`._p; }
-			`);
-		}
-		else static if (!is(T == const) && is(T==shared))
-		{
-			mixin(`
-			@property @trusted nothrow pure
-			ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() shared { return *cast(T*)`~uniqueMemberName!T~`._p; }
-			`);
-		}
-		else static if (is(T == const) && is(T==shared))
-		{
-			mixin(`
-			@property @trusted nothrow pure
-			ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() const shared { return *cast(T*)`~uniqueMemberName!T~`._p; }
-			`);
-		}
-		else
-		{
-			mixin(`
-			@property @safe nothrow pure
-			ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() { return *`~uniqueMemberName!T~`._p; }
-			`);
-		}
+		mixin(`
+		@property @trusted nothrow pure
+		ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() inout { return *cast(T*)`~uniqueMemberName!T~`._p; }
+		@property @trusted nothrow pure
+		ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() shared { return *cast(T*)`~uniqueMemberName!T~`._p; }
+		@property @trusted nothrow pure
+		ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() const shared { return *cast(T*)`~uniqueMemberName!T~`._p; }
+		`);
 	}
 	
 	mixin Proxy!(__traits(getMember, Unique, uniqueMemberName!(T, "_uniqueInstance")));
@@ -1505,7 +1437,7 @@ private Unique!T uniqueImpl(T, Args...)(Args args)
 		auto payload = malloc(instSize)[0..instSize];
 		payload[] = typeid(T).init[];
 	}
-	else static if (is(T==struct))
+	else
 	{
 		enum instSize = T.sizeof;
 		auto payload = malloc(instSize)[0..instSize];
@@ -1730,6 +1662,21 @@ unittest
 	assert(testary == [1,-3,-1,2,-4,-2,3]);
 }
 
+unittest
+{
+	struct S1 { int x; }
+	struct S2 { Unique!int x; }
+	class C1 { int x; }
+	class C2 { Unique!int x; }
+	foreach (T; TypeTuple!(
+		int, real, const(int), shared(int), shared(const(int)),
+		int*, real*, const(int)*, shared(int)*, shared(const(int))*,
+		S1, S2, C1, C2
+		))
+	{
+		auto u1  = unique!T();
+	}
+}
 
 
 private template _isNotRefPSC(uint pcs)
