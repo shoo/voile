@@ -40,16 +40,9 @@ void main(string[] args)
 		std.getopt.config.noBundling,
 		"src|s", &srcdir);
 	if (srcdir) opt.src = srcdir;
-	while (!args.empty())
-	{
-		if (args.front() == "--")
-		{
-			args.popFront();
-			break;
-		}
-		args.popFront();
-	}
-	opt.options ~= args[];
+	
+	if (args.length > 1)
+		opt.options ~= args[1..$];
 	
 	int res;
 	if (opt.doc)

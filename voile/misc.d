@@ -838,13 +838,13 @@ private:
 		{
 			enum generateFunctionBody =
 			q{
-				#line 842
+				#line 841
 				if (!_procs) return;
 				static if (_exFuncInfo.attrib & FunctionAttribute.nothrow_)
 				{
 					try
 					{
-						foreach (proc; (cast()_procs)[])
+						foreach (proc; (cast()_procs)[].array())
 						{
 							proc(args);
 						}
@@ -856,7 +856,7 @@ private:
 				}
 				else
 				{
-					foreach (proc; (cast()_procs)[])
+					foreach (proc; (cast()_procs)[].array())
 					{
 						proc(args);
 					}
