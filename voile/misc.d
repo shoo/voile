@@ -747,7 +747,7 @@ public:
 	}
 	
 	/// ditto
-	void clear()
+	void clear() pure
 	{
 		root.next = root;
 		root.prev = root;
@@ -932,16 +932,24 @@ public:
 		return HandlerProcId.init;
 	}
 	
-	HandlerProcId connect(Func)(Func tid)
-		if (is(Func == Tid))
+	static if (Args.length > 0 && !hasUnsharedAliasing!Args)
 	{
-		return connect(&(tid.send!(Args)));
-	}
-	
-	HandlerProcId connectedId(Func)(Func tid)
-		if (is(Func == Tid))
-	{
-		return connected(&(tid.send!(Args)));
+		static assert(Tid.sizeof == (void*).sizeof);
+		private static void _TidCaller(Tid* tid, Args args)
+		{
+			(*cast(Tid*)&tid).send(args);
+		}
+		HandlerProcId connect(Func)(Func tid)
+			if (is(Func == Tid))
+		{
+			return connect(toDelegateEx(*cast(Tid**)&tid, &_TidCaller));
+		}
+		
+		HandlerProcId connectedId(Func)(Func tid)
+			if (is(Func == Tid))
+		{
+			return connected(toDelegateEx(*cast(Tid**)&tid, &_TidCaller));
+		}
 	}
 	
 	static if (Args.length == 0)
@@ -1008,7 +1016,7 @@ public:
 	/***************************************************************************
 	 * 
 	 */
-	void clear()
+	void clear() pure
 	{
 		if (!_procs) return;
 		_procs.clear();

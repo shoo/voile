@@ -41,11 +41,11 @@ private template isStraightEnum(E)
 }
 
 
-private template ToField(Tuple...)
+private mixin template ToField(Tuple...)
 {
 	static if (Tuple.length)
 	{
-		mixin("alias Tuple[0] " ~ Tuple[0].stringof ~ ";");
+		mixin("alias Tuple[0] " ~ to!string(Tuple[0]) ~ ";");
 		mixin ToField!(Tuple[1..$]);
 	}
 }
@@ -62,7 +62,7 @@ enum EventHandler forbiddenEvent = cast(EventHandler)null;
 
 
 /// 無視するイベントハンドラー
-@property EventHandler ignoreEvent()
+@property EventHandler ignoreEvent() pure
 {
 	void dg(){}
 	return &dg;
@@ -70,7 +70,7 @@ enum EventHandler forbiddenEvent = cast(EventHandler)null;
 
 
 /// 何もしないイベント(状態遷移のみ)
-@property EventHandler doNothingEvent()
+@property EventHandler doNothingEvent() pure
 {
 	void dg(){}
 	return &dg;
@@ -165,7 +165,7 @@ struct Stm(TState, TEvent, TState defaultStateParam = TState.init)
 		/**********************************************************************
 		 * 次の状態とイベントハンドラの設定
 		 */
-		void set(State nextState, EventHandler eventHandler)
+		void set(State nextState, EventHandler eventHandler) pure
 		{
 			next = nextState;
 			handler = eventHandler;
@@ -235,14 +235,14 @@ public:
 	/***************************************************************************
 	 * 初期化
 	 */
-	this(SHPair!(State)[stateCount][eventCount] table...)
+	this(SHPair!(State)[stateCount][eventCount] table...) pure
 	{
 		initialize(table);
 	}
 	
 	
 	/// ditto
-	void initialize(SHPair!(State)[stateCount][eventCount] table...)
+	void initialize(SHPair!(State)[stateCount][eventCount] table...) pure
 	{
 		foreach (m; 0..eventCount)
 		foreach (n; 0..stateCount)
@@ -707,7 +707,7 @@ import std.stdio;
 		}
 		
 		srcstr.formattedWrite(
-			"Stm!(State, Event) stmFactory()\n"
+			"Stm!(State, Event) stmFactory() pure\n"
 			"{\n"
 			"\talias SHPair!(State) SH;\n"
 			"\tauto stm = Stm!(State, Event)(\n"
