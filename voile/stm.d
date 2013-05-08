@@ -624,7 +624,7 @@ private struct CsvStmParsedData
 			auto proclines = act.splitLines();
 			if (proclines.length == 0)
 				continue;
-			auto name = xformat("_stmStartActS%d", i);
+			auto name = format("_stmStartActS%d", i);
 			srcstr.put("void ");
 			srcstr.put(name);
 			srcstr.put("()\n{\n");
@@ -647,7 +647,7 @@ private struct CsvStmParsedData
 			auto proclines = act.splitLines();
 			if (proclines.length == 0)
 				continue;
-			auto name = xformat("_stmEndActS%d", i);
+			auto name = format("_stmEndActS%d", i);
 			srcstr.put("void ");
 			srcstr.put(name);
 			srcstr.put("()\n{\n");
@@ -699,9 +699,9 @@ import std.stdio;
 				}
 				else
 				{
-					proc = xformat("&_stmProcE%dS%d", i, j);
+					proc = format("&_stmProcE%dS%d", i, j);
 				}
-				app2.put(xformat("SH(State.%s, %s)", nextsts[i][j], proc));
+				app2.put(format("SH(State.%s, %s)", nextsts[i][j], proc));
 			}
 			app.put(app2.data.dup);
 		}

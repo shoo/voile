@@ -1353,7 +1353,7 @@ public:
 	this(U)(Unique!U u)
 		if (!is(U == T) && is(U: T))
 	{
-		debug (Unique) writefln("%d: Unique [%08x] other type constructor with rvalue [%08x]", __LINE__, cast(void*)&this, __traits(getMember, u, uniqueMemberName!U)._p);
+		debug (Unique) writefln("%d: Unique [%08x] other type constructor with rvalue [%08x]", __LINE__, cast(void*)&this, cast(void*)__traits(getMember, u, uniqueMemberName!U)._p);
 		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!U)._p;
 		__traits(getMember, u, uniqueMemberName!U)._p = null;
 	}
@@ -1372,7 +1372,7 @@ public:
 	void proxySwap()(ref Unique u)
 		if (!is(typeof(T.init.proxySwap(T.init))))
 	{
-		debug (Unique) writefln("%d: Unique [%08x] swap [%08x]", __LINE__, cast(void*)&this, __traits(getMember, u, uniqueMemberName!T)._p);
+		debug (Unique) writefln("%d: Unique [%08x] swap [%08x]", __LINE__, cast(void*)&this, cast(void*)__traits(getMember, u, uniqueMemberName!T)._p);
 		auto tmp = __traits(getMember, this, uniqueMemberName!T)._p;
 		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!T)._p;
 		__traits(getMember, u, uniqueMemberName!T)._p = tmp;
@@ -1386,7 +1386,7 @@ public:
 		}
 		body
 	{
-		debug (Unique) writefln("%d: Unique [%08x] assign [%08x]", __LINE__, cast(void*)&this, __traits(getMember, u, uniqueMemberName!T)._p);
+		debug (Unique) writefln("%d: Unique [%08x] assign [%08x]", __LINE__, cast(void*)&this, cast(void*)__traits(getMember, u, uniqueMemberName!T)._p);
 		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!T)._p;
 		__traits(getMember, u, uniqueMemberName!T)._p = null;
 		return this;
@@ -1442,28 +1442,13 @@ private Unique!T uniqueImpl(T, Args...)(Args args)
 	static if (is(T == class))
 	{
 		enum instSize = __traits(classInstanceSize, T);
-		auto payload = malloc(instSize)[0..instSize];
-		payload[] = typeid(T).init[];
+		return Unique!T(emplace!T(malloc(instSize)[0..instSize], args), instSize);
 	}
 	else
 	{
 		enum instSize = T.sizeof;
-		auto payload = malloc(instSize)[0..instSize];
-		*(cast(Unqual!(T)*)payload.ptr) = T.init;
+		return Unique!T(emplace(cast(RefT)malloc(instSize), args), instSize);
 	}
-	static if (Args.length == 0)
-	{
-		static if (is(typeof(T.init.__ctor())))
-		{
-			(cast(RefT)payload.ptr).__ctor();
-		}
-	}
-	else
-	{
-		emplace!T(cast(void[])payload, args);
-	}
-	
-	return Unique!T(cast(RefT)payload.ptr, instSize);
 }
 
 void release(T)(ref Unique!T u)
@@ -1528,6 +1513,7 @@ unittest
 		assert(!isEmpty(uf2));
 	}
 	testary ~= 4;
+	import std.stdio;
 	assert(testary == [1,2,-2,3,-1,4]);
 }
 
