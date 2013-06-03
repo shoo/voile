@@ -838,7 +838,6 @@ private:
 		{
 			enum generateFunctionBody =
 			q{
-				#line 841
 				if (!_procs) return;
 				static if (_exFuncInfo.attrib & FunctionAttribute.nothrow_)
 				{
@@ -1240,20 +1239,24 @@ private struct UniqueDataImpl(T)
 	static if ((is(T==class)||is(T==interface)))
 	{
 		@property @trusted nothrow pure
-		T _instance() inout { return cast(T)_p; }
-		@property @trusted nothrow pure
-		T _instance() shared { return cast(T)_p; }
-		@property @trusted nothrow pure
-		T _instance() const shared { return cast(T)_p; }
+		inout(T) _instance() inout { return cast(inout(T))_p; }
+//		@property @trusted nothrow pure
+//		immutable(T) _instance() immutable { return cast(immutable(T))_p; }
+//		@property @trusted nothrow pure
+//		shared(T) _instance() shared { return cast(shared(T))_p; }
+//		@property @trusted nothrow pure
+//		const(shared(T)) _instance() const shared { return cast(const(shared(T)))_p; }
 	}
 	else
 	{
 		@property @trusted nothrow pure
-		ref T _instance() inout { return *cast(T*)_p; }
-		@property @trusted nothrow pure
-		ref T _instance() shared { return *cast(T*)_p; }
-		@property @trusted nothrow pure
-		ref T _instance() const shared { return *cast(T*)_p; }
+		ref inout(T) _instance() inout { return *cast(inout(T)*)_p; }
+//		@property @trusted nothrow pure
+//		ref immutable(T) _instance() immutable { return *cast(immutable(T)*)_p; }
+//		@property @trusted nothrow pure
+//		ref shared(T) _instance() shared { return *cast(shared(T)*)_p; }
+//		@property @trusted nothrow pure
+//		ref const(shared(T)) _instance() const shared { return *cast(const(shared(T))*)_p; }
 	}
 	
 	
@@ -1295,6 +1298,8 @@ private struct UniqueDataImpl(T)
 	{
 		return _p is null;
 	}
+	
+	alias _instance this;
 }
 
 
@@ -1308,7 +1313,8 @@ private:
 	/***************************************************************************
 	 * Constructor
 	 */
-	this(U)(U p, TypeOf!(__traits(getMember, Unique, uniqueMemberName!T).Dummy) dummy) if (is(U == TypeOf!((__traits(getMember, Unique, uniqueMemberName!T).RefT))))
+	this(U)(U p, TypeOf!(__traits(getMember, Unique, uniqueMemberName!T).Dummy) dummy) pure
+		if (is(U == TypeOf!((__traits(getMember, Unique, uniqueMemberName!T).RefT))))
 	{
 		debug (Unique) writefln("%d: Unique constructor [%08x]", __LINE__, cast(void*)&this, cast(void*)_p);
 		__traits(getMember, this, uniqueMemberName!T)._p = p;
@@ -1392,31 +1398,7 @@ public:
 		return this;
 	}
 	
-	/** Forwards member access to contents */
-	static if ((is(T==class)||is(T==interface)))
-	{
-		mixin(`
-		@property @trusted nothrow pure
-		T `~uniqueMemberName!(T, "_uniqueInstance")~`() inout { return cast(T)`~uniqueMemberName!T~`._p; }
-		@property @trusted nothrow pure
-		T `~uniqueMemberName!(T, "_uniqueInstance")~`() shared { return cast(T)`~uniqueMemberName!T~`._p; }
-		@property @trusted nothrow pure
-		T `~uniqueMemberName!(T, "_uniqueInstance")~`() const shared { return cast(T)`~uniqueMemberName!T~`._p; }
-		`);
-	}
-	else
-	{
-		mixin(`
-		@property @trusted nothrow pure
-		ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() inout { return *cast(T*)`~uniqueMemberName!T~`._p; }
-		@property @trusted nothrow pure
-		ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() shared { return *cast(T*)`~uniqueMemberName!T~`._p; }
-		@property @trusted nothrow pure
-		ref T `~uniqueMemberName!(T, "_uniqueInstance")~`() const shared { return *cast(T*)`~uniqueMemberName!T~`._p; }
-		`);
-	}
-	
-	mixin Proxy!(__traits(getMember, Unique, uniqueMemberName!(T, "_uniqueInstance")));
+	mixin Proxy!(mixin(uniqueMemberName!T));
 }
 
 
@@ -1438,7 +1420,7 @@ Unique!T unique(T, Args...)(Args args)
 private Unique!T uniqueImpl(T, Args...)(Args args)
 	if (is(Unique!T))
 {
-	alias TypeOf!(__traits(getMember, Unique!T, uniqueMemberName!T).RefT) RefT;
+	mixin("alias Unique!T."~uniqueMemberName!T~".RefT RefT;");
 	static if (is(T == class))
 	{
 		enum instSize = __traits(classInstanceSize, T);
@@ -1669,6 +1651,41 @@ unittest
 		))
 	{
 		auto u1  = unique!T();
+	}
+	
+	{
+		auto u = unique!S1();
+		auto cu = unique!(const(S1))();
+		auto iu = unique!(immutable(S1))();
+		auto su = unique!(shared(S1))();
+		auto csu = unique!(const shared S1)();
+		auto x  = u.x;
+		auto cx = cu.x;
+		auto ix = iu.x;
+		auto sx = su.x;
+		auto csx = csu.x;
+		static assert(is(typeof(x)  == int));
+		static assert(is(typeof(cx) == const(int)));
+		static assert(is(typeof(ix) == immutable(int)));
+		static assert(is(typeof(sx) == shared(int)));
+		static assert(is(typeof(csx) == const(shared int)));
+	}
+	{
+		auto u   = unique!S1();
+		auto cu  = cast(const) &u;
+		auto iu  = cast(immutable) &u;
+		auto su  = cast(shared) &u;
+		auto csu = cast(const shared) &u;
+		auto x   = u.x;
+		auto cx  = cu.x;
+		auto ix  = iu.x;
+		//auto sx  = su.x;
+		//auto csx = csu.x;
+		static assert(is(typeof(x)  == int));
+		static assert(is(typeof(cx) == const(int)));
+		static assert(is(typeof(ix) == immutable(int)));
+		//static assert(is(typeof(ix) == shared(int)));
+		//static assert(is(typeof(ix) == const(shared int)));
 	}
 }
 
@@ -2203,17 +2220,6 @@ private S indentRuntime(S)(S s, S indentStr = " ")
 	// Overflow is no problem for this line.
 	app.reserve((s.length * 17)/16);
 	
-	version (ctfe) if (__ctfe)
-	{
-		auto lines = s.splitLines(KeepTerminator.yes);
-		foreach (l; lines)
-		{
-			app.put(indentStr);
-			app.put(l);
-		}
-		return app.data;
-	}
-	
 	immutable pend = s.ptr + s.length;
 	auto p = s.ptr;
 	auto pHead = p;
@@ -2250,8 +2256,6 @@ private S indentRuntime(S)(S s, S indentStr = " ")
 private S indentCtfe(S)(S s, S indentStr = " ")
 {
 	auto app = appender!(S)();
-	// Overflow is no problem for this line.
-	app.reserve((s.length * 17)/16);
 	
 	auto lines = s.splitLines(KeepTerminator.yes);
 	foreach (l; lines)
