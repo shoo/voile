@@ -224,7 +224,6 @@ function PackageExplorer()
         var node = this.tree.branch(path[0]);
         if ( !node )
             node = this.tree.createBranch(path[0], (path.length == 1) ? moduleIco : packageIco);
-        if (mod == "index") node.setRef("index.html");
         for (var i = 1; i < path.length; ++i)
         {
             var prev = node;
@@ -232,9 +231,8 @@ function PackageExplorer()
             if (!node)
                 node = prev.createChild(path[i], (path.length == i + 1) ? moduleIco : packageIco);
                 
-            if (path.length == i + 1)
-                node.setRef(path.join(".") + ".html");
         }
+        node.setRef(path.join(".") + ".html");
     }
 }
 
@@ -268,18 +266,9 @@ function Explorer()
             file_url = file_url.substring(file_url.lastIndexOf("/")+1,file_url.length)
             return file_url.substring(0,file_url.indexOf("."));
         }
-        if (baseName(location.href) == "index")
-        {
-            this.createTab("Package", this.packageExplorer.tree.domEntry);
-            this.packageExplorer.tree.createBranch("index", "candydoc/img/outline/package.png");
-        }
-        else
-        {
-            // create tabs
-            this.createTab("Outline", this.outline.tree.domEntry);
-            this.createTab("Package", this.packageExplorer.tree.domEntry);
-            this.packageExplorer.tree.createBranch("index", "candydoc/img/outline/package.png");
-        }
+        // create tabs
+        this.createTab("Outline", this.outline.tree.domEntry);
+        this.createTab("Package", this.packageExplorer.tree.domEntry);
     }
     
     this.createTab = function(name, domEntry)

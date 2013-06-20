@@ -9,12 +9,12 @@ See_Also:
 $(UL
 	$(LI $(LINK2 _index.html, voile)
 	$(UL
-		$(LI $(LINK2 voile.benchmark.html, benchmark))
-		$(LI $(LINK2 voile.judge.html, judge))
-		$(LI $(LINK2 voile.sync.html, sync))
-		$(LI $(LINK2 voile.dataformatter.html, dataformatter))
-		$(LI $(LINK2 voile.stm.html, stm))
-		$(LI $(LINK2 voile.misc.html, misc))
+		$(LI $(LINK2 _voile.benchmark.html, benchmark))
+		$(LI $(LINK2 _voile.judge.html, judge))
+		$(LI $(LINK2 _voile.sync.html, sync))
+		$(LI $(LINK2 _voile.dataformatter.html, dataformatter))
+		$(LI $(LINK2 _voile.stm.html, stm))
+		$(LI $(LINK2 _voile.misc.html, misc))
 	))
 )
 Authors: P.Knowledge, SHOO
@@ -22,4 +22,11 @@ License: NYSL ( $(LINK http://www.kmonos.net/nysl/) )
 Macros:
 	TITLE =Voile The Magic Library
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/
-module index;
+module voile;
+
+public import voile.benchmark;
+public import voile.dataformatter;
+public import voile.judge;
+public import voile.misc;
+public import voile.stm;
+public import voile.sync;

@@ -41,34 +41,6 @@ table
 	text-align: justify;
 }
 
-table.table
-{
-	border: solid 1px #e3bebe;
-	border-collapse: collapse;
-	border-spacing: 0px;
-}
-
-table.table tr td
-{
-	empty-cells: show;
-	padding: 5px;
-	border: solid 1px #dfaaaa;
-	border-width: 0 0 1px 1px;
-	text-align: center;
-}
-
-table.table tr th
-{
-	empty-cells: show;
-	padding: 5px;
-	border: solid 1px #fee0e0;
-	border-width: 0 0 1px 1px;
-	background-color: #a06060;
-	color: white;
-	font-weight: bold;
-	text-align: center;
-}
-
 /* Style used for all hyperlinks. */
 a:link {  color: #801000; text-decoration: none }
 a:visited {  color: #999900; text-decoration: none }
@@ -209,8 +181,130 @@ div.markerbottom{ border-left: dotted 2px #401000;}
 /* Style applied to preformated text used to show examples. */
 pre.d_code
 {
-	font-family: Consolas;
+	margin: 0px 0px 1em 50px;
+	padding: 5px 5px 5px 5px;
+	font-family: "Migu 1M",Consolas;
 	border: dotted 1px #401000;
 	background-color: #fff8f0;
+	page-break-inside: avoid;
 }
- 
+
+
+/* 表 */
+table.table
+{
+	border: solid 1px #e3bebe;
+	border-collapse: collapse;
+	border-spacing: 0px;
+	margin: 0px 0px 1em 50px;
+	padding: 0px 0px 0px 0px;
+	page-break-inside: avoid;
+}
+
+table.table tr td
+{
+	empty-cells: show;
+	padding: 5px;
+	border: solid 1px #dfaaaa;
+	border-width: 0 0 1px 1px;
+	text-align: center;
+}
+
+table.table tr th
+{
+	empty-cells: show;
+	padding: 5px;
+	border: solid 1px #fee0e0;
+	border-width: 0 0 1px 1px;
+	background-color: #a06060;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+}
+
+/* 図 */
+div.fig
+{
+	display: table;
+	width: 100%;
+	margin: 0px 0px 1em 0px;
+	padding: 0px 0px 0px 0px;
+	page-break-inside: avoid;
+}
+div.fig_area
+{
+	display: block;
+	
+	width: 90%;
+	float: center;
+	margin: 0 auto;
+}
+img.fig_image
+{
+	display: block;
+	width: 75%;
+	max-width: 400px;
+	min-width: 10px;
+	margin: 0 auto;
+	page-break-inside: avoid;
+}
+span.fig_title
+{
+	display: block;
+	width: 100%;
+	font-weight: bold;
+	text-align: center;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
+span.fig_explain
+{
+	display: block;
+	text-align: left;
+	width: 100%;
+}
+
+@media print
+{
+	#tabarea
+	{
+		display: none;
+	}
+	#docfooter
+	{
+		display: none;
+	}
+	#explorerclient
+	{
+		display: none;
+	}
+	#content
+	{
+		left: 8px;
+	}
+	body
+	{
+		background: url() fixed;
+	}
+	
+	div.fig
+	{
+		width: 100%;
+	}
+	div.fig_area
+	{
+		width: 100%;
+	}
+	img.fig_image
+	{
+		width: auto;
+		max-width: 100%;
+		min-width: 20mm;
+	}
+	span.fig_title
+	{
+	}
+	span.fig_explain
+	{
+	}
+}
