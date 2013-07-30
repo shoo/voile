@@ -3,7 +3,7 @@
  */
 module voile.misc;
 
-import core.memory, core.thread, core.exception, core.sync.mutex;
+import core.memory, core.thread, core.exception;
 import std.concurrency, std.parallelism;
 import std.stdio, std.exception, std.conv, std.string, std.variant;
 import std.range, std.container, std.array, std.typetuple;
@@ -389,7 +389,6 @@ private:
 		}
 	}
 	Node* root;
-	Mutex _mutex;
 public:
 	/***************************************************************************
 	 * 
@@ -609,7 +608,6 @@ public:
 		root = new Node(v, null, null);
 		root.next = root;
 		root.prev = root;
-		_mutex = new Mutex(this);
 	}
 	
 	@property bool empty() const pure nothrow
@@ -1021,22 +1019,6 @@ public:
 	{
 		if (!_procs) return;
 		_procs.clear();
-	}
-	
-	/***************************************************************************
-	 * 
-	 */
-	void lock() shared
-	{
-		(cast()_procs._mutex).lock();
-	}
-	
-	/***************************************************************************
-	 * 
-	 */
-	void unlock() shared
-	{
-		(cast()_procs._mutex).unlock();
 	}
 }
 
