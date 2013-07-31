@@ -359,7 +359,7 @@ else
 class NamedMutex: Object.Monitor
 {
 private:
-	struct MonitorProxy
+	static struct MonitorProxy
 	{
 		Object.Monitor link;
 	}
@@ -526,4 +526,256 @@ public:
 			ReleaseMutex(_handle);
 		}
 	}
+}
+
+
+
+/*******************************************************************************
+ * 管理された共有資源
+ * 
+ * 初期状態は非共有資源。
+ */
+class ManagedShared(T): Object.Monitor
+{
+private:
+	import core.sync.mutex, core.atomic;
+	import std.exception;
+	static struct MonitorProxy
+	{
+		Object.Monitor link;
+	}
+	MonitorProxy _proxy;
+	Mutex        _mutex;
+	size_t       _locked;
+	T            _data;
+	void _initData()
+	{
+		_proxy.link = this;
+		this.__monitor = &_proxy;
+		_mutex = new Mutex();
+		lock();
+	}
+public:
+	
+	/***************************************************************************
+	 * 
+	 */
+	this() pure
+	{
+		// これはひどい
+		(cast(void delegate() pure)&_initData)();
+	}
+	
+	
+	/***************************************************************************
+	 * ロックされたデータを得る
+	 * 
+	 * RAIIで自動的に
+	 */
+	auto locked() @property
+	{
+		lock();
+		static struct LockedData
+		{
+		private:
+			ManagedShared!T _data;
+			ref T _dataRef() @property { return _data._data; }
+			this(ManagedShared!T dat){_data = dat;}
+			import std.typecons;
+		public:
+			~this()
+			{
+				_data.unlock();
+			}
+			mixin Proxy!_dataRef;
+		}
+		return LockedData(this);
+	}
+	/// ditto
+	auto locked() shared @property
+	{
+		return (cast()this).locked();
+	}
+	
+	
+	/***************************************************************************
+	 * ロックを試行する。
+	 * 
+	 * Returns:
+	 *     すでにロックしているならtrue
+	 *     ロックされていなければロックしてtrue
+	 *     別のスレッドにロックされていてロックできなければfalse
+	 */
+	bool tryLock()
+	{
+		auto tmp = _mutex.tryLock();
+		// ロックされていなければ _locked を操作することは許されない
+		if (tmp)
+			_locked++;
+		return tmp;
+	}
+	/// ditto
+	bool tryLock() shared
+	{
+		return (cast()this).tryLock();
+	}
+	
+	
+	/***************************************************************************
+	 * ロックする。
+	 */
+	void lock()
+	{
+		_mutex.lock();
+		_locked++;
+	}
+	/// ditto
+	void lock() shared
+	{
+		(cast()this).lock();
+	}
+	
+	
+	/***************************************************************************
+	 * ロック解除する。
+	 */
+	void unlock()
+	{
+		_locked--;
+		_mutex.unlock();
+	}
+	/// ditto
+	void unlock() shared
+	{
+		(cast()this).unlock();
+	}
+	
+	
+	/***************************************************************************
+	 * 非共有資源としてアクセスする
+	 */
+	ref T asUnshared() @property
+	{
+		enforce(_locked != 0);
+		return *cast(T*)&_data;
+	}
+	/// ditto
+	ref T asUnshared() shared @property
+	{
+		enforce(_locked != 0);
+		return *cast(T*)&_data;
+	}
+	
+	
+	/***************************************************************************
+	 * 共有資源としてアクセスする
+	 */
+	ref shared(T) asShared() @property
+	{
+		return *cast(shared(T)*)&_data;
+	}
+	/// ditto
+	ref shared(T) asShared() shared @property
+	{
+		return *cast(shared(T)*)&_data;
+	}
+}
+
+
+/*******************************************************************************
+ * 
+ */
+ManagedShared!T managedShared(T, Args...)(Args args)
+{
+	auto s = new ManagedShared!T;
+	static if (Args.length == 0 && is(typeof(s.asUnshared.__ctor())))
+	{
+		s.asUnshared.__ctor();
+	}
+	else static if (is(typeof(s.asUnshared.__ctor(args))))
+	{
+		s.asUnshared.__ctor(args);
+	}
+	return s;
+}
+
+unittest
+{
+	auto s = managedShared!int();
+	s.asUnshared += 50;
+	s.asShared   += 100;
+	s.unlock();
+	try
+	{
+		s.asUnshared += 200;
+		assert(0);
+	}
+	catch (Exception e) { }
+	s.lock();
+	s.asUnshared += 200;
+	assert(s.asShared == 350);
+	s.unlock();
+	
+	{
+		auto ld = s.locked;
+		assert(s._locked);
+		ld += 1;
+	}
+	assert(!s._locked);
+	assert(s.asShared == 351);
+	
+	synchronized (s)
+	{
+		assert(s._locked);
+		{
+			auto ld = s.locked;
+			assert(s._locked);
+			ld += 2;
+		}
+		import std.stdio;
+		assert(s._locked);
+	}
+	assert(!s._locked);
+	assert(s.asShared == 353);
+}
+
+
+unittest
+{
+	auto s = new shared ManagedShared!int();
+	s.asUnshared += 50;
+	s.asShared   += 100;
+	s.unlock();
+	try
+	{
+		s.asUnshared += 200;
+		assert(0);
+	}
+	catch (Exception e) { }
+	s.lock();
+	s.asUnshared += 200;
+	assert(s.asShared == 350);
+	s.unlock();
+	
+	{
+		auto ld = s.locked;
+		assert(s._locked);
+		ld += 1;
+	}
+	assert(!s._locked);
+	assert(s.asShared == 351);
+	
+	synchronized (s)
+	{
+		assert(s._locked);
+		{
+			auto ld = s.locked;
+			assert(s._locked);
+			ld += 2;
+		}
+		import std.stdio;
+		assert(s._locked);
+	}
+	assert(!s._locked);
+	assert(s.asShared == 353);
 }
