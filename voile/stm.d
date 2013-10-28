@@ -258,7 +258,7 @@ public:
 	/***************************************************************************
 	 * 現在のステート
 	 */
-	@property State currentState()
+	@property State currentState() const pure
 	{
 		return _state;
 	}
