@@ -682,7 +682,7 @@ private struct CsvStmParsedData
 	{
 		auto app = appender!(string[][])();
 		auto app2 = appender!(string[])();
-import std.stdio;		
+		
 		foreach (i; 0..events.length)
 		{
 			app2.shrinkTo(0);

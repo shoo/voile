@@ -977,6 +977,7 @@ public:
 	 */
 	void opOpAssign(string op)(Handler hnd) if (op == "~")
 	{
+		if (!_procs) _procs = new ProcList;
 		foreach (p; hnd._procs[])
 		{
 			_procs.stableInsertBack(p);

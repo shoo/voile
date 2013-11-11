@@ -142,11 +142,11 @@ class SyncEvent
 		 */
 		@property void signaled(bool cond)
 		{
-			if (cond && signaled == false)
+			if (cond == true && signaled == false)
 			{
 				SetEvent(_handle);
 			}
-			else if(signaled == true)
+			else if (cond == false && signaled == true)
 			{
 				ResetEvent(_handle);
 			}
@@ -399,8 +399,8 @@ public:
 		static char_t[] encodeStr(string str, char_t[] aBuf)
 		{
 			auto dBuf = aBuf;
-			dBuf[0.."/voile::NamedMutex[".length] = "/voile::NamedMutex[";
-			size_t j="/voile::NamedMutex[".length;
+			dBuf[0..(cast(char_t[])"/voile::NamedMutex[").length] = cast(char_t[])"/voile::NamedMutex[";
+			size_t j=(cast(char_t[])"/voile::NamedMutex[").length;
 			foreach (char c; str)
 			{
 				switch (c)
