@@ -424,7 +424,8 @@ public:
 					break;
 				}
 			}
-			if (j >= dBuf.length - 1) dBuf.length = dBuf.length + 2;
+			if (j >= dBuf.length - 1)
+				dBuf.length = dBuf.length + 2;
 			dBuf[j++] = ']';
 			dBuf[j++] = '\0';
 			return dBuf[0..j];
@@ -778,4 +779,42 @@ unittest
 	}
 	assert(!s._locked);
 	assert(s.asShared == 353);
+}
+
+private template AssumedUnsharedType(T)
+{
+	import std.traits;
+	static if (is(T U == shared(U)))
+	{
+		alias AssumedUnsharedType!(U) AssumedUnsharedType;
+	}
+	else static if (is(T U == const(shared(U))))
+	{
+		alias const(AssumedUnsharedType!(U)) AssumedUnsharedType;
+	}
+	else static if (isPointer!T)
+	{
+		alias AssumedUnsharedType!(pointerTarget!T)* AssumedUnsharedType;
+	}
+	else static if (isDynamicArray!T)
+	{
+		alias AssumedUnsharedType!(ForeachType!T)[] AssumedUnsharedType;
+	}
+	else static if (isStaticArray!T)
+	{
+		alias AssumedUnsharedType!(ForeachType!T)[T.length] AssumedUnsharedType;
+	}
+	else static if (isAssociativeArray!T)
+	{
+		alias AssumedUnsharedType!(ValueType!T)[AssumedUnsharedType!(KeyType!T)] AssumedUnsharedType;
+	}
+	else
+	{
+		alias T AssumedUnsharedType;
+	}
+}
+
+auto ref assumeUnshared(T)(ref T x) @property
+{
+	return *cast(AssumedUnsharedType!(T)*)&x;
 }

@@ -194,7 +194,7 @@ final:
 					{
 						arg();
 					}
-					else static if(is(R == bool))
+					else static if (is(R == bool))
 					{
 						auto x = arg();
 						if (x == false)
@@ -202,7 +202,7 @@ final:
 							_results ~= msgtxt("failure");
 						}
 					}
-					else static if(is(R : Object))
+					else static if (is(R : Object))
 					{
 						auto x = arg();
 						if (x !is null
@@ -246,7 +246,7 @@ final:
 			}
 		}
 		
-		static if(T.length > 1)
+		static if (T.length > 1)
 		{
 			discuss(args[1..$]);
 		}
@@ -308,7 +308,8 @@ final:
 		foreach (ref Object e; _results)
 		{
 			result = dg(e);
-			if (result) break;
+			if (result)
+				break;
 		}
 		return result;
 	}
@@ -323,7 +324,8 @@ final:
 		foreach (int i, ref Object e; _results)
 		{
 			result = dg(i, e);
-			if (result) break;
+			if (result)
+				break;
 		}
 		return result;
 	}
@@ -353,7 +355,8 @@ final:
 	 */
 	void throwIfFailure(bool doCopy = true)
 	{
-		if (bad) throw new JudgementException(this);
+		if (bad)
+			throw new JudgementException(this);
 	}
 }
 /*******************************************************************************

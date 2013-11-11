@@ -127,7 +127,8 @@ private static:
 
 				if (!isCtor)
 				{
-					if (atts & FA.ref_) rtype ~= "ref ";
+					if (atts & FA.ref_)
+						rtype ~= "ref ";
 					rtype ~= myFuncInfo ~ ".RT";
 				}
 				return rtype;
@@ -215,7 +216,8 @@ private static:
 
 		foreach (i, stc; stcs)
 		{
-			if (i > 0) params ~= ", ";
+			if (i > 0)
+				params ~= ", ";
 
 			// Parameter storage classes.
 			if (stc & STC.scope_) params ~= "scope ";
@@ -258,7 +260,8 @@ private static:
 		foreach (i_; CountUp!(n))
 		{
 			enum i = 0 + i_; // workaround
-			if (i > 0) params ~= ", ";
+			if (i > 0)
+				params ~= ", ";
 			params ~= PARAMETER_VARIABLE_ID!(i);
 		}
 		return params;
@@ -470,7 +473,8 @@ public:
 		int opCmp(Iterator itr) const pure
 		{
 			enforce(list is itr.list);
-			if (node is itr.node) return 0;
+			if (node is itr.node)
+				return 0;
 			const(Node)* l = node;
 			const(Node)* r = itr.node;
 			while (1)
@@ -498,7 +502,8 @@ public:
 			size_t i;
 			for (auto n = node; ; n = n.next)
 			{
-				if (n is itr.node) return i;
+				if (n is itr.node)
+					return i;
 				n = n.next;
 				enforce(n !is list.root);
 				++i;
@@ -839,7 +844,8 @@ private:
 		{
 			enum generateFunctionBody =
 			q{
-				if (!_procs) return;
+				if (!_procs)
+					return;
 				static if (_exFuncInfo.attrib & FunctionAttribute.nothrow_)
 				{
 					try
@@ -901,7 +907,8 @@ public:
 	HandlerProcId connect(Func)(Func fn)
 		if (is(typeof( toDelegate(fn) )))
 	{
-		if (!_procs) _procs = new ProcList;
+		if (!_procs)
+			_procs = new ProcList;
 		_procs.stableInsertBack( toDelegate(fn) );
 		return _procs.begin;
 	}
@@ -918,7 +925,8 @@ public:
 	HandlerProcId connectedId(Func)(Func fn)
 		if (is(typeof( toDelegate(fn) )))
 	{
-		if (!_procs) return HandlerProcId.init;
+		if (!_procs)
+			return HandlerProcId.init;
 		auto f = toDelegate(fn);
 		for (auto r = _procs[]; !r.empty; r.popBack())
 		{
@@ -977,7 +985,8 @@ public:
 	 */
 	void opOpAssign(string op)(Handler hnd) if (op == "~")
 	{
-		if (!_procs) _procs = new ProcList;
+		if (!_procs)
+			_procs = new ProcList;
 		foreach (p; hnd._procs[])
 		{
 			_procs.stableInsertBack(p);
@@ -1018,7 +1027,8 @@ public:
 	 */
 	void clear() pure
 	{
-		if (!_procs) return;
+		if (!_procs)
+			return;
 		_procs.clear();
 	}
 }
@@ -1265,7 +1275,8 @@ private struct UniqueDataImpl(T)
 	@trusted
 	void release()
 	{
-		if (!_p) return;
+		if (!_p)
+			return;
 		debug (Unique) writefln("%d: Unique [%08x] release of [%08x]", __LINE__, cast(void*)&this, cast(void*)_p);
 		auto p = detach();
 		assert(_p is null);

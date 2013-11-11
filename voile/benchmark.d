@@ -191,7 +191,8 @@ struct FootPrintBenchmark
 	{
 		Data[] ret;
 		auto alldatas = _datas.data;
-		if (alldatas.length == 0) return null;
+		if (alldatas.length == 0)
+			return null;
 		TickDuration last = alldatas[0].time;
 		foreach (i, d; alldatas)
 		{
