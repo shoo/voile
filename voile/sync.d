@@ -103,7 +103,7 @@ class SyncEvent
 		/***********************************************************************
 		 * コンストラクタ
 		 * 
-		 * Params: aHandle = イベントハンドル
+		 * Params: h = イベントハンドル
 		 */
 		this(HANDLE h)
 		{
@@ -113,7 +113,7 @@ class SyncEvent
 		/***********************************************************************
 		 * コンストラクタ
 		 * 
-		 * Params: aFirstCondition = 初期状態
+		 * Params: firstCondition = 初期状態
 		 */
 		this(bool firstCondition = false)
 		{
@@ -135,7 +135,7 @@ class SyncEvent
 		/***********************************************************************
 		 * シグナル状態を設定する
 		 * 
-		 * Params: aCondition=
+		 * Params: cond=
 		 *     trueならシグナル状態にし、waitしているスレッドの制御を返す。
 		 *     falseなら非シグナル状態で、waitしたらシグナル状態になるまで制御を
 		 *     返さない状態にする。
@@ -201,7 +201,7 @@ class SyncEvent
 		/***********************************************************************
 		 * コンストラクタ
 		 * 
-		 * Params: aFirstCondition = 初期状態
+		 * Params: firstCondition = 初期状態
 		 */
 		this(bool firstCondition = false)
 		{
@@ -228,17 +228,17 @@ class SyncEvent
 		/***********************************************************************
 		 * シグナル状態を設定する
 		 * 
-		 * Params: aCondition=
+		 * Params: cond=
 		 *     trueならシグナル状態にし、waitしているスレッドの制御を返す。
 		 *     falseなら非シグナル状態で、waitしたらシグナル状態になるまで制御を
 		 *     返さない状態にする。
 		 */
 		@property
-		void signaled(bool aCondition)
+		void signaled(bool cond)
 		{
 			synchronized (_mutex)
 			{
-				_signaled = aCondition;
+				_signaled = cond;
 				_condition.notifyAll;
 			}
 		}

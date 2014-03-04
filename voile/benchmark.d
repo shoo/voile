@@ -168,7 +168,8 @@ struct FootPrintBenchmark
 		foreach (i, d; _datas.data)
 		{
 			auto r = d.time.seconds;
-			ret ~= last <>= 0 ? r - last : r;
+			import std.math;
+			ret ~= !last.isNaN() ? r - last : r;
 			last = r;
 		}
 		return assumeUnique(ret);

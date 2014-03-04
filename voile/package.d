@@ -10,11 +10,14 @@ $(UL
 	$(LI $(LINK2 _index.html, voile)
 	$(UL
 		$(LI $(LINK2 _voile.benchmark.html, benchmark))
-		$(LI $(LINK2 _voile.judge.html, judge))
-		$(LI $(LINK2 _voile.sync.html, sync))
 		$(LI $(LINK2 _voile.dataformatter.html, dataformatter))
-		$(LI $(LINK2 _voile.stm.html, stm))
+		$(LI $(LINK2 _voile.handler.html, handler))
+		$(LI $(LINK2 _voile.json.html, json))
+		$(LI $(LINK2 _voile.judge.html, judge))
 		$(LI $(LINK2 _voile.misc.html, misc))
+		$(LI $(LINK2 _voile.stm.html, stm))
+		$(LI $(LINK2 _voile.sync.html, sync))
+		$(LI $(LINK2 _voile.unique.html, unique))
 	))
 )
 Authors: P.Knowledge, SHOO
@@ -26,7 +29,10 @@ module voile;
 
 public import voile.benchmark;
 public import voile.dataformatter;
+public import voile.handler;
+public import voile.json;
 public import voile.judge;
 public import voile.misc;
 public import voile.stm;
 public import voile.sync;
+public import voile.unique;

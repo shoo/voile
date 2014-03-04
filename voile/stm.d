@@ -19,7 +19,7 @@ import core.memory;
 import std.traits, std.typecons, std.typetuple,
        std.string, std.conv, std.range, std.container,
        std.csv, std.array, std.format, std.algorithm;
-import voile.misc;
+import voile.handler;
 
 private template isStraight(int start, Em...)
 {
@@ -453,6 +453,7 @@ public:
 	 */
 	Handler!(ExceptionCallback) onException;
 }
+
 
 
 template isStm(STM)
