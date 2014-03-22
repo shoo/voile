@@ -921,3 +921,314 @@ enum replaceData = `▽初期,init
 	assert(stm.currentState == State.init);
 }
 
+///
+template StateFlow(Commands)
+{
+
+template OverloadSet(string nam, T...)
+{
+    enum string name = nam;
+    alias contents = T;
+}
+
+/*
+ * Code-generating stuffs are encupsulated in this helper template so that
+ * namespace pollusion, which can cause name confliction with Base's public
+ * members, should be minimized.
+ */
+template AutoImplement_Helper(string myName, string baseName,
+        Base, alias generateMethodBody, alias cherrypickMethod)
+{
+private static:
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+    // Internal stuffs
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+
+    // this would be deprecated by std.typelist.Filter
+    template staticFilter(alias pred, lst...)
+    {
+        static if (lst.length > 0)
+        {
+            alias tail = staticFilter!(pred, lst[1 .. $]);
+            //
+            static if (pred!(lst[0]))
+                alias staticFilter = TypeTuple!(lst[0], tail);
+            else
+                alias staticFilter = tail;
+        }
+        else
+            alias staticFilter = TypeTuple!();
+    }
+
+    // Returns function overload sets in the class C, filtered with pred.
+    template enumerateOverloads(C, alias pred)
+    {
+        template Impl(names...)
+        {
+            static if (names.length > 0)
+            {
+                alias methods = staticFilter!(pred, MemberFunctionsTuple!(C, names[0]));
+                alias next = Impl!(names[1 .. $]);
+
+                static if (methods.length > 0)
+                    alias Impl = TypeTuple!(OverloadSet!(names[0], methods), next);
+                else
+                    alias Impl = next;
+            }
+            else
+                alias Impl = TypeTuple!();
+        }
+
+        alias enumerateOverloads = Impl!(__traits(allMembers, C));
+    }
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+    // Target functions
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+
+    // Add a non-final check to the cherrypickMethod.
+    enum bool canonicalPicker(fun.../+[BUG 4217]+/) =
+        !__traits(isFinalFunction, fun[0]) && cherrypickMethod!(fun);
+
+    /*
+     * A tuple of overload sets, each item of which consists of functions to be
+     * implemented by the generated code.
+     */
+    alias targetOverloadSets = enumerateOverloads!(Base, canonicalPicker);
+
+    /*
+     * A tuple of the super class' constructors.  Used for forwarding
+     * constructor calls.
+     */
+    static if (__traits(hasMember, Base, "__ctor"))
+        alias ctorOverloadSet = OverloadSet!("__ctor", __traits(getOverloads, Base, "__ctor"));
+    else
+        alias ctorOverloadSet = OverloadSet!("__ctor"); // empty
+
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+    // Type information
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+
+    /*
+     * The generated code will be mixed into AutoImplement, which will be
+     * instantiated in this module's scope.  Thus, any user-defined types are
+     * out of scope and cannot be used directly (i.e. by their names).
+     *
+     * We will use FuncInfo instances for accessing return types and parameter
+     * types of the implemented functions.  The instances will be populated to
+     * the AutoImplement's scope in a certain way; see the populate() below.
+     */
+
+    // Returns the preferred identifier for the FuncInfo instance for the i-th
+    // overloaded function with the name.
+    template INTERNAL_FUNCINFO_ID(string name, size_t i)
+    {
+        import std.string : format;
+
+        enum string INTERNAL_FUNCINFO_ID = format("F_%s_%s", name, i);
+    }
+
+    /*
+     * Insert FuncInfo instances about all the target functions here.  This
+     * enables the generated code to access type information via, for example,
+     * "autoImplement_helper_.F_foo_1".
+     */
+    template populate(overloads...)
+    {
+        static if (overloads.length > 0)
+        {
+            mixin populate!(overloads[0].name, overloads[0].contents);
+            mixin populate!(overloads[1 .. $]);
+        }
+    }
+    template populate(string name, methods...)
+    {
+        static if (methods.length > 0)
+        {
+            mixin populate!(name, methods[0 .. $ - 1]);
+            //
+            alias target = methods[$ - 1];
+            enum ith = methods.length - 1;
+            mixin("alias " ~ INTERNAL_FUNCINFO_ID!(name, ith) ~ " = FuncInfo!target;");
+        }
+    }
+
+    public mixin populate!(targetOverloadSets);
+    public mixin populate!(  ctorOverloadSet );
+
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+    // Code-generating policies
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+
+    /* Common policy configurations for generating constructors and methods. */
+    package template CommonGeneratingPolicy()
+    {
+        // base class identifier which generated code should use
+        enum string BASE_CLASS_ID = baseName;
+
+        // FuncInfo instance identifier which generated code should use
+        template FUNCINFO_ID(string name, size_t i)
+        {
+            enum string FUNCINFO_ID =
+                myName ~ "." ~ INTERNAL_FUNCINFO_ID!(name, i);
+        }
+    }
+
+    /* Policy configurations for generating constructors. */
+    package template ConstructorGeneratingPolicy()
+    {
+        mixin CommonGeneratingPolicy;
+
+        /* Generates constructor body.  Just forward to the base class' one. */
+        package string generateFunctionBody(ctor.../+[BUG 4217]+/)() @property
+        {
+            enum varstyle = variadicFunctionStyle!(typeof(&ctor[0]));
+
+            static if (varstyle & (Variadic.c | Variadic.d))
+            {
+                // the argptr-forwarding problem
+                //pragma(msg, "Warning: AutoImplement!(", Base, ") ",
+                //        "ignored variadic arguments to the constructor ",
+                //        FunctionTypeOf!(typeof(&ctor[0])) );
+            }
+            return "super(args);";
+        }
+    }
+
+    /* Policy configurations for genearting target methods. */
+    package template MethodGeneratingPolicy()
+    {
+        mixin CommonGeneratingPolicy;
+
+        /* Geneartes method body. */
+        package string generateFunctionBody(func.../+[BUG 4217]+/)() @property
+        {
+            return generateMethodBody!(Base, func); // given
+        }
+    }
+
+
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+    // Generated code
+    //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+
+    alias ConstructorGenerator = MemberFunctionGeneratorEx!(ConstructorGeneratingPolicy!());
+    alias MethodGenerator      = MemberFunctionGeneratorEx!(MethodGeneratingPolicy!());
+
+    public enum string code =
+        ConstructorGenerator.generateCode!(  ctorOverloadSet ) ~ "\n" ~
+             MethodGenerator.generateCode!(targetOverloadSets);
+
+    debug (SHOW_GENERATED_CODE)
+    {
+        pragma(msg, "-------------------- < ", Base, " >");
+        pragma(msg, code);
+        pragma(msg, "--------------------");
+    }
+}
+
+	
+	enum generateTransferFunction(C, alias fun) =
+	`
+		auto nxt = _stsStack.front.` ~ __traits(identifier, fun) ~ `(args);
+		if (nxt is null)
+		{
+			_stsStack.removeFront();
+		}
+		else if (_stsStack.front !is nxt)
+		{
+			_stsStack.insertFront(nxt);
+		}
+		return this;
+	`;
+	
+	enum isEventDistributor(alias func) = is(ReturnType!func: Commands);
+	
+	class StateFlow: Commands/+AutoImplement!(StateData, generateTransferFunction, isEventDistributor)+/
+	{
+	private:
+		import std.container;
+		SList!Commands _stsStack;
+		
+	public:
+		private alias autoImplement_helper_ =
+			AutoImplement_Helper!("autoImplement_helper_", "Commands", Commands, generateTransferFunction, isEventDistributor);
+	//	pragma(msg, autoImplement_helper_.code);
+		mixin(autoImplement_helper_.code);
+	public:
+		this(Commands root)
+		{
+			_stsStack.insertFront(root);
+		}
+	}
+
+}
+
+///
+unittest
+{
+	interface TestCommand
+	{
+		TestCommand command(string cmd);
+		TestCommand update();
+	}
+	string msg;
+	
+	TestCommand test1;
+	TestCommand test2;
+	
+	test1 = new class TestCommand
+	{
+		TestCommand command(string cmd)
+		{
+			msg = cmd;
+			// not transit
+			return this;
+		}
+		TestCommand update()
+		{
+			msg = "";
+			// transit to child(test2)
+			return test2;
+		}
+	};
+	test2 = new class TestCommand
+	{
+		TestCommand command(string cmd)
+		{
+			msg = cmd ~ "!";
+			// not transit
+			return this;
+		}
+		TestCommand update()
+		{
+			msg = "!";
+			// transit to parent(test1)
+			return null;
+		}
+	};
+	
+	auto sts = new StateFlow!TestCommand(test1);
+	
+	// not transit
+	sts.command("test");
+	assert(msg == "test");
+	
+	// transit to child(test2)
+	sts.update();
+	assert(msg == "");
+	
+	// not transit
+	sts.command("test");
+	assert(msg == "test!");
+	
+	// transit to parent(test1)
+	sts.update();
+	assert(msg == "!");
+	
+	// not transit
+	sts.command("test");
+	assert(msg == "test");
+}

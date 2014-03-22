@@ -3,8 +3,14 @@
 import core.thread;
 import std.traits, std.range, std.exception, std.typetuple, std.concurrency, std.functional;
 
+private template isVirtualMethod(func...)
+	if (func.length == 1)
+{
+	enum isVirtualMethod = __traits(isVirtualMethod, func[0]);
+}
+
 /* This template based from std.typecons.MemberFunctionGenerator */
-private template MemberFunctionGeneratorEx(alias Policy)
+package template MemberFunctionGeneratorEx(alias Policy)
 {
 private static:
 	import std.string: format;
@@ -24,24 +30,21 @@ private static:
 	// preferred identifier for i-th parameter variable
 	static if (__traits(hasMember, Policy, "PARAMETER_VARIABLE_ID"))
 	{
-		alias Policy.PARAMETER_VARIABLE_ID PARAMETER_VARIABLE_ID;
+		alias PARAMETER_VARIABLE_ID = Policy.PARAMETER_VARIABLE_ID;
 	}
 	else
 	{
-		template PARAMETER_VARIABLE_ID(size_t i)
-		{
-			enum string PARAMETER_VARIABLE_ID = "a" ~ to!string(i);
-				// default: a0, a1, ...
-		}
+		enum string PARAMETER_VARIABLE_ID(size_t i) = format("a%s", i);
+			// default: a0, a1, ...
 	}
 
 	// Returns a tuple consisting of 0,1,2,...,n-1.  For static foreach.
 	template CountUp(size_t n)
 	{
 		static if (n > 0)
-			alias TypeTuple!(CountUp!(n - 1), n - 1) CountUp;
+			alias CountUp = TypeTuple!(CountUp!(n - 1), n - 1);
 		else
-			alias TypeTuple!() CountUp;
+			alias CountUp = TypeTuple!();
 	}
 
 
@@ -61,7 +64,7 @@ private static:
 		foreach (i_; CountUp!(0 + overloads.length)) // workaround
 		{
 			enum i = 0 + i_; // workaround
-			alias overloads[i] oset;
+			alias oset = overloads[i];
 
 			code ~= generateCodeForOverloadSet!(oset);
 
@@ -70,9 +73,10 @@ private static:
 				// The generated function declarations may hide existing ones
 				// in the base class (cf. HiddenFuncError), so we put an alias
 				// declaration here to reveal possible hidden functions.
-				code ~= format("alias %s.%s %s;\n",
+				code ~= format("alias %s = %s.%s;\n",
+							oset.name,
 							Policy.BASE_CLASS_ID, // [BUG 2540] super.
-							oset.name, oset.name );
+							oset.name);
 			}
 		}
 		return code;
@@ -83,11 +87,25 @@ private static:
 	{
 		string code = "";
 
+		template ExFuncInfo(alias func)
+		{
+			alias FuncType     = FunctionTypeOf!func;
+			alias RT           = ReturnType!func;
+			alias PT           = ParameterTypeTuple!func[0..$];
+			alias stcs         = ParameterStorageClassTuple!func[0..$];
+			alias valiadic     = variadicFunctionStyle!func;
+			alias attrib       = functionAttributes!func;
+			alias linkage      = functionLinkage!func;
+			alias abst         = isAbstractFunction!func;
+			enum  virt         = isVirtualMethod!func;
+		}
 		foreach (i_; CountUp!(0 + oset.contents.length)) // workaround
 		{
 			enum i = 0 + i_; // workaround
 			code ~= generateFunction!(
-					Policy.FUNCINFO_ID!(oset.name, i), oset.name,
+					Policy.FUNCINFO_ID!(oset.name, i),
+					ExFuncInfo!(oset.contents[i]),
+					oset.name,
 					oset.contents[i]) ~ "\n";
 		}
 		return code;
@@ -107,11 +125,13 @@ private static:
 
 		/*** Function Declarator ***/
 		{
-			alias exFuncInfo.FuncType Func;
-			alias FunctionAttribute FA;
+			alias Func    = exFuncInfo.FuncType;
+			alias FA      = FunctionAttribute;
 			enum atts     = exFuncInfo.attrib;
 			enum realName = isCtor ? "this" : name;
 
+			// FIXME?? Make it so that these aren't CTFE funcs any more, since
+			// Format is deprecated, and format works at compile time?
 			/* Made them CTFE funcs just for the sake of Format!(...) */
 
 			// return type with optional "ref"
@@ -148,19 +168,20 @@ private static:
 				string postc = "";
 				if (is(Func ==    shared)) postc ~= " shared";
 				if (is(Func ==     const)) postc ~= " const";
+				if (is(Func ==     inout)) postc ~= " inout";
 				if (is(Func == immutable)) postc ~= " immutable";
 				return postc;
 			}
 			enum storageClass = make_storageClass();
 
 			//
-			if (exFuncInfo.abst)
+			if (exFuncInfo.virt)
 				code ~= "override ";
 			code ~= format("extern(%s) %s %s(%s) %s %s\n",
 					exFuncInfo.linkage,
 					returnType,
 					realName,
-					""~generateParameters!(myFuncInfo, exFuncInfo),
+					generateParameters!(myFuncInfo, exFuncInfo),
 					postAtts, storageClass );
 		}
 
@@ -172,10 +193,10 @@ private static:
 			/* Declare keywords: args, self and parent. */
 			string preamble;
 
-			preamble ~= "alias TypeTuple!(" ~ enumerateParameters!(nparams) ~ ") args;\n";
+			preamble ~= "alias args = TypeTuple!(" ~ enumerateParameters!(nparams) ~ ");\n";
 			if (!isCtor)
 			{
-				preamble ~= "alias " ~ name ~ " self;\n";
+				preamble ~= "alias self = " ~ name ~ ";\n";
 				if (WITH_BASE_CLASS && !exFuncInfo.abst)
 					//preamble ~= "alias super." ~ name ~ " parent;\n"; // [BUG 2540]
 					preamble ~= "auto parent = &super." ~ name ~ ";\n";
@@ -220,7 +241,7 @@ private static:
 			if (stc & STC.lazy_ ) params ~= "lazy ";
 
 			// Take parameter type from the FuncInfo.
-			params ~= myFuncInfo ~ ".PT[" ~ to!string(i) ~ "]";
+			params ~= format("%s.PT[%s]", myFuncInfo, i);
 
 			// Declare a parameter variable.
 			params ~= " " ~ PARAMETER_VARIABLE_ID!(i);
@@ -283,14 +304,15 @@ private struct DelegateFakerEx(F) {
 	alias FuncInfo!(F) FuncInfo_doIt;
 	template ExFuncInfo()
 	{
-		alias FunctionTypeOf!(F)                     FuncType;
-		alias ReturnType!(F)                         RT;
-		alias ParameterTypeTuple!(F)[0..$-1]         PT;
-		alias ParameterStorageClassTuple!(F)[0..$-1] stcs;
-		alias variadicFunctionStyle!(F)              valiadic;
-		alias functionAttributes!(F)                 attrib;
-		alias functionLinkage!(F)                    linkage;
-		alias isAbstractFunction!(F)                 abst;
+		alias FuncType = FunctionTypeOf!F;
+		alias RT       = ReturnType!F;
+		alias PT       = ParameterTypeTuple!F[0..$-1];
+		alias stcs     = ParameterStorageClassTuple!F[0..$-1];
+		alias valiadic = variadicFunctionStyle!F;
+		alias attrib   = functionAttributes!F;
+		alias linkage  = functionLinkage!F;
+		alias abst     = isAbstractFunction!F;
+		alias virt     = isVirtualMethod!F;
 	}
 	mixin( MemberFunctionGeneratorEx!(GeneratingPolicy!())
 			.generateFunction!("FuncInfo_doIt", ExFuncInfo!(), "doIt") );
@@ -862,14 +884,15 @@ struct Handler(F)
 private:
 	template _ExFuncInfo(Func)
 	{
-		alias FunctionTypeOf!(Func)             FuncType;
-		alias ReturnType!(Func)                 RT;
-		alias ParameterTypeTuple!(Func)         PT;
-		alias ParameterStorageClassTuple!(Func) stcs;
-		alias variadicFunctionStyle!(Func)      valiadic;
-		alias functionAttributes!(Func)         attrib;
-		alias functionLinkage!(Func)            linkage;
-		alias isAbstractFunction!(Func)         abst;
+		alias FuncType = FunctionTypeOf!Func;
+		alias RT       = ReturnType!Func;
+		alias PT       = ParameterTypeTuple!Func;
+		alias stcs     = ParameterStorageClassTuple!Func;
+		alias valiadic = variadicFunctionStyle!Func;
+		alias attrib   = functionAttributes!Func;
+		alias linkage  = functionLinkage!Func;
+		alias abst     = isAbstractFunction!Func;
+		alias virt     = isVirtualMethod!Func;
 	}
 	alias _ExFuncInfo!(F) _exFuncInfo;
 	static private struct DummyData
