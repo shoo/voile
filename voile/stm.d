@@ -390,6 +390,7 @@ public:
 		{
 			throw new ForbiddenHandlingException(_state, e);
 		}
+		import std.stdio, std.range;
 		if (!events.empty)
 		{
 			events.insertAfter(events[], e);
@@ -397,7 +398,7 @@ public:
 		}
 		else
 		{
-			events.insertAfter(events[], e);
+			events.insert(e);
 		}
 		while (!events.empty)
 		{

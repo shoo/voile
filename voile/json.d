@@ -3,10 +3,11 @@
 import voile.misc;
 import std.json, std.traits, std.conv, std.array;
 
+
 /*******************************************************************************
  * JSONValueデータを得る
  */
-JSONValue json(T)(auto ref T[] x) @property
+JSONValue json(T)(auto const ref T[] x) @property
 	if (isSomeString!(T[]))
 {
 	JSONValue v;
@@ -15,7 +16,8 @@ JSONValue json(T)(auto ref T[] x) @property
 }
 
 
-JSONValue json(T)(auto ref T x) @property
+/// ditto
+JSONValue json(T)(auto const ref T x) @property
 	if ((isIntegral!T && !is(T == enum))
 	 || isFloatingPoint!T
 	 || is(Unqual!T == bool))
@@ -24,7 +26,8 @@ JSONValue json(T)(auto ref T x) @property
 }
 
 
-JSONValue json(T)(auto ref T[] ary) @property
+/// ditto
+JSONValue json(T)(auto const ref T[] ary) @property
 	if (!isSomeString!(T[]) && isArray!(T[]))
 {
 	auto app = appender!(JSONValue[])();
@@ -37,6 +40,31 @@ JSONValue json(T)(auto ref T[] ary) @property
 	return v;
 }
 
+
+/// ditto
+JSONValue json(Value, Key)(auto const ref Value[Key] aa) @property
+	if (isSomeString!Key && is(typeof({auto v = Value.init.json;})))
+{
+	auto ret = JSONValue((JSONValue[string]).init);
+	static if (is(Key: const string))
+	{
+		foreach (key, val; aa)
+			ret.object[key] = val.json;
+	}
+	else
+	{
+		foreach (key, val; aa)
+			v.object[key.to!string] = val.json;
+	}
+	return ret;
+}
+
+/// ditto
+auto ref JSONValue json(JV)(auto const ref JV v) @property
+	if (is(JV: const JSONValue))
+{
+	return cast(JSONValue)v;
+}
 
 ///
 unittest
@@ -173,14 +201,15 @@ private void _setValue(T)(ref JSONValue v, ref string name, ref T val)
 private void _setValue(T)(ref JSONValue v, ref string name, ref T val)
 	if (is(T == enum))
 {
+	import std.string;
 	if (v.type != JSON_TYPE.OBJECT || !v.object)
 	{
-		v = [name: to!string(val)];
+		v = [name: format("%s", val)];
 	}
 	else
 	{
 		auto x = v.object;
-		x[name] = to!string(val);
+		x[name] = format("%s", val);
 		v = x;
 	}
 }
@@ -262,61 +291,116 @@ unittest
 }
 
 
-private T _getValue(T)(in ref JSONValue v, string name, T defaultVal = T.init)
+///
+bool fromJson(T)(in ref JSONValue src, ref T dst)
+	if (isSomeString!T)
+{
+	if (src.type == JSON_TYPE.STRING)
+	{
+		static if (is(T: string))
+		{
+			dst = src.str;
+		}
+		else
+		{
+			dst = to!T(src.str);
+		}
+		return true;
+	}
+	return false;
+}
+
+
+private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
 	if (isSomeString!(T))
 {
+	T tmp;
 	if (auto x = name in v.object)
 	{
-		if (x.type == JSON_TYPE.STRING)
-		{
-			return to!T(x.str);
-		}
+		return fromJson(*x, tmp) ? tmp : defaultVal;
 	}
 	return defaultVal;
+}
+
+
+///
+bool fromJson(T)(in ref JSONValue src, ref T dst)
+	if (isIntegral!T && !is(T == enum))
+{
+	if (src.type == JSON_TYPE.INTEGER)
+	{
+		dst = cast(T)src.integer;
+		return true;
+	}
+	else if (src.type == JSON_TYPE.UINTEGER)
+	{
+		dst = cast(T)src.uinteger;
+		return true;
+	}
+	return false;
 }
 
 
 private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
 	if (isIntegral!T && !is(T == enum))
 {
+	T tmp;
 	if (auto x = name in v.object)
 	{
-		if (x.type == JSON_TYPE.INTEGER)
-		{
-			return cast(T)x.integer;
-		}
-		else if (x.type == JSON_TYPE.UINTEGER)
-		{
-			return cast(T)x.uinteger;
-		}
+		return fromJson(*x, tmp) ? tmp : defaultVal;
 	}
 	return defaultVal;
+}
+
+
+///
+bool fromJson(T)(in ref JSONValue src, ref T dst)
+	if (isFloatingPoint!T)
+{
+	switch (src.type)
+	{
+	case JSON_TYPE.FLOAT:
+		dst = cast(T)src.floating;
+		return true;
+	case JSON_TYPE.INTEGER:
+		dst = cast(T)src.integer;
+		return true;
+	case JSON_TYPE.UINTEGER:
+		dst = cast(T)src.uinteger;
+		return true;
+	default:
+		return false;
+	}
 }
 
 
 private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
 	if (isFloatingPoint!T)
 {
+	T tmp;
 	if (auto x = name in v.object)
 	{
-		switch (x.type)
-		{
-		case JSON_TYPE.FLOAT:
-			return x.floating;
-		case JSON_TYPE.INTEGER:
-			return cast(real)x.integer;
-		case JSON_TYPE.UINTEGER:
-			return cast(real)x.uinteger;
-		default:
-			return defaultVal;
-		}
+		return fromJson(*x, tmp) ? tmp : defaultVal;
 	}
 	return defaultVal;
 }
 
 
+///
+bool fromJson(T)(in ref JSONValue src, ref T dst)
+	if (is(T == struct) && !is(Unqual!T: JSONValue))
+{
+	if (src.type == JSON_TYPE.OBJECT)
+	{
+		dst.json = src;
+		return true;
+	}
+	return false;
+}
+
+
 private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
-	if (is(T == struct))
+	if (is(T == struct) && !is(Unqual!T: JSONValue))
 {
 	if (auto x = name in v.object)
 	{
@@ -328,6 +412,21 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal 
 		}
 	}
 	return defaultVal;
+}
+
+
+///
+bool fromJson(T)(in ref JSONValue src, ref T dst)
+	if (is(T == class))
+{
+	if (src.type == JSON_TYPE.OBJECT)
+	{
+		if (!dst)
+			dst = new T;
+		dst.json = src;
+		return true;
+	}
+	return false;
 }
 
 
@@ -347,96 +446,153 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
 }
 
 
+///
+bool fromJson(T)(in ref JSONValue src, ref T dst)
+	if (is(T == enum))
+{
+	if (src.type == JSON_TYPE.STRING)
+	{
+		dst = to!T(src.str);
+		return true;
+	}
+	return false;
+}
+
+
 private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
 	if (is(T == enum))
 {
+	T tmp;
 	if (auto x = name in v.object)
 	{
-		if (x.type == JSON_TYPE.STRING)
-		{
-			return to!T(x.str);
-		}
+		return fromJson(*x, tmp) ? tmp : defaultVal;
 	}
 	return defaultVal;
+}
+
+
+///
+bool fromJson(T)(in ref JSONValue src, ref T dst)
+	if (is(T == bool))
+{
+	if (src.type == JSON_TYPE.TRUE)
+	{
+		dst = true;
+		return true;
+	}
+	else if (src.type == JSON_TYPE.FALSE)
+	{
+		dst = false;
+		return true;
+	}
+	return false;
 }
 
 
 private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
 	if (is(T == bool))
 {
+	T tmp;
 	if (auto x = name in v.object)
 	{
-		if (x.type == JSON_TYPE.TRUE)
-		{
-			return true;
-		}
-		else if (x.type == JSON_TYPE.FALSE)
-		{
-			return false;
-		}
+		return fromJson(*x, tmp) ? tmp : defaultVal;
 	}
 	return defaultVal;
 }
 
 
-private T _getValue(T)(in ref JSONValue v, string name, T defaultVal = T.init)
-	if (!isSomeString!(T) && isArray!(T))
+///
+bool fromJson(T)(in ref JSONValue src, ref T dst)
+	if (!isSomeString!(T) && isDynamicArray!(T))
 {
 	alias ForeachType!T E;
-	enum ty = E.init.json.type;
-	T ret = defaultVal;
-	auto app = appender!T();
-	if (auto x = name in v.object)
+	if (src.type == JSON_TYPE.ARRAY)
 	{
-		if (x.type == JSON_TYPE.ARRAY)
+		dst = (dst.length >= src.array.length) ? dst[0..src.array.length]: new E[src.array.length];
+		foreach (ref i, ref e; src.array)
 		{
-			foreach (e; x.array)
-			{
-				static if (ty == JSON_TYPE.INTEGER)
-				{
-					app ~= to!E(e.integer);
-				}
-				else static if (ty == JSON_TYPE.FLOAT)
-				{
-					app ~= to!E(e.floating);
-				}
-				else static if (ty == JSON_TYPE.STRING)
-				{
-					app ~= to!E(e.str);
-				}
-				else static if (is(E == bool))
-				{
-					app ~= e.type == JSON_TYPE.TRUE;
-				}
-				else static if (ty == JSON_TYPE.OBJECT && is(E == struct) && is(typeof({E o; o.json = e;})))
-				{
-					E o;
-					o.json = e;
-					app ~= o;
-				}
-				else static if (ty == JSON_TYPE.OBJECT && is(E == class) && is(typeof({auto o = new E; o.json = e;})))
-				{
-					auto o = new E;
-					o.json = e;
-					app ~= o;
-				}
-				else
-				{
-					static assert(0);
-				}
-			}
+			if (!fromJson(e, dst[i]))
+				return false;
 		}
+		return true;
 	}
-	return app.data.length ? app.data : ret;
+	return false;
 }
 
+private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
+	if (!isSomeString!(T) && isDynamicArray!(T))
+{
+	Unqual!(ForeachType!T)[] tmp;
+	if (auto x = name in v.object)
+	{
+		return fromJson(*x, tmp) ? cast(T)tmp : defaultVal;
+	}
+	return defaultVal;
+}
+
+
+bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
+	if (isSomeString!Key && is(typeof({ JSONValue val; fromJson(val, dst[Key.init]); })))
+{
+	if (src.type == JSON_TYPE.OBJECT)
+	{
+		foreach (key, ref val; src.object)
+		{
+			static if (is(Key: const string))
+			{
+				Value tmp;
+				if (!fromJson(val, tmp))
+					return false;
+				dst[key] = tmp;
+			}
+			else
+			{
+				Value tmp;
+				if (!fromJson(val, tmp))
+					return false;
+				dst[to!Key(key)] = tmp;
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+private T _getValue(T: Value[Key], Value, Key)(in ref JSONValue v, string name, lazy scope Value[Key] defaultVal = T.init)
+	if (isSomeString!Key && is(typeof({ JSONValue val; Value[Key] dst; fromJson(val, dst[Key.init]); })))
+{
+	size_t[string] tmp;
+	if (auto x = name in v.object)
+	{
+		return fromJson(*x, tmp) ? tmp : defaultVal;
+	}
+	return defaultVal;
+}
+
+bool fromJson(T)(in ref JSONValue src, ref T dst)
+	if (is(Unqual!T == JSONValue))
+{
+	dst = src;
+	return true;
+}
+
+private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
+	if (is(Unqual!T == JSONValue))
+{
+	JSONValue tmp;
+	if (auto x = name in v.object)
+	{
+		return fromJson(*x, tmp) ? tmp : defaultVal;
+	}
+	return defaultVal;
+}
 
 ///
 T getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init) nothrow pure @trusted
 {
 	try
 	{
-		return assumePure(&_getValue!T)(v, name, defaultVal);
+		return assumePure(&_getValue!(Unqual!T))(v, name, defaultVal);
 	}
 	catch(Throwable)
 	{
@@ -574,6 +730,7 @@ unittest
 	JSONValue json;
 	json.setValue("test1", [1,2,3]);
 	auto x = json.getValue("test1", [2,3,4]);
+	
 	static assert(is(typeof(json.getValue("test1", [2,3,4])) == int[]));
 	assert(json.getValue("test1", [2,3,4]) == [1,2,3]);
 	assert(json.getValue("test1x", [2,3,4]) == [2,3,4]);

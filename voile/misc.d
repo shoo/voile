@@ -10,29 +10,115 @@ import std.traits, std.typetuple, std.variant;
 /*******************************************************************************
  * 
  */
-auto ref assumePure(alias fn, Args...)(auto ref Args args) pure
+auto ref assumeAttr(alias fn, alias attrs, Args...)(auto ref Args args)
 	if (!is(typeof(fn!Args)) && isCallable!fn)
 {
-	enum attrs = functionAttributes!fn | FunctionAttribute.pure_;
 	alias Func = SetFunctionAttributes!(typeof(&fn), functionLinkage!fn, attrs);
-	return (cast(Func)cast(void*)&fn)(args);
+//	if (!__ctfe)
+//	{
+//		alias dgTy = SetFunctionAttributes!(void function(string), "D", attrs);
+//		debug { (cast(dgTy)&disp)(typeof(fn).stringof); }
+//	}
+	return (cast(Func)&fn)(args);
 }
 
 /// ditto
-auto ref assumePure(alias fn, Args)(auto ref Args args) pure
+auto ref assumeAttr(alias fn, alias attrs, Args...)(auto ref Args args)
 	if (is(typeof(fn!Args)) && isCallable!(fn!Args))
 {
-	enum attrs = functionAttributes!(fn!Args) | FunctionAttribute.pure_;
 	alias Func = SetFunctionAttributes!(typeof(&(fn!Args)), functionLinkage!(fn!Args), attrs);
-	return (cast(Func)cast(void*)&(fn!Args))(args);
+//	if (!__ctfe)
+//	{
+//		alias dgTy = SetFunctionAttributes!(void function(string), "D", attrs);
+//		debug { (cast(dgTy)&disp)(typeof(fn!Args).stringof); }
+//	}
+	return (cast(Func)&fn!Args)(args);
+}
+
+/// ditto
+auto assumeAttr(alias attrs, Fn)(Fn t)
+	if (isFunctionPointer!Fn || isDelegate!Fn)
+{
+	return cast(SetFunctionAttributes!(Fn, functionLinkage!Fn, attrs)) t;
+}
+
+/*******************************************************************************
+ * 
+ */
+template getFunctionAttributes(T...)
+{
+	alias fn = T[0];
+	static if (T.length == 1 && (isFunctionPointer!(T[0]) || isDelegate!(T[0])))
+	{
+		enum getFunctionAttributes = functionAttributes!fn;
+	}
+	else static if (!is(typeof(fn!(T[1..$]))))
+	{
+		enum getFunctionAttributes = functionAttributes!(fn);
+	}
+	else
+	{
+		enum getFunctionAttributes = functionAttributes!(fn!(T[1..$]));
+	}
+}
+
+/*******************************************************************************
+ * 
+ */
+auto ref assumePure(alias fn, Args...)(auto ref Args args)
+{
+	return assumeAttr!(fn, getFunctionAttributes!(fn, Args) | FunctionAttribute.pure_, Args)(args);
 }
 
 /// ditto
 auto assumePure(T)(T t)
 	if (isFunctionPointer!T || isDelegate!T)
 {
-	enum attrs = functionAttributes!T | FunctionAttribute.pure_;
-	return cast(SetFunctionAttributes!(T, functionLinkage!T, attrs)) t;
+	return assumeAttr!(getFunctionAttributes!T | FunctionAttribute.pure_)(t);
+}
+
+/*******************************************************************************
+ * 
+ */
+auto ref assumeNogc(alias fn, Args...)(auto ref Args args)
+{
+	return assumeAttr!(fn, getFunctionAttributes!(fn, Args) | FunctionAttribute.nogc, Args)(args);
+}
+
+/// ditto
+auto assumeNogc(T)(T t)
+	if (isFunctionPointer!T || isDelegate!T)
+{
+	return assumeAttr!(getFunctionAttributes!T | FunctionAttribute.nogc)(t);
+}
+
+
+/*******************************************************************************
+ * 
+ */
+auto ref assumeNothrow(alias fn, Args...)(auto ref Args args)
+{
+	return assumeAttr!(fn, getFunctionAttributes!(fn, Args) | FunctionAttribute.nothrow_, Args)(args);
+}
+
+/// ditto
+auto assumeNothrow(T)(T t)
+	if (isFunctionPointer!T || isDelegate!T)
+{
+	return assumeAttr!(getFunctionAttributes!T | FunctionAttribute.nothrow_)(t);
+}
+
+
+
+debug private void dispImpl(T...)(T args)
+{
+	import std.stdio, std.string;
+	writeln(args);
+}
+
+debug void disp(T...)(T args) nothrow pure @nogc @trusted
+{
+	assumeAttr!(dispImpl!T, FunctionAttribute.nothrow_ | FunctionAttribute.pure_ | FunctionAttribute.nogc)(args);
 }
 
 private template AssumedUnsharedType(T)
