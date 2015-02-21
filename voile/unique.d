@@ -72,7 +72,7 @@ private struct UniqueDataImpl(T)
 	{
 		debug (Unique) writefln("%d: Unique Attach [%08x]", __LINE__,  cast(void*)p);
 		_p = p;
-		assumePure!(core.memory.GC.addRange)(cast(void*)_p, sz);
+		assumePure!(core.memory.GC.addRange)(cast(void*)_p, sz, null);
 	}
 	
 	
@@ -553,3 +553,27 @@ unittest
 	}
 }
 
+
+/*******************************************************************************
+ * 生データを利用できない形で返す
+ */
+auto toRawData(T)(ref Unique!T u)
+{
+	static struct Data {}
+	scope (exit)
+		__traits(getMember, u, uniqueMemberName!T)._p = null;
+	return cast(Data*)__traits(getMember, u, uniqueMemberName!T)._p;
+}
+
+/*******************************************************************************
+ * 生データから利用できる形のUnique型へと変換する
+ */
+auto toUnique(T)(ref ReturnType!(toRawData!T) d)
+{
+	mixin("alias Unique!T."~uniqueMemberName!T~".RefT RefT;");
+	mixin("alias Unique!T."~uniqueMemberName!T~".Dummy Dummy;");
+	enum instSize = T.sizeof;
+	scope (exit)
+		d = null;
+	return Unique!T(cast(RefT)d, Dummy.init);
+}

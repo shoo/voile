@@ -2,6 +2,7 @@
 
 import core.thread;
 import std.traits, std.range, std.exception, std.typetuple, std.concurrency, std.functional;
+import voile.unique;
 
 private template isVirtualMethod(func...)
 	if (func.length == 1)
@@ -97,7 +98,7 @@ private static:
 			alias attrib       = functionAttributes!func;
 			alias linkage      = functionLinkage!func;
 			alias abst         = isAbstractFunction!func;
-			enum  virt         = isVirtualMethod!func;
+			alias virt         = isVirtualMethod!func;
 		}
 		foreach (i_; CountUp!(0 + oset.contents.length)) // workaround
 		{
@@ -158,6 +159,7 @@ private static:
 				if (atts & FA.property) poatts ~= " @property";
 				if (atts & FA.safe    ) poatts ~= " @safe";
 				if (atts & FA.trusted ) poatts ~= " @trusted";
+				if (atts & FA.nogc    ) poatts ~= " @nogc";
 				return poatts;
 			}
 			enum postAtts = make_postAtts();
@@ -394,7 +396,7 @@ unittest
 private class List(T)
 {
 private:
-	struct Node
+	static struct Node
 	{
 		T     val;
 		Node* next;
@@ -411,7 +413,7 @@ public:
 	/***************************************************************************
 	 * 
 	 */
-	struct TIterator(TList)
+	static struct TIterator(TList)
 	{
 	private:
 		alias typeof(*TList.root)    TNode;
@@ -535,7 +537,7 @@ public:
 	/***************************************************************************
 	 * 
 	 */
-	struct TRange(TList)
+	static struct TRange(TList)
 	{
 	private:
 		alias typeof(*TList.root)     TNode;
@@ -867,6 +869,90 @@ unittest
 	}
 }
 
+template isCastableDelegate(aFunc, bFunc)
+{
+	alias ParameterStorageClass STC;
+	template funcInfo(func)
+	{
+		alias ParameterStorageClassTuple!func stcs;
+		alias ParameterTypeTuple!func         params;
+		alias ReturnType!func                 ret;
+		alias variadicFunctionStyle!func      valiadic;
+		alias functionAttributes!func         attrib;
+		alias functionLinkage!func            linkage;
+	}
+	template isStcsConvertible(Args...)
+	{
+		static if (Args.length > 1)
+		{
+			alias Args[0..Args.length/2] aStcs;
+			alias Args[Args.length/2..$] bStcs;
+			enum bool isStcsConvertible = aStcs[0] == bStcs[0]
+			                           && isStcsConvertible!(aStcs[1..$], bStcs[1..$]);
+		}
+		else
+		{
+			enum bool isStcsConvertible = true;
+		}
+	}
+	template isParamsConvertible(Args...)
+	{
+		static if (Args.length)
+		{
+			alias Args[0..Args.length/2] aParams;
+			alias Args[Args.length/2..$] bParams;
+			enum bool isParamsConvertible = (is(aParams[0] == bParams[0]) || isImplicitlyConvertible!(aParams[0], bParams[0]))
+			                             && isParamsConvertible!(aParams[1..$], bParams[1..$]);
+		}
+		else
+		{
+			enum bool isParamsConvertible = true;
+		}
+	}
+	
+	alias funcInfo!aFunc aInfo;
+	alias funcInfo!bFunc bInfo;
+	// nothrow, pure, @safe, @nogcは推論される可能性があるため、
+	// 意図しない結果となるケースが有る。aFuncに属性が指定されていない限り無視する
+	alias nonParamDgA = SetFunctionAttributes!(aInfo.ret delegate(), aInfo.linkage, aInfo.attrib);
+	alias nonParamDgB = SetFunctionAttributes!(bInfo.ret delegate(), bInfo.linkage, bInfo.attrib &
+	    ((aInfo.attrib & FunctionAttribute.nothrow_) ? ~0: ~FunctionAttribute.nothrow_) &
+	    ((aInfo.attrib & FunctionAttribute.pure_)    ? ~0: ~FunctionAttribute.pure_) &
+	    ((aInfo.attrib & FunctionAttribute.nogc)     ? ~0: ~FunctionAttribute.nogc) &
+	    ((aInfo.attrib & (FunctionAttribute.safe | FunctionAttribute.trusted)) ? ~0: ~(FunctionAttribute.safe | FunctionAttribute.trusted)));
+	import std.string;
+	static if (aInfo.params.length == bInfo.params.length)
+	{
+		enum bool isCastableDelegate = (aInfo.valiadic  == bInfo.valiadic)
+		                            && isCovariantWith!(FunctionTypeOf!nonParamDgA, FunctionTypeOf!nonParamDgB)
+		                            && isStcsConvertible!(aInfo.stcs, bInfo.stcs)
+		                            && isParamsConvertible!(aInfo.params, bInfo.params);
+	}
+	else
+	{
+		enum bool isCastableDelegate = false;
+	}
+}
+unittest
+{
+	class A{}
+	class B: A{}
+	class C: A{}
+	static assert(isCastableDelegate!(void delegate(int), void delegate(int)));
+	static assert(isCastableDelegate!(void delegate(int, int), void delegate(int, int)));
+	static assert(isCastableDelegate!(void delegate(A, int), void delegate(A, int)));
+	static assert(isCastableDelegate!(void delegate(B, int), void delegate(A, int)));
+	static assert(isCastableDelegate!(void delegate(B, A), void delegate(A, A)));
+	static assert(isCastableDelegate!(void delegate(int), void delegate(uint)));
+	static assert(isCastableDelegate!(void delegate(byte), void delegate(int)));
+	static assert(isCastableDelegate!(void delegate(byte) nothrow, void delegate(int) nothrow));
+	static assert(isCastableDelegate!(void delegate(byte) @safe, void delegate(int) @system));
+	static assert(isCastableDelegate!(void delegate(byte) @trusted, void delegate(int) @safe));
+	static assert(isCastableDelegate!(void delegate(byte) @safe, void delegate(int) @trusted));
+	//static assert(!isCastableDelegate!(void delegate(byte) @system, void delegate(int) @safe));
+	static assert(!isCastableDelegate!(void delegate(B, A), void delegate(A, B)));
+	static assert(!isCastableDelegate!(void delegate(C, C), void delegate(A, B)));
+}
 
 /*******************************************************************************
  * Generic Handler
@@ -889,15 +975,14 @@ private:
 		alias PT       = ParameterTypeTuple!Func;
 		alias stcs     = ParameterStorageClassTuple!Func;
 		alias valiadic = variadicFunctionStyle!Func;
-		alias attrib   = functionAttributes!Func;
+		enum  attrib   = functionAttributes!Func;
 		alias linkage  = functionLinkage!Func;
 		alias abst     = isAbstractFunction!Func;
 		alias virt     = isVirtualMethod!Func;
 	}
-	alias _ExFuncInfo!(F) _exFuncInfo;
+	alias _ExFuncInfo!F _exFuncInfo;
 	static private struct DummyData
 	{
-		alias _ExFuncInfo!(F) _exFuncInfo;
 		template _EmitGeneratingPolicy()
 		{
 			template generateFunctionBody(unused...)
@@ -916,7 +1001,8 @@ private:
 	{
 		template generateFunctionBody(unused...)
 		{
-			enum generateFunctionBody =
+			import std.conv;
+			enum generateFunctionBody = "#line " ~ to!string(__LINE__+2) ~ 
 			q{
 				static if (is(_exFuncInfo.RT: bool))
 				{
@@ -988,94 +1074,46 @@ public:
 		       .generateFunction!("_exFuncInfo", _exFuncInfo, "emit")() );
 	}
 	/// ditto
-	alias emit opCall;
-private:
-	template isCastableDelegate(aFunc, bFunc)
-	{
-		alias ParameterStorageClass STC;
-		template funcInfo(func)
-		{
-			alias ParameterStorageClassTuple!func stcs;
-			alias ParameterTypeTuple!func         params;
-			alias ReturnType!func                 ret;
-			alias variadicFunctionStyle!func      valiadic;
-			alias functionAttributes!func         attrib;
-			alias functionLinkage!func            linkage;
-		}
-		template isStcsConvertible(Args...)
-		{
-			static if (Args.length > 1)
-			{
-				alias Args[0..Args.length/2] aStcs;
-				alias Args[Args.length/2..$] bStcs;
-				enum bool isStcsConvertible = aStcs[0] == bStcs[0]
-				                           && isStcsConvertible!(aStcs[1..$], bStcs[1..$]);
-			}
-			else
-			{
-				enum bool isStcsConvertible = true;
-			}
-		}
-		template isParamsConvertible(Args...)
-		{
-			static if (Args.length)
-			{
-				alias Args[0..Args.length/2] aParams;
-				alias Args[Args.length/2..$] bParams;
-				enum bool isParamsConvertible = (is(aParams[0] == bParams[0]) || isImplicitlyConvertible!(aParams[0], bParams[0]))
-				                             && isParamsConvertible!(aParams[1..$], bParams[1..$]);
-			}
-			else
-			{
-				enum bool isParamsConvertible = true;
-			}
-		}
-		
-		alias funcInfo!aFunc aInfo;
-		alias funcInfo!bFunc bInfo;
-		// nothrow, pure, @safeは推論される可能性があるため、
-		// 意図しない結果となるケースが有る。aFuncに属性が指定されていない限り無視する
-		alias SetFunctionAttributes!(aInfo.ret delegate(), aInfo.linkage, aInfo.attrib) nonParamDgA;
-		alias SetFunctionAttributes!(bInfo.ret delegate(), bInfo.linkage, bInfo.attrib & ((aInfo.attrib & FunctionAttribute.nothrow_) ? ~0: ~FunctionAttribute.nothrow_) & ((aInfo.attrib & FunctionAttribute.pure_) ? ~0: ~FunctionAttribute.pure_) & ((aInfo.attrib & (FunctionAttribute.safe | FunctionAttribute.trusted)) ? ~0: ~(FunctionAttribute.safe | FunctionAttribute.trusted))) nonParamDgB;
-		import std.string;
-		static if (aInfo.params.length == bInfo.params.length)
-		{
-			enum bool isCastableDelegate = aInfo.valiadic  == bInfo.valiadic
-			                            && isCovariantWith!(FunctionTypeOf!nonParamDgA, FunctionTypeOf!nonParamDgB)
-			                            && isStcsConvertible!(aInfo.stcs, bInfo.stcs)
-			                            && isParamsConvertible!(aInfo.params, bInfo.params);
-		}
-		else
-		{
-			enum bool isCastableDelegate = false;
-		}
-	}
-	unittest
-	{
-		class A{}
-		class B: A{}
-		class C: A{}
-		static assert(isCastableDelegate!(void delegate(int), void delegate(int)));
-		static assert(isCastableDelegate!(void delegate(int, int), void delegate(int, int)));
-		static assert(isCastableDelegate!(void delegate(A, int), void delegate(A, int)));
-		static assert(isCastableDelegate!(void delegate(B, int), void delegate(A, int)));
-		static assert(isCastableDelegate!(void delegate(B, A), void delegate(A, A)));
-		static assert(isCastableDelegate!(void delegate(int), void delegate(uint)));
-		static assert(isCastableDelegate!(void delegate(byte), void delegate(int)));
-		static assert(isCastableDelegate!(void delegate(byte) nothrow, void delegate(int) nothrow));
-		static assert(isCastableDelegate!(void delegate(byte) @safe, void delegate(int) @system));
-		static assert(isCastableDelegate!(void delegate(byte) @trusted, void delegate(int) @safe));
-		static assert(isCastableDelegate!(void delegate(byte) @safe, void delegate(int) @trusted));
-		//static assert(!isCastableDelegate!(void delegate(byte) @system, void delegate(int) @safe));
-		static assert(!isCastableDelegate!(void delegate(B, A), void delegate(A, B)));
-		static assert(!isCastableDelegate!(void delegate(C, C), void delegate(A, B)));
-	}
+	alias opCall = emit;
+public:
 	alias typeof(&DummyData.init.emit) Proc;
 	alias _exFuncInfo.PT Args;
 	alias _exFuncInfo.RT RetType;
 	alias List!Proc ProcList;
 	ProcList _procs;
 	
+	static Proc toConnectable(Func)(Func fn)
+		if (is(typeof( toDelegate(fn) ))
+		 && isCastableDelegate!(Proc, typeof(toDelegate(fn))))
+	{
+		return cast(Proc)toDelegate(fn);
+	}
+	
+	static if (Args.length > 0 && !hasUnsharedAliasing!Args)
+	{
+		static assert(Tid.sizeof == (void*).sizeof);
+		private static void _TidCaller(Args args, Tid* tid)
+		{
+			(*cast(Tid*)&tid).send(args);
+		}
+		static Proc toConnectable(Func)(Func tid)
+			if (is(Func == Tid))
+		{
+			return cast(Proc)toDelegateEx(*cast(Tid**)&tid, &_TidCaller);
+		}
+	}
+	static if (Args.length == 0)
+	{
+		private static void _FiberCaller(Fiber fb)
+		{
+			fb.call();
+		}
+		static Proc toConnectable(Func)(Func fib)
+			if (is(Func: Fiber))
+		{
+			return cast(Proc)toDelegateEx(fib, &_FiberCaller);
+		}
+	}
 public:
 	/***************************************************************************
 	 * 
@@ -1089,20 +1127,22 @@ public:
 	 *     fn = delegate, function, Tid, Object( has opCall ), Fiber
 	 */
 	HandlerProcId connect(Func)(Func fn)
-		if (is(typeof( toDelegate(fn) ))
-		 && isCastableDelegate!(Proc, Func))
+		if (is(typeof( toConnectable(fn) )))
 	{
 		if (_procs is null)
 			_procs = new ProcList;
-		_procs.stableInsertBack( cast(Proc)toDelegate(fn) );
-		return _procs.begin;
+		auto f = toConnectable(fn);
+		_procs.stableInsertBack(f);
+		auto r = _procs[];
+		assert(r.back == f);
+		return --r.end;
 	}
 	
 	/// ditto
 	void opOpAssign(string op, Func)(Func dg) if (op == "~" && is(typeof(connect(dg))))
 	{
 		connect(dg);
-	}	
+	}
 	
 	
 	/// ditto
@@ -1113,18 +1153,15 @@ public:
 	 * 
 	 */
 	HandlerProcId connectedId(Func)(Func fn)
-		if (is(typeof( toDelegate(fn) ))
-		 && isCastableDelegate!(Func, Proc))
+		if (is(typeof( toConnectable(fn) )))
 	{
 		if (_procs is null)
 			return HandlerProcId.init;
-		auto f = cast(Proc)toDelegate(fn);
+		auto f = toConnectable(fn);
 		for (auto r = _procs[]; !r.empty; r.popBack())
 		{
 			if (r.back == f)
-			{
 				return --r.end;
-			}
 		}
 		
 		return HandlerProcId.init;
@@ -1215,7 +1252,7 @@ public:
 	 * 
 	 */
 	void disconnect(Func)(Func fn)
-		if (is(typeof( connectedId(fn) )))
+		if (is(typeof( toConnectable(fn) )))
 	{
 		disconnect(connectedId(fn));
 	}
@@ -1245,15 +1282,81 @@ public:
 	/***************************************************************************
 	 * 
 	 */
+	void insertAfter(Func)(ProcList.Range r, Func fn)
+		if (is(typeof( toConnectable(fn) )))
+	{
+		auto id = connectedId(fn);
+		if (id)
+			disconnect(id);
+		_procs.stableInsertAfter(r, toConnectable(fn));
+	}
+	
+	/// ditto
+	void insertAfter(Func)(HandlerProcId needleid, Func fn)
+		if (is(typeof( toConnectable(fn) )))
+	{
+		auto id = connectedId(fn);
+		if (id)
+			disconnect(id);
+		_procs.stableInsertAfter(needleid, toConnectable(fn));
+	}
+	
+	/// ditto
+	void insertAfter(Func)(Func needle, Func fn)
+		if (is(typeof( toConnectable(fn) )))
+	{
+		auto id = connectedId(fn);
+		if (id)
+			disconnect(id);
+		auto needleid = connectedId(needle);
+		_procs.stableInsertAfter(needleid, toConnectable(fn));
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	void insertBefore(Func)(ProcList.Range r, Func fn)
+		if (is(typeof( toConnectable(fn) )))
+	{
+		auto id = connectedId(fn);
+		if (id)
+			disconnect(id);
+		_procs.stableInsertBefore(r, toConnectable(fn));
+	}
+	
+	/// ditto
+	void insertBefore(Func)(HandlerProcId needleid, Func fn)
+		if (is(typeof( toConnectable(fn) )))
+	{
+		auto id = connectedId(fn);
+		if (id)
+			disconnect(id);
+		_procs.stableInsertBefore(needleid, toConnectable(fn));
+	}
+	
+	/// ditto
+	void insertBefore(Func)(Func needle, Func fn)
+		if (is(typeof( toConnectable(fn) )))
+	{
+		auto id = connectedId(fn);
+		if (id)
+			disconnect(id);
+		auto needleid = connectedId(needle);
+		_procs.stableInsertBefore(needleid, toConnectable(fn));
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
 	void clear() pure
 	{
 		if (_procs is null)
 			return;
-		_procs.clear();
+		delete _procs;
 	}
 }
 
-
+debug (workaround)
 unittest
 {
 	static string teststr;

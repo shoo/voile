@@ -24,11 +24,11 @@ version (Windows)
 	private enum uint INFINITE = 0xFFFFFFFF;
 	private enum uint WAIT_OBJECT_0 = 0x00000000;
 	private alias void* HANDLE;
-	private extern(Windows) uint WaitForSingleObject(in HANDLE, uint);
-	private extern(Windows) int CloseHandle(in HANDLE);
-	private extern(Windows) HANDLE CreateEventW(void*, int, int, void*);
-	private extern(Windows) int SetEvent(in HANDLE);
-	private extern(Windows) int ResetEvent(in HANDLE);
+	private extern(Windows) uint WaitForSingleObject(in HANDLE, uint) nothrow @nogc;
+	private extern(Windows) int CloseHandle(in HANDLE) nothrow @nogc;
+	private extern(Windows) HANDLE CreateEventW(void*, int, int, void*) nothrow @nogc;
+	private extern(Windows) int SetEvent(in HANDLE) nothrow @nogc;
+	private extern(Windows) int ResetEvent(in HANDLE) nothrow @nogc;
 }
 
 /*******************************************************************************
@@ -80,12 +80,12 @@ class SyncEvent
 {
 	version(Windows)
 	{
-		private static HANDLE createEvent(bool aFirstCondition = false)
+		private static HANDLE createEvent(bool aFirstCondition = false) nothrow @nogc
 		{
 			auto h = CreateEventW(null, 1, aFirstCondition ? 1 : 0, null);
 			return h;
 		}
-		private static void closeEvent(HANDLE h)
+		private static void closeEvent(HANDLE h) nothrow @nogc
 		{
 			CloseHandle(h);
 		}
@@ -105,7 +105,7 @@ class SyncEvent
 		 * 
 		 * Params: h = イベントハンドル
 		 */
-		this(HANDLE h)
+		this(HANDLE h) pure nothrow @nogc
 		{
 			_ownHandle = false;
 			_handle = h;
@@ -115,7 +115,7 @@ class SyncEvent
 		 * 
 		 * Params: firstCondition = 初期状態
 		 */
-		this(bool firstCondition = false)
+		this(bool firstCondition = false) nothrow @nogc
 		{
 			_ownHandle = true;
 			_handle = createEvent(firstCondition);
@@ -128,7 +128,7 @@ class SyncEvent
 		 *     falseなら非シグナル状態で、waitしたらシグナル状態になるか、時間が
 		 *     過ぎるまで制御を返さない状態であることを示す。
 		 */
-		@property bool signaled()
+		@property bool signaled() nothrow @nogc
 		{
 			return WaitForSingleObject(_handle, 0) == WAIT_OBJECT_0;
 		}
@@ -140,7 +140,7 @@ class SyncEvent
 		 *     falseなら非シグナル状態で、waitしたらシグナル状態になるまで制御を
 		 *     返さない状態にする。
 		 */
-		@property void signaled(bool cond)
+		@property void signaled(bool cond) nothrow @nogc
 		{
 			if (cond == true && signaled == false)
 			{
@@ -158,7 +158,7 @@ class SyncEvent
 		 * conditionがfalseなら非シグナル状態で、シグナル状態になるまで制御を
 		 * 返さない。
 		 */
-		void wait()
+		void wait() nothrow @nogc
 		{
 			WaitForSingleObject(_handle, INFINITE);
 		}
@@ -169,7 +169,7 @@ class SyncEvent
 		 * conditionがfalseなら非シグナル状態で、シグナル状態になるか、時間が
 		 * 過ぎるまで制御を返さない。
 		 */
-		bool wait(Duration dir)
+		bool wait(Duration dir) nothrow @nogc
 		{
 			return WaitForSingleObject(_handle, cast(uint)dir.total!"msecs")
 				== WAIT_OBJECT_0;
@@ -316,35 +316,17 @@ unittest
 
 version (Posix)
 {
-	version (Tango)
-	{
-		private import tango.stdc.posix.semaphore;
-		private import tango.stdc.posix.fcntl;
-		private import tango.stdc.posix.sys.stat: S_IRWXU, S_IRWXG, S_IRWXO;
-		private static const s777 = S_IRWXU|S_IRWXG|S_IRWXO;
-		private import tango.stdc.errno;
-	}
-	else
-	{
-		private import core.sys.posix.semaphore;
-		private import core.sys.posix.fcntl;
-		private import core.sys.posix.sys.stat: S_IRWXU, S_IRWXG, S_IRWXO;
-		private static const s777 = S_IRWXU|S_IRWXG|S_IRWXO;
-		private import core.stdc.errno;
-	}
+	private import core.sys.posix.semaphore;
+	private import core.sys.posix.fcntl;
+	private import core.sys.posix.sys.stat: S_IRWXU, S_IRWXG, S_IRWXO;
+	private static const s777 = S_IRWXU|S_IRWXG|S_IRWXO;
+	private import core.stdc.errno;
 	private alias sem_t* HANDLE;
 }
 else version (Windows)
 {
-	version (Tango)
-	{
-		private import tango.sys.Common: CreateMutexW, ReleaseMutex;
-	}
-	else
-	{
-		private extern (Windows) HANDLE CreateMutexW(void*,int,in wchar*);
-		private extern (Windows) int ReleaseMutex(in HANDLE);
-	}
+	private extern (Windows) HANDLE CreateMutexW(void*,int,in wchar*) nothrow @nogc;
+	private extern (Windows) int ReleaseMutex(in HANDLE) nothrow @nogc;
 }
 else
 {
@@ -456,7 +438,7 @@ public:
 	/***************************************************************************
 	 * 名前を返す。
 	 */
-	@property const string name()
+	string name() pure nothrow @safe @nogc const @property
 	{
 		return m_Name;
 	}
@@ -466,7 +448,7 @@ public:
 	 * 
 	 * 名前付きミューテックスの削除を行う
 	 */
-	~this()
+	~this() nothrow @nogc
 	{
 		this.__monitor = null;
 		version (Posix)
@@ -484,7 +466,7 @@ public:
 	 * 
 	 * ロックが成功するまで制御は返らない
 	 */
-	void lock()
+	void lock() nothrow @nogc
 	{
 		version (Posix)
 		{
@@ -502,7 +484,7 @@ public:
 	 * trueが帰った場合ロックが成功している。
 	 * falseなら別のMutexにロックされているため、ロックされなかった。
 	 */
-	bool tryLock()
+	bool tryLock() nothrow @nogc
 	{
 		version (Posix)
 		{
@@ -516,7 +498,7 @@ public:
 	/***************************************************************************
 	 * ロック解除
 	 */
-	void unlock()
+	void unlock() nothrow @nogc
 	{
 		version (Posix)
 		{
@@ -580,7 +562,7 @@ public:
 		{
 		private:
 			ManagedShared!T _data;
-			ref T _dataRef() @property { return _data._data; }
+			ref inout(T) _dataRef() @property inout { return _data._data; }
 			this(ManagedShared!T dat){_data = dat;}
 			import std.typecons;
 		public:
@@ -702,9 +684,10 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 
 unittest
 {
+	import core.atomic;
 	auto s = managedShared!int();
 	s.asUnshared += 50;
-	s.asShared   += 100;
+	s.asShared.atomicOp!"+="(100);
 	s.unlock();
 	try
 	{
@@ -743,9 +726,10 @@ unittest
 
 unittest
 {
+	import core.atomic;
 	auto s = new shared ManagedShared!int();
 	s.asUnshared += 50;
-	s.asShared   += 100;
+	s.asShared.atomicOp!"+="(100);
 	s.unlock();
 	try
 	{
