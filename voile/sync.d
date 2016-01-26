@@ -561,18 +561,19 @@ public:
 		static struct LockedData
 		{
 		private:
-			ManagedShared!T _data;
-			ref inout(T) _dataRef() @property inout { return _data._data; }
-			this(ManagedShared!T dat){_data = dat;}
-			import std.typecons;
+			T*              _data;
+			void delegate() _unlock;
+			ref inout(T) _dataRef() inout @property { return *_data; }
 		public:
+			@disable this(this);
 			~this()
 			{
-				_data.unlock();
+				if (_unlock)
+					_unlock();
 			}
-			mixin Proxy!_dataRef;
+			alias _dataRef this;
 		}
-		return LockedData(this);
+		return LockedData(&_data, &unlock);
 	}
 	/// ditto
 	auto locked() shared @property

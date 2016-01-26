@@ -13,11 +13,11 @@ private extern (C) static void _d_monitordelete(Object h, bool det) pure;
   transitively up the inheritance path, but work properly only if the
   static type of the object (T) is known.
  */
-private void destroy(T)(T obj) pure
+private void _destroy(T)(T obj) pure
 {
 	static if (is(T == class) || is(T == interface))
 	{
-		assumePure!(clear!(typeof(obj)))(obj);
+		assumePure!(object.destroy!(typeof(obj)))(obj);
 	}
 	else
 	{
@@ -138,7 +138,7 @@ private struct UniqueDataImpl(T)
 		{
 			if (auto o = cast(Object)p)
 			{
-				destroy(o);
+				_destroy(o);
 				if ((cast(void**)(cast(void*)o))[1]) // if monitor is not null
 				{
 					_d_monitordelete(o, true);
@@ -147,7 +147,7 @@ private struct UniqueDataImpl(T)
 		}
 		else
 		{
-			destroy(p);
+			_destroy(p);
 		}
 		assumePure!free(cast(void*)p);
 	}

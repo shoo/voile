@@ -84,7 +84,7 @@ int compile(Options opt)
 	
 	if (opt.test)
 	{
-		opts ~= ["-debug", "-g", "-unittest", "-I."];
+		opts ~= ["-debug", "-g", "-unittest", "-I.", "-de"];
 		if (opt.warning)     opts ~= "-w";
 		if (opt.options)     opts ~= opt.options;
 		if (opt.output)      opts ~= ["-of"~opt.output];
