@@ -791,3 +791,36 @@ unittest
 					h
 		>`);
 }
+
+
+import std.stdio;
+/***************************************************************************
+ * 
+ */
+void truncate(ref File f, size_t fileSize = -1)
+{
+	ulong oldptr = -1;
+	scope (exit)
+	{
+		if (oldptr != -1)
+			f.seek(oldptr);
+	}
+	version (Windows)
+	{
+		import core.sys.windows.windows;
+		if (fileSize != -1)
+		{
+			ulong p = f.tell;
+			if (p != fileSize)
+				oldptr = p;
+			f.seek(fileSize);
+		}
+		SetEndOfFile(f.windowsHandle);
+	}
+	else version (Posix)
+	{
+		import core.sys.posix.unistd, core.sys.posix.sys.types;
+		ftruncate(cast(int)f.getFP, cast(off_t)f.tell);
+	}
+}
+
