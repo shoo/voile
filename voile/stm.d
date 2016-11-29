@@ -635,13 +635,13 @@ private struct CsvStmParsedData
 			srcstr.put("\n}\n");
 			appst.formattedWrite(
 				"\tcase cast(typeof(newsts))%d:\n"
-				"\t\t%s();\n"
-				"\t\tbreak;\n", i, name);
+				 ~ "\t\t%s();\n"
+				 ~ "\t\tbreak;\n", i, name);
 			stacts[i] = proclines;
 		}
 		appst.put(
 			"\tdefault:\n"
-			"\t}\n");
+			 ~ "\t}\n");
 		
 		apped.put("\tswitch (oldsts)\n\t{\n");
 		foreach (i, act; edactsRaw)
@@ -658,20 +658,20 @@ private struct CsvStmParsedData
 			srcstr.put("\n}\n");
 			apped.formattedWrite(
 				"\tcase cast(typeof(oldsts))%d:\n"
-				"\t\t%s();\n"
-				"\t\tbreak;\n", i, name);
+				 ~ "\t\t%s();\n"
+				 ~ "\t\tbreak;\n", i, name);
 			edacts[i] = proclines;
 		}
 		apped.put(
 			"\tdefault:\n"
-			"\t}\n");
+			 ~ "\t}\n");
 		if (appst.data.length != 0 || apped.data.length != 0)
 		{
 			srcstr.put(
 				"void _onStEdActivity(State oldsts, State newsts)\n"
-				"{\n"
-				"\tif (oldsts == newsts)\n"
-				"\t\treturn;\n");
+				 ~ "{\n"
+				 ~ "\tif (oldsts == newsts)\n"
+				 ~ "\t\treturn;\n");
 			srcstr.put( apped.data );
 			srcstr.put( appst.data );
 			srcstr.put("}\n");
@@ -710,10 +710,10 @@ private struct CsvStmParsedData
 		
 		srcstr.formattedWrite(
 			"Stm!(State, Event) stmFactory() pure\n"
-			"{\n"
-			"\talias SHPair!(State) SH;\n"
-			"\tauto stm = Stm!(State, Event)(\n"
-			"\t\t%([%-(%s, %)]%|, \n\t\t%));\n", app.data);
+			 ~ "{\n"
+			 ~ "\talias SHPair!(State) SH;\n"
+			 ~ "\tauto stm = Stm!(State, Event)(\n"
+			 ~ "\t\t%([%-(%s, %)]%|, \n\t\t%));\n", app.data);
 		alias reduce!"a | (b.length != 0)" existsAct;
 		if (existsAct(false, stacts) || existsAct(false, edacts))
 		{
@@ -721,7 +721,7 @@ private struct CsvStmParsedData
 		}
 		srcstr.put(
 			"\treturn stm;\n"
-			"}\n");
+			 ~ "}\n");
 	}
 	
 }
