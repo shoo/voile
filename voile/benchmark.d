@@ -18,7 +18,9 @@
 
 module voile.benchmark;
 
-import std.exception, std.string, std.datetime, std.array, std.bigint, std.conv;
+import std.exception, std.string, std.array, std.bigint, std.conv;
+import std.datetime;
+import std.datetime.stopwatch: StopWatch, AutoStart;
 import core.thread;
 
 
@@ -59,7 +61,7 @@ struct FootPrintBenchmark
 	static struct Data
 	{
 		/// 時間
-		TickDuration time;
+		Duration time;
 		
 		
 		/// 呼び出し元ファイル名
@@ -73,10 +75,9 @@ struct FootPrintBenchmark
 		/***********************************************************************
 		 * 文字列表現
 		 */
-		const
-		string toString()
+		string toString() const
 		{
-			return format("%s(%d): %s", file, line, time.seconds);
+			return format("%s(%d): %s", file, line, time.total!"usecs" / 1.0e-6L);
 		}
 	}
 	
@@ -167,7 +168,7 @@ struct FootPrintBenchmark
 		real last;
 		foreach (i, d; _datas.data)
 		{
-			auto r = d.time.seconds;
+			auto r = d.time.total!"usecs" / 1.0e-6L;
 			import std.math;
 			ret ~= !last.isNaN() ? r - last : r;
 			last = r;
@@ -194,10 +195,10 @@ struct FootPrintBenchmark
 		auto alldatas = _datas.data;
 		if (alldatas.length == 0)
 			return null;
-		TickDuration last = alldatas[0].time;
+		Duration last = alldatas[0].time;
 		foreach (i, d; alldatas)
 		{
-			TickDuration r = d.time;
+			Duration r = d.time;
 			ret ~= Data(r - last, d.file, d.line);
 			last = r;
 		}
