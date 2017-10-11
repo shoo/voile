@@ -1,0 +1,13 @@
+{
+    "name": "voile",
+    "description": "Voile The Magic Library",
+    "targetType": "library",
+    "license": "public domain",
+    "copyright": "Copyright © 2013, SHOO",
+    "homepage": "https://github.com/shoo/voile",
+    "importPaths": ["."],
+    "sourcePath": "voile",
+    "authors": [ "P.Knowledge", "SHOO" ],
+    "dependencies": {
+    }
+}
