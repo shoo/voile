@@ -54,7 +54,7 @@ private mixin template ToField(Tuple...)
 /*******************************************************************************
  * イベントハンドラー
  */
-alias void delegate() EventHandler;
+alias EventHandler = void delegate();
 
 
 /// 到達不可能なイベントハンドラー
@@ -82,10 +82,7 @@ enum EventHandler forbiddenEvent = cast(EventHandler)null;
  * 
  * StateManagerのコンストラクタの引数に渡すために使用する
  */
-template SHPair(State)
-{
-	alias Tuple!(State, EventHandler) SHPair;
-}
+alias SHPair(State) = Tuple!(State, EventHandler);
 
 
 
@@ -99,12 +96,12 @@ struct Stm(TState, TEvent, TState defaultStateParam = TState.init)
 	/***************************************************************************
 	 * 状態の型です
 	 */
-	alias TState State;
+	alias State = TState;
 	
 	/***************************************************************************
 	 * イベントの型です
 	 */
-	alias TEvent Event;
+	alias Event = TEvent;
 	
 	/***************************************************************************
 	 * 禁則事項です
@@ -113,7 +110,9 @@ struct Stm(TState, TEvent, TState defaultStateParam = TState.init)
 	 */
 	static class ForbiddenHandlingException: Exception
 	{
+		///
 		immutable State state;
+		///
 		immutable Event event;
 		
 		
@@ -134,6 +133,9 @@ struct Stm(TState, TEvent, TState defaultStateParam = TState.init)
 	 */
 	static class EventCancelException: Exception
 	{
+		/***********************************************************************
+		 * コンストラクタ
+		 */
 		this()
 		{
 			super(null, __FILE__, __LINE__);
@@ -202,24 +204,38 @@ struct Stm(TState, TEvent, TState defaultStateParam = TState.init)
 	/***************************************************************************
 	 * 状態が遷移したときに呼ばれるハンドラ
 	 */
-	alias void delegate(State oldstate, State newstate) StateChangedCallback;
+	alias StateChangedCallback = void delegate(State oldstate, State newstate);
 	
 	/***************************************************************************
 	 * イベントが実行される直前に呼ばれるハンドラ
 	 */
-	alias void delegate(Event ev) EventCallback;
+	alias EventCallback = void delegate(Event ev);
 	
 	/***************************************************************************
 	 * 例外発生時に呼ばれるハンドラ
 	 */
-	alias void delegate(Throwable e) nothrow ExceptionCallback;
+	alias ExceptionCallback = void delegate(Throwable e) nothrow;
 	
-	
+	/***************************************************************************
+	 * イベントの消費モード
+	 */
+	enum ConsumeMode
+	{
+		/// イベントの消化は追加(put)と同時に行われます
+		combined,
+		/// イベントの消費は追加(put)とは別に、消費を指示します(consume)
+		separate
+	}
 private:
+	// 状態遷移表名
+	string _name;
+	// イベント名
+	string[eventCount] _eventName;
+	// 状態名
+	string[stateCount] _stateName;
 	
 	// 状態遷移表
 	Cell[stateCount][eventCount] _table;
-	
 	
 	// 現在のステート
 	State _state = defaultState;
@@ -228,6 +244,8 @@ private:
 	// 処理すべきイベントのFIFO
 	SList!Event events;
 	
+	// 消費タイミングをイベント追加と分ける
+	ConsumeMode _consumeMode = ConsumeMode.combined;
 	
 public:
 	
@@ -239,7 +257,6 @@ public:
 	{
 		initialize(table);
 	}
-	
 	
 	/// ditto
 	void initialize(SHPair!(State)[stateCount][eventCount] table...) pure
@@ -256,9 +273,84 @@ public:
 	
 	
 	/***************************************************************************
+	 * 状態遷移表の名前
+	 */
+	void name(string str) @property
+	{
+		_name = str;
+	}
+	
+	/// ditto
+	string name() const @property
+	{
+		return _name;
+	}
+	
+	/***************************************************************************
+	 * イベント名の設定と取得
+	 */
+	void setEventName(Event ev, string evname) @safe @nogc nothrow pure
+	{
+		assert(ev < _eventName.length);
+		_eventName[ev] = evname;
+	}
+	
+	/// ditto
+	string getEventName(Event ev) @safe pure const
+	{
+		assert(ev < _eventName.length);
+		if (_eventName[ev] is null)
+			return ev.to!string();
+		return _eventName[ev];
+	}
+	
+	/// ditto
+	void eventNames(in string[] names) @safe nothrow pure @property
+	{
+		_eventName = names.dup;
+	}
+	
+	/// ditto
+	immutable(string)[] eventNames() @safe nothrow pure const @property
+	{
+		return _eventName.idup;
+	}
+	
+	
+	/***************************************************************************
+	 * 状態名の設定と取得
+	 */
+	void setStateName(State st, string stname) @safe @nogc nothrow pure
+	{
+		assert(st < _stateName.length);
+		_stateName[st] = stname;
+	}
+	
+	/// ditto
+	string getStateName(State st) @safe pure const
+	{
+		if (_stateName[st] is null)
+			return st.to!string();
+		return _stateName[st];
+	}
+	
+	/// ditto
+	void stateNames(in string[] names) @safe nothrow pure @property
+	{
+		_stateName = names.dup;
+	}
+	
+	/// ditto
+	immutable(string)[] stateNames() @safe nothrow pure const @property
+	{
+		return _stateName.idup;
+	}
+	
+	
+	/***************************************************************************
 	 * 現在のステート
 	 */
-	@property State currentState() const pure
+	State currentState() @safe @nogc nothrow pure const @property
 	{
 		return _state;
 	}
@@ -267,9 +359,23 @@ public:
 	/***************************************************************************
 	 * ステートを強制的に変更
 	 */
-	@property void enforceState(State sts)
+	void enforceState(State sts) @system @nogc nothrow pure
 	{
 		_state = sts;
+	}
+	
+	/***************************************************************************
+	 * イベント追加と消化を分ける
+	 */
+	void consumeMode(ConsumeMode mode) @safe @nogc nothrow pure @property
+	{
+		_consumeMode = mode;
+	}
+	
+	/// ditto
+	ConsumeMode consumeMode() @safe @nogc nothrow pure const @property
+	{
+		return _consumeMode;
 	}
 	
 	
@@ -400,42 +506,58 @@ public:
 		{
 			events.insert(e);
 		}
-		while (!events.empty)
+		while (!_consumeMode && !events.empty)
 		{
+			consume();
+		}
+	}
+	
+	/***************************************************************************
+	 * イベントを1つ消化する
+	 */
+	void consume()
+	{
+		if (events.empty)
+			return;
+		try
+		{
+			auto ev = events.front;
+			bool cancel = false;
 			try
 			{
-				auto ev = events.front;
-				bool cancel = false;
-				try
-				{
-					onEvent.emit(ev);
-					_table[ev][_state].handler();
-				}
-				catch (EventCancelException e)
-				{
-					cancel = true;
-				}
-				if (!cancel)
-				{
-					auto oldstate = _state;
-					_state = _table[ev][_state].next;
-					onStateChanged.emit(oldstate, _state);
-				}
+				onEvent.emit(ev);
+				_table[ev][_state].handler();
 			}
-			catch (Throwable e)
+			catch (EventCancelException e)
 			{
-				onException.emit(e);
+				cancel = true;
 			}
-			assert(!events.empty);
-			try
+			if (!cancel)
 			{
-				events.removeFront();
-			}
-			catch (Throwable e)
-			{
-				assert(0);
+				auto oldstate = _state;
+				_state = _table[ev][_state].next;
+				onStateChanged.emit(oldstate, _state);
 			}
 		}
+		catch (Throwable e)
+		{
+			onException.emit(e);
+		}
+		assert(!events.empty);
+		try
+		{
+			events.removeFront();
+		}
+		catch (Throwable e)
+		{
+			assert(0);
+		}
+	}
+	
+	///
+	bool emptyEvents() const @property
+	{
+		return events.empty;
 	}
 	
 	/***************************************************************************
@@ -512,6 +634,7 @@ private struct CsvStmParsedData
 {
 	string[string] map;
 	
+	string         nameRaw;
 	string[]       statesRaw;
 	string[]       eventsRaw;
 	string[][]     cellsRaw;
@@ -719,6 +842,12 @@ private struct CsvStmParsedData
 		{
 			srcstr.put("\tstm.onStateChanged ~= &_onStEdActivity;\n");
 		}
+		srcstr.formattedWrite(
+			"\tstm.name = `%s`;\n", nameRaw);
+		srcstr.formattedWrite(
+			"\tstm.stateNames = %s;\n", statesRaw);
+		srcstr.formattedWrite(
+			"\tstm.eventNames = %s;\n", eventsRaw);
 		srcstr.put(
 			"\treturn stm;\n"
 			 ~ "}\n");
@@ -841,6 +970,7 @@ string parseCsvStm(string csvstm, string csvmap = "")
 	}
 	CsvStmParsedData pd;
 	pd.map = map;
+	pd.nameRaw   = app.data[0][0];
 	pd.statesRaw = app.data[0][1..$];
 	pd.stactsRaw = app.data[1][1..$];
 	pd.edactsRaw = app.data[2][1..$];
@@ -922,50 +1052,101 @@ enum replaceData = `▽初期,init
 	assert(stm.currentState == State.init);
 }
 
-///
-template StateFlow(Commands)
+private interface StateFlowHandler(Commands)
 {
-	class StateFlowBase
+protected:
+	///
+	void _onEnterChild(Commands child);
+	///
+	void _onExitChild(Commands child);
+	///
+	void _onEnter();
+	///
+	void _onExit();
+}
+
+///
+template StateFlow(Commands, Base = Object)
+{
+	abstract class StateFlowBase: Base
 	{
-	protected:
+	private:
 		import std.container;
 		SList!Commands _stsStack;
 		Commands _next;
-		
 	public:
 		///
-		Handler!(void delegate(Commands)) onEnterChild;
+		Handler!(void delegate(Commands parent, Commands child)) onEnterChild;
 		///
-		Handler!(void delegate(Commands)) onExitChild;
+		Handler!(void delegate(Commands parent, Commands child)) onExitChild;
 		///
-		void setNextFlow(Commands cmd) @property
-		{
-			_next = cmd;
-		}
+		Handler!(void delegate(Commands last)) onEndFlow;
+		///
 		this(Commands root)
 		{
 			_stsStack.insertFront(root);
+			_next = cast(Commands)this;
+			onEnterChild ~= (Commands parent, Commands child)
+			{
+				if (auto p = cast(StateFlowHandler!Commands)parent)
+				{
+					p._onEnterChild(child);
+				}
+				if (auto c = cast(StateFlowHandler!Commands)child)
+				{
+					c._onEnter();
+				}
+			};
+			onExitChild  ~= (Commands parent, Commands child)
+			{
+				if (auto c = cast(StateFlowHandler!Commands)child)
+				{
+					c._onExit();
+				}
+				if (auto p = cast(StateFlowHandler!Commands)parent)
+				{
+					p._onExitChild(child);
+				}
+			};
+		}
+		///
+		final inout(Commands) current() @trusted inout @property
+		{
+			return _stsStack.empty ? null : cast(inout)(*cast(SList!Commands*)&_stsStack).front;
+		}
+	protected:
+		/// internal
+		final Commands _transit(Commands curr, Commands nxt)
+		{
+			if (nxt is null)
+			{
+				_stsStack.removeFront();
+				if (_stsStack.empty)
+				{
+					onEndFlow(curr);
+				}
+				else
+				{
+					onExitChild(_stsStack.front, curr);
+				}
+			}
+			else if (cast(Object)curr !is cast(Object)nxt)
+			{
+				_stsStack.insertFront(nxt);
+				onEnterChild(curr, nxt);
+			}
+			else
+			{
+				// Do nothing
+			}
+			return _next;
 		}
 	}
 	enum generateTransferFunction(C, alias fun) =
 	`
-		auto currFlow = _stsStack.front;
-		auto res = currFlow.` ~ __traits(identifier, fun) ~ `(args);
-		if (res is null)
-		{
-			_stsStack.removeFront();
-			onExitChild(currFlow);
-		}
-		else if (currFlow !is res)
-		{
-			_stsStack.insertFront(res);
-			onEnterChild(res);
-		}
-		else
-		{
-			// Do nothing
-		}
-		return _next;
+		auto curr = current;
+		auto res = curr.` ~ __traits(identifier, fun) ~ `(args);
+		return _transit(curr, res);
 	`;
 	
 	enum isEventDistributor(alias func) = is(ReturnType!func: Commands);
@@ -1038,4 +1219,68 @@ unittest
 	// not transit
 	sts.command("test");
 	assert(msg == "test");
+}
+
+
+///
+private abstract class ProcessFlowImpl(Commands, Base=Object): Base, Commands, StateFlowHandler!Commands
+{
+private:
+	import std.container;
+	Commands _next;
+protected:
+	/// internal
+	Commands _getNextFlow()
+	{
+		scope (exit)
+			_next = this;
+		return _next;
+	}
+	/// ditto
+	void _onEnterChild(Commands child)
+	{
+		onEnterChild(child);
+	}
+	/// ditto
+	void _onExitChild(Commands child)
+	{
+		onExitChild(child);
+	}
+	/// ditto
+	void _onEnter()
+	{
+		onEnter();
+	}
+	/// ditto
+	void _onExit()
+	{
+		onExit();
+	}
+public:
+	///
+	this()
+	{
+		_next = this;
+	}
+	///
+	Handler!(void delegate(Commands child)) onEnterChild;
+	///
+	Handler!(void delegate(Commands child)) onExitChild;
+	///
+	Handler!(void delegate()) onEnter;
+	///
+	Handler!(void delegate()) onExit;
+	///
+	void setNextFlow(Commands cmd)
+	{
+		_next = cmd;
+	}
+}
+
+///
+template ProcessFlow(Commands)
+{
+	enum generateFlowFunction(C, alias fun) = `return _getNextFlow();`;
+	enum isEventDistributor(alias func) = is(ReturnType!func: Commands);
+	alias ProcessFlow = AutoImplement!(Commands, ProcessFlowImpl!Commands, generateFlowFunction, isEventDistributor);
 }
