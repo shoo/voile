@@ -1,0 +1,10 @@
+.*
+*.html
+*.bat
+*.sh
+*.json
+*.lib
+*.exe
+*.dll
+*.obj
+doc/candydoc/modules.ddoc
