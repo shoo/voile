@@ -190,14 +190,16 @@ private template _isNotRefPSC(uint pcs)
 CommonType!(staticMap!(ReturnType, T))
 	variantSwitch(T...)(auto ref Variant var, T caseFunctions)
 {
+	enum isZeroLengthParameter(P) = staticMap!(Parameters, P).length == 0;
+	import core.exception;
 	static assert(allSatisfy!(isCallable, T),
 		"variantSwitch ascepts only callable");
 	foreach (i, t1; T)
 	{
-		alias ParameterTypeTuple!(t1) a1;
-		alias ReturnType!(t1) r1;
+		alias a1 = Parameters!(t1);
+		alias r1 = ReturnType!(t1);
 		
-		static if (i < T.length-1)
+		static if (i + 1 < T.length)
 		{
 			// 最後のcase function以外では引数が1つでVariantというcaseは認められない
 			static assert(a1.length != 1 || !is( a1[0] == Variant ),
@@ -206,8 +208,8 @@ CommonType!(staticMap!(ReturnType, T))
 		}
 		foreach (t2; T[i+1 .. $] )
 		{
-			alias ParameterTypeTuple!(t2) a2;
-			alias ParameterStorageClassTuple!(t2) psc2;
+			alias a2 = ParameterTypeTuple!(t2);
+			alias psc2 = ParameterStorageClassTuple!(t2);
 			static assert( !is( a1 == a2 ),
 				"case function with argument types " ~ a1.stringof ~
 				" occludes successive function" );
@@ -218,18 +220,18 @@ CommonType!(staticMap!(ReturnType, T))
 					"case function with argument types " ~ a2.stringof ~
 					" is hidden by " ~ a1.stringof );
 			}
-			alias ParameterStorageClass PSC;
+			alias PSC = ParameterStorageClass;
 			static if (!allSatisfy!(_isNotRefPSC, psc2))
 			{
-				alias ParameterStorageClassTuple!(variantSwitch) psc;
+				alias psc = ParameterStorageClassTuple!(variantSwitch);
 				static assert(psc[0] & PSC.ref_);
 			}
 		}
 	}
 	foreach (fn; caseFunctions)
 	{
-		alias ParameterTypeTuple!fn Args;
-		alias ParameterStorageClassTuple!fn psc2;
+		alias Args = Parameters!fn;
+		alias psc2 = ParameterStorageClassTuple!fn;
 		static if (Args.length == 0)
 		{
 			return fn();
@@ -258,7 +260,10 @@ CommonType!(staticMap!(ReturnType, T))
 			}
 		}
 	}
-	throw new SwitchError("No appropriate switch clause found");
+	static if (staticMap!(Parameters, T).length > 0
+	 && !anySatisfy!(isZeroLengthParameter, T)
+	 && !is(staticMap!(Parameters, T)[$-1] == Variant))
+		throw new SwitchError("No appropriate switch clause found");
 }
 
 
@@ -466,6 +471,7 @@ unittest
 /*******************************************************************************
  * 
  */
+deprecated("castSwitch is now available in Phobos std.algorithm")
 CommonType!(staticMap!(ReturnType, T))
 	castSwitch(Base, T...)(Base inst, T caseFunctions)
 {
@@ -535,7 +541,7 @@ CommonType!(staticMap!(ReturnType, T))
 	throw new SwitchError("No appropriate switch clause found");
 }
 
-unittest
+version(none) unittest
 {
 	class A
 	{
