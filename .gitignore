@@ -8,3 +8,4 @@
 *.dll
 *.obj
 doc/candydoc/modules.ddoc
+cov
