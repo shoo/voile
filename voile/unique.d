@@ -503,7 +503,7 @@ unittest
 
 unittest
 {
-	import std.typetuple;
+	import std.typetuple, std.algorithm;
 	struct S1 { int x; }
 	struct S2 { Unique!int x; }
 	class C1 { int x; }
@@ -514,7 +514,9 @@ unittest
 		S1, S2, C1, C2
 		))
 	{
-		auto u1  = unique!T();
+		auto u1 = unique!T();
+		auto u2 = u1.move();
+	//	auto u3 = u2;
 	}
 	
 	{

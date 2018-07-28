@@ -2,7 +2,6 @@
 
 import core.thread;
 import std.traits, std.range, std.exception, std.typetuple, std.concurrency, std.functional;
-import voile.unique;
 
 private template isVirtualMethod(func...)
 	if (func.length == 1)
@@ -14,11 +13,10 @@ private template isVirtualMethod(func...)
 package template MemberFunctionGeneratorEx(alias Policy)
 {
 private static:
-	import std.string: format;
-	import std.conv: to;
 	//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 	// Internal stuffs
 	//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
+	import std.format;
 
 	enum CONSTRUCTOR_NAME = "__ctor";
 
@@ -181,7 +179,7 @@ private static:
 			enum storageClass = make_storageClass();
 			
 			//
-			if (__traits(isVirtualMethod, func))
+			static if (func.length && __traits(isVirtualMethod, func))
 			    code ~= "override ";
 			code ~= format("extern(%s) %s %s(%s) %s %s\n",
 			        exFuncInfo.linkage,
