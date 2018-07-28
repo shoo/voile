@@ -36,3 +36,4 @@ public import voile.misc;
 public import voile.stm;
 public import voile.sync;
 public import voile.unique;
+public import voile.fs;
