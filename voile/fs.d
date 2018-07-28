@@ -118,7 +118,17 @@ struct FileSystem
 				if (!target.dirName.exists)
 					mkdirRecurse(target.dirName);
 				if (force && target.exists && !target.isFile)
-					std.file.remove(target);
+				{
+					try
+					{
+						std.file.remove(target);
+					}
+					catch (Exception e)
+					{
+						clearReadonly(target);
+						std.file.remove(target);
+					}
+				}
 				mkdir(target);
 				enforce(target.isDir, "Cannot create directory");
 				onCreated(target);
@@ -404,20 +414,42 @@ struct FileSystem
 				onRemoving(target, i);
 				if (target.isDir)
 				{
-					if (force)
+					try
 					{
 						rmdirRecurse(target);
 					}
-					else
+					catch (Exception e)
 					{
-						rmdir(target);
+						if (force)
+						{
+							foreach (de; dirEntries(target, SpanMode.depth))
+								clearReadonlyImpl!false(de.name);
+							rmdirRecurse(target);
+						}
+						else
+						{
+							throw e;
+						}
 					}
 				}
 				else
 				{
-					if (force)
-						clearReadonlyImpl!false(target);
-					std.file.remove(target);
+					try
+					{
+						std.file.remove(target);
+					}
+					catch (Exception e)
+					{
+						if (force)
+						{
+							clearReadonlyImpl!false(target);
+							std.file.remove(target);
+						}
+						else
+						{
+							throw e;
+						}
+					}
 					enforce(!exists(target));
 				}
 				onRemoved(target);
