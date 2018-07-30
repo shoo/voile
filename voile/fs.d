@@ -35,7 +35,7 @@ struct FileSystem
 	 * 絶対パスに変換する
 	 * 
 	 * Params:
-	 *     target = 変換したい相対パス(何も指定しないとworkDirの絶対パスが返る))
+	 *     target = 変換したい相対パス(何も指定しないとworkDirの絶対パスが返る)
 	 *     base   = 基準となるパス(このパスの基準はworkDir)
 	 */
 	string absolutePath() const @safe
@@ -148,7 +148,9 @@ struct FileSystem
 	 * ディレクトリを作成する
 	 * 
 	 * Params:
-	 *     target = パス
+	 *     target   = パス
+	 *     force    = 強制的に作成
+	 *     retrycnt = リトライする回数
 	 */
 	void makeDir(string target, bool force = true, uint retrycnt = 5)
 	{
