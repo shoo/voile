@@ -205,7 +205,7 @@ struct FootPrintBenchmark
 		return assumeUnique(ret);
 	}
 	
-	alias datas opSlice;
+	alias opSlice = datas;
 }
 
 
@@ -285,10 +285,15 @@ class CallCounter
  */
 struct ProfileData
 {
+	///
 	Thread       thread;
+	///
 	string       file;
+	///
 	uint         line;
+	///
 	TickDuration time;
+	///
 	TickDuration duration;
 }
 

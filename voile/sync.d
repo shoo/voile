@@ -21,14 +21,7 @@ import core.thread, core.sync.mutex, core.sync.condition;
 
 version (Windows)
 {
-	private enum uint INFINITE = 0xFFFFFFFF;
-	private enum uint WAIT_OBJECT_0 = 0x00000000;
-	private alias void* HANDLE;
-	private extern(Windows) uint WaitForSingleObject(in HANDLE, uint) nothrow @nogc;
-	private extern(Windows) int CloseHandle(in HANDLE) nothrow @nogc;
-	private extern(Windows) HANDLE CreateEventW(void*, int, int, void*) nothrow @nogc;
-	private extern(Windows) int SetEvent(in HANDLE) nothrow @nogc;
-	private extern(Windows) int ResetEvent(in HANDLE) nothrow @nogc;
+	import core.sys.windows.windows;
 }
 
 /*******************************************************************************
@@ -274,7 +267,7 @@ class SyncEvent
 	}
 }
 
-unittest
+@system unittest
 {
 	int data;
 	SyncEvent[3] ev;
@@ -321,7 +314,7 @@ version (Posix)
 	private import core.sys.posix.sys.stat: S_IRWXU, S_IRWXG, S_IRWXO;
 	private static const s777 = S_IRWXU|S_IRWXG|S_IRWXO;
 	private import core.stdc.errno;
-	private alias sem_t* HANDLE;
+	private alias HANDLE = sem_t*;
 }
 else version (Windows)
 {
@@ -346,15 +339,8 @@ private:
 		Object.Monitor link;
 	}
 	MonitorProxy m_Proxy;
-	version(D_Version2)
-	{
-	}
-	else
-	{
-		alias char[] string;
-	}
-	const HANDLE _handle;
-	const string m_Name;
+	HANDLE _handle;
+	string m_Name;
 	version (Posix) const string m_SavedName;
 public:
 	/***************************************************************************
@@ -371,11 +357,11 @@ public:
 		m_Name = aName;
 		version (Posix)
 		{
-			alias char char_t;
+			alias char_t = char;
 		}
 		else version (Windows)
 		{
-			alias wchar char_t;
+			alias char_t = wchar;
 		}
 		char_t[1024*4] buf;
 		static char_t[] encodeStr(string str, char_t[] aBuf)
@@ -406,7 +392,7 @@ public:
 					break;
 				}
 			}
-			if (j >= dBuf.length - 1)
+			if (j + 1 >= dBuf.length)
 				dBuf.length = dBuf.length + 2;
 			dBuf[j++] = ']';
 			dBuf[j++] = '\0';
@@ -576,7 +562,7 @@ public:
 		return LockedData(&_data, &unlock);
 	}
 	/// ditto
-	auto locked() shared @property
+	auto locked() shared inout @property
 	{
 		return (cast()this).locked();
 	}
@@ -638,13 +624,13 @@ public:
 	/***************************************************************************
 	 * 非共有資源としてアクセスする
 	 */
-	ref T asUnshared() @property
+	ref T asUnshared() inout @property
 	{
 		enforce(_locked != 0);
 		return *cast(T*)&_data;
 	}
 	/// ditto
-	ref T asUnshared() shared @property
+	ref T asUnshared() shared inout @property
 	{
 		enforce(_locked != 0);
 		return *cast(T*)&_data;
@@ -654,12 +640,12 @@ public:
 	/***************************************************************************
 	 * 共有資源としてアクセスする
 	 */
-	ref shared(T) asShared() @property
+	ref shared(T) asShared() inout @property
 	{
 		return *cast(shared(T)*)&_data;
 	}
 	/// ditto
-	ref shared(T) asShared() shared @property
+	ref shared(T) asShared() shared inout @property
 	{
 		return *cast(shared(T)*)&_data;
 	}
@@ -683,7 +669,7 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 	return s;
 }
 
-unittest
+@system unittest
 {
 	import core.atomic;
 	auto s = managedShared!int();
@@ -725,7 +711,7 @@ unittest
 }
 
 
-unittest
+@system unittest
 {
 	import core.atomic;
 	auto s = new shared ManagedShared!int();
@@ -771,31 +757,31 @@ private template AssumedUnsharedType(T)
 	import std.traits;
 	static if (is(T U == shared(U)))
 	{
-		alias AssumedUnsharedType!(U) AssumedUnsharedType;
+		alias AssumedUnsharedType = AssumedUnsharedType!(U);
 	}
 	else static if (is(T U == const(shared(U))))
 	{
-		alias const(AssumedUnsharedType!(U)) AssumedUnsharedType;
+		alias AssumedUnsharedType = const(AssumedUnsharedType!(U));
 	}
 	else static if (isPointer!T)
 	{
-		alias AssumedUnsharedType!(pointerTarget!T)* AssumedUnsharedType;
+		alias AssumedUnsharedType = AssumedUnsharedType!(pointerTarget!T)*;
 	}
 	else static if (isDynamicArray!T)
 	{
-		alias AssumedUnsharedType!(ForeachType!T)[] AssumedUnsharedType;
+		alias AssumedUnsharedType = AssumedUnsharedType!(ForeachType!T)[];
 	}
 	else static if (isStaticArray!T)
 	{
-		alias AssumedUnsharedType!(ForeachType!T)[T.length] AssumedUnsharedType;
+		alias AssumedUnsharedType = AssumedUnsharedType!(ForeachType!T)[T.length];
 	}
 	else static if (isAssociativeArray!T)
 	{
-		alias AssumedUnsharedType!(ValueType!T)[AssumedUnsharedType!(KeyType!T)] AssumedUnsharedType;
+		alias AssumedUnsharedType = AssumedUnsharedType!(ValueType!T)[AssumedUnsharedType!(KeyType!T)];
 	}
 	else
 	{
-		alias T AssumedUnsharedType;
+		alias AssumedUnsharedType = T;
 	}
 }
 

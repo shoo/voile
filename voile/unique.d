@@ -30,7 +30,7 @@ private void _destroy(T)(T obj) pure
 
 private template TypeOf(T)
 {
-	alias T TypeOf;
+	alias TypeOf = T;
 }
 
 
@@ -50,12 +50,12 @@ private struct UniqueDataImpl(T)
 {
 	static if ((is(T==class)||is(T==interface)))
 	{
-		alias std.traits.Unqual!T RefT;
+		alias RefT = std.traits.Unqual!T;
 	}
 	else
 	{
-		alias std.traits.Unqual!T InstT;
-		alias InstT* RefT;
+		alias InstT = std.traits.Unqual!T;
+		alias RefT  = InstT*;
 	}
 	RefT _p;
 	enum Dummy { init }
@@ -222,7 +222,9 @@ public:
 	this(U)(Unique!U u)
 		if (!is(U == T) && is(U: T))
 	{
-		debug (Unique) writefln("%d: Unique [%08x] other type constructor with rvalue [%08x]", __LINE__, cast(void*)&this, cast(void*)__traits(getMember, u, uniqueMemberName!U)._p);
+		debug (Unique) writefln("%d: Unique [%08x] other type constructor with rvalue [%08x]",
+		                        __LINE__, cast(void*)&this,
+		                        cast(void*)__traits(getMember, u, uniqueMemberName!U)._p);
 		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!U)._p;
 		__traits(getMember, u, uniqueMemberName!U)._p = null;
 	}
@@ -230,7 +232,9 @@ public:
 	
 	~this() pure
 	{
-		debug (Unique) writefln("%d: Unique [%08x] destructor [%08x]", __LINE__, cast(void*)&this, cast(void*)__traits(getMember, this, uniqueMemberName!T)._p);
+		debug (Unique) writefln("%d: Unique [%08x] destructor [%08x]",
+		                        __LINE__, cast(void*)&this, cast(void*)
+		                        __traits(getMember, this, uniqueMemberName!T)._p);
 		__traits(getMember, this, uniqueMemberName!T).release();
 	}
 	
@@ -241,13 +245,15 @@ public:
 	void proxySwap()(ref Unique u)
 		if (!is(typeof(T.init.proxySwap(T.init))))
 	{
-		debug (Unique) writefln("%d: Unique [%08x] swap [%08x]", __LINE__, cast(void*)&this, cast(void*)__traits(getMember, u, uniqueMemberName!T)._p);
+		debug (Unique) writefln("%d: Unique [%08x] swap [%08x]",
+		                        __LINE__, cast(void*)&this,
+		                        cast(void*)__traits(getMember, u, uniqueMemberName!T)._p);
 		auto tmp = __traits(getMember, this, uniqueMemberName!T)._p;
 		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!T)._p;
 		__traits(getMember, u, uniqueMemberName!T)._p = tmp;
 	}
 	
-	//
+	///
 	ref Unique opAssign(Unique u)
 		in
 		{
@@ -255,7 +261,9 @@ public:
 		}
 		body
 	{
-		debug (Unique) writefln("%d: Unique [%08x] assign [%08x]", __LINE__, cast(void*)&this, cast(void*)__traits(getMember, u, uniqueMemberName!T)._p);
+		debug (Unique) writefln("%d: Unique [%08x] assign [%08x]",
+		                        __LINE__, cast(void*)&this,
+		                        cast(void*)__traits(getMember, u, uniqueMemberName!T)._p);
 		__traits(getMember, this, uniqueMemberName!T)._p = __traits(getMember, u, uniqueMemberName!T)._p;
 		__traits(getMember, u, uniqueMemberName!T)._p = null;
 		return this;
@@ -296,18 +304,20 @@ private Unique!T uniqueImpl(T, Args...)(Args args)
 	}
 }
 
+///
 void release(T)(ref Unique!T u)
 {
 	return __traits(getMember, u, uniqueMemberName!T).release();
 }
 
+///
 bool isEmpty(T)(ref Unique!T u)
 {
 	return __traits(getMember, u, uniqueMemberName!T).isEmpty;
 }
 
 
-unittest
+@system unittest
 {
 	static int[] testary;
 	{
@@ -316,7 +326,7 @@ unittest
 			~this() { testary ~= -1; }
 			@property int val() const { return 3; }
 		}
-		alias Unique!(Foo) UFoo;
+		alias UFoo = Unique!(Foo);
 	
 		UFoo f(UFoo u)
 		{
@@ -362,7 +372,7 @@ unittest
 	assert(testary == [1,2,-2,3,-1,4]);
 }
 
-unittest
+@system unittest
 {
 	static int[] testary;
 	{
@@ -371,7 +381,7 @@ unittest
 			~this() { testary ~= -1; }
 			@property int val() const { return 4; }
 		}
-		alias Unique!(Bar) UBar;
+		alias UBar = Unique!(Bar);
 		UBar g(UBar u)
 		{
 			testary ~= -2;
@@ -411,7 +421,7 @@ unittest
 	assert(testary == [1,2,-2,3,-1,4]);
 }
 
-unittest
+@system unittest
 {
 	static int[] testary;
 	{
@@ -468,7 +478,7 @@ unittest
 }
 
 
-unittest
+@system unittest
 {
 	static int[] testary;
 	{
@@ -501,7 +511,7 @@ unittest
 	assert(testary == [1,-3,-1,2,-4,-2,3]);
 }
 
-unittest
+@system unittest
 {
 	import std.typetuple, std.algorithm;
 	struct S1 { int x; }

@@ -442,7 +442,6 @@ public:
 		{
 			Cell[] cells;
 			@disable this();
-			@disable static HandlerSetter init();
 			@disable this(this);
 			private this(Cell[] c){cells = c;}
 			void opAssign(EventHandler[stateCount] handlers)
@@ -453,21 +452,21 @@ public:
 				}
 			}
 		}
-		alias onException    _onException;
-		alias onStateChanged _onStateChanged;
-		alias onEvent        _onEvent;
+		alias _onException    = onException;
+		alias _onStateChanged = onStateChanged;
+		alias _onEvent        = onEvent;
 		class StateSetter
 		{
 			private this(Dummy dummy) {  }
-			alias doNothingEvent doNothing;
-			alias forbiddenEvent forbidden;
-			alias ignoreEvent    ignore;
-			alias EnumMembers!(State)[0] invalid;
+			alias doNothing = doNothingEvent;
+			alias forbidden = forbiddenEvent;
+			alias ignore    = ignoreEvent;
+			alias invalid   = EnumMembers!(State)[0];
 			mixin ToField!(EnumMembers!Event);
 			mixin ToField!(EnumMembers!State);
-			ref Handler!(ExceptionCallback)    onException()    @property { return _onException; }
-			ref Handler!(StateChangedCallback) onStateChanged() @property { return _onStateChanged; }
-			ref Handler!(EventCallback)        onEvent()        @property { return _onEvent; }
+			ref Handler!(ExceptionCallback)    onException()    @property { return _onException; }  // @suppress(dscanner.confusing.function_attributes)
+			ref Handler!(StateChangedCallback) onStateChanged() @property { return _onStateChanged; } // @suppress(dscanner.confusing.function_attributes)
+			ref Handler!(EventCallback)        onEvent()        @property { return _onEvent; }      // @suppress(dscanner.confusing.function_attributes)
 			auto set(Event e)
 			{
 				auto cells = _table[e][];
@@ -522,7 +521,7 @@ public:
 		try
 		{
 			auto ev = events.front;
-			bool cancel = false;
+			bool cancel;
 			try
 			{
 				onEvent.emit(ev);
@@ -578,7 +577,7 @@ public:
 }
 
 
-
+///
 template isStm(STM)
 {
 	static if (is(STM S: Stm!(S, E), E))
@@ -591,13 +590,13 @@ template isStm(STM)
 	}
 }
 
-
-unittest
+///
+@system unittest
 {
 	enum State { a, b }
 	enum Event { e1, e2, e3 }
 	
-	alias SHPair!(State) SH;
+	alias SH = SHPair!(State);
 	string msg;
 	// 状態遷移表
 	auto sm = Stm!(State, Event)(
@@ -837,7 +836,7 @@ private struct CsvStmParsedData
 			 ~ "\talias SHPair!(State) SH;\n"
 			 ~ "\tauto stm = Stm!(State, Event)(\n"
 			 ~ "\t\t%([%-(%s, %)]%|, \n\t\t%));\n", app.data);
-		alias reduce!"a | (b.length != 0)" existsAct;
+		alias existsAct = reduce!"a | (b.length != 0)";
 		if (existsAct(false, stacts) || existsAct(false, edacts))
 		{
 			srcstr.put("\tstm.onStateChanged ~= &_onStEdActivity;\n");
@@ -974,8 +973,8 @@ string parseCsvStm(string csvstm, string csvmap = "")
 	pd.statesRaw = app.data[0][1..$];
 	pd.stactsRaw = app.data[1][1..$];
 	pd.edactsRaw = app.data[2][1..$];
-	pd.eventsRaw.length = app.data.length-3;
-	pd.cellsRaw.length = app.data.length-3;
+	pd.eventsRaw.length = cast(size_t)(cast(int)app.data.length-3);
+	pd.cellsRaw.length = cast(size_t)(cast(int)app.data.length-3);
 	foreach (i, r; app.data[3..$])
 	{
 		pd.eventsRaw[i] = r[0];
@@ -992,7 +991,7 @@ string parseCsvStm(string csvstm, string csvmap = "")
 }
 
 
-unittest
+@system unittest
 {
 enum stmcsv = `,▽初期,▽接続中,▽通信中,▽切断中
 スタートアクティビティ,,接続要求を開始,,切断要求を開始
@@ -1155,7 +1154,7 @@ template StateFlow(Commands, Base = Object)
 }
 
 ///
-unittest
+@system unittest
 {
 	interface TestCommand
 	{

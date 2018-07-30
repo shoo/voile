@@ -21,7 +21,7 @@ private class MessageText(String)
 	{
 		_text = str;
 	}
-	final override string toString()
+	final override string toString() const
 	{
 		static if (is(String == string))
 		{
@@ -263,13 +263,13 @@ final:
 	}
 	
 	/// ditto
-	alias certified ok;
+	alias ok = certified;
 	/// ditto
-	alias certified good;
+	alias good = certified;
 	/// ditto
-	alias certified success;
+	alias success = certified;
 	/// ditto
-	alias certified succeeded;
+	alias succeeded = certified;
 	
 	/***************************************************************************
 	 * 否決されているか
@@ -279,13 +279,13 @@ final:
 		return !certified();
 	}
 	/// ditto
-	alias rejected ng;
+	alias ng = rejected;
 	/// ditto
-	alias rejected bad;
+	alias bad = rejected;
 	/// ditto
-	alias rejected failure;
+	alias failure = rejected;
 	/// ditto
-	alias rejected failed;
+	alias failed = rejected;
 	
 	/***************************************************************************
 	 * 結果
@@ -304,7 +304,7 @@ final:
 	 */
 	int opApply(int delegate(ref Object) dg)
 	{
-		int result = 0;
+		int result;
 		foreach (ref Object e; _results)
 		{
 			result = dg(e);
@@ -320,7 +320,7 @@ final:
 	 */
 	int opApply(int delegate(ref int, ref Object) dg)
 	{
-		int result = 0;
+		int result;
 		foreach (int i, ref Object e; _results)
 		{
 			result = dg(i, e);
@@ -337,12 +337,12 @@ final:
 	 *     results のそれぞれのオブジェクトのtoStringで得られる文字列を改行でつ
 	 *     ないだ文字列を返します。
 	 */
-	override string toString()
+	override string toString() const
 	{
 		string ret;
 		foreach (o; _results)
 		{
-			ret ~= o.toString() ~ '\n';
+			ret ~= (cast()o).toString() ~ '\n';
 		}
 		return ret;
 	}
@@ -376,7 +376,7 @@ Judgement judge(T...)(lazy T args)
 }
 
 
-unittest
+@system unittest
 {
 	
 	static dstring func1()

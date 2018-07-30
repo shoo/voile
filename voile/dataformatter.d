@@ -29,7 +29,7 @@ private:
 public:
 	
 	
-	
+	///
 	void put(T)(in T v)
 		if (is(Unqual!T == ubyte)
 		||  is(Unqual!T == char)
@@ -46,6 +46,7 @@ public:
 	}
 	
 	
+	/// ditto
 	void put(T)(in T v)
 		if (is(Unqual!T == const(ubyte)[])
 		||  is(Unqual!T == const(byte)[])
@@ -90,6 +91,7 @@ public:
 	}
 	
 	
+	/// ditto
 	void put(T)(in T v)
 		if (is(Unqual!T == ushort)
 		||  is(Unqual!T == short)
@@ -111,6 +113,7 @@ public:
 	}
 	
 	
+	/// ditto
 	void put(T)(in T v)
 		if (is(Unqual!T == uint)  || is(Unqual!T == int)
 		||  is(Unqual!T == float) || is(Unqual!T == ifloat)
@@ -128,6 +131,7 @@ public:
 	}
 	
 	
+	/// ditto
 	void put(T)(T v)
 		if (is(Unqual!T == ulong) || is(Unqual!T == long)
 		||  is(Unqual!T == double) || is(Unqual!T == idouble) )
@@ -143,12 +147,13 @@ public:
 			    (cast(ulong)bswap(
 			        cast(const uint)((v & 0xFFFFFFFF00000000) >> 32))) |
 			    ((cast(ulong)bswap(
-			        cast(const uint)((v & 0x00000000FFFFFFFF)))) << 32);
+			        cast(const uint)(v & 0x00000000FFFFFFFF))) << 32);
 			put!(const(ubyte)[])((cast(const(ubyte)*)&x)[0..8]);
 		}
 	}
 	
 	
+	/// ditto
 	void put(T)(in T v)
 		if (is(Unqual!T U == enum) && isOutputRange!(typeof(this), OriginalType!(T)))
 	{
@@ -156,12 +161,15 @@ public:
 	}
 	
 	
+	/// ditto
 	void put(SrcRange)(ref SrcRange r)
 		if (isStaticArray!(Unqual!(SrcRange)))
 	{
 		put!(typeof(r[]))(r[]);
 	}
 	
+	
+	///
 	void put(SrcRange)(SrcRange r)
 		if (isInputRange!(Unqual!(SrcRange))
 		&& !is(Unqual!SrcRange == const(ubyte)[])
@@ -197,12 +205,16 @@ public:
 	}
 }
 
+
+///
 DataWriter!(ElementType!Range[], Endian.littleEndian) leWriter(Range)(ref Range r)
 	if (isStaticArray!(Range))
 {
 	return typeof(return)(r[]);
 }
 
+
+/// ditto
 DataWriter!(Range, Endian.littleEndian) leWriter(Range)(Range r)
 	if (isOutputRange!(Range, ubyte[])
 	||  isOutputRange!(Range, ubyte))
@@ -210,12 +222,16 @@ DataWriter!(Range, Endian.littleEndian) leWriter(Range)(Range r)
 	return typeof(return)(r);
 }
 
+
+///
 DataWriter!(ElementType!Range[], Endian.bigEndian) beWriter(Range)(ref Range r)
 	if (isStaticArray!(Range))
 {
 	return typeof(return)(r[]);
 }
 
+
+/// ditto
 DataWriter!(Range, Endian.bigEndian) beWriter(Range)(Range r)
 	if (isOutputRange!(Range, ubyte[])
 	||  isOutputRange!(Range, ubyte))
@@ -223,9 +239,10 @@ DataWriter!(Range, Endian.bigEndian) beWriter(Range)(Range r)
 	return typeof(return)(r);
 }
 
-unittest
+
+@system unittest
 {
-	alias DataWriter!(ubyte[]) ob;
+	alias ob = DataWriter!(ubyte[]);
 	enum E: uint { e }
 	static assert(isOutputRange!(ob, ubyte));
 	static assert(isOutputRange!(ob, byte));
@@ -410,7 +427,7 @@ unittest
 
 
 
-
+///
 void pick(R, E)(R r, ref E e)
 	if (!isArray!E)
 {
@@ -474,6 +491,7 @@ void pick(R, E)(R r, ref E e)
 }
 
 
+/// ditto
 void pick(R, E)(ref R r, E e)
 	if (isDynamicArray!E)
 {
@@ -517,6 +535,7 @@ void pick(R, E)(ref R r, E e)
 }
 
 
+/// ditto
 void pick(R, E)(ref R r, ref E e)
 	if (isStaticArray!E)
 {
@@ -524,16 +543,14 @@ void pick(R, E)(ref R r, ref E e)
 }
 
 
-template isEntryRange(R, E)
+///
+enum isEntryRange(R, E) = is(typeof(
 {
-	enum isEntryRange = is(typeof(
-	{
-		R r = void;
-		E e = void;
-		bool b = r.empty;
-		pick!(R, E)(r, e);
-	}()));
-}
+	R r = void;
+	E e = void;
+	bool b = r.empty;
+	pick!(R, E)(r, e);
+}()));
 
 static assert(isEntryRange!(ubyte[],ubyte[]));
 static assert(isEntryRange!(ubyte[],ubyte));
@@ -549,6 +566,7 @@ struct DataReader(Range, Endian rangeEndian = Endian.littleEndian)
 private:
 	Range range;
 public:
+	///
 	this(Range r)
 	{
 		range = r;
@@ -638,6 +656,7 @@ public:
 	}
 	
 	
+	/// ditto
 	void pick(T)(ref T v)
 		if (is(T == ulong)
 		||  is(T == long)
@@ -656,7 +675,7 @@ public:
 			x = (cast(ulong)bswap(
 			        cast(const uint)((v & 0xFFFFFFFF00000000) >> 32))) |
 			    ((cast(ulong)bswap(
-			        cast(const uint)((v & 0x00000000FFFFFFFF)))) << 32);
+			        cast(const uint)(v & 0x00000000FFFFFFFF))) << 32);
 			v = *cast(T*)&x;
 		}
 	}
@@ -699,18 +718,20 @@ public:
 	}
 	
 	/// Range primitive
-	bool empty() @property
+	bool empty() const @property
 	{
 		return range.empty;
 	}
 }
 
+///
 DataReader!(ElementType!Range[], Endian.littleEndian) leReader(Range)(ref Range r)
 	if (isStaticArray!(Range))
 {
 	return typeof(return)(r[]);
 }
 
+/// ditto
 DataReader!(Range, Endian.littleEndian) leReader(Range)(Range r)
 	if (isOutputRange!(Range, ubyte[])
 	||  isOutputRange!(Range, ubyte))
@@ -718,12 +739,14 @@ DataReader!(Range, Endian.littleEndian) leReader(Range)(Range r)
 	return typeof(return)(r);
 }
 
+///
 DataReader!(ElementType!Range[], Endian.bigEndian) beReader(Range)(ref Range r)
 	if (isStaticArray!(Range))
 {
 	return typeof(return)(r[]);
 }
 
+/// ditto
 DataReader!(Range, Endian.bigEndian) beReader(Range)(Range r)
 	if (isOutputRange!(Range, ubyte[])
 	||  isOutputRange!(Range, ubyte))
@@ -732,9 +755,9 @@ DataReader!(Range, Endian.bigEndian) beReader(Range)(Range r)
 }
 
 
-unittest
+@system unittest
 {
-	alias DataReader!(ubyte[]) ib;
+	alias ib = DataReader!(ubyte[]);
 	enum E: uint { e }
 	static assert(isEntryRange!(ib, ubyte));
 	static assert(isEntryRange!(ib, byte));

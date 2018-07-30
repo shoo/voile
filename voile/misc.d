@@ -110,12 +110,14 @@ auto assumeNothrow(T)(T t)
 
 
 
+///
 debug private void dispImpl(T...)(T args)
 {
 	import std.stdio, std.string;
 	writeln(args);
 }
 
+///
 debug void disp(T...)(T args) nothrow pure @nogc @trusted
 {
 	assumeAttr!(dispImpl!T, FunctionAttribute.nothrow_ | FunctionAttribute.pure_ | FunctionAttribute.nogc)(args);
@@ -126,31 +128,31 @@ private template AssumedUnsharedType(T)
 	import std.traits;
 	static if (is(T U == shared(U)))
 	{
-		alias AssumedUnsharedType!(U) AssumedUnsharedType;
+		alias AssumedUnsharedType = AssumedUnsharedType!(U);
 	}
 	else static if (is(T U == const(shared(U))))
 	{
-		alias const(AssumedUnsharedType!(U)) AssumedUnsharedType;
+		alias AssumedUnsharedType = const(AssumedUnsharedType!(U));
 	}
 	else static if (isPointer!T)
 	{
-		alias AssumedUnsharedType!(pointerTarget!T)* AssumedUnsharedType;
+		alias AssumedUnsharedType = AssumedUnsharedType!(pointerTarget!T)*;
 	}
 	else static if (isDynamicArray!T)
 	{
-		alias AssumedUnsharedType!(ForeachType!T)[] AssumedUnsharedType;
+		alias AssumedUnsharedType = AssumedUnsharedType!(ForeachType!T)[];
 	}
 	else static if (isStaticArray!T)
 	{
-		alias AssumedUnsharedType!(ForeachType!T)[T.length] AssumedUnsharedType;
+		alias AssumedUnsharedType = AssumedUnsharedType!(ForeachType!T)[T.length];
 	}
 	else static if (isAssociativeArray!T)
 	{
-		alias AssumedUnsharedType!(ValueType!T)[AssumedUnsharedType!(KeyType!T)] AssumedUnsharedType;
+		alias AssumedUnsharedType = AssumedUnsharedType!(ValueType!T)[AssumedUnsharedType!(KeyType!T)];
 	}
 	else
 	{
-		alias T AssumedUnsharedType;
+		alias AssumedUnsharedType = T;
 	}
 }
 
@@ -267,7 +269,7 @@ CommonType!(staticMap!(ReturnType, T))
 }
 
 
-unittest
+@system unittest
 {
 	Variant var1 = 1;
 	Variant var2 = 3.5;
@@ -479,10 +481,10 @@ CommonType!(staticMap!(ReturnType, T))
 		"classSwitch ascepts only callable");
 	foreach (i, t1; T)
 	{
-		alias ParameterTypeTuple!(t1) a1;
-		alias ReturnType!(t1) r1;
+		alias a1 = ParameterTypeTuple!(t1);
+		alias r1 = ReturnType!(t1);
 		
-		static if (i < T.length-1)
+		static if (i+1 < T.length)
 		{
 			// 最後じゃなければBaseに暗黙変換可能な型のみが許される
 			// 必ず引数は1つとること
@@ -504,7 +506,7 @@ CommonType!(staticMap!(ReturnType, T))
 		}
 		foreach (t2; T[i+1 .. $] )
 		{
-			alias ParameterTypeTuple!(t2) a2;
+			alias a2 = ParameterTypeTuple!(t2);
 			// 同じ型があってはならない
 			static assert( !is( a1 == a2 ),
 				"case function with argument types " ~ a1.stringof ~
@@ -521,7 +523,7 @@ CommonType!(staticMap!(ReturnType, T))
 	}
 	foreach (fn; caseFunctions)
 	{
-		alias ParameterTypeTuple!fn Args;
+		alias Args = ParameterTypeTuple!fn;
 		static if (Args.length == 0)
 		{
 			return fn();
@@ -541,7 +543,7 @@ CommonType!(staticMap!(ReturnType, T))
 	throw new SwitchError("No appropriate switch clause found");
 }
 
-version(none) unittest
+version(none) @system unittest
 {
 	class A
 	{
@@ -779,7 +781,7 @@ S indent(S)(S s, S indentStr = "\t")
 	return __ctfe ? s.indentCtfe(indentStr) : s.indentRuntime(indentStr);
 }
 
-unittest
+@system unittest
 {
 	static assert(`<
 		a b c

@@ -67,7 +67,7 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 }
 
 ///
-unittest
+@system unittest
 {
 	dstring dstr = "あいうえお";
 	wstring wstr = "かきくけこ";
@@ -85,7 +85,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	import std.typetuple;
 	foreach (T; TypeTuple!(ubyte, byte, ushort, short, uint, int, ulong, long))
@@ -114,10 +114,10 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	bool bt = true;
-	bool bf = false;
+	bool bf;
 	auto btjson = bt.json;
 	auto bfjson = bf.json;
 	assert(btjson.type == JSON_TYPE.TRUE);
@@ -126,7 +126,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	auto ary = [1,2,3];
 	auto aryjson = ary.json;
@@ -140,7 +140,7 @@ unittest
 }
 
 ///
-unittest
+@system unittest
 {
 	auto ary = ["ab","cd","ef"];
 	auto aryjson = ary.json;
@@ -154,7 +154,7 @@ unittest
 }
 
 ///
-unittest
+@system unittest
 {
 	struct A
 	{
@@ -229,7 +229,7 @@ void setValue(T)(ref JSONValue v, string name, T val) pure nothrow @trusted
 }
 
 ///
-unittest
+@system unittest
 {
 	JSONValue json;
 	json.setValue("dat", 123);
@@ -242,7 +242,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	enum Type
 	{
@@ -257,7 +257,7 @@ unittest
 }
 
 ///
-unittest
+@system unittest
 {
 	struct A
 	{
@@ -277,7 +277,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	JSONValue json;
 	json.setValue("test", "あいうえお");
@@ -505,7 +505,7 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (!isSomeString!(T) && isDynamicArray!(T))
 {
-	alias ForeachType!T E;
+	alias E = ForeachType!T;
 	if (src.type == JSON_TYPE.ARRAY)
 	{
 		dst = (dst.length >= src.array.length) ? dst[0..src.array.length]: new E[src.array.length];
@@ -531,6 +531,7 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal 
 }
 
 
+///
 bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
 	if (isSomeString!Key && is(typeof({ JSONValue val; fromJson(val, dst[Key.init]); })))
 {
@@ -558,7 +559,8 @@ bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
 	return false;
 }
 
-private T _getValue(T: Value[Key], Value, Key)(in ref JSONValue v, string name, lazy scope Value[Key] defaultVal = T.init)
+private T _getValue(T: Value[Key], Value, Key)(
+	in ref JSONValue v, string name, lazy scope Value[Key] defaultVal = T.init)
 	if (isSomeString!Key && is(typeof({ JSONValue val; Value[Key] dst; fromJson(val, dst[Key.init]); })))
 {
 	size_t[string] tmp;
@@ -569,6 +571,7 @@ private T _getValue(T: Value[Key], Value, Key)(in ref JSONValue v, string name, 
 	return defaultVal;
 }
 
+///
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(Unqual!T == JSONValue))
 {
@@ -609,7 +612,7 @@ T getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
 
 
 ///
-unittest
+@system unittest
 {
 	JSONValue json;
 	json.setValue("test", 123);
@@ -624,7 +627,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	JSONValue json;
 	json.setValue("test", 0.125);
@@ -639,7 +642,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	struct A
 	{
@@ -666,7 +669,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	static class A
 	{
@@ -693,7 +696,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	enum Type
 	{
@@ -708,7 +711,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	JSONValue json;
 	json.setValue("t", true);
@@ -725,7 +728,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	JSONValue json;
 	json.setValue("test1", [1,2,3]);
@@ -753,7 +756,7 @@ unittest
 
 
 ///
-unittest
+@system unittest
 {
 	static struct A
 	{

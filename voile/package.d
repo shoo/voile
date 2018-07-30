@@ -18,6 +18,7 @@ $(UL
 		$(LI $(LINK2 _voile.stm.html, stm))
 		$(LI $(LINK2 _voile.sync.html, sync))
 		$(LI $(LINK2 _voile.unique.html, unique))
+		$(LI $(LINK2 _voile.fs.html, fs))
 	))
 )
 Authors: P.Knowledge, SHOO
