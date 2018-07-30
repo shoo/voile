@@ -1,6 +1,7 @@
 module voile.fs;
 
 import std.file, std.path, std.exception, std.stdio;
+import std.process;
 import voile.handler;
 
 /*******************************************************************************
@@ -346,6 +347,7 @@ struct FileSystem
 	File createFile(string filename)
 	{
 		auto absFilename = absolutePath(filename);
+		makeDir(absFilename.dirName);
 		if (!absFilename.dirName.exists)
 			makeDir(absFilename);
 		return File(absFilename, "w+");
@@ -734,5 +736,154 @@ struct FileSystem
 		fs.copyFiles("a/b", "*.txt", "a/c");
 		assert(fs.isFile("a/c/c.txt"));
 		assert(!fs.isFile("a/c/d.dat"));
+	}
+	
+	/***************************************************************************
+	 * パスを検索する
+	 */
+	string searchPath(in char[] executable, in string[] additional = null) const @trusted
+	{
+		if (executable.exists)
+			return executable.dup;
+		import std.algorithm : splitter;
+		import std.conv;
+		import std.process: environment;
+		string execFileName = executable.setExtension(".exe");
+		string execPath;
+		if (execFileName.isAbsolute())
+			return execFileName;
+		
+		foreach (dir; additional)
+		{
+			execPath = buildPath(dir, execFileName);
+			if (execPath.exists)
+				return execPath;
+		}
+		
+		execPath = buildPath(thisExePath.dirName, execFileName);
+		if (execPath.exists)
+			return execPath;
+		
+		execPath = buildPath(workDir, execFileName);
+		if (execPath.exists)
+			return execPath;
+		
+		auto paths = environment.get("PATH", environment.get("Path", environment.get("path")));
+		if (paths == null)
+			return null;
+		
+		foreach (dir; splitter(to!string(paths), ';'))
+		{
+			execPath = buildPath(dir, execFileName);
+			if (execPath.exists)
+				return execPath;
+		}
+		
+		return null;
+	}
+	
+	/***************************************************************************
+	 * プロセスを実行する
+	 */
+	auto spawnProcess(string[] args, string[string] env = null,
+	                  std.process.Config cfg = std.process.Config.none)
+	{
+		makeDir(".");
+		return .spawnProcess([searchPath(args[0])] ~ args[1..$],
+		                      stdin, stdout, stderr, env, cfg, workDir);
+	}
+	
+	/// ditto
+	auto spawnProcess(string[] args, File fin, File fout, File ferr,
+	                  string[string] env = null,
+	                  std.process.Config cfg = std.process.Config.suppressConsole)
+	{
+		makeDir(".");
+		return .spawnProcess([searchPath(args[0])] ~ args[1..$],
+		                      fin  is File.init ? File.init : fin,
+		                      fout is File.init ? File.init : fout,
+		                      ferr is File.init ? File.init : ferr,
+		                      env, cfg, workDir);
+	}
+	
+	/// ditto
+	auto spawnProcess(string[] args, Pipe pin, Pipe pout, Pipe perr,
+	                  string[string] env = null,
+	                  std.process.Config cfg = std.process.Config.suppressConsole)
+	{
+		makeDir(".");
+		return .spawnProcess([searchPath(args[0])] ~ args[1..$],
+		                     pin  is Pipe.init ? File.init : pin.readEnd,
+		                     pout is Pipe.init ? File.init : pout.writeEnd,
+		                     perr is Pipe.init ? File.init : perr.writeEnd,
+		                     env, cfg, workDir);
+	}
+	
+	/// ditto
+	auto pipeProcess(string[] args, string[string] env = null,
+	                 std.process.Config cfg = std.process.Config.suppressConsole)
+	{
+		makeDir(".");
+		return .pipeProcess([searchPath(args[0])] ~ args[1..$],
+		                     Redirect.all, env, cfg, workDir);
+	}
+	
+	/// ditto
+	auto execute(string[] args, string[string] env = null,
+	             std.process.Config cfg = std.process.Config.suppressConsole)
+	{
+		makeDir(".");
+		return .execute([searchPath(args[0])] ~ args[1..$],
+		                 env, cfg, size_t.max, workDir);
+	}
+	
+	///
+	@system unittest
+	{
+		scope (exit)
+			std.file.rmdirRecurse("ut");
+		auto fs = FileSystem("ut");
+		auto pipeo = pipe();
+		auto pid = fs.spawnProcess(["cmd", "/C", "echo xxx"], Pipe.init, pipeo, pipeo);
+		pid.wait();
+		auto xxx = pipeo.readEnd().readln;
+		assert(xxx == "xxx\r\n");
+	}
+	
+	///
+	@system unittest
+	{
+		scope (exit)
+			std.file.rmdirRecurse("ut");
+		auto fs = FileSystem("ut");
+		auto pipeo = pipe();
+		auto pipe = fs.pipeProcess(["cmd", "/C", "echo xxx"]);
+		pipe.pid.wait();
+		auto xxx = pipe.stdout().readln;
+		assert(xxx == "xxx\r\n");
+	}
+	
+	///
+	@system unittest
+	{
+		scope (exit)
+			std.file.rmdirRecurse("ut");
+		auto fs = FileSystem("ut");
+		auto tout = fs.createFile("test.txt");
+		auto pid = fs.spawnProcess(["cmd", "/C", "echo xxx"], File.init, tout, File.init);
+		pid.wait();
+		tout.close();
+		auto result = fs.readText("test.txt");
+		assert(result == "xxx\r\n");
+	}
+	
+	///
+	@system unittest
+	{
+		scope (exit)
+			std.file.rmdirRecurse("ut");
+		auto fs = FileSystem("ut");
+		auto result = fs.execute(["cmd", "/C", "echo xxx"]);
+		assert(result.output == "xxx\r\n");
 	}
 }
