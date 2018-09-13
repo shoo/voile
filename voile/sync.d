@@ -23,6 +23,7 @@ version (Windows)
 {
 	import core.sys.windows.windows;
 }
+import std.traits, std.parallelism;
 
 /*******************************************************************************
  * 同期イベントクラス
@@ -499,6 +500,484 @@ public:
 
 
 
+
+
+/***************************************************************************
+ * タスクを生成する
+ */
+private void _makeTask(alias func, Fut, Args...)(Fut future, Args args)
+{
+	alias Ret = Fut.ResultType;
+	synchronized (future)
+	{
+		future._type = Fut.FinishedType.none;
+		future._resultException = null;
+	}
+	future._task = task({
+		future._evStart.signaled = true;
+		try
+		{
+			static if (is(Ret == void))
+			{
+				bool call;
+				func(args);
+				synchronized (future)
+				{
+					future._type = Fut.FinishedType.done;
+					call = future._onFinished !is null;
+				}
+				if (call)
+					future._onFinished();
+				return;
+			}
+			else
+			{
+				bool call;
+				future._resultRaw() = func(args);
+				synchronized (future)
+				{
+					future._type = Fut.FinishedType.done;
+					call = future._onFinished !is null;
+				}
+				if (call)
+					future._onFinished(future._resultRaw);
+				return future._resultRaw;
+			}
+		}
+		catch (Exception e)
+		{
+			bool call;
+			synchronized (future)
+			{
+				call = future._onFailed !is null;
+				future._type = Fut.FinishedType.failed;
+			}
+			if (call)
+				future._onFailed(e);
+			throw e;
+		}
+		catch (Throwable e)
+		{
+			bool call;
+			synchronized (future)
+			{
+				if (future._onFailed !is null)
+					call = true;
+				future._type = Fut.FinishedType.fatal;
+			}
+			if (call)
+				future._onFatalError(e);
+			throw e;
+		}
+		assert(0);
+	});
+}
+
+
+private auto _dgRun(F, Args...)(F dg, Args args)
+{
+	return dg(args);
+}
+
+
+/*******************************************************************************
+ * 
+ */
+final class Future(Ret)
+{
+	alias TaskFunc = Ret delegate();
+	alias TaskType = typeof(task(TaskFunc.init));
+	alias ResultType = Ret;
+	static if (is(Ret == void))
+	{
+		alias CallbackType = void delegate();
+	}
+	else
+	{
+		alias CallbackType = void delegate(ref ResultType res);
+	}
+private:
+	
+	CallbackType               _onFinished;
+	void delegate(Exception e) _onFailed;
+	void delegate(Throwable e) _onFatalError;
+	TaskType                   _task;
+	TaskPool                   _taskPool;
+	SyncEvent                  _evStart;
+	
+	enum FinishedType
+	{
+		none, done, failed, fatal
+	}
+	
+	FinishedType _type;
+	union
+	{
+		Exception _resultException;
+		Throwable _resultFatalError;
+	}
+	
+	static if (!is(Ret == void))
+	{
+		ref inout(ResultType) _resultRaw() inout @property
+		{
+			return *cast(inout(ResultType)*)&(cast(Future)this)._task.fixRef((cast(Future)this)._task.returnVal);
+		}
+	}
+	
+public:
+	this()
+	{
+		_evStart = new SyncEvent(false);
+	}
+	/***************************************************************************
+	 * 終了したら呼ばれる
+	 */
+	auto perform(alias func, Args...)(TaskPool pool, Args args)
+		if (is(typeof(func(args)) == ResultType))
+	{
+		_makeTask!func(this, args);
+		_taskPool = pool;
+		pool.put(_task);
+		return this;
+	}
+	/// ditto
+	auto perform(alias func, Args...)(Args args)
+		if (is(typeof(func(args)) == ResultType))
+	{
+		_makeTask!func(this, args);
+		if (_taskPool)
+		{
+			_taskPool.put(_task);
+		}
+		else
+		{
+			_task.executeInNewThread();
+		}
+		return this;
+	}
+	/// ditto
+	auto perform(F, Args...)(TaskPool pool, F dg, Args args)
+		if (is(typeof(dg(args)) == ResultType))
+	{
+		_makeTask!_dgRun(this, dg, args);
+		_taskPool = pool;
+		pool.put(_task);
+		return this;
+	}
+	/// ditto
+	auto perform(F, Args...)(F dg, Args args)
+		if (is(typeof(dg(args)) == ResultType))
+	{
+		_makeTask!_dgRun(this, dg, args);
+		if (_taskPool)
+		{
+			_taskPool.put(_task);
+		}
+		else
+		{
+			_task.executeInNewThread();
+		}
+		return this;
+	}
+	
+	/***************************************************************************
+	 * チェーン
+	 */
+	auto then(Ret2)(TaskPool pool,
+		Ret2 delegate(ResultType) callbackFinished,
+		void delegate(Exception e) callbackFailed = null,
+		void delegate(Throwable e) callbackFatalError = null)
+		if (!is(Ret == void) && is(typeof(callbackFinished(_resultRaw))))
+	{
+		auto ret = new Future!Ret2;
+		onFinished   = (ref ResultType result) { ret.perform(pool, callbackFinished, result); };
+		onFailed     = callbackFailed;
+		onFatalError = callbackFatalError;
+		return ret;
+	}
+	/// ditto
+	auto then(Ret2)(
+		Ret2 delegate(ResultType) callbackFinished,
+		void delegate(Exception e) callbackFailed = null,
+		void delegate(Throwable e) callbackFatalError = null)
+		if (!is(Ret == void) && is(typeof(callbackFinished(_resultRaw))))
+	{
+		auto ret = new Future!Ret2;
+		onFinished   = (ref ResultType result){ ret.perform(callbackFinished, result); };
+		onFailed     = callbackFailed;
+		onFatalError = callbackFatalError;
+		return ret;
+	}
+	/// ditto
+	auto then(alias func, Ex = Exception)(TaskPool pool,
+		void delegate(Ex e) callbackFailed = null,
+		void delegate(Throwable e) callbackFatalError = null)
+		if (!is(Ret == void) && is(typeof(func(_resultRaw))) && is(Ex == Exception))
+	{
+		auto ret = new Future!(typeof(func(_resultRaw)));
+		onFinished   = (ref ResultType result) { ret.perform!func(pool, result); };
+		onFailed     = callbackFailed;
+		onFatalError = callbackFatalError;
+		return ret;
+	}
+	/// ditto
+	auto then(alias func, Ex = Exception)(
+		void delegate(Ex e) callbackFailed = null,
+		void delegate(Throwable e) callbackFatalError = null)
+		if (!is(Ret == void) && is(typeof(func(_resultRaw))) && is(Ex == Exception))
+	{
+		auto ret = new Future!(typeof(func(_resultRaw)));
+		onFinished   = (ref ResultType result) { ret.perform!func(result); };
+		onFailed     = callbackFailed;
+		onFatalError = callbackFatalError;
+		return ret;
+	}
+	/// ditto
+	auto then(Ret2)(TaskPool pool,
+		Ret2 delegate() callbackFinished,
+		void delegate(Exception e) callbackFailed = null,
+		void delegate(Throwable e) callbackFatalError = null)
+		if (is(Ret == void) && is(typeof(callbackFinished())))
+	{
+		auto ret = new Future!Ret2;
+		onFinished   = () { ret.perform(pool, callbackFinished); };
+		onFailed     = callbackFailed;
+		onFatalError = callbackFatalError;
+		return ret;
+	}
+	/// ditto
+	auto then(Ret2)(
+		Ret2 delegate() callbackFinished,
+		void delegate(Exception e) callbackFailed = null,
+		void delegate(Throwable e) callbackFatalError = null)
+		if (is(Ret == void) && is(typeof(callbackFinished())))
+	{
+		auto ret = new Future!Ret2;
+		onFinished   = (){ ret.perform(callbackFinished); };
+		onFailed     = callbackFailed;
+		onFatalError = callbackFatalError;
+		return ret;
+	}
+	/// ditto
+	auto then(alias func, Ex = Exception)(TaskPool pool,
+		void delegate(Ex e) callbackFailed = null,
+		void delegate(Throwable e) callbackFatalError = null)
+		if (is(Ret == void) && is(typeof(func())) && is(Ex == Exception))
+	{
+		auto ret = new Future!(typeof(func()));
+		onFinished   = () { ret.perform!func(pool); };
+		onFailed     = callbackFailed;
+		onFatalError = callbackFatalError;
+		return ret;
+	}
+	/// ditto
+	auto then(alias func, Ex = Exception)(
+		void delegate(Ex e) callbackFailed = null,
+		void delegate(Throwable e) callbackFatalError = null)
+		if (is(Ret == void) && is(typeof(func())) && is(Ex == Exception))
+	{
+		auto ret = new Future!(typeof(func()));
+		onFinished   = () { ret.perform!func(); };
+		onFailed     = callbackFailed;
+		onFatalError = callbackFatalError;
+		return ret;
+	}
+	/***************************************************************************
+	 * 終了したら呼ばれる
+	 */
+	void onFinished(CallbackType dg) @property
+	{
+		bool call;
+		synchronized (this)
+		{
+			if (_type == FinishedType.done && dg !is null)
+				call = true;
+			_onFinished = dg;
+		}
+		static if (is(Ret == void))
+		{
+			if (call)
+				_onFinished();
+		}
+		else
+		{
+			if (call)
+				_onFinished(_resultRaw);
+		}
+	}
+	
+	/***************************************************************************
+	 * 例外が発生したら呼ばれる
+	 */
+	void onFailed(void delegate(Exception e) dg) @property
+	{
+		bool call;
+		synchronized (this)
+		{
+			if (_type == FinishedType.failed && dg is null && _resultException)
+				call = true;
+			_onFailed = dg;
+		}
+		if (call)
+			_onFailed(_resultException);
+	}
+	
+	
+	/***************************************************************************
+	 * 致命的エラーが発生したら呼ばれる
+	 */
+	void onFatalError(void delegate(Throwable e) dg) @property
+	{
+		bool call;
+		synchronized (this)
+		{
+			if (_type == FinishedType.fatal && dg is null && _resultFatalError)
+				call = true;
+			_onFatalError = dg;
+		}
+		if (call)
+			_onFatalError(_resultFatalError);
+	}
+	
+	/***************************************************************************
+	 * 終了するまで待機する
+	 */
+	void join()
+	{
+		_evStart.wait();
+		_task.yieldForce();
+	}
+	
+	
+	/***************************************************************************
+	 * 結果を受け取る
+	 */
+	ref ResultType yieldForce()
+	{
+		_evStart.wait();
+		return _task.yieldForce();
+	}
+	
+	/// ditto
+	ref ResultType workForce()
+	{
+		_evStart.wait();
+		return _task.workForce();
+	}
+	
+	/// ditto
+	ref ResultType spinForce()
+	{
+		_evStart.wait();
+		return _task.spinForce();
+	}
+	
+	static if (!is(Ret == void))
+	{
+		/// ditto
+		ref inout(ResultType) result() inout @property
+		{
+			import std.exception;
+			enforce((cast(Future)this)._task.done);
+			return _resultRaw();
+		}
+	}
+	
+}
+
+@system unittest
+{
+	auto future = new Future!int;
+	future.perform(delegate (int a) => a + 10, 10);
+	assert(future.yieldForce() == 20);
+	future.perform(taskPool, delegate (int a) => a + 20, 10);
+	assert(future.yieldForce() == 30);
+	static int foo(int a) { return a + 30; }
+	future.perform!foo(10);
+	assert(future.yieldForce() == 40);
+	future.perform!foo(taskPool, 10);
+	assert(future.yieldForce() == 40);
+	
+	auto future2 = future.perform(delegate (int a) => a + 10, 10)
+		.then((int a) => cast(ulong)(a + 20))
+		.then(a => a + 20)
+		.then!((ulong a) => a + 60)()
+		.then(taskPool, a => cast(int)(a + 20))
+		.then!((ref int a) => a + 60)(taskPool);
+	auto future3 = future2
+		.then((int a){ assert(a == 200); })
+		.then(taskPool, (){  })
+		.then((){  })
+		.then!((){  })
+		.then!((){  })(taskPool);
+	assert(future2.yieldForce() == 200);
+	future3.join();
+}
+
+
+/*******************************************************************************
+ * 非同期処理の開始
+ */
+auto async(F, Args...)(TaskPool pool, F dg, Args args)
+	if (isCallable!F)
+{
+	auto ret = new Future!(ReturnType!F);
+	_makeTask!_dgRun(ret, dg, args);
+	ret._taskPool = pool;
+	pool.put(ret._task);
+	return ret;
+}
+@system unittest
+{
+	auto future = async(taskPool, delegate (int a) => a + 10, 10);
+	assert(future.yieldForce() == 20);
+}
+
+/// ditto
+auto async(F, Args...)(F dg, Args args)
+	if (isCallable!F)
+{
+	auto ret = new Future!(ReturnType!F);
+	_makeTask!_dgRun(ret, dg, args);
+	ret._task.executeInNewThread();
+	return ret;
+}
+@system unittest
+{
+	auto future = async(delegate (int a) => a + 20, 10);
+	assert(future.yieldForce() == 30);
+}
+/// ditto
+auto async(alias func, Args...)(TaskPool pool, Args args)
+	if (is(typeof(func(args))))
+{
+	auto ret = new Future!(typeof(func(args)));
+	_makeTask!func(ret, args);
+	pool.put(ret._task);
+	ret._taskPool = pool;
+	return ret;
+}
+@system unittest
+{
+	auto future = async!(a => a + 30)(taskPool, 10);
+	assert(future.yieldForce() == 40);
+}
+/// ditto
+auto async(alias func, Args...)(Args args)
+	if (!is(Args[0] == TaskPool) && is(typeof(func(args))))
+{
+	auto ret = new Future!(typeof(func(args)));
+	_makeTask!func(ret, args);
+	ret._task.executeInNewThread();
+	return ret;
+}
+@system unittest
+{
+	auto future = async!(a => a + 40)(10);
+	assert(future.yieldForce() == 50);
+}
+
 /*******************************************************************************
  * 管理された共有資源
  * 
@@ -754,7 +1233,6 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 
 private template AssumedUnsharedType(T)
 {
-	import std.traits;
 	static if (is(T U == shared(U)))
 	{
 		alias AssumedUnsharedType = AssumedUnsharedType!(U);
