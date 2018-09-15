@@ -507,6 +507,7 @@ public:
  */
 private void _makeTask(alias func, Fut, Args...)(Fut future, Args args)
 {
+	import std.algorithm: move;
 	alias Ret = Fut.ResultType;
 	synchronized (future)
 	{
@@ -519,54 +520,49 @@ private void _makeTask(alias func, Fut, Args...)(Fut future, Args args)
 		{
 			static if (is(Ret == void))
 			{
-				bool call;
+				Fut.FinishedHandler call;
 				func(args);
 				synchronized (future)
 				{
+					call = future._onFinished.move();
 					future._type = Fut.FinishedType.done;
-					call = future._onFinished !is null;
 				}
-				if (call)
-					future._onFinished();
+				call();
 				return;
 			}
 			else
 			{
-				bool call;
+				Fut.FinishedHandler call;
 				future._resultRaw() = func(args);
 				synchronized (future)
 				{
+					call = future._onFinished.move();
 					future._type = Fut.FinishedType.done;
-					call = future._onFinished !is null;
 				}
-				if (call)
-					future._onFinished(future._resultRaw);
+				call(future._resultRaw);
 				return future._resultRaw;
 			}
 		}
 		catch (Exception e)
 		{
-			bool call;
+			Fut.FailedHandler call;
 			synchronized (future)
 			{
-				call = future._onFailed !is null;
+				call = future._onFailed.move();
 				future._type = Fut.FinishedType.failed;
 			}
-			if (call)
-				future._onFailed(e);
+			call(e);
 			throw e;
 		}
 		catch (Throwable e)
 		{
-			bool call;
+			Fut.FatalHandler call;
 			synchronized (future)
 			{
-				if (future._onFailed !is null)
-					call = true;
+				call = future._onFatal.move();
 				future._type = Fut.FinishedType.fatal;
 			}
-			if (call)
-				future._onFatalError(e);
+			call(e);
 			throw e;
 		}
 		assert(0);
@@ -585,6 +581,7 @@ private auto _dgRun(F, Args...)(F dg, Args args)
  */
 final class Future(Ret)
 {
+	import voile.handler;
 	alias TaskFunc = Ret delegate();
 	alias TaskType = typeof(task(TaskFunc.init));
 	alias ResultType = Ret;
@@ -596,14 +593,18 @@ final class Future(Ret)
 	{
 		alias CallbackType = void delegate(ref ResultType res);
 	}
+	alias CallbackFailedType = void delegate(Exception);
+	alias CallbackFatalType  = void delegate(Throwable);
+	alias FinishedHandler    = Handler!CallbackType;
+	alias FailedHandler      = Handler!CallbackFailedType;
+	alias FatalHandler       = Handler!CallbackFatalType;
 private:
-	
-	CallbackType               _onFinished;
-	void delegate(Exception e) _onFailed;
-	void delegate(Throwable e) _onFatalError;
-	TaskType                   _task;
-	TaskPool                   _taskPool;
-	SyncEvent                  _evStart;
+	FinishedHandler _onFinished;
+	FailedHandler   _onFailed;
+	FatalHandler    _onFatal;
+	TaskType        _task;
+	TaskPool        _taskPool;
+	SyncEvent       _evStart;
 	
 	enum FinishedType
 	{
@@ -614,7 +615,7 @@ private:
 	union
 	{
 		Exception _resultException;
-		Throwable _resultFatalError;
+		Throwable _resultFatal;
 	}
 	
 	static if (!is(Ret == void))
@@ -626,10 +627,30 @@ private:
 	}
 	
 public:
+	/***************************************************************************
+	 * コンストラクタ
+	 */
 	this()
 	{
 		_evStart = new SyncEvent(false);
 	}
+	/// ditto
+	this(SyncEvent evStart)
+	{
+		_evStart = evStart;
+		if (evStart is SyncEvent.init)
+		{
+			_type = FinishedType.done;
+		}
+	}
+	/// ditto
+	this(SyncEvent evStart, TaskPool pool)
+	{
+		this(evStart);
+		_taskPool = pool;
+	}
+	
+	
 	/***************************************************************************
 	 * 終了したら呼ばれる
 	 */
@@ -687,157 +708,276 @@ public:
 	auto then(Ret2)(TaskPool pool,
 		Ret2 delegate(ResultType) callbackFinished,
 		void delegate(Exception e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatalError = null)
+		void delegate(Throwable e) callbackFatal = null)
 		if (!is(Ret == void) && is(typeof(callbackFinished(_resultRaw))))
 	{
 		auto ret = new Future!Ret2;
-		onFinished   = (ref ResultType result) { ret.perform(pool, callbackFinished, result); };
-		onFailed     = callbackFailed;
-		onFatalError = callbackFatalError;
+		addListenerFinished((ref ResultType result) { ret.perform(pool, callbackFinished, result); });
+		addListenerFailed(callbackFailed);
+		addListenerFatal(callbackFatal);
 		return ret;
 	}
 	/// ditto
 	auto then(Ret2)(
 		Ret2 delegate(ResultType) callbackFinished,
 		void delegate(Exception e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatalError = null)
+		void delegate(Throwable e) callbackFatal = null)
 		if (!is(Ret == void) && is(typeof(callbackFinished(_resultRaw))))
 	{
 		auto ret = new Future!Ret2;
-		onFinished   = (ref ResultType result){ ret.perform(callbackFinished, result); };
-		onFailed     = callbackFailed;
-		onFatalError = callbackFatalError;
+		addListenerFinished((ref ResultType result){ ret.perform(callbackFinished, result); });
+		addListenerFailed(callbackFailed);
+		addListenerFatal(callbackFatal);
 		return ret;
 	}
 	/// ditto
 	auto then(alias func, Ex = Exception)(TaskPool pool,
 		void delegate(Ex e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatalError = null)
+		void delegate(Throwable e) callbackFatal = null)
 		if (!is(Ret == void) && is(typeof(func(_resultRaw))) && is(Ex == Exception))
 	{
 		auto ret = new Future!(typeof(func(_resultRaw)));
-		onFinished   = (ref ResultType result) { ret.perform!func(pool, result); };
-		onFailed     = callbackFailed;
-		onFatalError = callbackFatalError;
+		addListenerFinished((ref ResultType result) { ret.perform!func(pool, result); });
+		addListenerFailed(callbackFailed);
+		addListenerFatal(callbackFatal);
 		return ret;
 	}
 	/// ditto
 	auto then(alias func, Ex = Exception)(
 		void delegate(Ex e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatalError = null)
+		void delegate(Throwable e) callbackFatal = null)
 		if (!is(Ret == void) && is(typeof(func(_resultRaw))) && is(Ex == Exception))
 	{
 		auto ret = new Future!(typeof(func(_resultRaw)));
-		onFinished   = (ref ResultType result) { ret.perform!func(result); };
-		onFailed     = callbackFailed;
-		onFatalError = callbackFatalError;
+		addListenerFinished((ref ResultType result) { ret.perform!func(result); });
+		addListenerFailed(callbackFailed);
+		addListenerFatal(callbackFatal);
 		return ret;
 	}
 	/// ditto
 	auto then(Ret2)(TaskPool pool,
 		Ret2 delegate() callbackFinished,
 		void delegate(Exception e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatalError = null)
+		void delegate(Throwable e) callbackFatal = null)
 		if (is(Ret == void) && is(typeof(callbackFinished())))
 	{
 		auto ret = new Future!Ret2;
-		onFinished   = () { ret.perform(pool, callbackFinished); };
-		onFailed     = callbackFailed;
-		onFatalError = callbackFatalError;
+		addListenerFinished(() { ret.perform(pool, callbackFinished); });
+		addListenerFailed(callbackFailed);
+		addListenerFatal(callbackFatal);
 		return ret;
 	}
 	/// ditto
 	auto then(Ret2)(
 		Ret2 delegate() callbackFinished,
 		void delegate(Exception e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatalError = null)
+		void delegate(Throwable e) callbackFatal = null)
 		if (is(Ret == void) && is(typeof(callbackFinished())))
 	{
 		auto ret = new Future!Ret2;
-		onFinished   = (){ ret.perform(callbackFinished); };
-		onFailed     = callbackFailed;
-		onFatalError = callbackFatalError;
+		addListenerFinished((){ ret.perform(callbackFinished); });
+		addListenerFailed(callbackFailed);
+		addListenerFatal(callbackFatal);
 		return ret;
 	}
 	/// ditto
 	auto then(alias func, Ex = Exception)(TaskPool pool,
 		void delegate(Ex e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatalError = null)
+		void delegate(Throwable e) callbackFatal = null)
 		if (is(Ret == void) && is(typeof(func())) && is(Ex == Exception))
 	{
 		auto ret = new Future!(typeof(func()));
-		onFinished   = () { ret.perform!func(pool); };
-		onFailed     = callbackFailed;
-		onFatalError = callbackFatalError;
+		addListenerFinished( () { ret.perform!func(pool); });
+		addListenerFailed(callbackFailed);
+		addListenerFatal(callbackFatal);
 		return ret;
 	}
 	/// ditto
 	auto then(alias func, Ex = Exception)(
 		void delegate(Ex e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatalError = null)
+		void delegate(Throwable e) callbackFatal = null)
 		if (is(Ret == void) && is(typeof(func())) && is(Ex == Exception))
 	{
 		auto ret = new Future!(typeof(func()));
-		onFinished   = () { ret.perform!func(); };
-		onFailed     = callbackFailed;
-		onFatalError = callbackFatalError;
+		addListenerFinished( () { ret.perform!func(); } );
+		addListenerFailed(callbackFailed);
+		addListenerFatal(callbackFatal);
 		return ret;
 	}
 	/***************************************************************************
-	 * 終了したら呼ばれる
+	 * 終了したら呼ばれるコールバックをハンドラに登録
+	 * 
+	 * 指定されたコールバックは並列処理が正常終了したときにのみ呼び出される。
+	 * 並列処理がまだ終了していない場合には並列処理を行っていたスレッドでコールバックが呼び出されるが、
+	 * すでに並列処理が終了していた場合には現在のスレッドで即座にコールバックが呼び出される。
+	 * すでに終了していて、かつコールバック内で例外が発生した場合には、Failed, Fatalのハンドラが呼び出され、
+	 * Futureの状態も各々の状態へと変化する。
+	 * 
+	 * Params:
+	 *     dg = 設定するコールバックを指定する。nullを指定したらハンドラに登録されたすべてのコールバックをクリアする。
+	 * Returns:
+	 *     登録したハンドラのIDを返す。登録されなかった場合はFinishedHandler.HandlerProcId.initが返る
 	 */
-	void onFinished(CallbackType dg) @property
+	FinishedHandler.HandlerProcId addListenerFinished(CallbackType dg)
 	{
-		bool call;
+		import std.algorithm: move;
 		synchronized (this)
 		{
-			if (_type == FinishedType.done && dg !is null)
-				call = true;
-			_onFinished = dg;
+			if (dg is null)
+			{
+				_onFinished.clear();
+				return FinishedHandler.HandlerProcId.init;
+			}
+			else
+			{
+				if (_type == FinishedType.none)
+				{
+					return _onFinished.connect(dg);
+				}
+				else if (_type != FinishedType.done)
+				{
+					return FinishedHandler.HandlerProcId.init;
+				}
+				else
+				{
+					// 何もしない=関数の最後でdgの呼び出しを行う
+				}
+			}
 		}
-		static if (is(Ret == void))
+		try
 		{
-			if (call)
-				_onFinished();
+			static if (is(Ret == void))
+			{
+				dg();
+			}
+			else
+			{
+				dg(_resultRaw);
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			if (call)
-				_onFinished(_resultRaw);
+			FailedHandler call;
+			synchronized (this)
+			{
+				call = _onFailed.move();
+				_type = FinishedType.failed;
+			}
+			call(e);
 		}
+		catch (Throwable e)
+		{
+			FatalHandler call;
+			synchronized (this)
+			{
+				call = _onFatal.move();
+				_type = FinishedType.fatal;
+			}
+			call(e);
+		}
+		return FinishedHandler.HandlerProcId.init;
 	}
 	
 	/***************************************************************************
 	 * 例外が発生したら呼ばれる
+	 * 
+	 * Params:
+	 *     dg = 設定するコールバックを指定する。nullを指定したらすべてのコールバックをクリアする。
+	 * Returns:
+	 *     登録したハンドラのIDを返す。登録されなかった場合はFailedHandler.HandlerProcId.initが返る
 	 */
-	void onFailed(void delegate(Exception e) dg) @property
+	FailedHandler.HandlerProcId addListenerFailed(CallbackFailedType dg)
 	{
-		bool call;
 		synchronized (this)
 		{
-			if (_type == FinishedType.failed && dg is null && _resultException)
-				call = true;
-			_onFailed = dg;
+			if (dg is null)
+			{
+				_onFailed.clear();
+				return FailedHandler.HandlerProcId.init;
+			}
+			else
+			{
+				if (_type == FinishedType.none)
+				{
+					return _onFailed.connect(dg);
+				}
+				else if (_type != FinishedType.failed)
+				{
+					return FailedHandler.HandlerProcId.init;
+				}
+				else
+				{
+					// 何もしない=関数の最後でdgの呼び出しを行う
+				}
+			}
 		}
-		if (call)
-			_onFailed(_resultException);
+		dg(_resultException);
+		return FailedHandler.HandlerProcId.init;
 	}
 	
 	
 	/***************************************************************************
 	 * 致命的エラーが発生したら呼ばれる
+	 * 
+	 * Params:
+	 *     dg = 設定するコールバックを指定する。nullを指定したらすべてのコールバックをクリアする。
+	 * Returns:
+	 *     登録したハンドラのIDを返す。登録されなかった場合はFatalHandler.HandlerProcId.initが返る
 	 */
-	void onFatalError(void delegate(Throwable e) dg) @property
+	FatalHandler.HandlerProcId addListenerFatal(CallbackFatalType dg)
 	{
-		bool call;
 		synchronized (this)
 		{
-			if (_type == FinishedType.fatal && dg is null && _resultFatalError)
-				call = true;
-			_onFatalError = dg;
+			if (dg is null)
+			{
+				_onFatal.clear();
+				return FatalHandler.HandlerProcId.init;
+			}
+			else
+			{
+				if (_type == FinishedType.none)
+				{
+					return _onFatal.connect(dg);
+				}
+				else if (_type != FinishedType.fatal)
+				{
+					return FatalHandler.HandlerProcId.init;
+				}
+				else
+				{
+					/* 何もしない=関数の最後でdgの呼び出しを行う */
+				}
+			}
 		}
-		if (call)
-			_onFatalError(_resultFatalError);
+		dg(_resultFatal);
+		return FatalHandler.HandlerProcId.init;
+	}
+	
+	/***************************************************************************
+	 * 登録していたハンドラを削除する
+	 */
+	void removeListenerFinished(FinishedHandler.HandlerProcId id)
+	{
+		synchronized (this)
+		{
+			_onFinished.disconnect(id);
+		}
+	}
+	/// ditto
+	void removeListenerFailed(FailedHandler.HandlerProcId id)
+	{
+		synchronized (this)
+		{
+			_onFailed.disconnect(id);
+		}
+	}
+	/// ditto
+	void removeListenerFatal(FatalHandler.HandlerProcId id)
+	{
+		synchronized (this)
+		{
+			_onFatal.disconnect(id);
+		}
 	}
 	
 	/***************************************************************************
@@ -845,6 +985,11 @@ public:
 	 */
 	void join()
 	{
+		static if (is(Ret == void))
+		{
+			if (_type == FinishedType.done)
+				return;
+		}
 		_evStart.wait();
 		_task.yieldForce();
 	}
@@ -855,6 +1000,11 @@ public:
 	 */
 	ref ResultType yieldForce()
 	{
+		static if (is(Ret == void))
+		{
+			if (_type == FinishedType.done)
+				return;
+		}
 		_evStart.wait();
 		return _task.yieldForce();
 	}
@@ -862,6 +1012,11 @@ public:
 	/// ditto
 	ref ResultType workForce()
 	{
+		static if (is(Ret == void))
+		{
+			if (_type == FinishedType.done)
+				return;
+		}
 		_evStart.wait();
 		return _task.workForce();
 	}
@@ -869,6 +1024,11 @@ public:
 	/// ditto
 	ref ResultType spinForce()
 	{
+		static if (is(Ret == void))
+		{
+			if (_type == FinishedType.done)
+				return;
+		}
 		_evStart.wait();
 		return _task.spinForce();
 	}
@@ -919,6 +1079,22 @@ public:
 /*******************************************************************************
  * 非同期処理の開始
  */
+auto async()
+{
+	auto ret = new Future!void(SyncEvent.init);
+	ret._type = Future!void.FinishedType.done;
+	return ret;
+}
+@system unittest
+{
+	auto future = async();
+	future.yieldForce();
+	future.workForce();
+	future.spinForce();
+	future.join();
+}
+
+/// ditto
 auto async(F, Args...)(TaskPool pool, F dg, Args args)
 	if (isCallable!F)
 {
