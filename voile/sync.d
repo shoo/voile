@@ -649,7 +649,23 @@ public:
 		this(evStart);
 		_taskPool = pool;
 	}
-	
+	/// ditto
+	static if (!is(Ret == void))
+	{
+		this(ResultType val, SyncEvent evStart = null)
+		{
+			import std.algorithm: move;
+			static assert(isPointer!TaskType);
+			// Taskのインスタンスを無理やり生成することでreturnValのスペースを確保する
+			_task = new PointerTarget!TaskType;
+			static if (is(typeof(_task.returnVal) == ResultType*))
+				_task.returnVal = new ResultType;
+			_resultRaw() = val.move();
+			_type = FinishedType.done;
+			if (evStart !is null)
+				evStart.signaled = true;
+		}
+	}
 	
 	/***************************************************************************
 	 * 終了したら呼ばれる
@@ -985,11 +1001,8 @@ public:
 	 */
 	void join()
 	{
-		static if (is(Ret == void))
-		{
-			if (_type == FinishedType.done)
-				return;
-		}
+		if (_type == FinishedType.done)
+			return;
 		_evStart.wait();
 		_task.yieldForce();
 	}
@@ -1005,6 +1018,11 @@ public:
 			if (_type == FinishedType.done)
 				return;
 		}
+		else
+		{
+			if (_type == FinishedType.done)
+				return _resultRaw();
+		}
 		_evStart.wait();
 		return _task.yieldForce();
 	}
@@ -1017,6 +1035,11 @@ public:
 			if (_type == FinishedType.done)
 				return;
 		}
+		else
+		{
+			if (_type == FinishedType.done)
+				return _resultRaw();
+		}
 		_evStart.wait();
 		return _task.workForce();
 	}
@@ -1028,6 +1051,11 @@ public:
 		{
 			if (_type == FinishedType.done)
 				return;
+		}
+		else
+		{
+			if (_type == FinishedType.done)
+				return _resultRaw();
 		}
 		_evStart.wait();
 		return _task.spinForce();
@@ -1092,6 +1120,15 @@ auto async()
 	future.workForce();
 	future.spinForce();
 	future.join();
+}
+@system unittest
+{
+	auto future = new Future!int(10, SyncEvent.init);
+	assert(future.result == 10);
+	future.join();
+	assert(future.yieldForce() == 10);
+	assert(future.workForce() == 10);
+	assert(future.spinForce() == 10);
 }
 
 /// ditto
