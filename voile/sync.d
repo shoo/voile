@@ -17,8 +17,7 @@
 module voile.sync;
 
 
-import core.thread, core.sync.mutex, core.sync.condition;
-
+import core.thread, core.sync.mutex, core.sync.condition, core.atomic;
 version (Windows)
 {
 	import core.sys.windows.windows;
@@ -618,7 +617,14 @@ private:
 		Throwable _resultFatal;
 	}
 	
-	static if (!is(Ret == void))
+	static if (is(Ret == void))
+	{
+		void _resultRaw() inout @property
+		{
+			// 何もしない
+		}
+	}
+	else
 	{
 		ref inout(ResultType) _resultRaw() inout @property
 		{
@@ -718,6 +724,25 @@ public:
 		return this;
 	}
 	
+	private void _addListenerFailedWithNewFeature(Ret2)(void delegate(Exception e) callbackFailed, Future!Ret2 future)
+	{
+		addListenerFailed((e){
+			(cast(shared)future)._type.atomicStore( Future!Ret2.FinishedType.failed );
+			future._evStart.signaled = true;
+			if (callbackFailed)
+				callbackFailed(e);
+		});
+	}
+	private void _addListenerFatalWithNewFeature(Ret2)(void delegate(Throwable e) callbackFatal, Future!Ret2 future)
+	{
+		addListenerFailed((e){
+			(cast(shared)future)._type.atomicStore( Future!Ret2.FinishedType.fatal );
+			future._evStart.signaled = true;
+			if (callbackFatal)
+				callbackFatal(e);
+		});
+	}
+	
 	/***************************************************************************
 	 * チェーン
 	 */
@@ -729,8 +754,8 @@ public:
 	{
 		auto ret = new Future!Ret2;
 		addListenerFinished((ref ResultType result) { ret.perform(pool, callbackFinished, result); });
-		addListenerFailed(callbackFailed);
-		addListenerFatal(callbackFatal);
+		_addListenerFailedWithNewFeature(callbackFailed, ret);
+		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
 	}
 	/// ditto
@@ -742,8 +767,8 @@ public:
 	{
 		auto ret = new Future!Ret2;
 		addListenerFinished((ref ResultType result){ ret.perform(callbackFinished, result); });
-		addListenerFailed(callbackFailed);
-		addListenerFatal(callbackFatal);
+		_addListenerFailedWithNewFeature(callbackFailed, ret);
+		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
 	}
 	/// ditto
@@ -754,8 +779,8 @@ public:
 	{
 		auto ret = new Future!(typeof(func(_resultRaw)));
 		addListenerFinished((ref ResultType result) { ret.perform!func(pool, result); });
-		addListenerFailed(callbackFailed);
-		addListenerFatal(callbackFatal);
+		_addListenerFailedWithNewFeature(callbackFailed, ret);
+		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
 	}
 	/// ditto
@@ -766,8 +791,8 @@ public:
 	{
 		auto ret = new Future!(typeof(func(_resultRaw)));
 		addListenerFinished((ref ResultType result) { ret.perform!func(result); });
-		addListenerFailed(callbackFailed);
-		addListenerFatal(callbackFatal);
+		_addListenerFailedWithNewFeature(callbackFailed, ret);
+		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
 	}
 	/// ditto
@@ -779,8 +804,8 @@ public:
 	{
 		auto ret = new Future!Ret2;
 		addListenerFinished(() { ret.perform(pool, callbackFinished); });
-		addListenerFailed(callbackFailed);
-		addListenerFatal(callbackFatal);
+		_addListenerFailedWithNewFeature(callbackFailed, ret);
+		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
 	}
 	/// ditto
@@ -792,8 +817,8 @@ public:
 	{
 		auto ret = new Future!Ret2;
 		addListenerFinished((){ ret.perform(callbackFinished); });
-		addListenerFailed(callbackFailed);
-		addListenerFatal(callbackFatal);
+		_addListenerFailedWithNewFeature(callbackFailed, ret);
+		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
 	}
 	/// ditto
@@ -804,8 +829,8 @@ public:
 	{
 		auto ret = new Future!(typeof(func()));
 		addListenerFinished( () { ret.perform!func(pool); });
-		addListenerFailed(callbackFailed);
-		addListenerFatal(callbackFatal);
+		_addListenerFailedWithNewFeature(callbackFailed, ret);
+		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
 	}
 	/// ditto
@@ -816,8 +841,8 @@ public:
 	{
 		auto ret = new Future!(typeof(func()));
 		addListenerFinished( () { ret.perform!func(); } );
-		addListenerFailed(callbackFailed);
-		addListenerFatal(callbackFatal);
+		_addListenerFailedWithNewFeature(callbackFailed, ret);
+		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
 	}
 	/***************************************************************************
@@ -1001,9 +1026,11 @@ public:
 	 */
 	void join()
 	{
-		if (_type == FinishedType.done)
+		if (!_evStart)
 			return;
 		_evStart.wait();
+		if (_type != FinishedType.none)
+			return;
 		_task.yieldForce();
 	}
 	
@@ -1013,51 +1040,36 @@ public:
 	 */
 	ref ResultType yieldForce()
 	{
-		static if (is(Ret == void))
-		{
-			if (_type == FinishedType.done)
-				return;
-		}
-		else
-		{
-			if (_type == FinishedType.done)
-				return _resultRaw();
-		}
-		_evStart.wait();
+		if (!_evStart)
+			return _resultRaw();
+		if (_type == FinishedType.none)
+			_evStart.wait();
+		if (_type == FinishedType.done)
+			return _resultRaw();
 		return _task.yieldForce();
 	}
 	
 	/// ditto
 	ref ResultType workForce()
 	{
-		static if (is(Ret == void))
-		{
-			if (_type == FinishedType.done)
-				return;
-		}
-		else
-		{
-			if (_type == FinishedType.done)
-				return _resultRaw();
-		}
-		_evStart.wait();
+		if (!_evStart)
+			return _resultRaw();
+		if (_type == FinishedType.none)
+			_evStart.wait();
+		if (_type == FinishedType.done)
+			return _resultRaw();
 		return _task.workForce();
 	}
 	
 	/// ditto
 	ref ResultType spinForce()
 	{
-		static if (is(Ret == void))
-		{
-			if (_type == FinishedType.done)
-				return;
-		}
-		else
-		{
-			if (_type == FinishedType.done)
-				return _resultRaw();
-		}
-		_evStart.wait();
+		if (!_evStart)
+			return _resultRaw();
+		if (_type == FinishedType.none)
+			_evStart.wait();
+		if (_type == FinishedType.done)
+			return _resultRaw();
 		return _task.spinForce();
 	}
 	
@@ -1101,6 +1113,13 @@ public:
 		.then!((){  })(taskPool);
 	assert(future2.yieldForce() == 200);
 	future3.join();
+	
+	auto feature4 = async({
+		throw new Exception("Ex");
+	}).then({
+		assert(0);
+	});
+	feature4.join();
 }
 
 
@@ -1199,7 +1218,6 @@ auto async(alias func, Args...)(Args args)
 class ManagedShared(T): Object.Monitor
 {
 private:
-	import core.sync.mutex, core.atomic;
 	import std.exception;
 	static struct MonitorProxy
 	{
