@@ -563,7 +563,7 @@ private T _getValue(T: Value[Key], Value, Key)(
 	in ref JSONValue v, string name, lazy scope Value[Key] defaultVal = T.init)
 	if (isSomeString!Key && is(typeof({ JSONValue val; Value[Key] dst; fromJson(val, dst[Key.init]); })))
 {
-	size_t[string] tmp;
+	Value[Key] tmp;
 	if (auto x = name in v.object)
 	{
 		return fromJson(*x, tmp) ? tmp : defaultVal;
