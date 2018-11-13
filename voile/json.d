@@ -780,3 +780,186 @@ T getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
 	assert(json.getValue("a", [A(4),A(5),A(6)]) == [A(1),A(2),A(3)]);
 	assert(json.getValue("b", [A(4),A(5),A(6)]) == [A(4),A(5),A(6)]);
 }
+
+
+///
+struct AttrName
+{
+	///
+	string name;
+}
+///
+struct AttrEssential
+{
+}
+///
+struct AttrIgnore
+{
+}
+
+
+/*******************************************************************************
+ * Attribute forcing field name
+ */
+AttrName name(string name) @property
+{
+	return AttrName(name);
+}
+
+/*******************************************************************************
+ * Attribute marking essential field
+ */
+AttrEssential essential() @property
+{
+	return AttrEssential();
+}
+
+/*******************************************************************************
+ * Attribute marking ignore data
+ */
+AttrIgnore ignore() @property
+{
+	return AttrIgnore();
+}
+
+
+private enum isJSONizableRaw(T) = is(typeof({
+	T val;
+	JSONValue jv= val.json;
+	fromJson(jv, val);
+}));
+
+/*******************************************************************************
+ * serialize data to JSON
+ */
+JSONValue serializeToJson(T)(in T data)
+{
+	static if (isJSONizableRaw!T)
+	{
+		return data.json;
+	}
+	else
+	{
+		JSONValue ret;
+		static foreach (memberIdx, member; T.tupleof)
+		{{
+			static if (!hasUDA!(member, AttrIgnore))
+			{
+				static if (hasUDA!(member, AttrName))
+				{
+					enum fieldName = getUDAs!(member, AttrName)[$-1].name;
+				}
+				else
+				{
+					enum fieldName = __traits(identifier, member);
+				}
+				static if (isJSONizableRaw!(typeof(member)))
+				{
+					ret[fieldName] = data.tupleof[memberIdx].json;
+				}
+				else
+				{
+					ret[fieldName] = serializeToJson(data.tupleof[memberIdx]);
+				}
+			}
+		}}
+		return ret;
+	}
+}
+
+/*******************************************************************************
+ * deserialize data from JSON
+ */
+void deserializeFromJson(T)(ref T data, in JSONValue json)
+{
+	static if (isJSONizableRaw!T)
+	{
+		data.json = json;
+	}
+	else
+	{
+		static foreach (memberIdx, member; T.tupleof)
+		{{
+			static if (!hasUDA!(member, AttrIgnore))
+			{
+				static if (hasUDA!(member, AttrName))
+				{
+					enum fieldName = getUDAs!(member, AttrName)[$-1].name;
+				}
+				else
+				{
+					enum fieldName = __traits(identifier, member);
+				}
+				static if (isJSONizableRaw!(typeof(member)))
+				{
+					static if (hasUDA!(member, AttrEssential))
+					{
+						fromJson(json[fieldName], data.tupleof[memberIdx]);
+					}
+					else
+					{
+						data.tupleof[memberIdx] = json.getValue(fieldName, data.tupleof[memberIdx]);
+					}
+				}
+				else
+				{
+					static if (hasUDA!(member, AttrEssential))
+					{
+						deserializeFromJson(data.tupleof[memberIdx], json[fieldName]);
+					}
+					else
+					{
+						if (auto pJsonValue = fieldName in json)
+							deserializeFromJson(data.tupleof[memberIdx], *pJsonValue);
+					}
+				}
+			}
+		}}
+	}
+}
+
+///
+@system unittest
+{
+	import std.exception;
+	static struct Point
+	{
+		@name("xValue")
+		int x;
+		@name("yValue")
+		int y = 10;
+	}
+	static struct Data
+	{
+		string key;
+		int    value;
+		@ignore    int    testval;
+		@essential Point  pt;
+	}
+	Data x, y, z;
+	x.key = "xxx";
+	x.value = 200;
+	x.pt.x = 300;
+	x.pt.y = 400;
+	x.testval = 100;
+	y.testval = 200;
+	
+	JSONValue jv1     = serializeToJson(x);
+	string    jsonStr = jv1.toPrettyString();
+	JSONValue jv2     = parseJSON(jsonStr);
+	y.deserializeFromJson(jv2);
+	assert(x != y);
+	y.testval = x.testval;
+	assert(x == y);
+	assert(jv1["pt"]["xValue"].integer == 300);
+	assert(jv1["pt"]["yValue"].integer == 400);
+	
+	auto e1 = z.deserializeFromJson(parseJSON(`{}`)).collectException;
+	import std.stdio;
+	assert(e1);
+	assert(e1.msg == "Key not found: pt");
+	
+	auto e2 = z.deserializeFromJson(parseJSON(`{"pt": {}}`)).collectException;
+	assert(!e2);
+	assert(z.pt.y == 10);
+}
