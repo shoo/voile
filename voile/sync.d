@@ -1079,7 +1079,7 @@ public:
 		ref inout(ResultType) result() inout @property
 		{
 			import std.exception;
-			enforce((cast(Future)this)._task.done);
+			enforce((cast(Future)this)._type == FinishedType.done);
 			return _resultRaw();
 		}
 	}
