@@ -867,6 +867,20 @@ JSONValue serializeToJson(T)(in T data)
 	}
 }
 
+/// ditto
+string serializeToJsonString(T)(ref T data)
+{
+	return serializeToJson(data).toPrettyString();
+}
+
+/// ditto
+void serializeToJsonFile(T)(ref T data, string jsonfile)
+{
+	import std.file, std.encoding;
+	auto contents = serializeToJsonString(data);
+	std.file.write(jsonfile, contents);
+}
+
 /*******************************************************************************
  * deserialize data from JSON
  */
@@ -918,6 +932,19 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 	}
 }
 
+/// ditto
+void deserializeFromJsonString(T)(ref T data, string jsonContents)
+{
+	deserializeFromJson(data, parseJSON(jsonContents));
+}
+
+/// ditto
+void deserializeFromJsonFile(T)(ref T data, string jsonFile)
+{
+	import std.file;
+	deserializeFromJsonString(data, std.file.readText(jsonFile));
+}
+
 ///
 @system unittest
 {
@@ -962,4 +989,17 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 	auto e2 = z.deserializeFromJson(parseJSON(`{"pt": {}}`)).collectException;
 	assert(!e2);
 	assert(z.pt.y == 10);
+	
+	scope (exit)
+	{
+		import std.file;
+		if ("test.json".exists)
+			"test.json".remove();
+	}
+	
+	x.serializeToJsonFile("test.json");
+	z.deserializeFromJsonFile("test.json");
+	assert(x != z);
+	z.testval = x.testval;
+	assert(x == z);
 }
