@@ -782,6 +782,47 @@ T getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
 }
 
 
+import std.typecons: Rebindable;
+
+///
+alias JSONValueArray  = Rebindable!(const(JSONValue[]));
+///
+alias JSONValueObject = Rebindable!(const(JSONValue[string]));
+
+/*******************************************************************************
+ * 
+ */
+bool getArray(JSONValue json, string name, ref JSONValueArray ary)
+{
+	if (json.type != JSONType.object)
+		return false;
+	if (auto p = name in json)
+	{
+		if (p.type != JSONType.array)
+			return false;
+		ary = p.array;
+		return true;
+	}
+	return false;
+}
+
+/*******************************************************************************
+ * 
+ */
+bool getObject(JSONValue json, string name, ref JSONValueObject object)
+{
+	if (json.type != JSONType.object)
+		return false;
+	if (auto p = name in json)
+	{
+		if (p.type != JSONType.object)
+			return false;
+		object = p.object;
+		return true;
+	}
+	return false;
+}
+
 ///
 struct AttrName
 {
@@ -857,6 +898,20 @@ JSONValue serializeToJson(T)(in T data)
 				{
 					ret[fieldName] = data.tupleof[memberIdx].json;
 				}
+				else static if (isArray!(typeof(member)))
+				{
+					JSONValue[] jvAry;
+					auto len = data.tupleof[memberIdx].length;
+					jvAry.length = len;
+					foreach (idx; 0..len)
+						jvAry[idx] = serializeToJson(data.tupleof[memberIdx][idx]);
+				}
+				else static if (isAssociativeArray!(typeof(member)))
+				{
+					JSONValue[string] jvObj;
+					foreach (pair; data.tupleof[memberIdx].byKeyValue)
+						jvObj[pair.key] = serializeToJson(pair.value);
+				}
 				else
 				{
 					ret[fieldName] = serializeToJson(data.tupleof[memberIdx]);
@@ -913,6 +968,41 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 					else
 					{
 						data.tupleof[memberIdx] = json.getValue(fieldName, data.tupleof[memberIdx]);
+					}
+				}
+				else static if (isArray!(typeof(member)))
+				{
+					JSONValueArray jvAry;
+					auto foundAry = json.getArray(fieldName, jvAry);
+					if (hasUDA!(member, AttrEssential) || foundAry)
+					{
+						static if (isDynamicArray!(typeof(member)))
+							data.tupleof[memberIdx].length = jvAry[0].length;
+						foreach (idx, ref dataElm; data.tupleof[memberIdx])
+							deserializeFromJson(dataElm, jvAry[idx]);
+					}
+				}
+				else static if (isAssociativeArray!(typeof(member)))
+				{
+					JSONValueObject jvObj;
+					auto foundObj = json.getObject(fieldName, jvObj);
+					if (hasUDA!(member, AttrEssential) || foundObj)
+					{
+						data.tupleof[memberIdx] = null;
+						alias ValueType = typeof(data.tupleof[memberIdx].byValue.front);
+						foreach (key, val; jvObj)
+						{
+							data.tupleof[memberIdx].update(key,
+							{
+								ValueType ret;
+								deserializeFromJson(ret, val);
+								return ret.move();
+							}, (ValueType ret)
+							{
+								deserializeFromJson(ret, val);
+								return ret.move();
+							});
+						}
 					}
 				}
 				else
