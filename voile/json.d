@@ -879,6 +879,22 @@ JSONValue serializeToJson(T)(in T data)
 	{
 		return data.json;
 	}
+	else static if (isArray!T)
+	{
+		JSONValue[] jvAry;
+		auto len = data.length;
+		jvAry.length = len;
+		foreach (idx; 0..len)
+			jvAry[idx] = serializeToJson(data[idx]);
+		return JSONValue(jvAry);
+	}
+	else static if (isAssociativeArray!T)
+	{
+		JSONValue[string] jvObj;
+		foreach (pair; data.byKeyValue)
+			jvObj[pair.key] = serializeToJson(pair.value);
+		return JSONValue(jvObj);
+	}
 	else
 	{
 		JSONValue ret;
@@ -898,20 +914,6 @@ JSONValue serializeToJson(T)(in T data)
 				{
 					ret[fieldName] = data.tupleof[memberIdx].json;
 				}
-				else static if (isArray!(typeof(member)))
-				{
-					JSONValue[] jvAry;
-					auto len = data.tupleof[memberIdx].length;
-					jvAry.length = len;
-					foreach (idx; 0..len)
-						jvAry[idx] = serializeToJson(data.tupleof[memberIdx][idx]);
-				}
-				else static if (isAssociativeArray!(typeof(member)))
-				{
-					JSONValue[string] jvObj;
-					foreach (pair; data.tupleof[memberIdx].byKeyValue)
-						jvObj[pair.key] = serializeToJson(pair.value);
-				}
 				else
 				{
 					ret[fieldName] = serializeToJson(data.tupleof[memberIdx]);
@@ -923,13 +925,13 @@ JSONValue serializeToJson(T)(in T data)
 }
 
 /// ditto
-string serializeToJsonString(T)(ref T data)
+string serializeToJsonString(T)(in T data)
 {
 	return serializeToJson(data).toPrettyString();
 }
 
 /// ditto
-void serializeToJsonFile(T)(ref T data, string jsonfile)
+void serializeToJsonFile(T)(in T data, string jsonfile)
 {
 	import std.file, std.encoding;
 	auto contents = serializeToJsonString(data);
@@ -944,6 +946,37 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 	static if (isJSONizableRaw!T)
 	{
 		data.json = json;
+	}
+	else static if (isArray!T)
+	{
+		if (json.type != JSONType.array)
+			return;
+		auto jvAry = json.array;
+		static if (isDynamicArray!T)
+			data.length = jvAry.length;
+		foreach (idx, ref dataElm; data)
+			deserializeFromJson(dataElm, jvAry[idx]);
+	}
+	else static if (isAssociativeArray!T)
+	{
+		if (json.type != JSONType.object)
+			return;
+		data.clear();
+		alias ValueType = typeof(data.byValue.front);
+		foreach (pair; json.object.byKeyValue)
+		{
+			import std.algorithm: move;
+			data.update(pair.key,
+			{
+				ValueType ret;
+				deserializeFromJson(ret, pair.value);
+				return ret.move();
+			}, (ref ValueType ret)
+			{
+				deserializeFromJson(ret, pair.value);
+				return ret;
+			});
+		}
 	}
 	else
 	{
@@ -968,41 +1001,6 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 					else
 					{
 						data.tupleof[memberIdx] = json.getValue(fieldName, data.tupleof[memberIdx]);
-					}
-				}
-				else static if (isArray!(typeof(member)))
-				{
-					JSONValueArray jvAry;
-					auto foundAry = json.getArray(fieldName, jvAry);
-					if (hasUDA!(member, AttrEssential) || foundAry)
-					{
-						static if (isDynamicArray!(typeof(member)))
-							data.tupleof[memberIdx].length = jvAry.length;
-						foreach (idx, ref dataElm; data.tupleof[memberIdx])
-							deserializeFromJson(dataElm, jvAry[idx]);
-					}
-				}
-				else static if (isAssociativeArray!(typeof(member)))
-				{
-					JSONValueObject jvObj;
-					auto foundObj = json.getObject(fieldName, jvObj);
-					if (hasUDA!(member, AttrEssential) || foundObj)
-					{
-						data.tupleof[memberIdx] = null;
-						alias ValueType = typeof(data.tupleof[memberIdx].byValue.front);
-						foreach (key, val; jvObj)
-						{
-							data.tupleof[memberIdx].update(key,
-							{
-								ValueType ret;
-								deserializeFromJson(ret, val);
-								return ret.move();
-							}, (ValueType ret)
-							{
-								deserializeFromJson(ret, val);
-								return ret.move();
-							});
-						}
 					}
 				}
 				else
@@ -1052,6 +1050,8 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 		int    value;
 		@ignore    int    testval;
 		@essential Point  pt;
+		Point[] points;
+		Point[string] pointMap;
 	}
 	Data x, y, z;
 	x.key = "xxx";
@@ -1092,4 +1092,21 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	assert(x != z);
 	z.testval = x.testval;
 	assert(x == z);
+	
+	Data[] datAry1, datAry2;
+	Data[string] datMap1, datMap2;
+	datAry1 = [Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)])];
+	datMap1 = ["Data": Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)])];
+	datAry1.serializeToJsonFile("test.json");
+	datAry2.deserializeFromJsonFile("test.json");
+	datMap1.serializeToJsonFile("test.json");
+	datMap2.deserializeFromJsonFile("test.json");
+	assert(datAry1[0].points[0] == Point(3,4));
+	assert(datAry1[0].pointMap["PT"] == Point(5,6));
+	assert(datMap1["Data"].points[0] == Point(3,4));
+	assert(datMap1["Data"].pointMap["PT"] == Point(5,6));
+	assert(datAry2[0].points[0] == Point(3,4));
+	assert(datAry2[0].pointMap["PT"] == Point(5,6));
+	assert(datMap2["Data"].points[0] == Point(3,4));
+	assert(datMap2["Data"].pointMap["PT"] == Point(5,6));
 }
