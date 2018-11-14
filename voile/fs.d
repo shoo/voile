@@ -1,6 +1,6 @@
 module voile.fs;
 
-import std.file, std.path, std.exception, std.stdio;
+import std.file, std.path, std.exception, std.stdio, std.datetime;
 import std.process;
 import voile.handler;
 
@@ -65,6 +65,33 @@ struct FileSystem
 		assert(fs.absolutePath(".") == .absolutePath("ut").buildNormalizedPath());
 	}
 	
+	/*******************************************************************************
+	 * 実際のパス名に修正する
+	 */
+	string actualPath(string path = ".")
+	{
+		import core.sys.windows.shellapi;
+		import core.stdc.wchar_: wcslen;
+		import std.utf: toUTF16z, toUTF8;
+		SHFILEINFOW info;
+		info.szDisplayName[0] = 0;
+		auto paths = absolutePath(path).pathSplitter();
+		string result;
+		import std.uni: toUpper;
+		result = paths.front.toUpper();
+		paths.popFront();
+		foreach (p; paths)
+		{
+			SHGetFileInfoW(result.buildPath(p).toUTF16z(), 0, &info, info.sizeof, SHGFI_DISPLAYNAME);
+			result = result.buildPath(toUTF8(info.szDisplayName.ptr[0..wcslen(info.szDisplayName.ptr)]));
+		}
+		return result;
+	}
+	@system unittest
+	{
+		auto fs = FileSystem("C:/");
+		assert(fs.actualPath(r"wInDoWs") == r"C:\Windows");
+	}
 	
 	/***************************************************************************
 	 * パスが存在するか確認する
@@ -739,6 +766,292 @@ struct FileSystem
 		assert(fs.isFile("a/c/c.txt"));
 		assert(!fs.isFile("a/c/d.dat"));
 	}
+	
+	
+	private bool mirrorFilesImpl(bool absConvert)(string srcDir, string dstDir, bool force, uint retrycnt)
+	{
+		auto absWork      = absolutePath();
+		auto absSrcDir    = .absolutePath(srcDir, absWork).buildNormalizedPath();
+		auto absTargetDir = .absolutePath(dstDir, absWork).buildNormalizedPath();
+		return mirrorFilesImpl!false(absSrcDir, absTargetDir, force, retrycnt);
+	}
+	
+	private bool mirrorFilesImpl(bool absConvert: false)(string srcDir, string dstDir, bool force, uint retrycnt)
+	{
+		import std.algorithm, std.file, std.path, std.array;
+		if (!dstDir.exists)
+			return copyFiles(srcDir, dstDir);
+		auto srcAbsPaths = dirEntries(srcDir, SpanMode.breadth).map!(a => a.name).array;
+		auto dstAbsPaths = dirEntries(dstDir, SpanMode.breadth).map!(a => a.name).array;
+		auto srcRelPaths = srcAbsPaths.map!(a => a.relativePath(srcDir)).array;
+		auto dstRelPaths = dstAbsPaths.map!(a => a.relativePath(dstDir)).array;
+		import std.stdio;
+		size_t indexBefore, indexAfter;
+		auto levPath = levenshteinDistanceAndPath(srcRelPaths, dstRelPaths)[1];
+		
+		bool mirCp(string srcPath, string dstPath)
+		{
+			if (srcPath.isDir)
+			{
+				if (!dstPath.exists)
+					mkdirRecurse(dstPath);
+				return true;
+			}
+			else
+			{
+				return copyFileImpl!false(srcPath, dstPath, force, retrycnt);
+			}
+		}
+		bool mirRm(string dstPath)
+		{
+			return removeFilesImpl!false(dstPath, force, retrycnt);
+		}
+		
+		foreach (editOp; levPath) final switch (editOp)
+		{
+		case EditOp.none:
+			// ミラー元にもミラー先にもある更新対象のファイル/フォルダ
+			if (srcAbsPaths[indexBefore].isFile)
+			{
+				// ファイルで、更新時間が違う場合のみコピーする
+				if (srcAbsPaths[indexBefore].timeLastModified != dstAbsPaths[indexAfter].timeLastModified)
+				{
+					if (!mirCp(srcAbsPaths[indexBefore], dstAbsPaths[indexAfter]))
+						return false;
+				}
+			}
+			indexBefore++;
+			indexAfter++;
+			break;
+		case EditOp.insert:
+			// ミラー元になくてミラー先にある削除対象のファイル/フォルダ
+			if (!mirRm(dstAbsPaths[indexAfter]))
+				return false;
+			indexAfter++;
+			break;
+		case EditOp.substitute:
+			// ミラー元にあって、ミラー先にないコピー対象のファイル/フォルダ と ミラー元になくてミラー先にある削除対象のファイル/フォルダ
+			if (!mirCp(srcAbsPaths[indexBefore], dstDir.buildPath(srcRelPaths[indexBefore]))
+			 || !mirRm(dstAbsPaths[indexAfter]))
+				return false;
+			indexBefore++;
+			indexAfter++;
+			break;
+		case EditOp.remove:
+			// ミラー元にあって、ミラー先にないコピー対象のファイル/フォルダ
+			if (!mirCp(srcAbsPaths[indexBefore], dstDir.buildPath(srcRelPaths[indexBefore])))
+				return false;
+			indexBefore++;
+			break;
+		}
+		return true;
+	}
+	
+	/*******************************************************************************
+	 * ファイルをミラーリングする
+	 */
+	bool mirrorFiles(string srcDir, string dstDir, bool force = true, uint retrycnt = 5)
+	{
+		return mirrorFilesImpl!true(srcDir, dstDir, force, retrycnt);
+	}
+	
+	
+	
+	//--------------------------------------------------------------------------
+	// 
+	private bool moveFilesImpl(bool absConvert)(string src, string dst, bool force, bool retrycnt)
+	{
+		auto absWork      = absolutePath();
+		auto absSrcDir    = .absolutePath(src, absWork).buildNormalizedPath();
+		auto absTargetDir = .absolutePath(dst, absWork).buildNormalizedPath();
+		return moveFilesImpl!false(absSrcDir, absTargetDir, force, retrycnt);
+	}
+	// 
+	private bool moveFilesImpl(bool absConvert: false)(string src, string dst, bool force, bool retrycnt)
+	{
+		import std.file, std.path;
+		if (!src.exists)
+			return true;
+		if (src.driveName == dst.driveName)
+		{
+			// ドライブが同一ならWinAPIのMoveFileを利用する
+			if (!removeFilesImpl!false(dst, force, retrycnt))
+				return false;
+			import core.sys.windows.windows;
+			import std.windows.syserror;
+			import std.utf;
+			auto movSrc = (`\\?\`~src).toUTF16z();
+			auto movDst = (`\\?\`~dst).toUTF16z();
+			foreach (Unused; 0..retrycnt)
+			{
+				try
+				{
+					enforce(!dst.exists);
+					MoveFileW(movSrc, movDst).enforce(GetLastError().sysErrorString());
+					return true;
+				}
+				catch (Exception e)
+				{
+					import core.thread;
+					Thread.sleep(10.msecs);
+				}
+			}
+			// WinAPIが使用できない場合はファイルをミラーリングして元のファイルを削除する
+			if (!mirrorFilesImpl!false(src, dst, force, retrycnt)
+			 || !removeFilesImpl!false(src, force, retrycnt))
+				return false;
+		}
+		else
+		{
+			// ドライブが異なる場合、ミラーリングして元のファイルを削除する
+			if (!mirrorFilesImpl!false(src, dst, force, retrycnt)
+			 || !removeFilesImpl!false(src, force, retrycnt))
+				return false;
+		}
+		return true;
+	}
+	
+	/*******************************************************************************
+	 * ファイルを移動する
+	 */
+	bool moveFiles(string src, string dst, bool force = true, bool retrycnt = true)
+	{
+		return moveFilesImpl!true(src, dst, force, retrycnt);
+	}
+	
+	
+	//--------------------------------------------------------------------------
+	// タイムスタンプ取得・設定の実装
+	private void setTimeStampImpl(bool absConvert)(string dst, SysTime accessTime, SysTime modificationTime)
+	{
+		return setTimeStampImpl!false(absolutePath(dst), accessTime, modificationTime);
+	}
+	// 
+	private void setTimeStampImpl(bool absConvert: false)(string dst, SysTime accessTime, SysTime modificationTime)
+	{
+		setTimes(dst, accessTime, modificationTime);
+	}
+	// 
+	private void getTimeStampImpl(bool absConvert)(string dst, out SysTime accessTime, out SysTime modificationTime)
+	{
+		return setTimeStampImpl!false(absolutePath(dst), accessTime, modificationTime);
+	}
+	// 
+	private void getTimeStampImpl(bool absConvert: false)(string dst, out SysTime accessTime, out SysTime modificationTime)
+	{
+		setTimes(dst, accessTime, modificationTime);
+	}
+	
+	
+	/*******************************************************************************
+	 * タイムスタンプを変更/取得する
+	 */
+	void setTimeStamp(string dst, SysTime accessTime, SysTime modificationTime)
+	{
+		return setTimeStampImpl!true(dst, accessTime, modificationTime);
+	}
+	/// ditto
+	void setTimeStamp(string dst, SysTime modificationTime)
+	{
+		return setTimeStampImpl!true(dst, modificationTime, modificationTime);
+	}
+	/// ditto
+	void setTimeStamp(string dst, DateTime accessTime, DateTime modificationTime)
+	{
+		return setTimeStampImpl!true(dst, SysTime(accessTime), SysTime(modificationTime));
+	}
+	/// ditto
+	void setTimeStamp(string dst, DateTime modificationTime)
+	{
+		return setTimeStampImpl!true(dst, SysTime(modificationTime), SysTime(modificationTime));
+	}
+	/// ditto
+	void getTimeStamp(string dst, out SysTime accessTime, out SysTime modificationTime)
+	{
+		getTimeStampImpl!true(dst, accessTime, modificationTime);
+	}
+	/// ditto
+	void getTimeStamp(string dst, out SysTime modificationTime)
+	{
+		SysTime accessTime;
+		getTimeStampImpl!true(dst, accessTime, modificationTime);
+	}
+	/// ditto
+	void getTimeStamp(string dst, out DateTime accessTime, out DateTime modificationTime)
+	{
+		SysTime accessTimeTmp, modificationTimeTmp;
+		getTimeStampImpl!true(dst, accessTimeTmp, modificationTimeTmp);
+		accessTime       = cast(DateTime)accessTimeTmp;
+		modificationTime = cast(DateTime)modificationTimeTmp;
+	}
+	/// ditto
+	void getTimeStamp(string dst, out DateTime modificationTime)
+	{
+		SysTime accessTimeTmp, modificationTimeTmp;
+		getTimeStampImpl!true(dst, accessTimeTmp, modificationTimeTmp);
+		modificationTime = cast(DateTime)modificationTimeTmp;
+	}
+	/// ditto
+	SysTime getTimeStamp(string dst)
+	{
+		SysTime accessTime, modificationTime;
+		getTimeStampImpl!true(dst, accessTime, modificationTime);
+		return modificationTime;
+	}
+	
+	@system unittest
+	{
+		mkdirRecurse("ut/filestest/src");
+		mkdirRecurse("ut/filestest/dst");
+		auto fs = FileSystem("ut");
+		scope (exit)
+			fs.removeFiles(".");
+		auto timMod = Clock.currTime;
+		auto timAcc = timMod;
+		fs.writeText(   "filestest/src/test1-1.txt", "1");
+		fs.setTimeStamp("filestest/src/test1-1.txt", timAcc, timMod+1.msecs);
+		fs.writeText(   "filestest/src/test1-2.txt", "1");
+		fs.setTimeStamp("filestest/src/test1-2.txt", timAcc, timMod+1.msecs);
+		fs.writeText(   "filestest/src/test2-1.txt", "2");
+		fs.setTimeStamp("filestest/src/test2-1.txt", timAcc, timMod+2.msecs);
+		fs.writeText(   "filestest/src/test2-2.txt", "2");
+		fs.setTimeStamp("filestest/src/test2-2.txt", timAcc, timMod+2.msecs);
+		fs.copyFile(    "filestest/src/test2-1.txt", "testcase/filestest/dst/test2-1.txt");
+		fs.copyFile(    "filestest/src/test2-2.txt", "testcase/filestest/dst/test2-2.txt");
+		fs.writeText(   "filestest/src/test4.txt", "4");
+		fs.setTimeStamp("filestest/src/test4.txt", timAcc, timMod+4.msecs);
+		fs.writeText(   "filestest/dst/test3.txt", "3");
+		fs.setTimeStamp("filestest/dst/test3.txt", timAcc, timMod+3.msecs);
+		fs.writeText(   "filestest/dst/test4.txt", "4x");
+		fs.setTimeStamp("filestest/dst/test4.txt", timAcc, timMod+8.msecs);
+		fs.writeText(   "filestest/src/test5-11.txt", "5");
+		fs.setTimeStamp("filestest/src/test5-11.txt", timAcc, timMod+10.msecs);
+		fs.writeText(   "filestest/src/test5-21.txt", "5");
+		fs.setTimeStamp("filestest/src/test5-21.txt", timAcc, timMod+10.msecs);
+		fs.writeText(   "filestest/dst/test5-12.txt", "5");
+		fs.setTimeStamp("filestest/dst/test5-12.txt", timAcc, timMod+10.msecs);
+		fs.writeText(   "filestest/dst/test5-22.txt", "5");
+		fs.setTimeStamp("filestest/dst/test5-22.txt", timAcc, timMod+10.msecs);
+		fs.mirrorFiles( "filestest/src", "filestest/dst");
+		assert( "ut/filestest/src/test1-1.txt".exists);
+		assert( "ut/filestest/src/test1-2.txt".exists);
+		assert( "ut/filestest/src/test2-1.txt".exists);
+		assert( "ut/filestest/src/test2-2.txt".exists);
+		assert(!"ut/filestest/src/test3.txt".exists);
+		assert( "ut/filestest/src/test4.txt".exists);
+		assert( "ut/filestest/dst/test1-1.txt".exists);
+		assert( "ut/filestest/dst/test1-2.txt".exists);
+		assert( "ut/filestest/dst/test2-1.txt".exists);
+		assert( "ut/filestest/dst/test2-2.txt".exists);
+		assert(!"ut/filestest/dst/test3.txt".exists);
+		assert( "ut/filestest/dst/test4.txt".exists);
+		assert((cast(string)std.file.read("ut/filestest/dst/test1-1.txt")) == "1");
+		assert((cast(string)std.file.read("ut/filestest/dst/test1-2.txt")) == "1");
+		assert((cast(string)std.file.read("ut/filestest/dst/test2-1.txt")) == "2");
+		assert((cast(string)std.file.read("ut/filestest/dst/test2-2.txt")) == "2");
+		assert((cast(string)std.file.read("ut/filestest/dst/test4.txt")) == "4");
+	}
+	
 	
 	/***************************************************************************
 	 * パスを検索する
