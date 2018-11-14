@@ -977,7 +977,7 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 					if (hasUDA!(member, AttrEssential) || foundAry)
 					{
 						static if (isDynamicArray!(typeof(member)))
-							data.tupleof[memberIdx].length = jvAry[0].length;
+							data.tupleof[memberIdx].length = jvAry.length;
 						foreach (idx, ref dataElm; data.tupleof[memberIdx])
 							deserializeFromJson(dataElm, jvAry[idx]);
 					}
