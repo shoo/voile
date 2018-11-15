@@ -1,6 +1,9 @@
-﻿module voile.unique;
+﻿/*******************************************************************************
+ * Unique
+ */
+module voile.unique;
 
-import std.algorithm, std.traits, std.typecons, std.conv;
+import std.traits, std.typecons, std.conv;
 import core.memory;
 import core.stdc.stdlib: malloc, free;
 import voile.misc;
@@ -131,12 +134,11 @@ private struct UniqueDataImpl(T)
 		if (!_p)
 			return;
 		debug (Unique) writefln("%d: Unique [%08x] release of [%08x]", __LINE__, cast(void*)&this, cast(void*)_p);
-		auto p = detach();
-		assert(_p is null);
-		assert(p !is null);
+		scope (exit)
+			detach();
 		static if (is(T==interface))
 		{
-			if (auto o = cast(Object)p)
+			if (auto o = cast(Object)_p)
 			{
 				_destroy(o);
 				if ((cast(void**)(cast(void*)o))[1]) // if monitor is not null
@@ -147,9 +149,9 @@ private struct UniqueDataImpl(T)
 		}
 		else
 		{
-			_destroy(p);
+			_destroy(_p);
 		}
-		assumePure!free(cast(void*)p);
+		assumePure!free(cast(void*)_p);
 	}
 	
 	
@@ -233,8 +235,8 @@ public:
 	~this() pure
 	{
 		debug (Unique) writefln("%d: Unique [%08x] destructor [%08x]",
-		                        __LINE__, cast(void*)&this, cast(void*)
-		                        __traits(getMember, this, uniqueMemberName!T)._p);
+		                        __LINE__, cast(void*)&this,
+		                        cast(void*)__traits(getMember, this, uniqueMemberName!T)._p);
 		__traits(getMember, this, uniqueMemberName!T).release();
 	}
 	
@@ -276,14 +278,9 @@ public:
 /*******************************************************************************
  * 
  */
-@trusted @property
-Unique!T unique(T)()
-{
-	return uniqueImpl!(T)();
-}
-/// ditto
-@trusted
-Unique!T unique(T, Args...)(Args args)
+Unique!T unique(T, Args...)(Args args) @trusted
+	if (((is(T == class) || is(T == struct) || is(T == union)) && !isNested!T)
+	 || !(is(T == class) || is(T == struct) || is(T == union)))
 {
 	return uniqueImpl!(T)(args);
 }
@@ -319,6 +316,7 @@ bool isEmpty(T)(ref Unique!T u)
 
 @system unittest
 {
+	import std.algorithm: move;
 	static int[] testary;
 	{
 		static struct Foo
@@ -374,6 +372,7 @@ bool isEmpty(T)(ref Unique!T u)
 
 @system unittest
 {
+	import std.algorithm: move;
 	static int[] testary;
 	{
 		static class Bar
@@ -423,6 +422,7 @@ bool isEmpty(T)(ref Unique!T u)
 
 @system unittest
 {
+	import std.algorithm: move;
 	static int[] testary;
 	{
 		static class A
@@ -480,15 +480,16 @@ bool isEmpty(T)(ref Unique!T u)
 
 @system unittest
 {
+	import std.algorithm: move;
 	static int[] testary;
 	{
-		class A
+		static class A
 		{
 			this() { testary ~= -1; }
 			~this() { testary ~= -2; }
 			@property int val() const { return 4; }
 		}
-		class Foo
+		static class Foo
 		{
 			Unique!A a;
 			this()
@@ -516,8 +517,8 @@ bool isEmpty(T)(ref Unique!T u)
 	import std.typetuple, std.algorithm;
 	struct S1 { int x; }
 	struct S2 { Unique!int x; }
-	class C1 { int x; }
-	class C2 { Unique!int x; }
+	static class C1 { int x; }
+	static class C2 { Unique!int x; }
 	foreach (T; TypeTuple!(
 		int, real, const(int), shared(int), shared(const(int)),
 		int*, real*, const(int)*, shared(int)*, shared(const(int))*,
@@ -526,7 +527,8 @@ bool isEmpty(T)(ref Unique!T u)
 	{
 		auto u1 = unique!T();
 		auto u2 = u1.move();
-	//	auto u3 = u2;
+		static assert(is(typeof(u2) == Unique!T));
+		static assert(!__traits(compiles, { auto u3 = u2; }));
 	}
 	
 	{
@@ -555,13 +557,15 @@ bool isEmpty(T)(ref Unique!T u)
 		auto x   = u.x;
 		auto cx  = cu.x;
 		auto ix  = iu.x;
+		// multiple alias this is needed...
 		//auto sx  = su.x;
 		//auto csx = csu.x;
 		static assert(is(typeof(x)  == int));
 		static assert(is(typeof(cx) == const(int)));
 		static assert(is(typeof(ix) == immutable(int)));
-		//static assert(is(typeof(ix) == shared(int)));
-		//static assert(is(typeof(ix) == const(shared int)));
+		// multiple alias this is needed...
+		//static assert(is(typeof(sux) == shared(int)));
+		//static assert(is(typeof(csx) == const(shared int)));
 	}
 }
 
