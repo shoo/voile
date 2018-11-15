@@ -1,4 +1,7 @@
-﻿module voile.handler;
+﻿/*******************************************************************************
+ * Common Handler type
+ */
+module voile.handler;
 
 import core.thread;
 import std.traits, std.range, std.exception, std.typetuple, std.concurrency, std.functional;
@@ -10,7 +13,7 @@ private template isVirtualMethod(func...)
 }
 
 /* This template based from std.typecons.MemberFunctionGenerator */
-package template MemberFunctionGeneratorEx(alias Policy)
+private template MemberFunctionGeneratorEx(alias Policy)
 {
 private static:
 	//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
@@ -991,7 +994,7 @@ private:
 		alias virt     = isVirtualMethod!F;
 	}
 	alias _exFuncInfo = _ExFuncInfo!F;
-	static struct DummyData
+	static private struct DummyData
 	{
 		template _EmitGeneratingPolicy()
 		{
