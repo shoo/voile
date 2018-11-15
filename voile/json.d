@@ -842,7 +842,7 @@ struct AttrIgnore
 /*******************************************************************************
  * Attribute forcing field name
  */
-AttrName name(string name) @property
+AttrName name(string name)
 {
 	return AttrName(name);
 }
@@ -850,18 +850,12 @@ AttrName name(string name) @property
 /*******************************************************************************
  * Attribute marking essential field
  */
-AttrEssential essential() @property
-{
-	return AttrEssential();
-}
+enum AttrEssential essential = AttrEssential.init;
 
 /*******************************************************************************
  * Attribute marking ignore data
  */
-AttrIgnore ignore() @property
-{
-	return AttrIgnore();
-}
+enum AttrIgnore ignore = AttrIgnore.init;
 
 
 private enum isJSONizableRaw(T) = is(typeof({
@@ -1109,4 +1103,51 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	assert(datAry2[0].pointMap["PT"] == Point(5,6));
 	assert(datMap2["Data"].points[0] == Point(3,4));
 	assert(datMap2["Data"].pointMap["PT"] == Point(5,6));
+}
+
+///
+JSONValue deepCopy(in JSONValue v) @property
+{
+	final switch (v.type)
+	{
+	case JSONType.null_:
+	case JSONType.string:
+	case JSONType.integer:
+	case JSONType.uinteger:
+	case JSONType.float_:
+	case JSONType.true_:
+	case JSONType.false_:
+		return v;
+	case JSONType.object:
+		JSONValue[string] ret;
+		foreach (key, val; v.object)
+			ret[key] = deepCopy(val);
+		return JSONValue(ret);
+	case JSONType.array:
+		auto ret = appender!(JSONValue[]);
+		foreach (e; v.array)
+			ret ~= deepCopy(e);
+		return JSONValue(ret.data);
+	}
+}
+
+@system unittest
+{
+	auto jv1 = JSONValue(["a": "A"]);
+	auto jv2 = jv1;
+	auto jv3 = jv1.deepCopy();
+	jv1["a"] = "XXX";
+	assert(jv1["a"].str == "XXX");
+	assert(jv2["a"].str == "XXX");
+	assert(jv3["a"].str == "A");
+}
+@system unittest
+{
+	auto jv1 = JSONValue(["a": ["A", "B", "C"]]);
+	auto jv2 = jv1;
+	auto jv3 = jv1.deepCopy();
+	jv1["a"][0] = "XXX";
+	assert(jv1["a"][0].str == "XXX");
+	assert(jv2["a"][0].str == "XXX");
+	assert(jv3["a"][0].str == "A");
 }
