@@ -922,80 +922,80 @@ struct FileSystem
 	
 	//--------------------------------------------------------------------------
 	// タイムスタンプ取得・設定の実装
-	private void setTimeStampImpl(bool absConvert)(string dst, SysTime accessTime, SysTime modificationTime)
+	private void setTimeStampImpl(bool absConvert)(string target, SysTime accessTime, SysTime modificationTime)
 	{
-		return setTimeStampImpl!false(absolutePath(dst), accessTime, modificationTime);
+		setTimeStampImpl!false(absolutePath(target), accessTime, modificationTime);
 	}
 	// 
-	private void setTimeStampImpl(bool absConvert: false)(string dst, SysTime accessTime, SysTime modificationTime)
+	private void setTimeStampImpl(bool absConvert: false)(string target, SysTime accessTime, SysTime modificationTime)
 	{
-		setTimes(dst, accessTime, modificationTime);
+		setTimes(target, accessTime, modificationTime);
 	}
 	// 
-	private void getTimeStampImpl(bool absConvert)(string dst, out SysTime accessTime, out SysTime modificationTime)
+	private void getTimeStampImpl(bool absConvert)(string target, out SysTime accessTime, out SysTime modificationTime)
 	{
-		return setTimeStampImpl!false(absolutePath(dst), accessTime, modificationTime);
+		getTimeStampImpl!false(absolutePath(target), accessTime, modificationTime);
 	}
 	// 
-	private void getTimeStampImpl(bool absConvert: false)(string dst, out SysTime accessTime, out SysTime modificationTime)
+	private void getTimeStampImpl(bool absConvert: false)(string target, out SysTime accessTime, out SysTime modificationTime)
 	{
-		setTimes(dst, accessTime, modificationTime);
+		getTimes(target, accessTime, modificationTime);
 	}
 	
 	
 	/*******************************************************************************
 	 * タイムスタンプを変更/取得する
 	 */
-	void setTimeStamp(string dst, SysTime accessTime, SysTime modificationTime)
+	void setTimeStamp(string target, SysTime accessTime, SysTime modificationTime)
 	{
-		return setTimeStampImpl!true(dst, accessTime, modificationTime);
+		setTimeStampImpl!true(target, accessTime, modificationTime);
 	}
 	/// ditto
-	void setTimeStamp(string dst, SysTime modificationTime)
+	void setTimeStamp(string target, SysTime modificationTime)
 	{
-		return setTimeStampImpl!true(dst, modificationTime, modificationTime);
+		setTimeStampImpl!true(target, modificationTime, modificationTime);
 	}
 	/// ditto
-	void setTimeStamp(string dst, DateTime accessTime, DateTime modificationTime)
+	void setTimeStamp(string target, DateTime accessTime, DateTime modificationTime)
 	{
-		return setTimeStampImpl!true(dst, SysTime(accessTime), SysTime(modificationTime));
+		setTimeStampImpl!true(target, SysTime(accessTime), SysTime(modificationTime));
 	}
 	/// ditto
-	void setTimeStamp(string dst, DateTime modificationTime)
+	void setTimeStamp(string target, DateTime modificationTime)
 	{
-		return setTimeStampImpl!true(dst, SysTime(modificationTime), SysTime(modificationTime));
+		setTimeStampImpl!true(target, SysTime(modificationTime), SysTime(modificationTime));
 	}
 	/// ditto
-	void getTimeStamp(string dst, out SysTime accessTime, out SysTime modificationTime)
+	void getTimeStamp(string target, out SysTime accessTime, out SysTime modificationTime)
 	{
-		getTimeStampImpl!true(dst, accessTime, modificationTime);
+		getTimeStampImpl!true(target, accessTime, modificationTime);
 	}
 	/// ditto
-	void getTimeStamp(string dst, out SysTime modificationTime)
+	void getTimeStamp(string target, out SysTime modificationTime)
 	{
 		SysTime accessTime;
-		getTimeStampImpl!true(dst, accessTime, modificationTime);
+		getTimeStampImpl!true(target, accessTime, modificationTime);
 	}
 	/// ditto
-	void getTimeStamp(string dst, out DateTime accessTime, out DateTime modificationTime)
+	void getTimeStamp(string target, out DateTime accessTime, out DateTime modificationTime)
 	{
 		SysTime accessTimeTmp, modificationTimeTmp;
-		getTimeStampImpl!true(dst, accessTimeTmp, modificationTimeTmp);
+		getTimeStampImpl!true(target, accessTimeTmp, modificationTimeTmp);
 		accessTime       = cast(DateTime)accessTimeTmp;
 		modificationTime = cast(DateTime)modificationTimeTmp;
 	}
 	/// ditto
-	void getTimeStamp(string dst, out DateTime modificationTime)
+	void getTimeStamp(string target, out DateTime modificationTime)
 	{
 		SysTime accessTimeTmp, modificationTimeTmp;
-		getTimeStampImpl!true(dst, accessTimeTmp, modificationTimeTmp);
+		getTimeStampImpl!true(target, accessTimeTmp, modificationTimeTmp);
 		modificationTime = cast(DateTime)modificationTimeTmp;
 	}
 	/// ditto
-	SysTime getTimeStamp(string dst)
+	SysTime getTimeStamp(string target)
 	{
 		SysTime accessTime, modificationTime;
-		getTimeStampImpl!true(dst, accessTime, modificationTime);
+		getTimeStampImpl!true(target, accessTime, modificationTime);
 		return modificationTime;
 	}
 	
