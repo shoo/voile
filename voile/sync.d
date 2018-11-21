@@ -151,9 +151,9 @@ class SyncEvent
 		 * conditionがfalseなら非シグナル状態で、シグナル状態になるまで制御を
 		 * 返さない。
 		 */
-		void wait() nothrow @nogc
+		void wait() nothrow @nogc const
 		{
-			WaitForSingleObject(_handle, INFINITE);
+			WaitForSingleObject(cast(HANDLE)_handle, INFINITE);
 		}
 		/***********************************************************************
 		 * シグナル状態になるまで待つ
@@ -162,9 +162,9 @@ class SyncEvent
 		 * conditionがfalseなら非シグナル状態で、シグナル状態になるか、時間が
 		 * 過ぎるまで制御を返さない。
 		 */
-		bool wait(Duration dir) nothrow @nogc
+		bool wait(Duration dir) nothrow @nogc const
 		{
-			return WaitForSingleObject(_handle, cast(uint)dir.total!"msecs")
+			return WaitForSingleObject(cast(HANDLE)_handle, cast(uint)dir.total!"msecs")
 				== WAIT_OBJECT_0;
 		}
 		~this()
@@ -1024,21 +1024,21 @@ public:
 	/***************************************************************************
 	 * 終了するまで待機する
 	 */
-	void join()
+	void join() const
 	{
 		if (!_evStart)
 			return;
 		_evStart.wait();
 		if (_type != FinishedType.none)
 			return;
-		_task.yieldForce();
+		(cast(TaskType)_task).yieldForce();
 	}
 	
 	
 	/***************************************************************************
 	 * 結果を受け取る
 	 */
-	ref ResultType yieldForce()
+	ref auto yieldForce() inout
 	{
 		if (!_evStart)
 			return _resultRaw();
@@ -1046,11 +1046,12 @@ public:
 			_evStart.wait();
 		if (_type == FinishedType.done)
 			return _resultRaw();
-		return _task.yieldForce();
+		(cast(TaskType)_task).yieldForce();
+		return _resultRaw();
 	}
 	
 	/// ditto
-	ref ResultType workForce()
+	ref auto workForce() inout
 	{
 		if (!_evStart)
 			return _resultRaw();
@@ -1058,11 +1059,12 @@ public:
 			_evStart.wait();
 		if (_type == FinishedType.done)
 			return _resultRaw();
-		return _task.workForce();
+		(cast(TaskType)_task).workForce();
+		return _resultRaw();
 	}
 	
 	/// ditto
-	ref ResultType spinForce()
+	ref auto spinForce() inout
 	{
 		if (!_evStart)
 			return _resultRaw();
@@ -1070,7 +1072,8 @@ public:
 			_evStart.wait();
 		if (_type == FinishedType.done)
 			return _resultRaw();
-		return _task.spinForce();
+		(cast(TaskType)_task).spinForce();
+		return _resultRaw();
 	}
 	
 	static if (!is(Ret == void))
