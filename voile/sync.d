@@ -499,6 +499,39 @@ public:
 
 
 
+/***************************************************************************
+ * タスクの例外処理
+ */
+private void _execTaskOnFailed(Fut)(Fut future, Exception e)
+{
+	import std.algorithm: move;
+	Fut.FailedHandler call;
+	synchronized (future)
+	{
+		call = future._onFailed.move();
+		future._resultException = e;
+		future._type = Fut.FinishedType.failed;
+	}
+	call(e);
+	throw e;
+}
+
+/***************************************************************************
+ * タスクの異常処理
+ */
+private void _execTaskOnFatal(Fut)(Fut future, Throwable e)
+{
+	import std.algorithm: move;
+	Fut.FatalHandler call;
+	synchronized (future)
+	{
+		call = future._onFatal.move();
+		future._resultFatal = e;
+		future._type = Fut.FinishedType.fatal;
+	}
+	call(e);
+	throw e;
+}
 
 
 /***************************************************************************
@@ -544,25 +577,11 @@ private void _makeTask(alias func, Fut, Args...)(Fut future, Args args)
 		}
 		catch (Exception e)
 		{
-			Fut.FailedHandler call;
-			synchronized (future)
-			{
-				call = future._onFailed.move();
-				future._type = Fut.FinishedType.failed;
-			}
-			call(e);
-			throw e;
+			_execTaskOnFailed(future, e);
 		}
 		catch (Throwable e)
 		{
-			Fut.FatalHandler call;
-			synchronized (future)
-			{
-				call = future._onFatal.move();
-				future._type = Fut.FinishedType.fatal;
-			}
-			call(e);
-			throw e;
+			_execTaskOnFatal(future, e);
 		}
 		assert(0);
 	});
@@ -592,8 +611,8 @@ final class Future(Ret)
 	{
 		alias CallbackType = void delegate(ref ResultType res);
 	}
-	alias CallbackFailedType = void delegate(Exception);
-	alias CallbackFatalType  = void delegate(Throwable);
+	alias CallbackFailedType = void delegate(Exception) nothrow;
+	alias CallbackFatalType  = void delegate(Throwable) nothrow;
 	alias FinishedHandler    = Handler!CallbackType;
 	alias FailedHandler      = Handler!CallbackFailedType;
 	alias FatalHandler       = Handler!CallbackFatalType;
@@ -724,20 +743,31 @@ public:
 		return this;
 	}
 	
-	private void _addListenerFailedWithNewFeature(Ret2)(void delegate(Exception e) callbackFailed, Future!Ret2 future)
+	private void _addListenerFailedWithNewFeature(Ret2)(CallbackFailedType callbackFailed, Future!Ret2 future)
 	{
-		addListenerFailed((e){
-			(cast(shared)future)._type.atomicStore( Future!Ret2.FinishedType.failed );
-			future._evStart.signaled = true;
+		addListenerFailed(cast(CallbackFailedType)(Exception e)
+		{
+			scope (exit)
+				future._evStart.signaled = true;
+			synchronized (future)
+			{
+				future._resultException = e;
+				future._type = Future!Ret2.FinishedType.failed;
+			}
 			if (callbackFailed)
 				callbackFailed(e);
 		});
 	}
-	private void _addListenerFatalWithNewFeature(Ret2)(void delegate(Throwable e) callbackFatal, Future!Ret2 future)
+	private void _addListenerFatalWithNewFeature(Ret2)(CallbackFatalType callbackFatal, Future!Ret2 future)
 	{
-		addListenerFailed((e){
-			(cast(shared)future)._type.atomicStore( Future!Ret2.FinishedType.fatal );
-			future._evStart.signaled = true;
+		addListenerFatal(cast(CallbackFatalType)(Throwable e){
+			scope (exit)
+				future._evStart.signaled = true;
+			synchronized (future)
+			{
+				future._resultFatal = e;
+				future._type = Future!Ret2.FinishedType.fatal;
+			}
 			if (callbackFatal)
 				callbackFatal(e);
 		});
@@ -748,8 +778,8 @@ public:
 	 */
 	auto then(Ret2)(TaskPool pool,
 		Ret2 delegate(ResultType) callbackFinished,
-		void delegate(Exception e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatal = null)
+		void delegate(Exception e) nothrow callbackFailed = null,
+		void delegate(Throwable e) nothrow callbackFatal = null)
 		if (!is(Ret == void) && is(typeof(callbackFinished(_resultRaw))))
 	{
 		auto ret = new Future!Ret2;
@@ -761,8 +791,8 @@ public:
 	/// ditto
 	auto then(Ret2)(
 		Ret2 delegate(ResultType) callbackFinished,
-		void delegate(Exception e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatal = null)
+		void delegate(Exception e) nothrow callbackFailed = null,
+		void delegate(Throwable e) nothrow callbackFatal = null)
 		if (!is(Ret == void) && is(typeof(callbackFinished(_resultRaw))))
 	{
 		auto ret = new Future!Ret2;
@@ -773,8 +803,8 @@ public:
 	}
 	/// ditto
 	auto then(alias func, Ex = Exception)(TaskPool pool,
-		void delegate(Ex e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatal = null)
+		void delegate(Ex e) nothrow callbackFailed = null,
+		void delegate(Throwable e) nothrow callbackFatal = null)
 		if (!is(Ret == void) && is(typeof(func(_resultRaw))) && is(Ex == Exception))
 	{
 		auto ret = new Future!(typeof(func(_resultRaw)));
@@ -785,8 +815,8 @@ public:
 	}
 	/// ditto
 	auto then(alias func, Ex = Exception)(
-		void delegate(Ex e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatal = null)
+		void delegate(Ex e) nothrow callbackFailed = null,
+		void delegate(Throwable e) nothrow callbackFatal = null)
 		if (!is(Ret == void) && is(typeof(func(_resultRaw))) && is(Ex == Exception))
 	{
 		auto ret = new Future!(typeof(func(_resultRaw)));
@@ -798,8 +828,8 @@ public:
 	/// ditto
 	auto then(Ret2)(TaskPool pool,
 		Ret2 delegate() callbackFinished,
-		void delegate(Exception e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatal = null)
+		void delegate(Exception e) nothrow callbackFailed = null,
+		void delegate(Throwable e) nothrow callbackFatal = null)
 		if (is(Ret == void) && is(typeof(callbackFinished())))
 	{
 		auto ret = new Future!Ret2;
@@ -811,8 +841,8 @@ public:
 	/// ditto
 	auto then(Ret2)(
 		Ret2 delegate() callbackFinished,
-		void delegate(Exception e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatal = null)
+		void delegate(Exception e) nothrow callbackFailed = null,
+		void delegate(Throwable e) nothrow callbackFatal = null)
 		if (is(Ret == void) && is(typeof(callbackFinished())))
 	{
 		auto ret = new Future!Ret2;
@@ -823,8 +853,8 @@ public:
 	}
 	/// ditto
 	auto then(alias func, Ex = Exception)(TaskPool pool,
-		void delegate(Ex e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatal = null)
+		void delegate(Ex e) nothrow callbackFailed = null,
+		void delegate(Throwable e) nothrow callbackFatal = null)
 		if (is(Ret == void) && is(typeof(func())) && is(Ex == Exception))
 	{
 		auto ret = new Future!(typeof(func()));
@@ -835,8 +865,8 @@ public:
 	}
 	/// ditto
 	auto then(alias func, Ex = Exception)(
-		void delegate(Ex e) callbackFailed = null,
-		void delegate(Throwable e) callbackFatal = null)
+		void delegate(Ex e) nothrow callbackFailed = null,
+		void delegate(Throwable e) nothrow callbackFatal = null)
 		if (is(Ret == void) && is(typeof(func())) && is(Ex == Exception))
 	{
 		auto ret = new Future!(typeof(func()));
@@ -1024,14 +1054,27 @@ public:
 	/***************************************************************************
 	 * 終了するまで待機する
 	 */
-	void join() const
+	void join(bool rethrow = false) const
 	{
 		if (!_evStart)
 			return;
 		_evStart.wait();
-		if (_type != FinishedType.none)
-			return;
-		(cast(TaskType)_task).yieldForce();
+		final switch (_type)
+		{
+		case FinishedType.none:
+			(cast(TaskType)_task).yieldForce();
+			break;
+		case FinishedType.done:
+			break;
+		case FinishedType.failed:
+			if (rethrow)
+				throw _resultException;
+			break;
+		case FinishedType.fatal:
+			if (rethrow)
+				throw _resultFatal;
+			break;
+		}
 	}
 	
 	
@@ -1044,10 +1087,17 @@ public:
 			return _resultRaw();
 		if (_type == FinishedType.none)
 			_evStart.wait();
-		if (_type == FinishedType.done)
+		final switch (_type)
+		{
+		case FinishedType.none:
+			return (cast(TaskType)_task).yieldForce();
+		case FinishedType.done:
 			return _resultRaw();
-		(cast(TaskType)_task).yieldForce();
-		return _resultRaw();
+		case FinishedType.failed:
+			throw _resultException;
+		case FinishedType.fatal:
+			throw _resultFatal;
+		}
 	}
 	
 	/// ditto
@@ -1057,10 +1107,17 @@ public:
 			return _resultRaw();
 		if (_type == FinishedType.none)
 			_evStart.wait();
-		if (_type == FinishedType.done)
+		final switch (_type)
+		{
+		case FinishedType.none:
+			return (cast(TaskType)_task).yieldForce();
+		case FinishedType.done:
 			return _resultRaw();
-		(cast(TaskType)_task).workForce();
-		return _resultRaw();
+		case FinishedType.failed:
+			throw _resultException;
+		case FinishedType.fatal:
+			throw _resultFatal;
+		}
 	}
 	
 	/// ditto
@@ -1070,10 +1127,17 @@ public:
 			return _resultRaw();
 		if (_type == FinishedType.none)
 			_evStart.wait();
-		if (_type == FinishedType.done)
+		final switch (_type)
+		{
+		case FinishedType.none:
+			return (cast(TaskType)_task).yieldForce();
+		case FinishedType.done:
 			return _resultRaw();
-		(cast(TaskType)_task).spinForce();
-		return _resultRaw();
+		case FinishedType.failed:
+			throw _resultException;
+		case FinishedType.fatal:
+			throw _resultFatal;
+		}
 	}
 	
 	static if (!is(Ret == void))
@@ -1089,6 +1153,7 @@ public:
 	
 }
 
+/// ditto
 @system unittest
 {
 	auto future = new Future!int;
@@ -1117,14 +1182,94 @@ public:
 	assert(future2.yieldForce() == 200);
 	future3.join();
 	
-	auto feature4 = async({
-		throw new Exception("Ex");
-	}).then({
-		assert(0);
-	});
-	feature4.join();
 }
 
+/// ditto
+@system unittest
+{
+	Exception lastEx;
+	auto feature = async({
+		throw new Exception("Ex1");
+	}).then({
+		assert(0);
+	}, (Exception e){
+		lastEx = e;
+	});
+	try
+	{
+		feature.join(true);
+	}
+	catch (Exception e)
+	{
+		assert(lastEx.msg == "Ex1");
+		assert(lastEx is e);
+	}
+}
+
+/// ditto
+@system unittest
+{
+	import std.exception;
+	Exception e1, e2;
+	auto future1 = async({
+		throw new Exception("Ex1");
+	});
+	auto future2 = future1.then({
+		assert(0);
+	}, (Exception e)
+	{
+		// future1の例外処理
+		e1 = e;
+	});
+	
+	// future1でEx1が投げられている
+	e2 = future1.join(true).collectException();
+	assert(e2.msg == "Ex1");
+	// future2もEx1が投げられたことになっている
+	e2 = future2.join(true).collectException();
+	assert(e2.msg == "Ex1");
+	assert(e1 is e2);
+}
+
+/// ditto
+@system unittest
+{
+	import std.exception;
+	Exception e1, e2;
+	auto future1 = async(
+	{
+		// future1の処理
+	});
+	auto future2 = future1.then(
+	{
+		// feature1の後続処理
+		throw new Exception("Ex1");
+	}, (Exception e)
+	{
+		// future1の例外処理
+		e1 = e;
+	});
+	auto future3 = future2.then(
+	{
+		// feature2の後続処理
+		throw new Exception("Ex2");
+	}, (Exception e)
+	{
+		// future2の例外処理
+		e2 = e;
+	});
+	
+	// future1では例外が投げられない
+	auto e3 = future1.join(true).collectException();
+	assert(e1 is null);
+	assert(e3 is null);
+	// future2ではEx1例外が投げられる
+	auto e4 = future2.join(true).collectException();
+	assert(e2 !is null);
+	assert(e2 is e4);
+	assert(e2.msg == "Ex1");
+	// (Ex2は投げられない)
+}
 
 /*******************************************************************************
  * 非同期処理の開始
