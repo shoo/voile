@@ -1090,7 +1090,8 @@ public:
 		final switch (_type)
 		{
 		case FinishedType.none:
-			return (cast(TaskType)_task).yieldForce();
+			(cast(TaskType)_task).yieldForce();
+			return _resultRaw();
 		case FinishedType.done:
 			return _resultRaw();
 		case FinishedType.failed:
@@ -1110,7 +1111,8 @@ public:
 		final switch (_type)
 		{
 		case FinishedType.none:
-			return (cast(TaskType)_task).yieldForce();
+			(cast(TaskType)_task).workForce();
+			return _resultRaw();
 		case FinishedType.done:
 			return _resultRaw();
 		case FinishedType.failed:
@@ -1130,7 +1132,8 @@ public:
 		final switch (_type)
 		{
 		case FinishedType.none:
-			return (cast(TaskType)_task).yieldForce();
+			(cast(TaskType)_task).spinForce();
+			return _resultRaw();
 		case FinishedType.done:
 			return _resultRaw();
 		case FinishedType.failed:
