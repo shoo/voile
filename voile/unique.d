@@ -18,16 +18,13 @@ private extern (C) static void _d_monitordelete(Object h, bool det) pure;
  */
 private void _destroy(T)(T obj) pure
 {
-	static if (is(T == class) || is(T == interface))
+	static if (is(typeof(object.destroy!(true, typeof(obj)).destroy)))
 	{
-		assumePure!(object.destroy!(typeof(obj)))(obj);
+		assumePure!(object.destroy!(true, typeof(obj)))(obj);
 	}
 	else
 	{
-		static if (is(typeof(obj.__dtor())))
-		{
-			assumePure!(obj.__dtor)();
-		}
+		assumePure!(object.destroy!(typeof(obj)))(obj);
 	}
 }
 
