@@ -16,16 +16,13 @@ private extern (C) static void _d_monitordelete(Object h, bool det) pure;
   transitively up the inheritance path, but work properly only if the
   static type of the object (T) is known.
  */
+private void _destroyImpl(T)(T obj)
+{
+	object.destroy(obj);
+}
 private void _destroy(T)(T obj) pure
 {
-	static if (is(typeof(object.destroy!(true, typeof(obj)).destroy)))
-	{
-		assumePure!(object.destroy!(true, typeof(obj)))(obj);
-	}
-	else
-	{
-		assumePure!(object.destroy!(typeof(obj)))(obj);
-	}
+	assumePure!(_destroyImpl!T)(obj);
 }
 
 private template TypeOf(T)
