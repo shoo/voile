@@ -74,7 +74,7 @@ class JudgementException: Exception
 		return judgement.opApply(dg);
 	}
 	/// ditto
-	int opApply(int delegate(ref int, ref Object) dg)
+	int opApply(int delegate(ref size_t, ref Object) dg)
 	{
 		return judgement.opApply(dg);
 	}
@@ -318,10 +318,10 @@ final:
 	/***************************************************************************
 	 * foreach (i, d; judgement.result)と同義
 	 */
-	int opApply(int delegate(ref int, ref Object) dg)
+	int opApply(int delegate(ref size_t, ref Object) dg)
 	{
 		int result;
-		foreach (int i, ref Object e; _results)
+		foreach (size_t i, ref Object e; _results)
 		{
 			result = dg(i, e);
 			if (result)
