@@ -16,11 +16,11 @@ private extern (C) static void _d_monitordelete(Object h, bool det) pure;
   transitively up the inheritance path, but work properly only if the
   static type of the object (T) is known.
  */
-private void _destroyImpl(T)(T obj)
+private void _destroyImpl(T)(ref T obj)
 {
 	object.destroy(obj);
 }
-private void _destroy(T)(T obj) pure
+private void _destroy(T)(ref T obj) pure
 {
 	assumePure!(_destroyImpl!T)(obj);
 }
@@ -141,9 +141,14 @@ private struct UniqueDataImpl(T)
 				}
 			}
 		}
+		else static if (is(T ==struct))
+		{
+			_destroy(*_p);
+		}
 		else
 		{
-			_destroy(_p);
+			auto p = _p;
+			_destroy(p);
 		}
 		assumePure!free(cast(void*)_p);
 	}
@@ -360,7 +365,6 @@ bool isEmpty(T)(ref Unique!T u)
 		assert(!isEmpty(uf2));
 	}
 	testary ~= 4;
-	import std.stdio;
 	assert(testary == [1,2,-2,3,-1,4]);
 }
 
