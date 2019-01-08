@@ -156,7 +156,10 @@ private struct UniqueDataImpl(T)
 	///
 	hash_t toHash() const nothrow @trusted
 	{
-		return hashOf(_instance());
+		try
+			return hashOf(_instance());
+		catch (Throwable e)
+			return hash_t.init;
 	}
 	
 	/***************************************************************************
