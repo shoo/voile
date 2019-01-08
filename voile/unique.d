@@ -154,12 +154,15 @@ private struct UniqueDataImpl(T)
 	}
 	
 	///
-	hash_t toHash() const nothrow @trusted
+	static if (__traits(compiles, hashOf(_instance())))
 	{
-		try
-			return hashOf(_instance());
-		catch (Throwable e)
-			return hash_t.init;
+		hash_t toHash() const nothrow @trusted
+		{
+			try
+				return hashOf(_instance());
+			catch (Throwable e)
+				return hash_t.init;
+		}
 	}
 	
 	/***************************************************************************
