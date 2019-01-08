@@ -101,7 +101,19 @@ struct FileSystem
 	 */
 	bool exists(string target) const @safe
 	{
+		return existsImpl!true(target);
+	}
+	
+	/// ditto
+	private bool existsImpl(bool absConvert)(string target) const @safe
+	{
 		return .exists(absolutePath(target));
+	}
+	
+	/// ditto
+	private bool existsImpl(bool absConvert: false)(string target) const @safe
+	{
+		return .exists(target);
 	}
 	
 	
@@ -113,8 +125,20 @@ struct FileSystem
 	 */
 	bool isFile(string target) const @safe
 	{
+		return isFileImpl!true(target);
+	}
+	
+	/// ditto
+	private bool isFileImpl(bool absConvert)(string target) const @safe
+	{
 		auto absTarget = absolutePath(target);
 		return .exists(absTarget) && .isFile(absTarget);
+	}
+	
+	/// ditto
+	private bool isFileImpl(bool absConvert: false)(string target) const @safe
+	{
+		return .exists(target) && .isFile(target);
 	}
 	
 	/***************************************************************************
@@ -125,8 +149,20 @@ struct FileSystem
 	 */
 	bool isDir(string target) const @safe
 	{
+		return isDirImpl!true(target);
+	}
+	
+	/// ditto
+	private bool isDirImpl(bool absConvert)(string target) const @safe
+	{
 		auto absTarget = absolutePath(target);
 		return .exists(absTarget) && .isDir(absTarget);
+	}
+	
+	/// ditto
+	private bool isDirImpl(bool absConvert: false)(string target) const @safe
+	{
+		return .exists(target) && .isDir(target);
 	}
 	
 	private bool makeDirImpl(bool absConvert)(string target, bool force, uint retrycnt)
