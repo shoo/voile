@@ -153,6 +153,11 @@ private struct UniqueDataImpl(T)
 		assumePure!free(cast(void*)_p);
 	}
 	
+	///
+	hash_t toHash() const nothrow @trusted
+	{
+		return hashOf(_instance());
+	}
 	
 	/***************************************************************************
 	 * Nullifies the current contents.
