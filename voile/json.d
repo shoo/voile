@@ -10,9 +10,7 @@ import std.json, std.traits, std.conv, std.array;
 JSONValue json(T)(auto const ref T[] x) @property
 	if (isSomeString!(T[]))
 {
-	JSONValue v;
-	v.str = to!string(x);
-	return v;
+	return JSONValue(to!string(x));
 }
 
 
@@ -23,6 +21,14 @@ JSONValue json(T)(auto const ref T x) @property
 	 || is(Unqual!T == bool))
 {
 	return JSONValue(x);
+}
+
+
+/// ditto
+JSONValue json(T)(auto const ref T x) @property
+	if (is(T == enum))
+{
+	return JSONValue(x.to!string());
 }
 
 
@@ -124,6 +130,19 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	assert(bfjson.type == JSON_TYPE.FALSE);
 }
 
+///
+@system unittest
+{
+	enum EnumType
+	{
+		a, b, c
+	}
+	auto a = EnumType.a;
+	auto ajson = a.json;
+	assert(ajson.type == JSONType.string);
+	assert(ajson.str == "a");
+}
+
 
 ///
 @system unittest
@@ -194,22 +213,6 @@ private void _setValue(T)(ref JSONValue v, ref string name, ref T val)
 	{
 		auto x = v.object;
 		x[name] = val.json;
-		v = x;
-	}
-}
-
-private void _setValue(T)(ref JSONValue v, ref string name, ref T val)
-	if (is(T == enum))
-{
-	import std.string;
-	if (v.type != JSON_TYPE.OBJECT || !v.object)
-	{
-		v = [name: format("%s", val)];
-	}
-	else
-	{
-		auto x = v.object;
-		x[name] = format("%s", val);
 		v = x;
 	}
 }
@@ -885,8 +888,8 @@ JSONValue serializeToJson(T)(in T data)
 	else static if (isAssociativeArray!T)
 	{
 		JSONValue[string] jvObj;
-		foreach (pair; data.byKeyValue)
-			jvObj[pair.key] = serializeToJson(pair.value);
+		foreach (pair; data.byPair)
+			jvObj[pair.key.to!string()] = serializeToJson(pair.value);
 		return JSONValue(jvObj);
 	}
 	else
@@ -939,7 +942,7 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 {
 	static if (isJSONizableRaw!T)
 	{
-		data.json = json;
+		fromJson(json, data);
 	}
 	else static if (isArray!T)
 	{
@@ -956,11 +959,12 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 		if (json.type != JSONType.object)
 			return;
 		data.clear();
+		alias KeyType = typeof(data.byKey.front);
 		alias ValueType = typeof(data.byValue.front);
-		foreach (pair; json.object.byKeyValue)
+		foreach (pair; json.object.byPair)
 		{
 			import std.algorithm: move;
-			data.update(pair.key,
+			data.update(pair.key.to!KeyType(),
 			{
 				ValueType ret;
 				deserializeFromJson(ret, pair.value);
@@ -1104,6 +1108,43 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	assert(datMap2["Data"].points[0] == Point(3,4));
 	assert(datMap2["Data"].pointMap["PT"] == Point(5,6));
 }
+
+
+@system unittest
+{
+	enum EnumVal
+	{
+		val1,
+		val2
+	}
+	struct Data
+	{
+		EnumVal val;
+	}
+	Data data1 = Data(EnumVal.val1), data2 = Data(EnumVal.val2);
+	auto jv = data1.serializeToJson();
+	data2.deserializeFromJson(jv);
+	assert(data1.val == data2.val);
+}
+
+
+@system unittest
+{
+	struct Data
+	{
+		string[uint] map;
+	}
+	Data data1 = Data([1: "1"]);
+	Data data2 = Data([2: "2"]);
+	auto jv = data1.serializeToJson();
+	data2.deserializeFromJson(jv);
+	assert(1 in data1.map);
+	assert(1 in data2.map);
+	assert(2 !in data2.map);
+	assert(data2.map[1] == "1");
+}
+
+
 
 ///
 JSONValue deepCopy(in JSONValue v) @property
