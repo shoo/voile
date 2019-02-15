@@ -1,6 +1,6 @@
 module voile.fs;
 
-import std.file, std.path, std.exception, std.stdio, std.datetime;
+import std.file, std.path, std.exception, std.stdio, std.datetime, std.regex;
 import std.process;
 import voile.handler;
 
@@ -35,8 +35,9 @@ struct FileSystem
 	 * 絶対パスに変換する
 	 * 
 	 * Params:
-	 *     target = 変換したい相対パス(何も指定しないとworkDirの絶対パスが返る)
-	 *     base   = 基準となるパス(このパスの基準はworkDir)
+	 *     target     = 変換したい相対パス(何も指定しないとworkDirの絶対パスが返る)
+	 *     targetPath = 変換したい相対パスのパンくずリスト
+	 *     base       = 基準となるパス(このパスの基準はworkDir)
 	 */
 	string absolutePath() const @safe
 	{
@@ -52,11 +53,21 @@ struct FileSystem
 		return .absolutePath(target, absolutePath()).buildNormalizedPath;
 	}
 	/// ditto
+	string absolutePath(string[] targetPath) const @safe
+	{
+		return this.absolutePath(.buildPath(targetPath));
+	}
+	/// ditto
 	string absolutePath(string target, string base) const @safe
 	{
 		if (target.isAbsolute)
 			return target.buildNormalizedPath();
 		return .absolutePath(target, this.absolutePath(base)).buildNormalizedPath();
+	}
+	/// ditto
+	string absolutePath(string[] targetPath, string base) const @safe
+	{
+		return this.absolutePath(.buildPath(targetPath), base);
 	}
 	
 	@safe unittest
@@ -92,6 +103,42 @@ struct FileSystem
 		auto fs = FileSystem("C:/");
 		assert(fs.actualPath(r"wInDoWs") == r"C:\Windows");
 	}
+	
+	/***************************************************************************
+	 * 相対パスに変換する
+	 * 
+	 * Params:
+	 *     target     = 変換したい絶対/相対パス
+	 *     targetPath = 変換したい相対パスのパンくずリスト
+	 *     base       = 基準となるパス(このパスの基準はworkDir)
+	 */
+	string relativePath(string target)
+	{
+		return .relativePath(this.absolutePath(target), this.absolutePath());
+	}
+	/// ditto
+	string relativePath(string[] targetPath)
+	{
+		return .relativePath(this.absolutePath(targetPath), this.absolutePath());
+	}
+	/// ditto
+	string relativePath(string target, string base)
+	{
+		return .relativePath(this.absolutePath(target), this.absolutePath(base));
+	}
+	/// ditto
+	string relativePath(string[] targetPath, string base)
+	{
+		return .relativePath(this.absolutePath(targetPath), this.absolutePath(base));
+	}
+	
+	@system unittest
+	{
+		auto fs = FileSystem("C:/work");
+		assert(fs.relativePath(r"C:/Windows") == r"..\Windows");
+		assert(fs.relativePath(r"C:/Program Files", "../Windows") == r"..\Program Files");
+	}
+	
 	
 	/***************************************************************************
 	 * パスが存在するか確認する
@@ -257,13 +304,70 @@ struct FileSystem
 	}
 	
 	/***************************************************************************
+	 * エントリー一覧
+	 */
+	auto entries(SpanMode mode, bool followSymlink = true)
+	{
+		return .dirEntries(absolutePath(), mode, followSymlink);
+	}
+	
+	/// ditto
+	auto entries(string pattern, SpanMode mode = SpanMode.shallow, bool followSymlink = true)
+	{
+		return .dirEntries(absolutePath(), pattern, mode, followSymlink);
+	}
+	
+	/// ditto
+	auto entries(Char)(Regex!Char pattern, SpanMode mode = SpanMode.shallow, bool followSymlink = true)
+	{
+		import std.algorithm.iteration : filter;
+		bool f(DirEntry de) { return match(de.name, pattern); }
+		return filter!f(.dirEntries(absolutePath(), mode, followSymlink));
+	}
+	
+	///
+	@system unittest
+	{
+		scope (exit)
+			std.file.rmdirRecurse("ut");
+		auto fs = FileSystem("ut");
+		fs.writeText("a/b/test1.txt", "Test");
+		fs.writeText("a/c/test2.txt", "Test");
+		fs.writeText("a/b/test3.txt", "Test");
+		string[] files;
+		foreach (de; fs.entries(SpanMode.depth))
+		{
+			files ~= de.name;
+			assert(de.name.isAbsolute);
+		}
+		assert(files.length == 6);
+		import std.algorithm: sort;
+		files.sort();
+		assert(fs.relativePath(files[0]) == "a");
+		assert(fs.relativePath(files[1]) == "a\\b");
+		assert(fs.relativePath(files[2]) == "a\\b\\test1.txt");
+		assert(fs.relativePath(files[3]) == "a\\b\\test3.txt");
+		assert(fs.relativePath(files[4]) == "a\\c");
+		assert(fs.relativePath(files[5]) == "a\\c\\test2.txt");
+	}
+	
+	/***************************************************************************
 	 * テキストファイルを書き出す
 	 */
 	void writeText(string filename, in char[] text)
 	{
+		writeTextImpl!true(filename, text);
+	}
+	
+	private void writeTextImpl(bool absConvert)(string filename, in char[] text)
+	{
 		auto absFilename = absolutePath(filename);
-		makeDirImpl!false(absFilename.dirName, false, 0);
-		std.file.write(absFilename, text);
+		writeTextImpl!false(absFilename, text);
+	}
+	private void writeTextImpl(bool absConvert: false)(string filename, in char[] text)
+	{
+		makeDirImpl!false(filename.dirName, false, 0);
+		std.file.write(filename, text);
 	}
 	
 	///
@@ -284,11 +388,21 @@ struct FileSystem
 	 */
 	string readText(string filename)
 	{
-		auto absFilename = absolutePath(filename);
-		if (!isFile(absFilename))
-			return null;
-		return cast(typeof(return))std.file.read(absFilename);
+		return readTextImpl!true(filename);
 	}
+	
+	private string readTextImpl(bool absConvert)(string filename)
+	{
+		auto absFilename = absolutePath(filename);
+		return readTextImpl!false(absFilename);
+	}
+	private string readTextImpl(bool absConvert: false)(string filename)
+	{
+		if (!isFileImpl!false(filename))
+			return null;
+		return cast(typeof(return))std.file.read(filename);
+	}
+	
 	
 	///
 	@system unittest
@@ -305,9 +419,18 @@ struct FileSystem
 	 */
 	void writeBinary(string filename, in ubyte[] binary)
 	{
+		writeBinaryImpl!true(filename, binary);
+	}
+	
+	private void writeBinaryImpl(bool absConvert)(string filename, in ubyte[] binary)
+	{
 		auto absFilename = absolutePath(filename);
-		makeDirImpl!false(absFilename.dirName, false, 0);
-		std.file.write(absFilename, binary);
+		writeBinaryImpl!false(absFilename, binary);
+	}
+	private void writeBinaryImpl(bool absConvert: false)(string filename, in ubyte[] binary)
+	{
+		makeDirImpl!false(filename.dirName, false, 0);
+		std.file.write(filename, binary);
 	}
 	
 	///
@@ -328,10 +451,19 @@ struct FileSystem
 	 */
 	immutable(ubyte)[] readBinary(string filename)
 	{
+		return readBinaryImpl!true(filename);
+	}
+	
+	private immutable(ubyte)[] readBinaryImpl(bool absConvert)(string filename)
+	{
 		auto absFilename = absolutePath(filename);
-		if (!isFile(absFilename))
+		return readBinaryImpl!false(absFilename);
+	}
+	private immutable(ubyte)[] readBinaryImpl(bool absConvert: false)(string filename)
+	{
+		if (!isFileImpl!false(filename))
 			return null;
-		return cast(typeof(return))std.file.read(absFilename);
+		return cast(typeof(return))std.file.read(filename);
 	}
 	
 	///
@@ -350,8 +482,8 @@ struct FileSystem
 	void writeJson(T)(string filename, in T data)
 	{
 		import voile.json, std.json;
-		static assert(__traits(compiles, data.json), "Unsupported type " ~ T.stringof);
-		writeText(filename, data.json.toPrettyString);
+		static assert(__traits(compiles, data.serializeToJsonString), "Unsupported type " ~ T.stringof);
+		writeText(filename, data.serializeToJsonString());
 	}
 	
 	/***************************************************************************
@@ -361,12 +493,11 @@ struct FileSystem
 	{
 		import voile.json, std.json;
 		T ret;
+		static assert(__traits(compiles, ret.deserializeFromJsonString("")), "Unsupported type " ~ T.stringof);
 		auto absFilename = absolutePath(filename);
-		if (!absFilename.isFile)
+		if (!isFileImpl!false(absFilename))
 			return T.init;
-		auto jv = parseJSON(readText(filename));
-		static assert(__traits(compiles, fromJson!T(jv, ret)), "Unsupported type " ~ T.stringof);
-		enforce(fromJson(jv, ret));
+		ret.deserializeFromJsonString(readTextImpl!false(absFilename));
 		return ret;
 	}
 	
@@ -814,7 +945,7 @@ struct FileSystem
 	
 	private bool mirrorFilesImpl(bool absConvert: false)(string srcDir, string dstDir, bool force, uint retrycnt)
 	{
-		import std.algorithm, std.file, std.path, std.array;
+		import std.algorithm, std.array;
 		if (!dstDir.exists)
 			return copyFiles(srcDir, dstDir);
 		auto srcAbsPaths = dirEntries(srcDir, SpanMode.breadth).map!(a => a.name).array;
@@ -905,7 +1036,6 @@ struct FileSystem
 	// 
 	private bool moveFilesImpl(bool absConvert: false)(string src, string dst, bool force, bool retrycnt)
 	{
-		import std.file, std.path;
 		if (!src.exists)
 			return true;
 		if (src.driveName == dst.driveName)
