@@ -4,14 +4,336 @@
 module voile.log;
 
 
+import std.range: isInputRange, isOutputRange, isForwardRange, hasLength, hasSlicing;
 import std.experimental.logger: Logger, FileLogger;
+
+
+
+/*******************************************************************************
+ * 
+ */
+struct LogData
+{
+	import std.experimental.logger;
+	import std.datetime, std.json;
+	import voile.json;
+	///
+	ulong    id;
+	///
+	LogLevel level;
+	///
+	SysTime  time;
+	///
+	string   file;
+	///
+	uint     line;
+	///
+	string   msg;
+	///
+	string   moduleName;
+	///
+	string   funcName;
+	///
+	string   prettyFuncName;
+	///
+	string   threadId;
+	
+	///
+	JSONValue json() @safe nothrow const @property
+	{
+		JSONValue ret;
+		ret.setValue("id", id);
+		ret.setValue("level", level);
+		ret.setValue("time", time.toISOExtString);
+		ret.setValue("file", file);
+		ret.setValue("line", line);
+		ret.setValue("msg", msg);
+		ret.setValue("moduleName", moduleName);
+		ret.setValue("funcName", funcName);
+		ret.setValue("prettyFuncName", prettyFuncName);
+		ret.setValue("threadId", threadId);
+		return ret;
+	}
+	///
+	void json(JSONValue v) @safe nothrow @property
+	{
+		try
+		{
+			id             = v.getValue("id", id.init);
+			level          = v.getValue("level", level.init);
+			time           = SysTime.fromISOExtString(v.getValue("time", string.init));
+			file           = v.getValue("file", file.init);
+			line           = v.getValue("line", line.init);
+			msg            = v.getValue("msg", msg.init);
+			moduleName     = v.getValue("moduleName", moduleName.init);
+			funcName       = v.getValue("funcName", funcName.init);
+			prettyFuncName = v.getValue("prettyFuncName", prettyFuncName.init);
+			threadId       = v.getValue("threadId", threadId.init);
+		}
+		catch (Exception e)
+		{
+			/* DO NOTHING */
+		}
+	}
+	
+	///
+	string toString() const
+	{
+		return json.toString();
+	}
+}
+
+@safe unittest
+{
+	import std.datetime, std.concurrency, core.thread, std.experimental.logger;
+	LogData logData1;
+	with (logData1)
+	{
+		id         = 0;
+		level      = LogLevel.warning;
+		time       = Clock.currTime();
+		file       = __FILE__;
+		line       = __LINE__;
+		moduleName = __MODULE__;
+		funcName   = __FUNCTION__;
+		threadId   = "Thread";
+		msg        = "message";
+	}
+	LogData logData2;
+	logData2.json = logData1.json;
+	
+	assert(logData2.id == logData1.id);
+	assert(logData2.level == logData1.level);
+	assert(logData2.time == logData1.time);
+	assert(logData2.file == logData1.file);
+	assert(logData2.line == logData1.line);
+	assert(logData2.moduleName == logData1.moduleName);
+	assert(logData2.funcName == logData1.funcName);
+	assert(logData2.threadId == logData1.threadId);
+	assert(logData2.msg == logData1.msg);
+}
+
+
+/*******************************************************************************
+ * 
+ */
+interface LogStrageInput
+{
+	///
+	LogData front() const @property;
+	///
+	bool empty() const @property;
+	///
+	void popFront();
+	///
+	void reset();
+}
+
+/*******************************************************************************
+ * 
+ */
+interface LogStrageOutput
+{
+	import std.datetime;
+	///
+	void put(LogData datas);
+	///
+	void clear();
+}
+static assert(isInputRange!(LogStrageInput));
+static assert(isOutputRange!(LogStrageOutput, LogData));
+
+
+
+
+
+/*******************************************************************************
+ * 
+ */
+class LogStrageInMemory: LogStrageInput, LogStrageOutput
+{
+private:
+	const(LogData)[] _datas;
+	size_t _idx;
+public:
+	///
+	LogData front() const @property
+	{
+		return _datas[_idx];
+	}
+	
+	///
+	bool empty() const @property
+	{
+		return _idx == _datas.length;
+	}
+	
+	///
+	void popFront()
+	{
+		_idx++;
+	}
+	
+	///
+	void put(LogData data)
+	{
+		_datas ~= data;
+	}
+	
+	///
+	void reset() pure nothrow @safe @nogc
+	{
+		_idx = 0;
+	}
+	///
+	void clear() pure nothrow @safe @nogc
+	{
+		_idx = 0;
+		_datas = null;
+	}
+	
+	///
+	LogStrageInMemory save() pure nothrow @safe const
+	{
+		auto ls = new LogStrageInMemory;
+		ls._idx   = _idx;
+		ls._datas = _datas;
+		return ls;
+	}
+	
+	///
+	size_t currentIndex() pure nothrow @nogc @safe const @property
+	{
+		return _idx;
+	}
+	
+	///
+	size_t length() pure nothrow @nogc @safe const @property
+	{
+		return _datas.length;
+	}
+	
+	/// 
+	LogStrageInMemory opSlice() pure nothrow @safe const
+	{
+		return save();
+	}
+	
+	/// ditto
+	LogStrageInMemory opSlice(size_t begin, size_t end) pure nothrow @safe const
+	{
+		auto ls = new LogStrageInMemory;
+		ls._idx   = 0;
+		ls._datas = _datas[begin..end];
+		return ls;
+	}
+	
+	/// 
+	auto slice() pure nothrow @safe const
+	{
+		return _datas[];
+	}
+	
+	/// ditto
+	auto slice(size_t begin, size_t end) pure nothrow @safe const
+	{
+		return _datas[begin..end];
+	}
+	
+	///
+	alias opDoller = length;
+}
+
+static assert(isForwardRange!LogStrageInMemory);
+static assert(hasLength!LogStrageInMemory);
+static assert(hasSlicing!LogStrageInMemory);
+static assert(hasLength!(typeof(LogStrageInMemory.slice())));
+static assert(hasSlicing!(typeof(LogStrageInMemory.slice())));
+static assert(hasLength!(typeof(LogStrageInMemory.slice(0,0))));
+static assert(hasSlicing!(typeof(LogStrageInMemory.slice(0,0))));
+
+
+/*******************************************************************************
+ * 
+ */
+class LogStrageLogger : Logger
+{
+private:
+	import std.experimental.logger: LogLevel;
+	size_t _currentId;
+	LogStrageOutput _logDst;
+public:
+	///
+	this(LogStrageOutput logDst, LogLevel lv = LogLevel.all)
+	{
+		_logDst = logDst;
+		_currentId = 0;
+		super(lv);
+	}
+	
+	///
+	override void writeLogMsg(ref LogEntry payload) @trusted
+	{
+		import std.conv, core.thread, std.range;
+		LogData log;
+		log.id         = _currentId++;
+		log.level      = payload.logLevel;
+		log.time       = payload.timestamp;
+		log.msg        = payload.msg;
+		log.file       = payload.file;
+		log.line       = payload.line;
+		log.moduleName = payload.moduleName;
+		log.funcName   = payload.funcName;	
+		log.threadId   = text(payload.threadId);
+		put(_logDst, log);
+	}
+}
+
+
+/*******************************************************************************
+ * メモリ内のロガー
+ */
+class InMemoryLogger: LogStrageLogger
+{
+private:
+	import std.experimental.logger: LogLevel;
+	LogStrageInMemory _logStorage;
+	
+	
+public:
+	
+	///
+	this(LogLevel lv = LogLevel.all)
+	{
+		super(_logStorage, lv);
+	}
+	
+	///
+	inout(LogStrageInMemory) logStorage() pure nothrow @safe inout
+	{
+		return _logStorage;
+	}
+	
+	/// 
+	auto slice() pure nothrow @safe const
+	{
+		return _logStorage.slice;
+	}
+	
+	/// ditto
+	auto slice(size_t begin, size_t end) pure nothrow @safe const
+	{
+		return _logStorage.slice(begin, end);
+	}
+	
+}
 
 /*******************************************************************************
  * テキストファイルのロガー
  */
 class TextFileLogger: FileLogger
 {
-	import std.experimental.logger: Logger, LogLevel, CreateFolder;
+	import std.experimental.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -69,7 +391,7 @@ class TextFileLogger: FileLogger
 class JsonFileLogger: Logger
 {
 private:
-	import std.experimental.logger: Logger, LogLevel, CreateFolder;
+	import std.experimental.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -150,7 +472,7 @@ public:
 			~`"moduleName":"%s",`
 			~`"logLevel":"%s",`
 			~`"threadId":"%s",`
-			~`"timestamp":"%s",`
+			~`"time":"%s",`
 			~`"msg":%s`
 			~`}`~"\n]\n",
 			JSONValue(payload.file).toString,
@@ -171,8 +493,88 @@ public:
 	{
 		return _filename;
 	}
+	
+	///
+	static LogStrageInput loadFromFile(string fileName)
+	{
+		return new class LogStrageInput
+		{
+			import std.stdio;
+			File file;
+			typeof(file.byLine()) byLine;
+			const(char)[] line;
+			ulong id;
+			
+			this()
+			{
+				file.open(fileName, "r");
+				reset();
+			}
+			///
+			LogData front() const @property
+			{
+				import voile.json;
+				LogData ret;
+				ret.deserializeFromJsonString(cast(string)line);
+				ret.id = id;
+				return ret;
+			}
+			///
+			bool empty() const @property
+			{
+				return line == "]";
+			}
+			///
+			void popFront()
+			{
+				import std.string;
+				byLine.popFront();
+				line = byLine.front.chomp(",");
+				id++;
+			}
+			///
+			void reset()
+			{
+				file.seek(0);
+				byLine = file.byLine();
+				popFront();
+				id = 0;
+			}
+		};
+	}
 }
 
+@system unittest
+{
+	import voile.fs;
+	auto fs = FileSystem("ut");
+	scope (exit)
+		fs.removeFiles("ut");
+	auto logger = new JsonFileLogger(fs.absolutePath("jsonlogger.json"));
+	logger.trace("TRACETEST");
+	logger.info("INFOTEST");
+	logger.warning("WARNINGTEST");
+	logger.error("ERRORTEST");
+	logger.destroy();
+	auto input = JsonFileLogger.loadFromFile(fs.absolutePath("jsonlogger.json"));
+	assert(!input.empty);
+	assert(input.front.id == 0);
+	assert(input.front.msg == "TRACETEST");
+	input.popFront();
+	assert(!input.empty);
+	assert(input.front.id == 1);
+	assert(input.front.msg == "INFOTEST");
+	input.popFront();
+	assert(!input.empty);
+	assert(input.front.id == 2);
+	assert(input.front.msg == "WARNINGTEST");
+	input.popFront();
+	assert(!input.empty);
+	assert(input.front.id == 3);
+	assert(input.front.msg == "ERRORTEST");
+	input.popFront();
+	assert(input.empty);
+}
 
 
 /*******************************************************************************
@@ -181,7 +583,7 @@ public:
 class XmlFileLogger: Logger
 {
 private:
-	import std.experimental.logger: Logger, LogLevel, CreateFolder;
+	import std.experimental.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -248,7 +650,7 @@ public:
 			~` moduleName="%s"`
 			~` logLevel="%s"`
 			~` threadId="%s"`
-			~` timestamp="%s"`
+			~` time="%s"`
 			~` msg="%s"`
 			~" />\n</Log>\n",
 			encode(payload.file),
@@ -278,7 +680,7 @@ public:
 class CsvFileLogger: Logger
 {
 private:
-	import std.experimental.logger: Logger, LogLevel, CreateFolder;
+	import std.experimental.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -359,7 +761,7 @@ public:
 class TsvFileLogger: Logger
 {
 private:
-	import std.experimental.logger: Logger, LogLevel, CreateFolder;
+	import std.experimental.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
