@@ -263,8 +263,9 @@ private:
 	size_t _currentId;
 	LogStrageOutput _logDst;
 public:
+	
 	///
-	this(LogStrageOutput logDst, LogLevel lv = LogLevel.all)
+	this(LogStrageOutput logDst, LogLevel lv = LogLevel.all) @safe
 	{
 		_logDst = logDst;
 		_currentId = 0;
@@ -303,13 +304,14 @@ private:
 public:
 	
 	///
-	this(LogLevel lv = LogLevel.all)
+	this(LogLevel lv = LogLevel.all) @safe
 	{
+		_logStorage = new LogStrageInMemory;
 		super(_logStorage, lv);
 	}
 	
 	///
-	inout(LogStrageInMemory) logStorage() pure nothrow @safe inout
+	inout(LogStrageInMemory) logStorage() pure nothrow @safe inout @property
 	{
 		return _logStorage;
 	}
@@ -327,6 +329,32 @@ public:
 	}
 	
 }
+
+///
+@system unittest
+{
+	import std.experimental.logger: LogLevel;
+	auto logger = new InMemoryLogger(LogLevel.info);
+	logger.trace("TRACETEST"); // ignore
+	logger.info("INFOTEST");
+	logger.warning("WARNINGTEST");
+	logger.error("ERRORTEST");
+	auto input = logger.logStorage;
+	assert(!input.empty);
+	assert(input.front.id == 0);
+	assert(input.front.msg == "INFOTEST");
+	input.popFront();
+	assert(!input.empty);
+	assert(input.front.id == 1);
+	assert(input.front.msg == "WARNINGTEST");
+	input.popFront();
+	assert(!input.empty);
+	assert(input.front.id == 2);
+	assert(input.front.msg == "ERRORTEST");
+	input.popFront();
+	assert(input.empty);
+}
+
 
 /*******************************************************************************
  * テキストファイルのロガー
