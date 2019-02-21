@@ -30,11 +30,12 @@ module voile;
 
 public import voile.benchmark;
 public import voile.dataformatter;
+public import voile.fs;
 public import voile.handler;
 public import voile.json;
 public import voile.judge;
+public import voile.log;
 public import voile.misc;
 public import voile.stm;
 public import voile.sync;
 public import voile.unique;
-public import voile.fs;
