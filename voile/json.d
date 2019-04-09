@@ -840,6 +840,14 @@ struct AttrEssential
 struct AttrIgnore
 {
 }
+///
+struct AttrConverter(T)
+{
+	///
+	T function(in JSONValue v) from;
+	///
+	JSONValue function(in T v) to;
+}
 
 
 /*******************************************************************************
@@ -848,6 +856,14 @@ struct AttrIgnore
 AttrName name(string name)
 {
 	return AttrName(name);
+}
+
+/*******************************************************************************
+ * Attribute converting method
+ */
+AttrConverter!T converter(T)(T function(in JSONValue) from, JSONValue function(in T) to)
+{
+	return AttrConverter!T(from, to);
 }
 
 /*******************************************************************************
@@ -907,7 +923,11 @@ JSONValue serializeToJson(T)(in T data)
 				{
 					enum fieldName = __traits(identifier, member);
 				}
-				static if (isJSONizableRaw!(typeof(member)))
+				static if (hasUDA!(member, AttrConverter!(typeof(member))))
+				{
+					ret[fieldName] = getUDAs!(member, AttrConverter!(typeof(member)))[$-1].to(data.tupleof[memberIdx]);
+				}
+				else static if (isJSONizableRaw!(typeof(member)))
 				{
 					ret[fieldName] = data.tupleof[memberIdx].json;
 				}
@@ -990,7 +1010,27 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 				{
 					enum fieldName = __traits(identifier, member);
 				}
-				static if (isJSONizableRaw!(typeof(member)))
+				static if (hasUDA!(member, AttrConverter!(typeof(member))))
+				{
+					static if (hasUDA!(member, AttrEssential))
+					{
+						data.tupleof[memberIdx] = getUDAs!(member, AttrConverter!(typeof(member)))[$-1].from(json[fieldName]);
+					}
+					else
+					{
+						if (auto pJsonValue = fieldName in json)
+						{
+							try
+								data.tupleof[memberIdx] = getUDAs!(member, AttrConverter!(typeof(member)))[$-1].from(*pJsonValue);
+							catch (Exception e)
+							{
+								/* ignore */
+							}
+						}
+						
+					}
+				}
+				else static if (isJSONizableRaw!(typeof(member)))
 				{
 					static if (hasUDA!(member, AttrEssential))
 					{
@@ -1034,7 +1074,7 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 ///
 @system unittest
 {
-	import std.exception;
+	import std.exception, std.datetime.systime;
 	static struct Point
 	{
 		@name("xValue")
@@ -1050,6 +1090,10 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 		@essential Point  pt;
 		Point[] points;
 		Point[string] pointMap;
+		
+		@converter!SysTime(jv=>SysTime.fromISOExtString(jv.str),
+		                   v =>JSONValue(v.toISOExtString()))
+		SysTime time;
 	}
 	Data x, y, z;
 	x.key = "xxx";
@@ -1058,7 +1102,8 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	x.pt.y = 400;
 	x.testval = 100;
 	y.testval = 200;
-	
+	auto tim = Clock.currTime();
+	x.time = tim;
 	JSONValue jv1     = serializeToJson(x);
 	string    jsonStr = jv1.toPrettyString();
 	JSONValue jv2     = parseJSON(jsonStr);
@@ -1068,6 +1113,7 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	assert(x == y);
 	assert(jv1["pt"]["xValue"].integer == 300);
 	assert(jv1["pt"]["yValue"].integer == 400);
+	assert(jv1["time"].str == tim.toISOExtString());
 	
 	auto e1 = z.deserializeFromJson(parseJSON(`{}`)).collectException;
 	import std.stdio;
@@ -1077,6 +1123,7 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	auto e2 = z.deserializeFromJson(parseJSON(`{"pt": {}}`)).collectException;
 	assert(!e2);
 	assert(z.pt.y == 10);
+	assert(z.time == SysTime.init);
 	
 	scope (exit)
 	{
