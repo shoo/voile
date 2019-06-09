@@ -81,9 +81,9 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	auto dstrjson = dstr.json;
 	auto wstrjson = wstr.json;
 	auto strjson  = str.json;
-	assert(dstrjson.type == JSON_TYPE.STRING);
-	assert(wstrjson.type == JSON_TYPE.STRING);
-	assert(strjson.type  == JSON_TYPE.STRING);
+	assert(dstrjson.type == JSONType.string);
+	assert(wstrjson.type == JSONType.string);
+	assert(strjson.type  == JSONType.string);
 	assert(dstrjson.str == "あいうえお");
 	assert(wstrjson.str == "かきくけこ");
 	assert(strjson.str  == "さしすせそ");
@@ -100,12 +100,12 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 		auto xjson = x.json;
 		static if (isUnsigned!T)
 		{
-			assert(xjson.type == JSON_TYPE.UINTEGER);
+			assert(xjson.type == JSONType.uinteger);
 			assert(xjson.uinteger == 123);
 		}
 		else
 		{
-			assert(xjson.type == JSON_TYPE.INTEGER);
+			assert(xjson.type == JSONType.integer);
 			assert(xjson.integer == 123);
 		}
 	}
@@ -113,7 +113,7 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	{
 		T x = 0.125;
 		auto xjson = x.json;
-		assert(xjson.type == JSON_TYPE.FLOAT);
+		assert(xjson.type == JSONType.float_);
 		assert(xjson.floating == 0.125);
 	}
 }
@@ -126,8 +126,8 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	bool bf;
 	auto btjson = bt.json;
 	auto bfjson = bf.json;
-	assert(btjson.type == JSON_TYPE.TRUE);
-	assert(bfjson.type == JSON_TYPE.FALSE);
+	assert(btjson.type == JSONType.true_);
+	assert(bfjson.type == JSONType.false_);
 }
 
 ///
@@ -149,10 +149,10 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 {
 	auto ary = [1,2,3];
 	auto aryjson = ary.json;
-	assert(aryjson.type == JSON_TYPE.ARRAY);
-	assert(aryjson[0].type == JSON_TYPE.INTEGER);
-	assert(aryjson[1].type == JSON_TYPE.INTEGER);
-	assert(aryjson[2].type == JSON_TYPE.INTEGER);
+	assert(aryjson.type == JSONType.array);
+	assert(aryjson[0].type == JSONType.integer);
+	assert(aryjson[1].type == JSONType.integer);
+	assert(aryjson[2].type == JSONType.integer);
 	assert(aryjson[0].integer == 1);
 	assert(aryjson[1].integer == 2);
 	assert(aryjson[2].integer == 3);
@@ -163,10 +163,10 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 {
 	auto ary = ["ab","cd","ef"];
 	auto aryjson = ary.json;
-	assert(aryjson.type == JSON_TYPE.ARRAY);
-	assert(aryjson[0].type == JSON_TYPE.STRING);
-	assert(aryjson[1].type == JSON_TYPE.STRING);
-	assert(aryjson[2].type == JSON_TYPE.STRING);
+	assert(aryjson.type == JSONType.array);
+	assert(aryjson[0].type == JSONType.string);
+	assert(aryjson[1].type == JSONType.string);
+	assert(aryjson[2].type == JSONType.string);
 	assert(aryjson[0].str == "ab");
 	assert(aryjson[1].str == "cd");
 	assert(aryjson[2].str == "ef");
@@ -189,13 +189,13 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	}
 	auto ary = [A(1),A(2),A(3)];
 	auto aryjson = ary.json;
-	assert(aryjson.type == JSON_TYPE.ARRAY);
-	assert(aryjson[0].type == JSON_TYPE.OBJECT);
-	assert(aryjson[1].type == JSON_TYPE.OBJECT);
-	assert(aryjson[2].type == JSON_TYPE.OBJECT);
-	assert(aryjson[0]["a"].type == JSON_TYPE.INTEGER);
-	assert(aryjson[1]["a"].type == JSON_TYPE.INTEGER);
-	assert(aryjson[2]["a"].type == JSON_TYPE.INTEGER);
+	assert(aryjson.type == JSONType.array);
+	assert(aryjson[0].type == JSONType.object);
+	assert(aryjson[1].type == JSONType.object);
+	assert(aryjson[2].type == JSONType.object);
+	assert(aryjson[0]["a"].type == JSONType.integer);
+	assert(aryjson[1]["a"].type == JSONType.integer);
+	assert(aryjson[2]["a"].type == JSONType.integer);
 	assert(aryjson[0]["a"].integer == 1);
 	assert(aryjson[1]["a"].integer == 2);
 	assert(aryjson[2]["a"].integer == 3);
@@ -205,7 +205,7 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 private void _setValue(T)(ref JSONValue v, ref string name, ref T val)
 	if (is(typeof(val.json)))
 {
-	if (v.type != JSON_TYPE.OBJECT || !v.object)
+	if (v.type != JSONType.object || !v.object)
 	{
 		v = [name: val.json];
 	}
@@ -236,9 +236,9 @@ void setValue(T)(ref JSONValue v, string name, T val) pure nothrow @trusted
 {
 	JSONValue json;
 	json.setValue("dat", 123);
-	assert(json.type == JSON_TYPE.OBJECT);
+	assert(json.type == JSONType.object);
 	assert("dat" in json.object);
-	assert(json["dat"].type == JSON_TYPE.INTEGER);
+	assert(json["dat"].type == JSONType.integer);
 	assert(json["dat"].integer == 123);
 }
 
@@ -253,9 +253,9 @@ void setValue(T)(ref JSONValue v, string name, T val) pure nothrow @trusted
 	}
 	JSONValue json;
 	json.setValue("type", Type.foo);
-	assert(json.type == JSON_TYPE.OBJECT);
+	assert(json.type == JSONType.object);
 	assert("type" in json.object);
-	assert(json["type"].type == JSON_TYPE.STRING);
+	assert(json["type"].type == JSONType.string);
 	assert(json["type"].str == "foo");
 }
 
@@ -298,7 +298,7 @@ void setValue(T)(ref JSONValue v, string name, T val) pure nothrow @trusted
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (isSomeString!T)
 {
-	if (src.type == JSON_TYPE.STRING)
+	if (src.type == JSONType.string)
 	{
 		static if (is(T: string))
 		{
@@ -330,12 +330,12 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal 
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (isIntegral!T && !is(T == enum))
 {
-	if (src.type == JSON_TYPE.INTEGER)
+	if (src.type == JSONType.integer)
 	{
 		dst = cast(T)src.integer;
 		return true;
 	}
-	else if (src.type == JSON_TYPE.UINTEGER)
+	else if (src.type == JSONType.uinteger)
 	{
 		dst = cast(T)src.uinteger;
 		return true;
@@ -362,13 +362,13 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 {
 	switch (src.type)
 	{
-	case JSON_TYPE.FLOAT:
+	case JSONType.float_:
 		dst = cast(T)src.floating;
 		return true;
-	case JSON_TYPE.INTEGER:
+	case JSONType.integer:
 		dst = cast(T)src.integer;
 		return true;
-	case JSON_TYPE.UINTEGER:
+	case JSONType.uinteger:
 		dst = cast(T)src.uinteger;
 		return true;
 	default:
@@ -393,7 +393,7 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(T == struct) && !is(Unqual!T: JSONValue))
 {
-	if (src.type == JSON_TYPE.OBJECT)
+	if (src.type == JSONType.object)
 	{
 		dst.json = src;
 		return true;
@@ -407,7 +407,7 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal 
 {
 	if (auto x = name in v.object)
 	{
-		if (x.type == JSON_TYPE.OBJECT)
+		if (x.type == JSONType.object)
 		{
 			auto ret = T.init;
 			ret.json = *x;
@@ -422,7 +422,7 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal 
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(T == class))
 {
-	if (src.type == JSON_TYPE.OBJECT)
+	if (src.type == JSONType.object)
 	{
 		if (!dst)
 			dst = new T;
@@ -438,7 +438,7 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
 {
 	if (auto x = name in v.object)
 	{
-		if (x.type == JSON_TYPE.OBJECT)
+		if (x.type == JSONType.object)
 		{
 			auto ret = new T;
 			ret.json = *x;
@@ -453,7 +453,7 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(T == enum))
 {
-	if (src.type == JSON_TYPE.STRING)
+	if (src.type == JSONType.string)
 	{
 		dst = to!T(src.str);
 		return true;
@@ -478,12 +478,12 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(T == bool))
 {
-	if (src.type == JSON_TYPE.TRUE)
+	if (src.type == JSONType.true_)
 	{
 		dst = true;
 		return true;
 	}
-	else if (src.type == JSON_TYPE.FALSE)
+	else if (src.type == JSONType.false_)
 	{
 		dst = false;
 		return true;
@@ -509,7 +509,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (!isSomeString!(T) && isDynamicArray!(T))
 {
 	alias E = ForeachType!T;
-	if (src.type == JSON_TYPE.ARRAY)
+	if (src.type == JSONType.array)
 	{
 		dst = (dst.length >= src.array.length) ? dst[0..src.array.length]: new E[src.array.length];
 		foreach (ref i, ref e; src.array)
@@ -538,7 +538,7 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal 
 bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
 	if (isSomeString!Key && is(typeof({ JSONValue val; fromJson(val, dst[Key.init]); })))
 {
-	if (src.type == JSON_TYPE.OBJECT)
+	if (src.type == JSONType.object)
 	{
 		foreach (key, ref val; src.object)
 		{
@@ -772,7 +772,7 @@ T getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
 		}
 		void json(JSONValue v) @property
 		{
-			assert(v.type == JSON_TYPE.OBJECT);
+			assert(v.type == JSONType.object);
 			a = v.getValue("a", 123);
 		}
 	}
