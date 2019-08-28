@@ -919,23 +919,40 @@ const(char)[] toMBS(in char[] data, uint codePage = 0)
 }
 
 
+/*******************************************************************************
+ * 
+ */
+enum MacroType
+{
+	/// $xxx, ${xxx}
+	str,
+	/// $(xxx)
+	expr
+}
 
 /*******************************************************************************
- * 文字列内に含まれるマクロ変数を展開します
+ * Expands macro variables contained within a str
  */
 T expandMacro(T, Func)(in T str, Func mapFunc)
 	if (isSomeString!T
 	&& isCallable!Func
 	&& is(ReturnType!Func: bool)
-	&& ParameterTypeTuple!Func.length == 1
+	&& ParameterTypeTuple!Func.length >= 1
 	&& is(T: ParameterTypeTuple!Func[0])
 	&& (ParameterStorageClassTuple!Func[0] & ParameterStorageClass.ref_) == ParameterStorageClass.ref_)
 {
-	bool func(ref T arg, bool expandRecurse)
+	bool func(ref T arg, MacroType type, bool expandRecurse)
 	{
 		if (expandRecurse)
 			arg = arg.expandMacroImpl!(T, func)();
-		return mapFunc(arg);
+		static if (ParameterTypeTuple!Func.length == 1)
+		{
+			return mapFunc(arg);
+		}
+		else
+		{
+			return mapFunc(arg, type);
+		}
 	}
 	return str.expandMacroImpl!(T, func)();
 }
@@ -945,14 +962,21 @@ T expandMacro(T, Func)(in T str, Func mapFunc)
 	if (isSomeString!T
 	&& isCallable!Func
 	&& is(ReturnType!Func: T)
-	&& ParameterTypeTuple!Func.length == 1
+	&& ParameterTypeTuple!Func.length >= 1
 	&& is(T: ParameterTypeTuple!Func[0]))
 {
-	bool func(ref T arg, bool expandRecurse)
+	bool func(ref T arg, MacroType type, bool expandRecurse)
 	{
 		if (expandRecurse)
 			arg = arg.expandMacroImpl!(T, func)();
-		arg = mapFunc(arg);
+		static if (ParameterTypeTuple!Func.length == 1)
+		{
+			arg = mapFunc(arg);
+		}
+		else
+		{
+			arg = mapFunc(arg, type);
+		}
 		return true;
 	}
 	
@@ -964,7 +988,7 @@ T expandMacro(T, MAP)(in T str, MAP map)
 	if (isSomeString!T
 	&& is(typeof({ auto p = T.init in map; T tmp = *p; })))
 {
-	bool func(ref T arg, bool expandRecurse)
+	bool func(ref T arg, MacroType type, bool expandRecurse)
 	{
 		if (expandRecurse)
 			arg = arg.expandMacroImpl!(T, func)();
@@ -1013,7 +1037,10 @@ private size_t searchEnd2(Ch)(const(Ch)[] str, Ch ch)
 			{
 				// 連続する$$は無視
 				if (str[i+1] == '$')
+				{
+					i+=2;
 					continue;
+				}
 				if (str[i+1] == '(')
 				{
 					auto i2 = searchEnd2(str[i+2..$], ')');
@@ -1062,9 +1089,10 @@ private T expandMacroImpl(T, alias func)(in T str)
 	if (isSomeString!T
 	&& isCallable!func
 	&& is(ReturnType!func: bool)
-	&& ParameterTypeTuple!func.length == 2
-	&& is(T: ParameterTypeTuple!func[0])
-	&& is(bool: ParameterTypeTuple!func[1])
+	&& ParameterTypeTuple!func.length == 3
+	&& is(T:         ParameterTypeTuple!func[0])
+	&& is(MacroType: ParameterTypeTuple!func[1])
+	&& is(bool:      ParameterTypeTuple!func[2])
 	&& (ParameterStorageClassTuple!func[0] & ParameterStorageClass.ref_) == ParameterStorageClass.ref_)
 {
 	import std.array, std.algorithm;
@@ -1082,14 +1110,14 @@ private T expandMacroImpl(T, alias func)(in T str)
 		
 		if (rest[idxBegin+1] == '(')
 		{
-			auto head = rest[0..idxBegin+2];
+			auto head = rest[idxBegin..idxBegin+2];
 			rest = rest[idxBegin+2..$];
 			idxEnd = searchEnd2(rest, ')');
 			if (idxEnd == -1)
 				return result.data ~ head ~ rest;
 			assert(rest[idxEnd] == ')');
 			auto tmp = rest[0..idxEnd];
-			if (func(tmp, true))
+			if (func(tmp, MacroType.expr, true))
 			{
 				result ~= tmp;
 				rest    = rest[idxEnd+1..$];
@@ -1109,7 +1137,7 @@ private T expandMacroImpl(T, alias func)(in T str)
 				return result.data ~ head ~ rest;
 			assert(rest[idxEnd] == '}');
 			auto tmp = rest[0..idxEnd];
-			if (func(tmp, true))
+			if (func(tmp, MacroType.str, true))
 			{
 				result ~= tmp;
 				rest    = rest[idxEnd+1..$];
@@ -1133,7 +1161,7 @@ private T expandMacroImpl(T, alias func)(in T str)
 			if (idxEnd == -1)
 				return result.data ~ rest;
 			auto tmp = rest[0..idxEnd];
-			if (func(tmp, false))
+			if (func(tmp, MacroType.str, false))
 			{
 				result ~= tmp;
 				rest    = rest[idxEnd..$];
@@ -1157,6 +1185,8 @@ private T expandMacroImpl(T, alias func)(in T str)
 		T str = "test$(xxx)${zzz}test$$${yyy}";
 		T[T] map = ["xxx": "XXX", "yyy": "YYY"];
 		assert(str.expandMacro(map) == "testXXX${zzz}test$YYY");
+		assert(expandMacro(cast(T)"test$(yyy", map) == "test$(yyy");
+		assert(expandMacro(cast(T)"test${zzz", map) == "test${zzz");
 		
 		auto foo = function T(T arg)
 		{
@@ -1183,6 +1213,42 @@ private T expandMacroImpl(T, alias func)(in T str)
 			return false;
 		};
 		assert(expandMacro(cast(T)"xxx$yyy$(abc${xxx})", bar) == "xxx$yyyyyy");
+		assert(expandMacro(cast(T)"xxx$(aaa)", bar) == "xxx$(aaa)");
+		assert(expandMacro(cast(T)"xxx$$(aaa)", bar) == "xxx$(aaa)");
+		assert(expandMacro(cast(T)"xxx$(a$$aa)", bar) == "xxx$(a$aa)");
+		assert(expandMacro(cast(T)"xxx$(a$(aa", bar) == "xxx$(a$(aa");
+		assert(expandMacro(cast(T)"xxx$(a$...", bar) == "xxx$(a$...");
+		assert(expandMacro(cast(T)"xxx$(a$", bar) == "xxx$(a$");
+		
+		auto foo2 = function T(T arg, MacroType ty)
+		{
+			if (arg == cast(T)"xxx")
+				return ty == MacroType.str ? cast(T)"XXX1" : cast(T)"XXX2";
+			if (arg == cast(T)"abcXXX1")
+				return ty == MacroType.str ? cast(T)"yyy1" : cast(T)"yyy2";
+			return ty == MacroType.str ? cast(T)"ooo1" : cast(T)"ooo2";
+		};
+		assert(expandMacro(cast(T)"xxx$yyy$(abc${xxx})", foo2) == "xxxooo1yyy2");
+		assert(expandMacro(cast(T)"xxx$yyy$(abc${xxx}", foo2) == "xxxooo1$(abc${xxx}");
+		assert(expandMacro(cast(T)"xxx$yyy$(abc${xxx", foo2) == "xxxooo1$(abc${xxx");
+		assert(expandMacro(cast(T)"xxx$...", foo2) == "xxx...");
+		
+		auto bar2 = delegate bool(ref T arg, MacroType ty)
+		{
+			if (arg == cast(T)"xxx")
+			{
+				arg = ty == MacroType.str ? cast(T)"XXX1" : cast(T)"XXX2";
+				return true;
+			}	
+			if (arg == cast(T)"abcXXX1")
+			{
+				arg = ty == MacroType.str ? cast(T)"yyy1" : cast(T)"yyy2";
+				return true;
+			}
+			return false;
+		};
+		assert(expandMacro(cast(T)"xxx$yyy$(abc${xxx})", bar2) == "xxx$yyyyyy2");
+		assert(expandMacro(cast(T)"xxx$yyy$(abc${xxx}", bar2) == "xxx$yyy$(abc${xxx}");
 	}}
 }
 
