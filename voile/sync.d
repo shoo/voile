@@ -1398,10 +1398,28 @@ public:
 	/***************************************************************************
 	 * 
 	 */
-	this() pure
+	this() pure @trusted
 	{
 		// これはひどい
 		(cast(void delegate() pure)&_initData)();
+	}
+	
+	
+	/***************************************************************************
+	 * 
+	 */
+	inout(Mutex) mutex() pure nothrow @nogc inout @property
+	{
+		return _mutex;
+	}
+	
+	
+	/***************************************************************************
+	 * 
+	 */
+	shared(inout(Mutex)) mutex() pure nothrow @nogc shared inout @property
+	{
+		return _mutex;
 	}
 	
 	
