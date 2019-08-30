@@ -17,7 +17,7 @@
 module voile.sync;
 
 
-import core.thread, core.sync.mutex, core.sync.condition, core.atomic;
+import core.thread, core.sync.mutex, core.sync.condition, core.sync.event, core.atomic;
 version (Windows)
 {
 	import core.sys.windows.windows;
@@ -305,7 +305,20 @@ class SyncEvent
 }
 
 
-
+version (Windows) HANDLE handle(ref Event e) @system @property
+{
+	return *cast(HANDLE*)&e;
+}
+version (Windows) @system unittest
+{
+	import core.sys.windows.windows;
+	Event e;
+	e.initialize(true, true);
+	auto res = ResetEvent(e.handle);
+	assert(res != FALSE);
+	assert(GetLastError() == 0);
+	e.terminate();
+}
 
 version (Posix)
 {
@@ -497,6 +510,196 @@ public:
 	}
 }
 
+
+
+
+private template QueuedSemImpl()
+{
+private:
+	import core.sync.mutex, core.sync.semaphore;
+	Semaphore[]  _sems;
+	Mutex        _mutex;
+	size_t       _count;
+	
+	void _lockImpl()
+	{
+		import std.algorithm, std.array;
+		Semaphore s;
+		synchronized (_mutex)
+		{
+			if (_count == 0)
+			{
+				s = new Semaphore;
+				_sems ~= s;
+			}
+			else
+			{
+				_count--;
+				return;
+			}
+		}
+		s.wait();
+	}
+	
+	bool _tryLockImpl()
+	{
+		synchronized (_mutex)
+		{
+			if (_count == 0)
+				return false;
+			_count--;
+		}
+		return true;
+	}
+	
+	void _unlockImpl()
+	{
+		synchronized (_mutex)
+		{
+			if (_sems.length == 0)
+			{
+				_count++;
+			}
+			else
+			{
+				_sems[0].notify();
+				_sems = _sems[1..$];
+			}
+		}
+	}
+	
+	void _initialize(size_t cnt)
+	{
+		_count = cnt;
+		_mutex = new Mutex;
+	}
+}
+
+/*******************************************************************************
+ * 
+ */
+class QueuedMutex: Object.Monitor
+{
+private:
+	struct MonitorProxy
+	{
+		Object.Monitor link;
+	}
+	MonitorProxy _proxy;
+	mixin QueuedSemImpl;
+public:
+	///
+	this()
+	{
+		_initialize(1);
+		_proxy.link = this;
+		this.__monitor = cast(void*)&_proxy;
+	}
+	///
+	this() shared
+	{
+		(cast()this)._initialize(1);
+		_proxy.link = this;
+		this.__monitor = cast(void*)&_proxy;
+	}
+	
+	
+	///
+	void lock() @trusted
+	{
+		_lockImpl();
+	}
+	
+	///
+	void lock() @trusted shared
+	{
+		(cast()this)._lockImpl();
+	}
+	
+	///
+	bool tryLock() @trusted
+	{
+		return _tryLockImpl();
+	}
+	
+	///
+	bool tryLock() @trusted shared
+	{
+		return (cast()this)._tryLockImpl();
+	}
+	
+	///
+	void unlock() @trusted
+	{
+		_unlockImpl();
+	}
+	
+	///
+	void unlock() @trusted shared
+	{
+		(cast()this)._unlockImpl();
+	}
+	
+}
+
+
+
+/*******************************************************************************
+ * 
+ */
+class QueuedSemaphore
+{
+private:
+	mixin QueuedSemImpl;
+public:
+	///
+	this(size_t count = 0)
+	{
+		_initialize(count);
+	}
+	///
+	this(size_t count = 0) shared
+	{
+		(cast()this)._initialize(count);
+	}
+	
+	///
+	void wait() @trusted
+	{
+		_lockImpl();
+	}
+	
+	///
+	void wait() @trusted shared
+	{
+		(cast()this)._lockImpl();
+	}
+	
+	///
+	bool tryWait() @trusted
+	{
+		return _tryLockImpl();
+	}
+	
+	///
+	bool tryWait() @trusted shared
+	{
+		return (cast()this)._tryLockImpl();
+	}
+	
+	///
+	void notify() @trusted
+	{
+		_unlockImpl();
+	}
+	
+	///
+	void notify() @trusted shared
+	{
+		(cast()this)._unlockImpl();
+	}
+	
+}
 
 
 /***************************************************************************
@@ -1368,6 +1571,8 @@ auto async(alias func, Args...)(Args args)
 	auto future = async!(a => a + 40)(10);
 	assert(future.yieldForce() == 50);
 }
+
+
 
 /*******************************************************************************
  * 管理された共有資源
