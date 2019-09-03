@@ -1577,7 +1577,7 @@ auto async(alias func, Args...)(Args args)
 /*******************************************************************************
  * 管理された共有資源
  * 
- * 初期状態は非共有資源。
+ * 
  */
 class ManagedShared(T): Object.Monitor
 {
@@ -1591,22 +1591,32 @@ private:
 	Mutex        _mutex;
 	size_t       _locked;
 	T            _data;
-	void _initData()
+	void _initData(bool initLocked)
 	{
 		_proxy.link = this;
 		this.__monitor = &_proxy;
 		_mutex = new Mutex();
-		lock();
+		if (initLocked)
+			lock();
 	}
 public:
 	
 	/***************************************************************************
+	 * コンストラクタ
 	 * 
+	 * sharedのコンストラクタを呼んだ場合の初期状態は共有資源(unlockされた状態)
+	 * 非sharedのコンストラクタを呼んだ場合の初期状態は非共有資源(lockされた状態)
 	 */
 	this() pure @trusted
 	{
 		// これはひどい
-		(cast(void delegate() pure)&_initData)();
+		(cast(void delegate(bool) pure)&_initData)(true);
+	}
+	
+	/// ditto
+	this() pure @trusted shared
+	{
+		(cast(void delegate(bool) pure)(&(cast()this)._initData))(false);
 	}
 	
 	
