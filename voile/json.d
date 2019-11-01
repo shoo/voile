@@ -1038,7 +1038,9 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 					}
 					else
 					{
-						data.tupleof[memberIdx] = json.getValue(fieldName, data.tupleof[memberIdx]);
+						import std.algorithm: move;
+						auto tmp = json.getValue(fieldName, data.tupleof[memberIdx]);
+						move(tmp, data.tupleof[memberIdx]);
 					}
 				}
 				else
