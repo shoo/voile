@@ -529,7 +529,7 @@ struct FileSystem
 			}
 			void json(JSONValue v) @property
 			{
-				assert(v.type == JSON_TYPE.OBJECT);
+				assert(v.type == JSONType.object);
 				a = v.getValue("a", 123);
 			}
 		}
@@ -1103,7 +1103,8 @@ struct FileSystem
 		getTimeStampImpl!false(absolutePath(target), accessTime, modificationTime);
 	}
 	// 
-	private void getTimeStampImpl(bool absConvert: false)(string target, out SysTime accessTime, out SysTime modificationTime)
+	private void getTimeStampImpl(bool absConvert: false)(string target,
+		out SysTime accessTime, out SysTime modificationTime)
 	{
 		getTimes(target, accessTime, modificationTime);
 	}

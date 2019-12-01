@@ -4,6 +4,7 @@
 module voile.handler;
 
 import core.thread;
+import std.format;
 import std.traits, std.range, std.exception, std.typetuple, std.concurrency, std.functional;
 
 private template isVirtualMethod(func...)
@@ -19,8 +20,6 @@ private static:
 	//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 	// Internal stuffs
 	//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
-	import std.format;
-
 	enum CONSTRUCTOR_NAME = "__ctor";
 
 	// true if functions are derived from a base class
@@ -121,8 +120,6 @@ private static:
 	public string generateFunction( // @suppress(dscanner.confusing.function_attributes)
 	        string myFuncInfo, alias exFuncInfo, string name, func... )() @property
 	{
-		import std.format : format;
-		
 		enum isCtor = (name == CONSTRUCTOR_NAME);
 		
 		string code; // the result
@@ -787,7 +784,16 @@ public:
 		stableLinearRemove(convert(r));
 	}
 	
-	/// ditto
+	///
+	const(T)[] capture() const @property
+	{
+		const(T)[] ret;
+		for (const(Node)* p = root.next; p !is root; p = p.next)
+			ret ~= p.val;
+		return ret;
+	}
+	
+	///
 	void clear() pure
 	{
 		root.next = root;
@@ -994,7 +1000,7 @@ private:
 		alias virt     = isVirtualMethod!F;
 	}
 	alias _exFuncInfo = _ExFuncInfo!F;
-	static private struct DummyData
+	static struct DummyData
 	{
 		template _EmitGeneratingPolicy()
 		{
@@ -1015,7 +1021,7 @@ private:
 		template generateFunctionBody(unused...)
 		{
 			import std.conv;
-			enum generateFunctionBody = "#line " ~ to!string(__LINE__+2) ~ 
+			enum generateFunctionBody =
 			q{
 				alias FnTy = SetFunctionAttributes!(typeof((*cast(Unique!ProcList*)&_procs)[].front),
 				                                    _exFuncInfo.linkage, _exFuncInfo.attrib);
@@ -1034,7 +1040,7 @@ private:
 				{
 					try
 					{
-						foreach (FnTy proc; (*cast(Unique!ProcList*)&_procs)[].array())
+						foreach (FnTy proc; (*cast(Unique!ProcList*)&_procs).capture)
 						{
 							static if (is(_exFuncInfo.RT: bool))
 							{
@@ -1054,7 +1060,7 @@ private:
 				}
 				else
 				{
-					foreach (proc; (*cast(Unique!ProcList*)&_procs)[].array())
+					foreach (proc; (*cast(Unique!ProcList*)&_procs).capture)
 					{
 						static if (is(_exFuncInfo.RT: bool))
 						{

@@ -104,6 +104,7 @@ public:
 	}
 }
 
+///
 class MainStm: BaseTestFlow
 {
 private:
@@ -183,7 +184,7 @@ public:
 		initialize();
 	}
 	///
-	void initialize()
+	final void initialize()
 	{
 		with (Event)
 			_step = [test, test];

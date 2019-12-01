@@ -749,7 +749,8 @@ private void _makeTask(alias func, Fut, Args...)(Fut future, Args args)
 		future._type = Fut.FinishedType.none;
 		future._resultException = null;
 	}
-	future._task = task({
+	auto dg = ()
+	{
 		future._evStart.signaled = true;
 		try
 		{
@@ -787,7 +788,8 @@ private void _makeTask(alias func, Fut, Args...)(Fut future, Args args)
 			_execTaskOnFatal(future, e);
 		}
 		assert(0);
-	});
+	};
+	future._task = task(dg);
 }
 
 
@@ -1643,7 +1645,7 @@ public:
 	 * 
 	 * RAIIで自動的に
 	 */
-	auto locked() @property
+	auto locked() @property // @suppress(dscanner.confusing.function_attributes)
 	{
 		lock();
 		static struct LockedData
@@ -1817,8 +1819,16 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 {
 	import core.atomic;
 	auto s = new shared ManagedShared!int();
-	s.asUnshared += 50;
+	try
+	{
+		s.asUnshared += 50;
+	}
+	catch (Exception e) { }
+	assert(s.asShared == 0);
 	s.asShared.atomicOp!"+="(100);
+	s.lock();
+	s.asUnshared += 200;
+	assert(s.asShared == 300);
 	s.unlock();
 	try
 	{
@@ -1826,10 +1836,7 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 		assert(0);
 	}
 	catch (Exception e) { }
-	s.lock();
-	s.asUnshared += 200;
-	assert(s.asShared == 350);
-	s.unlock();
+	assert(s.asShared == 300);
 	
 	{
 		auto ld = s.locked;
@@ -1837,7 +1844,7 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 		ld += 1;
 	}
 	assert(!s._locked);
-	assert(s.asShared == 351);
+	assert(s.asShared == 301);
 	
 	synchronized (s)
 	{
@@ -1851,7 +1858,7 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 		assert(s._locked);
 	}
 	assert(!s._locked);
-	assert(s.asShared == 353);
+	assert(s.asShared == 303);
 }
 
 private template AssumedUnsharedType(T)
