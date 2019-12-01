@@ -36,6 +36,7 @@ public import voile.json;
 public import voile.judge;
 public import voile.log;
 public import voile.misc;
+public import voile.parseopt;
 public import voile.stm;
 public import voile.sync;
 public import voile.unique;
