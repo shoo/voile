@@ -602,6 +602,7 @@ public:
 	assert(input.front.msg == "ERRORTEST");
 	input.popFront();
 	assert(input.empty);
+	input.destroy();
 }
 
 

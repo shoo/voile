@@ -1,6 +1,6 @@
 module voile.fs;
 
-import std.file, std.path, std.exception, std.stdio, std.datetime, std.regex;
+import std.file, std.path, std.exception, std.stdio, std.datetime, std.regex, std.json;
 import std.process;
 import voile.handler;
 
@@ -479,11 +479,11 @@ struct FileSystem
 	/***************************************************************************
 	 * JSONファイルを書き出す
 	 */
-	void writeJson(T)(string filename, in T data)
+	void writeJson(T)(string filename, in T data, JSONOptions options = JSONOptions.none)
 	{
-		import voile.json, std.json;
+		import voile.json;
 		static assert(__traits(compiles, data.serializeToJsonString), "Unsupported type " ~ T.stringof);
-		writeText(filename, data.serializeToJsonString());
+		writeText(filename, data.serializeToJsonString(options));
 	}
 	
 	/***************************************************************************
@@ -491,7 +491,7 @@ struct FileSystem
 	 */
 	T readJson(T)(string filename)
 	{
-		import voile.json, std.json;
+		import voile.json;
 		T ret;
 		static assert(__traits(compiles, ret.deserializeFromJsonString("")), "Unsupported type " ~ T.stringof);
 		auto absFilename = absolutePath(filename);
@@ -514,7 +514,7 @@ struct FileSystem
 	/// ditto
 	@system unittest
 	{
-		import voile.json, std.json;
+		import voile.json;
 		scope (exit)
 			std.file.rmdirRecurse("ut");
 		auto fs = FileSystem("ut");

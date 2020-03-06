@@ -942,16 +942,16 @@ JSONValue serializeToJson(T)(in T data)
 }
 
 /// ditto
-string serializeToJsonString(T)(in T data)
+string serializeToJsonString(T)(in T data, JSONOptions options = JSONOptions.none)
 {
-	return serializeToJson(data).toPrettyString();
+	return serializeToJson(data).toPrettyString(options);
 }
 
 /// ditto
-void serializeToJsonFile(T)(in T data, string jsonfile)
+void serializeToJsonFile(T)(in T data, string jsonfile, JSONOptions options = JSONOptions.none)
 {
 	import std.file, std.encoding;
-	auto contents = serializeToJsonString(data);
+	auto contents = serializeToJsonString(data, options);
 	std.file.write(jsonfile, contents);
 }
 
@@ -1134,7 +1134,7 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 			"test.json".remove();
 	}
 	
-	x.serializeToJsonFile("test.json");
+	x.serializeToJsonFile("test.json", JSONOptions.doNotEscapeSlashes);
 	z.deserializeFromJsonFile("test.json");
 	assert(x != z);
 	z.testval = x.testval;
