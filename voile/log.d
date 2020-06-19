@@ -5,7 +5,7 @@ module voile.log;
 
 
 import std.range: isInputRange, isOutputRange, isForwardRange, hasLength, hasSlicing;
-import std.experimental.logger: Logger, FileLogger;
+import std.experimental.logger: Logger, FileLogger, MultiLogger, sharedLog;
 
 
 
@@ -864,6 +864,36 @@ public:
 }
 
 
+
+/*******************************************************************************
+ * 
+ */
+class NamedLogger: MultiLogger
+{
+	
+	/***************************************************************************
+	 * ロガーを取得する
+	 */
+	Logger getLogger(string name) @safe
+	{
+		import std.algorithm, std.range;
+		auto found = logger.find!(l => l.name == name)();
+		return found.empty ? null : found.front.logger;
+	}
+	
+	/***************************************************************************
+	 * ロガーを追加する
+	 * 
+	 * 重複チェックをする
+	 */
+	override void insertLogger(string name, Logger l) @safe
+	{
+		import std.exception;
+		enforce(!getLogger(name));
+		super.insertLogger(name, l);
+	}
+}
+
 /*******************************************************************************
  * クラス内で使用するロガーを切り替えるためのミックスインテンプレート
  */
@@ -1054,3 +1084,18 @@ mixin template Logging(loggerAlias...)
 	}
 }
 
+
+/*******************************************************************************
+ * 名前からロガーを取得する
+ */
+Logger getLogger(string name, Logger defaultLogger = sharedLog)
+{
+	import std.experimental.logger;
+	auto logger = cast(NamedLogger)sharedLog;
+	if (!logger)
+		return defaultLogger;
+	auto named = logger.getLogger(name);
+	if (!named)
+		return defaultLogger;
+	return named;
+}
