@@ -894,6 +894,111 @@ class NamedLogger: MultiLogger
 	}
 }
 
+
+/*******************************************************************************
+ * 
+ */
+class DispatchLogger: NamedLogger
+{
+	import std.experimental.logger: LogLevel;
+	import std.regex;
+	/***************************************************************************
+	 * 
+	 */
+	struct Filter
+	{
+		///
+		Regex!char file;
+		///
+		Regex!char moduleName;
+		///
+		Regex!char funcName;
+		///
+		Regex!char prettyFuncName;
+		///
+		Regex!char msg;
+		///
+		size_t lineMax = size_t.max;
+		///
+		size_t lineMin = size_t.min;
+		///
+		LogLevel   logLevel = LogLevel.all;
+		///
+		string     targetName = "default";
+	}
+	/***************************************************************************
+	 * 
+	 */
+	struct MatchFilter
+	{
+		///
+		string file;
+		///
+		string moduleName;
+		///
+		string funcName;
+		///
+		string prettyFuncName;
+		///
+		string msg;
+		///
+		size_t lineMax = size_t.max;
+		///
+		size_t lineMin = size_t.min;
+		///
+		LogLevel   logLevel = LogLevel.all;
+		///
+		string     targetName = "default";
+	}
+private:
+	Filter[] _filters;
+public:
+	/***************************************************************************
+	 * 
+	 */
+	void addFilter(Filter filter)
+	{
+		_filters ~= filter;
+	}
+	/// ditto
+	void addFilter(MatchFilter filter)
+	{
+		addFilter(Filter(
+			filter.file.length           == 0 ? Regex!char.init : regex(filter.file),
+			filter.moduleName.length     == 0 ? Regex!char.init : regex(filter.moduleName),
+			filter.funcName.length       == 0 ? Regex!char.init : regex(filter.funcName),
+			filter.prettyFuncName.length == 0 ? Regex!char.init : regex(filter.prettyFuncName),
+			filter.msg.length            == 0 ? Regex!char.init : regex(filter.msg),
+			filter.lineMax, filter.lineMin, filter.logLevel,
+			filter.targetName));
+	}
+	/***************************************************************************
+	 * 
+	 */
+	override void writeLogMsg(ref LogEntry payload) @safe
+	{
+		import std.exception;
+		foreach (f; _filters)
+		{
+			bool filtered = true;
+			filtered = filtered && (f.file           is Regex!char.init || payload.file.matchFirst(f.file));
+			filtered = filtered && (f.moduleName     is Regex!char.init || payload.moduleName.matchFirst(f.moduleName));
+			filtered = filtered && (f.funcName       is Regex!char.init || payload.funcName.matchFirst(f.funcName));
+			filtered = filtered && (f.prettyFuncName is Regex!char.init || payload.prettyFuncName.matchFirst(f.prettyFuncName));
+			filtered = filtered && (f.msg            is Regex!char.init || payload.msg.matchFirst(f.msg));
+			filtered = filtered && (f.logLevel <= payload.logLevel);
+			filtered = filtered && ((f.lineMax >= payload.line) && (f.lineMin <= payload.line));
+			if (filtered)
+			{
+				getLogger(f.targetName).enforce("Cannot find Logger").writeLogMsg(payload);
+				break;
+			}
+		}
+		super.writeLogMsg(payload);
+	}
+}
+
+
 /*******************************************************************************
  * クラス内で使用するロガーを切り替えるためのミックスインテンプレート
  */
