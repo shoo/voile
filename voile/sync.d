@@ -1645,7 +1645,8 @@ public:
 	/***************************************************************************
 	 * ロックされたデータを得る
 	 * 
-	 * RAIIで自動的に
+	 * この戻り値が破棄されるときにRAIIで自動的にロックが解除される。
+	 * また、戻り値はロックされた共有資源へ、非共有資源としてアクセス可能な参照として使用できる。
 	 */
 	auto locked() @property // @suppress(dscanner.confusing.function_attributes)
 	{
@@ -1655,15 +1656,15 @@ public:
 		private:
 			T*              _data;
 			void delegate() _unlock;
-			ref inout(T) _dataRef() inout @property { return *_data; }
 		public:
+			ref inout(T) dataRef() inout @property { return *_data; }
 			@disable this(this);
 			~this()
 			{
 				if (_unlock)
 					_unlock();
 			}
-			alias _dataRef this;
+			alias dataRef this;
 		}
 		return LockedData(&_data, &unlock);
 	}
@@ -1861,41 +1862,4 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 	}
 	assert(!s._locked);
 	assert(s.asShared == 303);
-}
-
-private template AssumedUnsharedType(T)
-{
-	static if (is(T U == shared(U)))
-	{
-		alias AssumedUnsharedType = AssumedUnsharedType!(U);
-	}
-	else static if (is(T U == const(shared(U))))
-	{
-		alias AssumedUnsharedType = const(AssumedUnsharedType!(U));
-	}
-	else static if (isPointer!T)
-	{
-		alias AssumedUnsharedType = AssumedUnsharedType!(pointerTarget!T)*;
-	}
-	else static if (isDynamicArray!T)
-	{
-		alias AssumedUnsharedType = AssumedUnsharedType!(ForeachType!T)[];
-	}
-	else static if (isStaticArray!T)
-	{
-		alias AssumedUnsharedType = AssumedUnsharedType!(ForeachType!T)[T.length];
-	}
-	else static if (isAssociativeArray!T)
-	{
-		alias AssumedUnsharedType = AssumedUnsharedType!(ValueType!T)[AssumedUnsharedType!(KeyType!T)];
-	}
-	else
-	{
-		alias AssumedUnsharedType = T;
-	}
-}
-
-auto ref assumeUnshared(T)(ref T x) @property
-{
-	return *cast(AssumedUnsharedType!(T)*)&x;
 }
