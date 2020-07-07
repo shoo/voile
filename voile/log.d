@@ -668,7 +668,16 @@ public:
 		import std.json: JSONValue;
 		import core.stdc.stdio;
 		import std.stdio;
-		import std.xml: encode;
+		string encode(string str)
+		{
+			import std.string: translate;
+			return str.translate([
+				'&': "&amp;",
+				'"': "&quot;",
+				'\'': "&apos;",
+				'<': "&lt;",
+				'>': "&gt;"]);
+		}
 		auto writer = _file.lockingBinaryWriter();
 		writer.formattedWrite(
 			"<LogEntry"
