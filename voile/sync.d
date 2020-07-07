@@ -1810,7 +1810,6 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 			assert(s._locked);
 			ld += 2;
 		}
-		import std.stdio;
 		assert(s._locked);
 	}
 	assert(!s._locked);
@@ -1857,9 +1856,575 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 			assert(s._locked);
 			ld += 2;
 		}
-		import std.stdio;
 		assert(s._locked);
 	}
 	assert(!s._locked);
 	assert(s.asShared == 303);
+}
+
+
+
+///
+class TaskData
+{
+	import std.datetime;
+	import std.uuid;
+protected:
+	/// タスクの種類
+	immutable string                 type;
+	/// タスクの本体
+	immutable void delegate() shared onCall;
+	/// Queueに追加された時刻
+	shared SysTime                   timCreate;
+	/// Poolに追加された時刻
+	shared SysTime                   timReady = SysTime.init;
+	/// 実行開始した時刻
+	shared SysTime                   timStart = SysTime.init;
+	/// 実行終了した時刻
+	shared SysTime                   timEnd = SysTime.init;
+	/// 一意なID
+	immutable UUID                   uuid;
+	/// 状態
+	enum State
+	{
+		/// 初期状態で、タスクプールに追加される前
+		waiting,
+		/// タスクプールに追加された状態
+		ready,
+		/// 実行中の状態
+		running,
+		/// 実行が終了した状態
+		finished,
+		/// 実行の結果、異常終了した状態
+		failed,
+		/// 実行されずにドロップされた状態
+		dropped,
+	}
+	///
+	State state = State.waiting;
+public:
+	/// Poolに追加されたタイミングでコールバック
+	void onReady() shared {  }
+	/// 実行開始したタイミングでコールバック
+	void onStart() shared {  }
+	/// 実行終了したタイミングでコールバック
+	void onEnd() shared {  }
+	/// 実行失敗したタイミングでコールバック
+	void onFailed(Throwable) shared {  }
+	/// 実行されずにドロップしたタイミングでコールバック
+	void onDropped() shared {  }
+	
+	///
+	this(string ty, void delegate() shared callback, UUID id = randomUUID())
+	{
+		type      = ty;
+		onCall    = callback;
+		timCreate = Clock.currTime();
+		uuid      = cast(immutable)id;
+	}
+}
+
+/*******************************************************************************
+ * 
+ */
+class MultiTaskQueue
+{
+private:
+	import core.atomic;
+	import core.sync.mutex;
+	import core.thread;
+	import std.concurrency;
+	import std.parallelism;
+	import std.uuid;
+	import std.datetime;
+	
+	TaskPool _pool;
+	void delegate() _finishPool;
+	
+	struct TaskQueue
+	{
+	private:
+		TaskData[][string] _tasks;
+		enum State
+		{
+			ready, finish
+		}
+		State _state = State.ready;
+	public:
+		///
+		void pushBack(TaskData task, void delegate() onCreated = null)
+		{
+			TaskData[] update(ref TaskData[] tasks)
+			{
+				onCreated = null;
+				tasks ~= task;
+				return tasks;
+			}
+			TaskData[] create()
+			{
+				return [task];
+			}
+			_tasks.update(task.type, &create, &update);
+			if (onCreated !is null)
+				onCreated();
+		}
+		///
+		TaskData removeAt(string type, UUID uuid)
+		{
+			import std.algorithm: countUntil;
+			import std.array: replaceInPlace;
+			TaskData removed;
+			TaskData[] update(ref TaskData[] tasks)
+			{
+				// 現在実行中のタスクには手を出さない
+				if (tasks.length <= 1 || tasks[0].uuid == uuid)
+					return tasks;
+				auto removeIdx = tasks.countUntil!(e => e.uuid == uuid);
+				if (removeIdx == -1)
+					return tasks;
+				removed = tasks[removeIdx];
+				tasks.replaceInPlace(removeIdx, removeIdx+1, TaskData[].init);
+				return tasks;
+			}
+			TaskData[] create()
+			{
+				return [];
+			}
+			_tasks.update(type, &create, &update);
+			return removed;
+		}
+		///
+		TaskData removeFront(string type)
+		{
+			TaskData ret;
+			TaskData[] update(ref TaskData[] tasks)
+			{
+				if (tasks.length == 0)
+					return tasks;
+				ret = tasks[0];
+				tasks = tasks[1..$];
+				return tasks;
+			}
+			TaskData[] create()
+			{
+				return [];
+			}
+			_tasks.update(type, &create, &update);
+			return ret;
+		}
+		///
+		TaskData removeFrontAndGetNext(string type, out TaskData next)
+		{
+			TaskData ret;
+			TaskData[] update(ref TaskData[] tasks)
+			{
+				if (tasks.length == 0)
+					return tasks;
+				ret = tasks[0];
+				tasks = tasks[1..$];
+				if (tasks.length > 0)
+					next = tasks[0];
+				return tasks;
+			}
+			TaskData[] create()
+			{
+				return [];
+			}
+			_tasks.update(type, &create, &update);
+			return ret;
+		}
+		///
+		TaskData refFront(string type)
+		{
+			import std.exception: enforce;
+			return (*enforce(type in _tasks))[0];
+		}
+		///
+		TaskData getFront(string type)
+		{
+			if (auto p = type in _tasks)
+				if ((*p).length > 0)
+					return (*p)[0];
+			return null;
+		}
+		///
+		TaskData getAt(string type, UUID id)
+		{
+			if (auto p = type in _tasks)
+			{
+				import std.algorithm, std.array;
+				auto found = (*p).find!(a => a.uuid == id);
+				if (!found.empty)
+					return found.front;
+			}
+			return null;
+		}
+		/// 現在実行中の次のタスクを得る
+		TaskData getNext(string type)
+		{
+			if (auto p = type in _tasks)
+				if ((*p).length > 1)
+					return (*p)[1];
+			return null;
+		}
+		/// 現在実行中のタスクの次のタスクを破棄する。破棄されたタスクを返す。
+		TaskData dropNext(string type)
+		{
+			import std.array: replaceInPlace;
+			if (auto p = type in _tasks)
+			{
+				if ((*p).length > 1)
+				{
+					auto ret = (*p)[1];
+					replaceInPlace(*p, 1, 2, cast(TaskData[])[]);
+					return ret;
+				}
+			}
+			return null;
+		}
+		///
+		string[] types()
+		{
+			return _tasks.keys;
+		}
+	}
+	shared ManagedShared!TaskQueue _taskQueue;
+	
+	void _startTask(string type) shared
+	{
+		void delegate(TaskData p, Throwable e) edTask;
+		void delegate(TaskData p) stTask;
+		edTask = (TaskData p, Throwable e)
+		{
+			auto tim = Clock.currTime();
+			auto queue = _taskQueue.locked;
+			assert(p.timStart.assumeUnshared !is SysTime.init);
+			assert(p.timEnd.assumeUnshared    is SysTime.init);
+			p.timEnd.assumeUnshared = tim;
+			auto sp = cast(shared)p;
+			TaskData next;
+			auto currTsk = queue.removeFrontAndGetNext(type, next);
+			assert(currTsk is p);
+			if (e)
+			{
+				p.state = TaskData.State.failed;
+				sp.onFailed(e);
+			}
+			else
+			{
+				p.state = TaskData.State.finished;
+				sp.onEnd();
+			}
+			if (next)
+				stTask(next);
+		};
+		stTask = (TaskData p)
+		{
+			assert(p.timReady.assumeUnshared is SysTime.init);
+			assert(p.timStart.assumeUnshared is SysTime.init);
+			p.timReady.assumeUnshared = Clock.currTime();
+			p.state.assumeUnshared = TaskData.State.ready;
+			auto sp = cast(shared)p;
+			sp.onReady();
+			_pool.assumeUnshared.put(task(
+			{
+				synchronized (_taskQueue)
+				{
+					p.state.assumeUnshared = TaskData.State.running;
+					p.timStart.assumeUnshared = Clock.currTime();
+				}
+				sp.onStart();
+				try
+				{
+					sp.onCall();
+					edTask(p, null);
+				}
+				catch (Throwable e)
+				{
+					edTask(p, e);
+				}
+			}));
+		};
+		synchronized (_taskQueue)
+			stTask(_taskQueue.asUnshared.refFront(type));
+	}
+	
+	void _initialize(TaskPool pool, void delegate() finishPool)
+	{
+		_pool          = pool;
+		_finishPool    = finishPool;
+		_taskQueue     = new shared ManagedShared!TaskQueue;
+	}
+	
+public:
+	
+	/***************************************************************************
+	 * 
+	 */
+	this(TaskPool pool, void delegate() callbackFinishPool = null)
+	{
+		this._initialize(pool, callbackFinishPool);
+	}
+	
+	/// ditto
+	this(TaskPool pool, void delegate() callbackFinishPool = null) shared
+	{
+		// コンストラクタにおいては、このインスタンスは間違いなく単一であるため
+		// unsharedにキャストできる
+		(cast()this)._initialize(pool, callbackFinishPool);
+	}
+	/// ditto
+	this(size_t worker = 8)
+	{
+		this(new TaskPool(worker), () => _pool.finish(true));
+	}
+	/// ditto
+	this(size_t worker = 8) shared
+	{
+		this(new TaskPool(worker), () => _pool.assumeUnshared.finish(true));
+	}
+	
+	/***************************************************************************
+	 * インスタンスを破棄する。
+	 */
+	void dispose()
+	{
+		with (_taskQueue.locked)
+		{
+			_state = State.finish;
+			// 現在実行されていないすべてのデータを破棄
+			foreach (ty; types)
+			{
+				TaskData t = dropNext(ty);
+				while (t)
+				{
+					(cast(shared)t).onDropped();
+					t = dropNext(ty);
+				}
+			}
+		}
+		if (_finishPool !is null)
+			_finishPool();
+	}
+	
+
+	/***************************************************************************
+	 * 
+	 */
+	bool invoke(TaskData tsk)
+	{
+		with (_taskQueue.locked)
+		{
+			if (_state == State.ready)
+			{
+				pushBack(tsk);
+				auto frontTask = refFront(tsk.type);
+				if (frontTask.uuid == tsk.uuid)
+					(cast(shared)this)._startTask(tsk.type);
+				return true;
+			}
+		}
+		return false;
+	}
+	/// ditto
+	bool invoke(TaskData tsk) shared
+	{
+		// どちらもやることは同じ
+		return (cast()this).invoke(tsk);
+	}
+	/// ditto
+	bool invoke(string type, void delegate() shared dg, UUID id = randomUUID())
+	{
+		return invoke(new TaskData(type, dg, id));
+	}
+	/// ditto
+	bool invoke(string type, void delegate() shared dg, UUID id = randomUUID()) shared
+	{
+		return invoke(new TaskData(type, dg, id));
+	}
+	
+	///
+	void drop(string type, UUID id)
+	{
+		with (_taskQueue.locked)
+		{
+			if (_state == State.ready)
+				removeAt(type, id);
+		}
+	}
+}
+
+@system unittest
+{
+	import std;
+	auto pool = new TaskPool(2);
+	pool.isDaemon = true;
+	auto mtq = new MultiTaskQueue(pool, () => pool.finish(false));
+	scope (exit)
+		mtq.dispose();
+	UUID[][4] ids;
+	
+	class MyTaskData: TaskData
+	{
+		SyncEvent ended;
+		SyncEvent started;
+		SyncEvent kill;
+		bool      fail;
+		this(int grp, UUID id)
+		{
+			started = new SyncEvent(false);
+			ended   = new SyncEvent(false);
+			kill    = new SyncEvent(false);
+			super(grp.text, &(cast(shared)this).onRun, id);
+		}
+		void onRun() shared
+		{
+			started.assumeUnshared.signaled = true;
+			kill.assumeUnshared.wait();
+			enforce(!fail);
+		}
+		override void onEnd() shared
+		{
+			ended.assumeUnshared.signaled = true;
+		}
+		override void onFailed(Throwable e) shared
+		{
+			ended.assumeUnshared.signaled = true;
+		}
+	}
+	MyTaskData[][4] tasks;
+	MyTaskData currentTask(size_t grp)
+	{
+		return cast(MyTaskData) mtq._taskQueue.locked.getFront(grp.text);
+	}
+	MyTaskData getTask(size_t grp, size_t idx)
+	{
+		return tasks[grp][idx];
+	}
+	size_t currentIdx(size_t grp)
+	{
+		if (auto tsk = currentTask(grp))
+			return ids[grp].countUntil(tsk.uuid.assumeUnshared);
+		return -1;
+	}
+	void wait(size_t grp)
+	{
+		currentTask(grp).started.wait();
+	}
+	void start(int grp)
+	{
+		auto id = randomUUID();
+		auto tsk = new MyTaskData(grp, id);
+		mtq.invoke(tsk);
+		tasks[grp] ~= tsk;
+		ids[grp]   ~= id;
+	}
+	void end(size_t grp)
+	{
+		auto tsk = currentTask(grp);
+		tsk.kill.signaled = true;
+		tsk.ended.wait();
+	}
+	void fail(size_t grp)
+	{
+		auto tsk = currentTask(grp);
+		tsk.fail = true;
+		tsk.kill.signaled = true;
+		tsk.ended.wait();
+	}
+	void drop(size_t grp, size_t idx)
+	{
+		mtq.drop(grp.text, ids[grp][idx]);
+	}
+	
+	
+	start(1);
+	start(2);
+	start(3);
+	
+	wait(1);
+	wait(2);
+	
+	// チェック1：ワーカースレッド以上の処理は動かさない
+	with (mtq._taskQueue.locked)
+	{
+		assert(currentIdx(1) == 0);
+		assert(currentIdx(2) == 0);
+		assert(currentIdx(3) == 0);
+		assert(getFront("1").state == TaskData.State.running);
+		assert(getFront("2").state == TaskData.State.running);
+		assert(getFront("3").state == TaskData.State.ready);
+	}
+	
+	end(1);
+	wait(3);
+	
+	// チェック2：ワーカーが空くと自動でキューが消費される
+	with (mtq._taskQueue.locked)
+	{
+		assert(currentIdx(1) == -1);
+		assert(currentIdx(2) == 0);
+		assert(currentIdx(3) == 0);
+		assert(getFront("1") is null);
+		assert(getFront("2").state == TaskData.State.running);
+		assert(getFront("3").state == TaskData.State.running);
+	}
+	
+	start(2);
+	end(3);
+	
+	// チェック3：ワーカーが開いても前処理が終わっていないとキューは消費されない
+	with (mtq._taskQueue.locked)
+	{
+		assert(currentIdx(2) == 0);
+		assert(getAt("2", ids[2][1]).state == TaskData.State.waiting);
+	}
+	
+	end(2);
+	wait(2);
+	
+	// チェック4：前処理が終わるとキューが消費される
+	with (mtq._taskQueue.locked)
+	{
+		assert(currentIdx(2) == 1);
+		assert(getAt("2", ids[2][1]).state == TaskData.State.running);
+	}
+	
+	
+	start(3);
+	start(3);
+	start(3);
+	drop(3, 2);
+	wait(3);
+	
+	// チェック5：タスクをドロップする
+	with (mtq._taskQueue.locked)
+	{
+		assert(currentIdx(3) == 1);
+		assert(getAt("3", ids[3][1]).state == TaskData.State.running);
+		assert(getAt("3", ids[3][2]) is null);
+		assert(getAt("3", ids[3][3]).state == TaskData.State.waiting);
+	}
+	
+	end(2);
+	end(3);
+	wait(3);
+	
+	// チェック6：ドロップされたタスクは実行されない
+	with (mtq._taskQueue.locked)
+	{
+		assert(currentIdx(3) == 3);
+		assert(getAt("3", ids[3][1]) is null);
+		assert(getAt("3", ids[3][2]) is null);
+		assert(getAt("3", ids[3][3]).state == TaskData.State.running);
+	}
+	fail(3);
+	
+	// チェック7：タスクの失敗がわかる
+	with (mtq._taskQueue.locked)
+	{
+		assert(currentIdx(3) == -1);
+		assert(getAt("3", ids[3][3]) is null);
+		assert(getTask(3, 3).state == TaskData.State.failed);
+	}
 }
