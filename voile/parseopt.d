@@ -629,8 +629,10 @@ template getHelpString(T, size_t displayWidth = 80)
 		string helpStr = helpStrHead;
 		
 		string[] optLongs;
+		enum isNotThis(string name)        = name != "this";
+		enum allMembers                    = Filter!(isNotThis, __traits(allMembers, T));
 		enum hasHelp(string memberName)    = OptionOf!(T, memberName).help.length > 0;
-		enum getAllMembers(T)              = Filter!(hasHelp, __traits(allMembers, T));
+		enum getAllMembers(T)              = Filter!(hasHelp, allMembers);
 		enum getOption(string memberName)  = OptionOf!(T, memberName);
 		enum getHelp(string memberName)    = getOption!memberName.help;
 		enum getOpts(string memberName)    = getOption!memberName.longOptions.length > 0
@@ -948,13 +950,14 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 	string[] passedArgs = [args[0]];
 	bool helpWanted;
 	
-	
 	enum getOption(string name)        = OptionOf!(T, name);
 	enum isRequired(string name)       = getOption!name.required;
 	enum isBoolMember(string name)     = is(typeof(__traits(getMember, T, name)) == bool);
-	enum getRequiredMembers(T)         = Filter!(isRequired, __traits(allMembers, T));
+	enum isNotThis(string name)        = name != "this";
+	enum allMembers                    = Filter!(isNotThis, __traits(allMembers, T));
+	enum getRequiredMembers(T)         = Filter!(isRequired, allMembers);
 	enum getRequiredOptions(T)         = staticMap!(getOption, getRequiredMembers!T);
-	enum getBooleanMembers(T)          = Filter!(isBoolMember, __traits(allMembers, T));
+	enum getBooleanMembers(T)          = Filter!(isBoolMember, allMembers);
 	enum getBooleanOptions(T)          = staticMap!(getOption, getBooleanMembers!T);
 	enum getOptionArgs(Option[] opt)   = opt.map!(a => a.longOptions ~ a.shortOptions.map!(a => a.to!string).array).join();
 	enum getBooleanArgs(T)             = getOptionArgs!([getBooleanOptions!T]);
@@ -982,7 +985,7 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 			foreach (argOne; arg.key)
 			{
 				bool argOneMached;
-				static foreach (memberName; __traits(allMembers, T))
+				static foreach (memberName; allMembers)
 				{{
 					enum Option memberOpt = OptionOf!(T, memberName);
 					enum dchar[] shortOptions = memberOpt.shortOptions();
@@ -1008,7 +1011,7 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 			&& !typeOpt.binding)
 		{
 			// no-binding short prefix
-			static foreach (memberName; __traits(allMembers, T))
+			static foreach (memberName; allMembers)
 			{{
 				enum memberOpt = OptionOf!(T, memberName);
 				enum dchar[] shortOptions = memberOpt.shortOptions();
@@ -1031,7 +1034,7 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 		}
 		else if (arg.prefix.type == OptPrefix.Type.longOpt)
 		{
-			static foreach (memberName; __traits(allMembers, T))
+			static foreach (memberName; allMembers)
 			{{
 				enum memberOpt = OptionOf!(T, memberName);
 				enum string[] longOptions = memberOpt.longOptions();
@@ -1057,7 +1060,7 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 		else
 		{
 			// none prefix
-			static foreach (memberName; __traits(allMembers, T))
+			static foreach (memberName; allMembers)
 			{{
 				enum memberOpt = OptionOf!(T, memberName);
 				enum string[] longOptions = memberOpt.longOptions();
@@ -1248,7 +1251,7 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 {
 	import std.conv;
 	
-	static struct Dat
+	struct Dat
 	{
 		@opt("values|v")
 		int[string] values;
@@ -1288,7 +1291,7 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 	import std.conv, std.math;
 	static int xxxxx = 10;
 	
-	static struct Dat
+	struct Dat
 	{
 		@opt("foo")
 		@convBy!(a => a ~ a)
