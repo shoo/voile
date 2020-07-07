@@ -938,7 +938,7 @@ private ArgData[] _parseArgsStep2(ArgData[] args, string[] boolArgs) pure @safe
 }
 
 ///
-HelpInformation parseOptions(T)(ref string[] args, ref T dat) pure @safe
+HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 {
 	import std.algorithm, std.array, std.exception, std.conv;
 	enum TypeOption typeOptData = TypeOptionOf!T;
@@ -1248,10 +1248,12 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) pure @safe
 {
 	import std.conv;
 	
-	struct Dat
+	static struct Dat
 	{
 		@opt("values|v")
 		int[string] values;
+		
+		void hogehoge(string x) /+ pure but not annotation +/ { }
 	}
 	Dat dat;
 	
@@ -1272,15 +1274,19 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) pure @safe
 	
 	dat.values = dat.values.init;
 	args = ["program.name", "--values", "foo=0,bar=1,baz=2"];
-	args.parseOptions(dat);
+	// call from pure
+	() pure {
+		args.parseOptions(dat);
+	} ();
 	assert(dat.values == ["foo":0, "bar":1, "baz":2], to!string(dat.values));
+	
 }
-
 
 ///
 @safe unittest
 {
 	import std.conv, std.math;
+	static int xxxxx = 10;
 	
 	static struct Dat
 	{
@@ -1312,19 +1318,26 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) pure @safe
 		
 		@ignore
 		size_t hogeLen;
+		
 		@convBy!convHoge
 		string hoge;
+		
+		void fuga(string x) /+ impure +/
+		{
+			valueF32 += valueI32 + xxxxx;
+			valueI32 += to!int(x);
+		}
 	}
 	Dat dat;
 	
 	dat.valueStr = dat.valueStr.init;
 	dat.valueI32 = dat.valueI32.init;
 	dat.valueF32 = dat.valueF32.init;
-	auto args = ["program.name", "--foo=aaa", "--bar=12345", "--valueF32=10", "--hoge=3"];
+	auto args = ["program.name", "--foo=aaa", "--bar=12345", "--valueF32=10", "--hoge=3", "--fuga=5"];
 	args.parseOptions(dat);
 	assert(dat.valueStr == "aaaaaa");
-	assert(dat.valueI32 == 12345);
-	assert(dat.valueF32.approxEqual(10.0f));
+	assert(dat.valueI32 == 12345+5);
+	assert(dat.valueF32.approxEqual(10.0f+12345 + 10));
 	assert(dat.hogeLen == 3);
 	assert(dat.hoge == "hogehogehoge");
 }
