@@ -7,5 +7,5 @@
 *.exe
 *.dll
 *.obj
-doc/candydoc/modules.ddoc
+docs
 cov

@@ -1,0 +1,20 @@
+_=Macros for customizing the output for a particular project
+
+
+_=
+
+MENU_DUBPKG =$3
+MENU_PKG    =$(LIC expand-container open, $(AC expand-toggle, #, $(SPAN, $1))$(UL $2))
+MENU_PKGD   =$(LIC expand-container open, <a title='$9' class='expand-toggle' href='#'>$(SPAN, $1)</a>$(UL $(LI <a title='$9' href="$3">$(SPAN, package)</a>)$2))
+MENU_MOD    =$(LI <a title="$8" href="$2">$(SPAN, $1)</a>)
+
+INDEX_DUBPKG =$(DIVC module_index_dubpkgname, $1)$(UL $3)
+INDEX_PKG    =$2
+INDEX_PKGD   =$(DIVC module_index, $(DT $(A $3, $1))$(DD $9)$2)
+INDEX_MOD    =$(DT $(A $2, $(SPANC module_index, $6)))$(DD $8)
+_=
+
+INFO_DUBPKG =
+INFO_PKG    =
+INFO_MOD    =
+_=
