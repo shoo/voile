@@ -1282,7 +1282,7 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) pure @safe
 {
 	import std.conv, std.math;
 	
-	struct Dat
+	static struct Dat
 	{
 		@opt("foo")
 		@convBy!(a => a ~ a)
