@@ -1,6 +1,0 @@
-▽初期,init
-▽状態1,st1
-○A,a
-○B,b
-・初期化する,initialize();
-・子STM終了,setNextFlow(null);
