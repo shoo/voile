@@ -167,6 +167,14 @@ auto ref assumeUnshared(T)(ref T x) @property
 /*******************************************************************************
  * 
  */
+auto ref assumeShared(T)(ref T x) @property
+{
+	return *cast(shared)&x;
+}
+
+/*******************************************************************************
+ * 
+ */
 template TemplateSpecializedTypeTuple(T)
 {
 	static if (is(T: Temp!Params, alias Temp, Params...))

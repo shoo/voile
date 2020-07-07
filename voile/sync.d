@@ -24,6 +24,8 @@ version (Windows)
 }
 import std.traits, std.parallelism;
 
+public import voile.misc: assumeUnshared, assumeShared;
+
 /*******************************************************************************
  * 同期イベントクラス
  * 
