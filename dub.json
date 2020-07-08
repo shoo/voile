@@ -15,24 +15,11 @@
             "name": "default"
         },
         {
-            "name": "ut",
+            "name": "unittest",
             "targetType": "executable",
             "targetName": "voile-ut",
-            "sourceFiles": ["samples/ut.d"],
-            "dflags": [
-                "-main"
-            ]
-        }
-    ],
-    "subPackages": [
-        {
-            "name": "sample01",
-            "targetType": "executable",
-            "targetName": "voile-sample",
-            "dependencies": { "voile": "*" },
-            "sourcePaths": ["samples/sample01"],
-            "importPaths": ["samples/sample01"],
-            "stringImportPaths": ["samples/sample01/stm"]
+            "sourceFiles": ["ci/ut.d"],
+            "mainSourceFile": "ci/dummy.d"
         }
     ]
 }

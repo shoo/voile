@@ -1142,8 +1142,8 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	
 	Data[] datAry1, datAry2;
 	Data[string] datMap1, datMap2;
-	datAry1 = [Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)])];
-	datMap1 = ["Data": Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)])];
+	datAry1 = [Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)], tim)];
+	datMap1 = ["Data": Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)], tim)];
 	datAry1.serializeToJsonFile("test.json");
 	datAry2.deserializeFromJsonFile("test.json");
 	datMap1.serializeToJsonFile("test.json");
