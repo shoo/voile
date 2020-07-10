@@ -244,11 +244,12 @@ class SyncEvent
 		 * conditionがfalseなら非シグナル状態で、シグナル状態になるまで制御を
 		 * 返さない。
 		 */
-		void wait()
+		void wait() const
 		{
 			synchronized (_mutex)
 			{
-				while (! _signaled) _condition.wait;
+				while (! _signaled)
+					(cast()_condition).wait();
 			}
 		}
 		/***********************************************************************
@@ -258,11 +259,12 @@ class SyncEvent
 		 * conditionがfalseなら非シグナル状態で、シグナル状態になるか、時間が
 		 * 過ぎるまで制御を返さない。
 		 */
-		bool wait(double period)
+		bool wait(Duration dur)
 		{
 			synchronized (_mutex)
 			{
-				while (! _signaled) _condition.wait(period);
+				while (! _signaled)
+					_condition.wait(dur);
 				return _signaled;
 			}
 		}
@@ -356,7 +358,7 @@ private:
 	MonitorProxy m_Proxy;
 	HANDLE _handle;
 	string m_Name;
-	version (Posix) const string m_SavedName;
+	version (Posix) string m_SavedName;
 public:
 	/***************************************************************************
 	 * コンストラクタ
@@ -415,7 +417,7 @@ public:
 		}
 		version (Posix)
 		{
-			auto tmpname = m_SavedName = encodeStr(name, buf);
+			auto tmpname = m_SavedName = cast(string)encodeStr(name, buf);
 		}
 		else
 		{

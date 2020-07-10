@@ -1,8 +1,114 @@
-module voile.fs;
+﻿module voile.fs;
 
 import std.file, std.path, std.exception, std.stdio, std.datetime, std.regex, std.json;
 import std.process;
 import voile.handler;
+
+
+
+/*******************************************************************************
+ * パスを分解してパンくずリストにする
+ * 
+ * Params:
+ *     path  = 変換したい絶対/相対パス
+ */
+static string[] splitPath(string path) @safe pure
+{
+	import std.array: split;
+	import std.algorithm: remove;
+	return path.split!(a => a == '\\' || a == '/').remove!(a=>a.length == 0);
+}
+
+
+
+/*******************************************************************************
+ * パンくずリストをPosixパスに再構築する
+ * 
+ * Params:
+ *     paths  = 変換したい絶対/相対パス
+ */
+static string joinPath(string[] path, string delimiter = dirSeparator) @safe pure
+{
+	import std.array: join;
+	return path.join(delimiter);
+}
+
+/*******************************************************************************
+ * パンくずリストをWindowsパスに再構築する
+ * 
+ * Params:
+ *     paths  = 変換したい絶対/相対パス
+ */
+static string joinWindowsPath(string[] path) @safe pure
+{
+	return path.joinPath("\\");
+}
+
+/*******************************************************************************
+ * パンくずリストをPosixパスに再構築する
+ * 
+ * Params:
+ *     paths  = 変換したい絶対/相対パス
+ */
+static string joinPosixPath(string[] path) @safe pure
+{
+	return path.joinPath("/");
+}
+
+
+/*******************************************************************************
+ * パンをPosixパスに変換する(/を使うように変換)
+ * 
+ * Params:
+ *     paths  = 変換したい絶対/相対パス
+ */
+string posixPath(string path)
+{
+	return path.splitPath.joinPosixPath();
+}
+
+/*******************************************************************************
+ * パンをWindowsパスに変換する(\を使うように変換)
+ * 
+ * Params:
+ *     paths  = 変換したい絶対/相対パス
+ */
+string windowsPath(string path)
+{
+	return path.splitPath.joinWindowsPath();
+}
+
+
+version (Windows)
+{
+	private File nullFile(string attr)
+	{
+		return File.init;
+	}
+}
+else
+{
+	private File nullFile(string attr)
+	{
+		return File("/dev/null", attr);
+	}
+}
+
+version (Windows)
+{
+	/// In Windows
+	alias joinNativePath = joinWindowsPath;
+	/// ditto
+	alias nativePath = windowsPath;
+}
+else
+{
+	/// In Posix
+	alias joinNativePath = joinPosixPath;
+	/// ditto
+	alias nativePath = posixPath;
+}
+
 
 /*******************************************************************************
  * ファイルシステムの操作に関するヘルパ
@@ -43,14 +149,14 @@ struct FileSystem
 	{
 		if (workDir.isAbsolute)
 			return workDir.buildNormalizedPath();
-		return .absolutePath(workDir).buildNormalizedPath;
+		return .absolutePath(workDir).buildNormalizedPath();
 	}
 	/// ditto
 	string absolutePath(string target) const @safe
 	{
 		if (target.isAbsolute)
 			return target.buildNormalizedPath();
-		return .absolutePath(target, absolutePath()).buildNormalizedPath;
+		return .absolutePath(target, absolutePath()).buildNormalizedPath();
 	}
 	/// ditto
 	string absolutePath(string[] targetPath) const @safe
@@ -79,30 +185,45 @@ struct FileSystem
 	/*******************************************************************************
 	 * 実際のパス名に修正する
 	 */
-	string actualPath(string path = ".")
+	string actualPath(string path = ".") const @safe
 	{
-		import core.sys.windows.shellapi;
-		import core.stdc.wchar_: wcslen;
-		import std.utf: toUTF16z, toUTF8;
-		SHFILEINFOW info;
-		info.szDisplayName[0] = 0;
-		auto paths = absolutePath(path).pathSplitter();
-		string result;
-		import std.uni: toUpper;
-		result = paths.front.toUpper();
-		paths.popFront();
-		foreach (p; paths)
+		version (Windows)
 		{
-			SHGetFileInfoW(result.buildPath(p).toUTF16z(), 0, &info, info.sizeof, SHGFI_DISPLAYNAME);
-			result = result.buildPath(toUTF8(info.szDisplayName.ptr[0..wcslen(info.szDisplayName.ptr)]));
+			import core.sys.windows.shellapi;
+			import core.stdc.wchar_: wcslen;
+			import std.utf: toUTF16z, toUTF8;
+			SHFILEINFOW info;
+			info.szDisplayName[0] = 0;
+			auto paths = absolutePath(path).pathSplitter();
+			string result;
+			import std.uni: toUpper;
+			result = paths.front.toUpper();
+			paths.popFront();
+			foreach (p; paths)
+			{
+				() @trusted { SHGetFileInfoW(result.buildPath(p).toUTF16z(), 0, &info, info.sizeof, SHGFI_DISPLAYNAME); }();
+				() @trusted { result = result.buildPath(toUTF8(info.szDisplayName.ptr[0..wcslen(info.szDisplayName.ptr)])); }();
+			}
+			return result;
 		}
-		return result;
+		else
+		{
+			return absolutePath(path);
+		}
 	}
 	@system unittest
 	{
-		auto fs = FileSystem("C:/");
-		assert(fs.actualPath(r"wInDoWs") == r"C:\Windows");
+		version (Windows)
+		{
+			auto fs = FileSystem("C:/");
+			assert(fs.actualPath(r"wInDoWs") == r"C:\Windows");
+		}
+		else
+		{
+			// テストなし
+		}
 	}
+	
 	
 	/***************************************************************************
 	 * 相対パスに変換する
@@ -112,33 +233,300 @@ struct FileSystem
 	 *     targetPath = 変換したい相対パスのパンくずリスト
 	 *     base       = 基準となるパス(このパスの基準はworkDir)
 	 */
-	string relativePath(string target)
+	string relativePath(string target) const @safe
 	{
 		return .relativePath(this.absolutePath(target), this.absolutePath());
 	}
 	/// ditto
-	string relativePath(string[] targetPath)
+	string relativePath(string[] targetPath) const @safe
 	{
 		return .relativePath(this.absolutePath(targetPath), this.absolutePath());
 	}
 	/// ditto
-	string relativePath(string target, string base)
+	string relativePath(string target, string base) const @safe
 	{
 		return .relativePath(this.absolutePath(target), this.absolutePath(base));
 	}
 	/// ditto
-	string relativePath(string[] targetPath, string base)
+	string relativePath(string[] targetPath, string base) const @safe
 	{
 		return .relativePath(this.absolutePath(targetPath), this.absolutePath(base));
 	}
 	
-	@system unittest
+	@safe unittest
 	{
-		auto fs = FileSystem("C:/work");
-		assert(fs.relativePath(r"C:/Windows") == r"..\Windows");
-		assert(fs.relativePath(r"C:/Program Files", "../Windows") == r"..\Program Files");
+		version (Windows)
+		{
+			auto fs = FileSystem("C:/work");
+			assert(fs.relativePath(r"C:/Windows") == r"..\Windows");
+			assert(fs.relativePath(r"C:/Program Files", "../Windows") == r"..\Program Files");
+		}
+		else
+		{
+			auto fs = FileSystem("/usr/local");
+			assert(fs.relativePath(r"/usr/bin") == r"../bin");
+			assert(fs.relativePath(r"/usr/bin", "../lib") == r"../bin");
+		}
 	}
 	
+	
+	/***************************************************************************
+	 * パスをパンくず表現に変換
+	 * 
+	 * Params:
+	 *     path  = 変換したい絶対/相対パス
+	 *     paths = 変換したい相対パスのパンくずリスト
+	 */
+	string[] buildSplittedPath(string path) const @safe
+	{
+		if (path.isAbsolute())
+			return splitPath(path);
+		return splitPath(workDir) ~ splitPath(path);
+	}
+	
+	/// ditto
+	string[] buildSplittedPath(string[] paths) const @safe
+	{
+		return buildSplittedPath(paths.buildPath());
+	}
+	
+	/// ditto
+	string[] buildSplittedPath() const @safe
+	{
+		return splitPath(workDir);
+	}
+	
+	@safe unittest
+	{
+		auto fs = FileSystem("ut/path");
+		auto pathsplitted = fs.buildSplittedPath();
+		assert(pathsplitted.length == 2);
+		assert(pathsplitted[0] == "ut");
+		assert(pathsplitted[1] == "path");
+		pathsplitted = fs.buildSplittedPath("../path\\aaa/bbb");
+		assert(pathsplitted.length == 6);
+		assert(pathsplitted[0] == "ut");
+		assert(pathsplitted[1] == "path");
+		assert(pathsplitted[2] == "..");
+		assert(pathsplitted[3] == "path");
+		assert(pathsplitted[4] == "aaa");
+		assert(pathsplitted[5] == "bbb");
+	}
+	
+	
+	/***************************************************************************
+	 * パスをPosix表現に変換
+	 * 
+	 * Params:
+	 *     path  = 変換したい絶対/相対パス
+	 *     paths = 変換したい相対パスのパンくずリスト
+	 */
+	string buildPosixPath(string path) const @safe
+	{
+		return buildSplittedPath(path).joinPosixPath();
+	}
+	
+	/// ditto
+	string buildPosixPath(string[] paths) const @safe
+	{
+		return buildSplittedPath(paths).joinPosixPath();
+	}
+	
+	/// ditto
+	string buildPosixPath() const @safe
+	{
+		return buildSplittedPath().joinPosixPath();
+	}
+	
+	/// ditto
+	@safe unittest
+	{
+		auto fs = FileSystem("ut\\test");
+		assert(fs.buildPosixPath() == "ut/test");
+		auto posixPath = fs.buildPosixPath("path\\to/file");
+		assert(posixPath == "ut/test/path/to/file");
+	}
+	
+	/***************************************************************************
+	 * パスをWindows表現に変換
+	 * 
+	 * Params:
+	 *     path  = 変換したい絶対/相対パス
+	 *     paths = 変換したい相対パスのパンくずリスト
+	 */
+	string buildWindowsPath(string path) const @safe
+	{
+		return buildSplittedPath(path).joinWindowsPath();
+	}
+	
+	/// ditto
+	string buildWindowsPath(string[] paths) const @safe
+	{
+		return buildSplittedPath(paths).joinWindowsPath();
+	}
+	
+	/// ditto
+	string buildWindowsPath() const @safe
+	{
+		return buildSplittedPath().joinWindowsPath();
+	}
+	
+	/// ditto
+	@safe unittest
+	{
+		auto fs = FileSystem("ut/test");
+		assert(fs.buildWindowsPath() == "ut\\test");
+		auto posixPath = fs.buildWindowsPath("path\\to/file");
+		assert(posixPath == "ut\\test\\path\\to\\file");
+	}
+	
+	
+	
+	/***************************************************************************
+	 * パスを正規化して分解してパンくずリストにする
+	 * 
+	 * Params:
+	 *     path  = 変換したい絶対/相対パス
+	 *     paths = 変換したい相対パスのパンくずリスト
+	 */
+	string[] buildNormalizedSplittedPath(string path) const @safe
+	{
+		import std.array;
+		return buildSplittedPath(path).buildNormalizedPath().split!(a => a == '\\' || a == '/');
+	}
+	
+	/// ditto
+	string[] buildNormalizedSplittedPath(string[] paths) const @safe
+	{
+		import std.array;
+		return buildSplittedPath(paths).buildNormalizedPath().split!(a => a == '\\' || a == '/');
+	}
+	
+	/// ditto
+	string[] buildNormalizedSplittedPath() const @safe
+	{
+		import std.array;
+		return buildSplittedPath().buildNormalizedPath().split!(a => a == '\\' || a == '/');
+	}
+	
+	@safe unittest
+	{
+		auto fs = FileSystem("ut/path/");
+		auto pathsplitted = fs.buildNormalizedSplittedPath();
+		assert(pathsplitted.length == 2);
+		assert(pathsplitted[0] == "ut");
+		assert(pathsplitted[1] == "path");
+		pathsplitted = fs.buildNormalizedSplittedPath("../path/./\\aaa/bbb");
+		assert(pathsplitted.length == 4);
+		assert(pathsplitted[0] == "ut");
+		assert(pathsplitted[1] == "path");
+		assert(pathsplitted[2] == "aaa");
+		assert(pathsplitted[3] == "bbb");
+	}
+	
+	/***************************************************************************
+	 * パスを正規化してPosix表現に変換
+	 * 
+	 * Params:
+	 *     path  = 変換したい絶対/相対パス
+	 *     paths = 変換したい相対パスのパンくずリスト
+	 */
+	string buildNormalizedPosixPath(string path)
+	{
+		import std.array;
+		return buildNormalizedSplittedPath(path).join('/');
+	}
+	
+	/// ditto
+	string buildNormalizedPosixPath(string[] paths)
+	{
+		import std.array;
+		return buildNormalizedSplittedPath(paths).join('/');
+	}
+	
+	/// ditto
+	string buildNormalizedPosixPath()
+	{
+		import std.array;
+		return buildNormalizedSplittedPath().join('/');
+	}
+	
+	/// ditto
+	@system unittest
+	{
+		auto fs = FileSystem("ut\\test");
+		assert(fs.buildNormalizedPosixPath() == "ut/test");
+		auto posixPath = fs.buildNormalizedPosixPath("../path\\to/file");
+		assert(posixPath == "ut/path/to/file");
+	}
+	
+	@system unittest
+	{
+		auto fs = FileSystem("ut\\test\\");
+		assert(fs.buildNormalizedPosixPath() == "ut/test");
+		auto posixPath = fs.buildNormalizedPosixPath("../path\\to/file");
+		assert(posixPath == "ut/path/to/file");
+	}
+	
+	/***************************************************************************
+	 * パスを正規化してWindows表現に変換
+	 * 
+	 * Params:
+	 *     path  = 変換したい絶対/相対パス
+	 *     paths = 変換したい相対パスのパンくずリスト
+	 */
+	string buildNormalizedWindowsPath(string path)
+	{
+		import std.array;
+		return buildNormalizedSplittedPath(path).join('\\');
+	}
+	
+	/// ditto
+	string buildNormalizedWindowsPath(string[] paths)
+	{
+		import std.array;
+		return buildNormalizedSplittedPath(paths).join('\\');
+	}
+	
+	/// ditto
+	string buildNormalizedWindowsPath()
+	{
+		import std.array;
+		return buildNormalizedSplittedPath().join('\\');
+	}
+	
+	/// ditto
+	@system unittest
+	{
+		auto fs = FileSystem("ut\\./test");
+		assert(fs.buildNormalizedWindowsPath() == "ut\\test");
+		auto posixPath = fs.buildNormalizedWindowsPath("../path\\to/file");
+		assert(posixPath == "ut\\path\\to\\file");
+	}
+	
+	@system unittest
+	{
+		auto fs = FileSystem("ut/test\\");
+		assert(fs.buildNormalizedWindowsPath() == "ut\\test");
+		auto posixPath = fs.buildNormalizedWindowsPath("../path\\to/file");
+		assert(posixPath == "ut\\path\\to\\file");
+	}
+	
+	
+	version (Windows)
+	{
+		/// In Windows
+		alias buildNativePath           = buildWindowsPath;
+		/// ditto
+		alias buildNormalizedNativePath = buildNormalizedWindowsPath;
+	}
+	else
+	{
+		/// In Posix
+		alias buildNativePath           = buildPosixPath;
+		/// ditto
+		alias buildNormalizedNativePath = buildNormalizedPosixPath;
+	}
 	
 	/***************************************************************************
 	 * パスが存在するか確認する
@@ -299,8 +687,15 @@ struct FileSystem
 		// 作れないフォルダを作る
 		fs.onCreating.clear();
 		fs.onCreated.clear();
-		fs.makeDir(":");
-		assert(except);
+		version (Windows)
+		{
+			fs.makeDir(":");
+			assert(except);
+		}
+		else
+		{
+			// /や\0は作れないが、makeDirでは動かない
+		}
 	}
 	
 	/***************************************************************************
@@ -343,12 +738,12 @@ struct FileSystem
 		assert(files.length == 6);
 		import std.algorithm: sort;
 		files.sort();
-		assert(fs.relativePath(files[0]) == "a");
-		assert(fs.relativePath(files[1]) == "a\\b");
-		assert(fs.relativePath(files[2]) == "a\\b\\test1.txt");
-		assert(fs.relativePath(files[3]) == "a\\b\\test3.txt");
-		assert(fs.relativePath(files[4]) == "a\\c");
-		assert(fs.relativePath(files[5]) == "a\\c\\test2.txt");
+		assert(fs.relativePath(files[0]).splitPath() == ["a"]);
+		assert(fs.relativePath(files[1]).splitPath() == ["a", "b"]);
+		assert(fs.relativePath(files[2]).splitPath() == ["a", "b", "test1.txt"]);
+		assert(fs.relativePath(files[3]).splitPath() == ["a", "b", "test3.txt"]);
+		assert(fs.relativePath(files[4]).splitPath() == ["a", "c"]);
+		assert(fs.relativePath(files[5]).splitPath() == ["a", "c", "test2.txt"]);
 	}
 	
 	/***************************************************************************
@@ -580,7 +975,7 @@ struct FileSystem
 		}
 		else version (Posix)
 		{
-			import core.sys.posix.stat: S_IWUSR;
+			import core.sys.posix.sys.stat: S_IWUSR;
 			enum writable = S_IWUSR;
 			if ((target.getAttributes() & writable) != writable)
 				target.setAttributes(target.getAttributes() | writable);
@@ -1038,22 +1433,53 @@ struct FileSystem
 	{
 		if (!src.exists)
 			return true;
-		if (src.driveName == dst.driveName)
+		version (Windows)
 		{
-			// ドライブが同一ならWinAPIのMoveFileを利用する
-			if (!removeFilesImpl!false(dst, force, retrycnt))
-				return false;
-			import core.sys.windows.windows;
-			import std.windows.syserror;
-			import std.utf;
-			auto movSrc = (`\\?\`~src).toUTF16z();
-			auto movDst = (`\\?\`~dst).toUTF16z();
+			if (src.driveName == dst.driveName)
+			{
+				// ドライブが同一ならWinAPIのMoveFileを利用する
+				if (!removeFilesImpl!false(dst, force, retrycnt))
+					return false;
+				import core.sys.windows.windows;
+				import std.windows.syserror;
+				import std.utf;
+				auto movSrc = (`\\?\`~src).toUTF16z();
+				auto movDst = (`\\?\`~dst).toUTF16z();
+				foreach (Unused; 0..retrycnt)
+				{
+					try
+					{
+						enforce(!dst.exists);
+						MoveFileW(movSrc, movDst).enforce(GetLastError().sysErrorString());
+						return true;
+					}
+					catch (Exception e)
+					{
+						import core.thread;
+						Thread.sleep(10.msecs);
+					}
+				}
+				// WinAPIが使用できない場合はファイルをミラーリングして元のファイルを削除する
+				if (!mirrorFilesImpl!false(src, dst, force, retrycnt)
+				 || !removeFilesImpl!false(src, force, retrycnt))
+					return false;
+			}
+			else
+			{
+				// ドライブが異なる場合、ミラーリングして元のファイルを削除する
+				if (!mirrorFilesImpl!false(src, dst, force, retrycnt)
+				 || !removeFilesImpl!false(src, force, retrycnt))
+					return false;
+			}
+		}
+		else
+		{
 			foreach (Unused; 0..retrycnt)
 			{
 				try
 				{
 					enforce(!dst.exists);
-					MoveFileW(movSrc, movDst).enforce(GetLastError().sysErrorString());
+					std.file.rename(src, dst);
 					return true;
 				}
 				catch (Exception e)
@@ -1062,14 +1488,7 @@ struct FileSystem
 					Thread.sleep(10.msecs);
 				}
 			}
-			// WinAPIが使用できない場合はファイルをミラーリングして元のファイルを削除する
-			if (!mirrorFilesImpl!false(src, dst, force, retrycnt)
-			 || !removeFilesImpl!false(src, force, retrycnt))
-				return false;
-		}
-		else
-		{
-			// ドライブが異なる場合、ミラーリングして元のファイルを削除する
+			// リネームに失敗した場合はミラーリングして元のファイルを削除する
 			if (!mirrorFilesImpl!false(src, dst, force, retrycnt)
 			 || !removeFilesImpl!false(src, force, retrycnt))
 				return false;
@@ -1230,11 +1649,12 @@ struct FileSystem
 		import std.algorithm : splitter;
 		import std.conv;
 		import std.process: environment;
-		string execFileName = executable.setExtension(".exe");
+		string execFileName = executable.idup;
+		version (Windows)
+			execFileName = execFileName.setExtension(".exe");
 		string execPath;
 		if (execFileName.isAbsolute())
 			return execFileName;
-		
 		foreach (dir; additional)
 		{
 			execPath = buildPath(dir, execFileName);
@@ -1254,7 +1674,7 @@ struct FileSystem
 		if (paths == null)
 			return null;
 		
-		foreach (dir; splitter(to!string(paths), ';'))
+		foreach (dir; splitter(to!string(paths), pathSeparator))
 		{
 			execPath = buildPath(dir, execFileName);
 			if (execPath.exists)
@@ -1282,9 +1702,9 @@ struct FileSystem
 	{
 		makeDir(".");
 		return .spawnProcess([searchPath(args[0])] ~ args[1..$],
-		                      fin  is File.init ? File.init : fin,
-		                      fout is File.init ? File.init : fout,
-		                      ferr is File.init ? File.init : ferr,
+		                      fin  is File.init ? nullFile("r") : fin,
+		                      fout is File.init ? nullFile("w") : fout,
+		                      ferr is File.init ? nullFile("w") : ferr,
 		                      env, cfg, workDir);
 	}
 	
@@ -1295,9 +1715,9 @@ struct FileSystem
 	{
 		makeDir(".");
 		return .spawnProcess([searchPath(args[0])] ~ args[1..$],
-		                     pin  is Pipe.init ? File.init : pin.readEnd,
-		                     pout is Pipe.init ? File.init : pout.writeEnd,
-		                     perr is Pipe.init ? File.init : perr.writeEnd,
+		                     pin  is Pipe.init ? nullFile("r") : pin.readEnd,
+		                     pout is Pipe.init ? nullFile("w") : pout.writeEnd,
+		                     perr is Pipe.init ? nullFile("w") : perr.writeEnd,
 		                     env, cfg, workDir);
 	}
 	
@@ -1322,50 +1742,86 @@ struct FileSystem
 	///
 	@system unittest
 	{
+		import std.string;
 		scope (exit)
 			std.file.rmdirRecurse("ut");
 		auto fs = FileSystem("ut");
 		auto pipeo = pipe();
-		auto pid = fs.spawnProcess(["cmd", "/C", "echo xxx"], Pipe.init, pipeo, pipeo);
+		version (Windows)
+		{
+			auto cmd = ["cmd", "/C", "echo xxx"];
+		}
+		else
+		{
+			auto cmd = ["bash", "-c", "echo xxx"];
+		}
+		auto pid = fs.spawnProcess(cmd, Pipe.init, pipeo, pipeo);
 		pid.wait();
 		auto xxx = pipeo.readEnd().readln;
-		assert(xxx == "xxx\r\n");
+		assert(xxx.chomp == "xxx");
 	}
 	
 	///
 	@system unittest
 	{
+		import std.string;
 		scope (exit)
 			std.file.rmdirRecurse("ut");
 		auto fs = FileSystem("ut");
 		auto pipeo = pipe();
-		auto pipe = fs.pipeProcess(["cmd", "/C", "echo xxx"]);
+		version (Windows)
+		{
+			auto cmd = ["cmd", "/C", "echo xxx"];
+		}
+		else
+		{
+			auto cmd = ["bash", "-c", "echo xxx"];
+		}
+		auto pipe = fs.pipeProcess(cmd);
 		pipe.pid.wait();
 		auto xxx = pipe.stdout().readln;
-		assert(xxx == "xxx\r\n");
+		assert(xxx.chomp == "xxx");
 	}
 	
 	///
 	@system unittest
 	{
+		import std.string;
 		scope (exit)
 			std.file.rmdirRecurse("ut");
 		auto fs = FileSystem("ut");
 		auto tout = fs.createFile("test.txt");
-		auto pid = fs.spawnProcess(["cmd", "/C", "echo xxx"], File.init, tout, File.init);
+		version (Windows)
+		{
+			auto cmd = ["cmd", "/C", "echo xxx"];
+		}
+		else
+		{
+			auto cmd = ["bash", "-c", "echo xxx"];
+		}
+		auto pid = fs.spawnProcess(cmd, File.init, tout, File.init);
 		pid.wait();
 		tout.close();
 		auto result = fs.readText("test.txt");
-		assert(result == "xxx\r\n");
+		assert(result.chomp == "xxx");
 	}
 	
 	///
 	@system unittest
 	{
+		import std.string;
 		scope (exit)
 			std.file.rmdirRecurse("ut");
 		auto fs = FileSystem("ut");
-		auto result = fs.execute(["cmd", "/C", "echo xxx"]);
-		assert(result.output == "xxx\r\n");
+		version (Windows)
+		{
+			auto cmd = ["cmd", "/C", "echo xxx"];
+		}
+		else
+		{
+			auto cmd = ["bash", "-c", "echo xxx"];
+		}
+		auto result = fs.execute(cmd);
+		assert(result.output.chomp == "xxx");
 	}
 }

@@ -895,11 +895,17 @@ void addPathBefore(string newpath)
  */
 string fromMBS(in ubyte[] data, uint codePage = 0)
 {
-	import std.windows.charset: fromMBSz;
-//	if (*(data.ptr + data.length) == 0)
-//		return fromMBSz(cast(immutable char*)data.ptr);
-	auto buf = data ~ 0;
-	return fromMBSz(cast(immutable char*)buf.ptr, codePage);
+	version (Windows)
+	{
+		import std.windows.charset: fromMBSz;
+		auto buf = data ~ 0;
+		return fromMBSz(cast(immutable char*)buf.ptr, codePage);
+	}
+	else
+	{
+		// Windows以外では無視する。
+		return cast(string)data.idup;
+	}
 }
 
 
@@ -908,9 +914,11 @@ string fromMBS(in ubyte[] data, uint codePage = 0)
  */
 string fromUTF16z(in wchar* data)
 {
-	import core.stdc.wchar_: wcslen;
 	import std.utf: toUTF8;
-	return toUTF8(data[0..wcslen(data)]);
+	const(wchar)* p = data;
+	while (*p != '\0')
+		++p;
+	return toUTF8(data[0..(p - data)]);
 }
 
 
@@ -920,10 +928,18 @@ string fromUTF16z(in wchar* data)
  */
 const(char)[] toMBS(in char[] data, uint codePage = 0)
 {
-	import std.windows.charset: toMBSz;
-	import core.stdc.string: strlen;
-	auto dat = toMBSz(cast(string)data, codePage);
-	return dat[0..strlen(dat)];
+	version (Windows)
+	{
+		import std.windows.charset: toMBSz;
+		import core.stdc.string: strlen;
+		auto dat = toMBSz(cast(string)data, codePage);
+		return dat[0..strlen(dat)];
+	}
+	else
+	{
+		// Windows以外では無視する。
+		return cast(string)data.idup;
+	}
 }
 
 
