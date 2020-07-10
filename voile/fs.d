@@ -25,7 +25,8 @@ static string[] splitPath(string path) @safe pure
  * パンくずリストをPosixパスに再構築する
  * 
  * Params:
- *     paths  = 変換したい絶対/相対パス
+ *     path      = 変換したい絶対/相対パス
+ *     delimiter = パスの区切り文字を指定する
  */
 static string joinPath(string[] path, string delimiter = dirSeparator) @safe pure
 {
@@ -37,7 +38,7 @@ static string joinPath(string[] path, string delimiter = dirSeparator) @safe pur
  * パンくずリストをWindowsパスに再構築する
  * 
  * Params:
- *     paths  = 変換したい絶対/相対パス
+ *     path  = 変換したい絶対/相対パス
  */
 static string joinWindowsPath(string[] path) @safe pure
 {
@@ -48,7 +49,7 @@ static string joinWindowsPath(string[] path) @safe pure
  * パンくずリストをPosixパスに再構築する
  * 
  * Params:
- *     paths  = 変換したい絶対/相対パス
+ *     path  = 変換したい絶対/相対パス
  */
 static string joinPosixPath(string[] path) @safe pure
 {
@@ -60,7 +61,7 @@ static string joinPosixPath(string[] path) @safe pure
  * パンをPosixパスに変換する(/を使うように変換)
  * 
  * Params:
- *     paths  = 変換したい絶対/相対パス
+ *     path  = 変換したい絶対/相対パス
  */
 string posixPath(string path)
 {
@@ -71,7 +72,7 @@ string posixPath(string path)
  * パンをWindowsパスに変換する(\を使うように変換)
  * 
  * Params:
- *     paths  = 変換したい絶対/相対パス
+ *     path  = 変換したい絶対/相対パス
  */
 string windowsPath(string path)
 {
