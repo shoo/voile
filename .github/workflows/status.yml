@@ -1,8 +1,8 @@
-name: Schedule
+name: status
 
 on:
   schedule:
-    # 毎日12:00(UTC)=21:00(JST)=05:00(シアトル)
+    # ステータスの更新は毎日12:00(UTC)=21:00(JST)=05:00(シアトル)
     - cron: 0 12 * * *
 
 jobs:
