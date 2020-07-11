@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.handler</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.handler</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">Common Handler type</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".isCastableDelegate"></span><div class="quickindex" id="quickindex.isCastableDelegate"></div>template <code class="ddoc_psymbol">isCastableDelegate</code>(aFunc, bFunc)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler"></span><div class="quickindex" id="quickindex.Handler"></div>struct <code class="ddoc_psymbol">Handler</code>(F) if (isCallable!F &amp;&amp; (is(ReturnType!F == void) || is(ReturnType!F : bool)));
+<br></div></dt>
+<dd><div class="ddoc_summary">Generic <code class="ddoc_psymbol">Handler</code>
+</div><div class="ddoc_description">$(_123 a, bbb) = xxx
+
+</div>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.emit"></span><div class="quickindex" id="quickindex.Handler.emit"></div>RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>);
+<br>
+const RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>);
+<br>
+shared const RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>);
+<br>
+<span class="def-anchor" id=".Handler.opCall"></span><div class="quickindex" id="quickindex.Handler.opCall"></div>alias <code class="ddoc_psymbol">opCall</code> = emit;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.toConnectable"></span><div class="quickindex" id="quickindex.Handler.toConnectable"></div>Proc <code class="ddoc_psymbol">toConnectable</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toDelegate(<span class="ddoc_param">fn</span>))) &amp;&amp; isCastableDelegate!(Proc, typeof(toDelegate(<span class="ddoc_param">fn</span>))))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.toConnectable.2"></span><div class="quickindex" id="quickindex.Handler.toConnectable.2"></div>Proc <code class="ddoc_psymbol">toConnectable</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">tid</span>)<br><span class="ddoc_constraint">if(is(Func == Tid))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.toConnectable.3"></span><div class="quickindex" id="quickindex.Handler.toConnectable.3"></div>Proc <code class="ddoc_psymbol">toConnectable</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(Range <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(Args.length == 1 &amp;&amp; isOutputRange!(Range, Args) &amp;&amp; !isCallable!Range &amp;&amp; (is(Range == class) || is(Range == interface) || isPointer!Range) &amp;&amp; is(typeof(()
+{
+Range tmp;
+if (!tmp.empty)
+{
+}
+}
+)))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.toConnectable.4"></span><div class="quickindex" id="quickindex.Handler.toConnectable.4"></div>Proc <code class="ddoc_psymbol">toConnectable</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">fib</span>)<br><span class="ddoc_constraint">if(is(Func : Fiber))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.HandlerProcId"></span><div class="quickindex" id="quickindex.Handler.HandlerProcId"></div>alias <code class="ddoc_psymbol">HandlerProcId</code> = ProcList.Iterator;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.connect"></span><div class="quickindex" id="quickindex.Handler.connect"></div>HandlerProcId <code class="ddoc_psymbol">connect</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Connect
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">Func <span class="ddoc_param">fn</span></td>
+<td class="ddoc_param_desc">delegate, function, Tid, Object( has opCall ), Fiber,
+          OutputRange(class or interface or T*, and has empty method)</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.singleShotConnect"></span><div class="quickindex" id="quickindex.Handler.singleShotConnect"></div>HandlerProcId <code class="ddoc_psymbol">singleShotConnect</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<br>
+<span class="def-anchor" id=".Handler.opOpAssign"></span><div class="quickindex" id="quickindex.Handler.opOpAssign"></div>void <code class="ddoc_psymbol">opOpAssign</code><span class="ddoc_template_param_list" title="Template parameter list">(string op, Func)</span>(Func <span class="ddoc_param">dg</span>)<br><span class="ddoc_constraint">if(op == "~" &amp;&amp; is(typeof(connect(<span class="ddoc_param">dg</span>))))</span>;
+<br>
+<span class="def-anchor" id=".Handler.put"></span><div class="quickindex" id="quickindex.Handler.put"></div>alias <code class="ddoc_psymbol">put</code> = connect;
+<br></div></dt>
+<dd><div class="ddoc_summary">一度だけ実行するハンドラを接続する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.connectedId"></span><div class="quickindex" id="quickindex.Handler.connectedId"></div>HandlerProcId <code class="ddoc_psymbol">connectedId</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.opOpAssign.2"></span><div class="quickindex" id="quickindex.Handler.opOpAssign.2"></div>void <code class="ddoc_psymbol">opOpAssign</code><span class="ddoc_template_param_list" title="Template parameter list">(string op, ProcContainer)</span>(auto ref ProcContainer <span class="ddoc_param">procs</span>)<br><span class="ddoc_constraint">if(op == "~" &amp;&amp; is(ForeachType!(typeof(ProcContainer.init[])) : Proc))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Concut
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">ProcContainer <span class="ddoc_param">procs</span></td>
+<td class="ddoc_param_desc">other Handler</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.opSlice"></span><div class="quickindex" id="quickindex.Handler.opSlice"></div>auto <code class="ddoc_psymbol">opSlice</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.opCast"></span><div class="quickindex" id="quickindex.Handler.opCast"></div>const pure nothrow bool <code class="ddoc_psymbol">opCast</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>()<br><span class="ddoc_constraint">if(is(T == bool))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.disconnect"></span><div class="quickindex" id="quickindex.Handler.disconnect"></div>void <code class="ddoc_psymbol">disconnect</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<br>
+void <code class="ddoc_psymbol">disconnect</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">id</span>)<br><span class="ddoc_constraint">if(is(Func == HandlerProcId))</span>;
+<br>
+void <code class="ddoc_psymbol">disconnect</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">hnd</span>)<br><span class="ddoc_constraint">if(is(Func == Handler))</span>;
+<br>
+<span class="def-anchor" id=".Handler.remove"></span><div class="quickindex" id="quickindex.Handler.remove"></div>alias <code class="ddoc_psymbol">remove</code> = disconnect;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.insertAfter"></span><div class="quickindex" id="quickindex.Handler.insertAfter"></div>void <code class="ddoc_psymbol">insertAfter</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(ProcList.Range <span class="ddoc_param">r</span>, Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<br>
+void <code class="ddoc_psymbol">insertAfter</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(HandlerProcId <span class="ddoc_param">needleid</span>, Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<br>
+void <code class="ddoc_psymbol">insertAfter</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">needle</span>, Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.insertBefore"></span><div class="quickindex" id="quickindex.Handler.insertBefore"></div>void <code class="ddoc_psymbol">insertBefore</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(ProcList.Range <span class="ddoc_param">r</span>, Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<br>
+void <code class="ddoc_psymbol">insertBefore</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(HandlerProcId <span class="ddoc_param">needleid</span>, Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<br>
+void <code class="ddoc_psymbol">insertBefore</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">needle</span>, Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.clear"></span><div class="quickindex" id="quickindex.Handler.clear"></div>pure void <code class="ddoc_psymbol">clear</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

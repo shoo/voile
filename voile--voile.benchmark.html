@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.benchmark</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.benchmark</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">性能評価に関するモジュール
+</div><div class="ddoc_description">ベンチマークのヘルパクラスや、所定位置を通過した時間の記録、呼び出された回数
+ などを記録することのできるクラスを用意した。
+ 関数の実行にかかる時間を短縮し、スピードアップするのに役に立つかもしれない。
+ <ul>     <li>Benchmark</li>
+     <li>FootPrint</li>
+     <li>CallCounter</li>
+ </ul>
+</div>
+<div class="ddoc_date"><span class="ddoc_date_header">Date:</span>
+ December 08, 2008
+</div>
+<div class="ddoc_authors"><span class="ddoc_authors_header">Authors:</span>
+ P.Knowledge, SHOO
+</div>
+<div class="ddoc_license"><span class="ddoc_license_header">License:</span>
+ NYSL ( <a href="http://www.kmonos.net/nysl/">http://www.kmonos.net/nysl/</a> )</div>
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark"></span><div class="quickindex" id="quickindex.FootPrintBenchmark"></div>struct <code class="ddoc_psymbol">FootPrintBenchmark</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">足跡を記録する
+</div><div class="ddoc_description"> このクラスは、ファイルと行番号ごとに足跡をつけ、前回の足跡からどの程度の時間
+ が経過したかを記録し、時間がかかっている個所を特定するためのクラスです。
+<pre class="d_code notranslate"><span class="d_keyword">void</span> main()
+{
+    <span class="d_keyword">scope</span> fp = <span class="d_keyword">new</span> FootPrint;
+    fp.stamp(<span class="d_keyword">__FILE__</span>,<span class="d_keyword">__LINE__</span>);
+    func1();
+    fp.stamp(<span class="d_keyword">__FILE__</span>,<span class="d_keyword">__LINE__</span>);
+    func2();
+    fp.stamp(<span class="d_keyword">__FILE__</span>,<span class="d_keyword">__LINE__</span>);
+    Stdout(<span class="d_string">"Stamp infomations"</span>).newline;
+    <span class="d_keyword">foreach</span> (d; fp.result)
+    {
+        Stdout.formatln(<span class="d_string">"{}({}): {} sec"</span>, d.file, d.line, d.time.interval);
+    }
+}
+</pre>
+ For profiling.
+<div class="ddoc_blankline"></div>
+
+ It stamps the code footprints for searching bottlenecks.
+ When not enough to profile in -profile, this object is useful.</div>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.Data"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.Data"></div>struct <code class="ddoc_psymbol">Data</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">記録されるデータ</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.Data.time"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.Data.time"></div>Duration <code class="ddoc_psymbol">time</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">時間</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.Data.file"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.Data.file"></div>string <code class="ddoc_psymbol">file</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">呼び出し元ファイル名</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.Data.line"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.Data.line"></div>uint <code class="ddoc_psymbol">line</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">呼び出し元行数</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.Data.toString"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.Data.toString"></div>const string <code class="ddoc_psymbol">toString</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">文字列表現</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.this"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.this"></div>this(AutoStart <span class="ddoc_param">as</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">自動測定コンストラクタ
+</div><div class="ddoc_description">AutoStartの値によって、自動的にストップウォッチ開始するか決まります。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.start"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.start"></div>void <code class="ddoc_psymbol">start</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ストップウォッチスタート
+</div><div class="ddoc_description">初めてのスタートの場合、この時刻からの時間を測定して足跡に記録します。
+ 一時停止からの復帰の場合、継続的に時間の測定を行います。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.stop"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.stop"></div>void <code class="ddoc_psymbol">stop</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ストップウォッチストップ
+</div><div class="ddoc_description">一時停止です。再び復帰する場合はstart()します</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.reset"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.reset"></div>void <code class="ddoc_psymbol">reset</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ストップウォッチリセット</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.clear"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.clear"></div>void <code class="ddoc_psymbol">clear</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">データをクリアします。
+</div><div class="ddoc_description">ストップウォッチの状態はそのままです。
+ ストップウォッチをリセットする場合はresetをコールしてください</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.stamp"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.stamp"></div>void <code class="ddoc_psymbol">stamp</code>(string <span class="ddoc_param">f</span> = __FILE__, uint <span class="ddoc_param">l</span> = __LINE__);
+<br></div></dt>
+<dd><div class="ddoc_summary">足跡を記録します。
+</div><div class="ddoc_description">この関数を呼び出した時点での時間と、呼び出し元を記録してデータに追加しま
+ す。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.intervals"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.intervals"></div>immutable(real)[] <code class="ddoc_psymbol">intervals</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">各データのそれぞれの呼び出し間隔を返します。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.datas"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.datas"></div>immutable(Data)[] <code class="ddoc_psymbol">datas</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">記録されたデータそのものを返します</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FootPrintBenchmark.intervalDatas"></span><div class="quickindex" id="quickindex.FootPrintBenchmark.intervalDatas"></div>immutable(Data)[] <code class="ddoc_psymbol">intervalDatas</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">記録されたデータそのものを返します</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CallCounter"></span><div class="quickindex" id="quickindex.CallCounter"></div>class <code class="ddoc_psymbol">CallCounter</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">呼び出しの情報を記録する
+</div><div class="ddoc_description">このクラスは呼び出した回数を記録する。呼び出された回数が多いほどその周囲は
+ 時間に気をつけるようにするとよい。</div>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".CallCounter.Data"></span><div class="quickindex" id="quickindex.CallCounter.Data"></div>struct <code class="ddoc_psymbol">Data</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">記録されるデータ</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".CallCounter.Data.file"></span><div class="quickindex" id="quickindex.CallCounter.Data.file"></div>immutable string <code class="ddoc_psymbol">file</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">ファイル名</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CallCounter.Data.line"></span><div class="quickindex" id="quickindex.CallCounter.Data.line"></div>immutable uint <code class="ddoc_psymbol">line</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">行番号</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CallCounter.Data.count"></span><div class="quickindex" id="quickindex.CallCounter.Data.count"></div>immutable ulong <code class="ddoc_psymbol">count</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">回数</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CallCounter.call"></span><div class="quickindex" id="quickindex.CallCounter.call"></div>void <code class="ddoc_psymbol">call</code>(string <span class="ddoc_param">file</span> = __FILE__, uint <span class="ddoc_param">line</span> = __LINE__);
+<br></div></dt>
+<dd><div class="ddoc_summary">呼び出す
+</div><div class="ddoc_description">この関数を呼び出すことで、その場所の呼び出し回数カウントしていく。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CallCounter.result"></span><div class="quickindex" id="quickindex.CallCounter.result"></div>immutable(Data)[] <code class="ddoc_psymbol">result</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">結果を返す
+</div><div class="ddoc_description">このクラスは呼び出した回数を記録する。呼び出された回数が多いほどその周囲は
+ 時間に気をつけるようにするとよい。</div>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ProfileData"></span><div class="quickindex" id="quickindex.ProfileData"></div>struct <code class="ddoc_psymbol">ProfileData</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".ProfileData.thread"></span><div class="quickindex" id="quickindex.ProfileData.thread"></div>Thread <code class="ddoc_psymbol">thread</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ProfileData.file"></span><div class="quickindex" id="quickindex.ProfileData.file"></div>string <code class="ddoc_psymbol">file</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ProfileData.line"></span><div class="quickindex" id="quickindex.ProfileData.line"></div>uint <code class="ddoc_psymbol">line</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ProfileData.time"></span><div class="quickindex" id="quickindex.ProfileData.time"></div>TickDuration <code class="ddoc_psymbol">time</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ProfileData.duration"></span><div class="quickindex" id="quickindex.ProfileData.duration"></div>TickDuration <code class="ddoc_psymbol">duration</code>;
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.misc</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.misc</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumeAttr"></span><div class="quickindex" id="quickindex.assumeAttr"></div>ref auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, alias attrs, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!is(typeof(fn!Args)) &amp;&amp; isCallable!fn)</span>;
+<br>
+ref auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, alias attrs, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(is(typeof(fn!Args)) &amp;&amp; isCallable!(fn!Args))</span>;
+<br>
+auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias attrs, Fn)</span>(Fn <span class="ddoc_param">t</span>)<br><span class="ddoc_constraint">if(isFunctionPointer!Fn || isDelegate!Fn)</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getFunctionAttributes"></span><div class="quickindex" id="quickindex.getFunctionAttributes"></div>template <code class="ddoc_psymbol">getFunctionAttributes</code>(T...)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumePure"></span><div class="quickindex" id="quickindex.assumePure"></div>ref auto <code class="ddoc_psymbol">assumePure</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>);
+<br>
+auto <code class="ddoc_psymbol">assumePure</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">t</span>)<br><span class="ddoc_constraint">if(isFunctionPointer!T || isDelegate!T)</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumeNogc"></span><div class="quickindex" id="quickindex.assumeNogc"></div>ref auto <code class="ddoc_psymbol">assumeNogc</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>);
+<br>
+auto <code class="ddoc_psymbol">assumeNogc</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">t</span>)<br><span class="ddoc_constraint">if(isFunctionPointer!T || isDelegate!T)</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumeNothrow"></span><div class="quickindex" id="quickindex.assumeNothrow"></div>ref auto <code class="ddoc_psymbol">assumeNothrow</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>);
+<br>
+auto <code class="ddoc_psymbol">assumeNothrow</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">t</span>)<br><span class="ddoc_constraint">if(isFunctionPointer!T || isDelegate!T)</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumeUnshared"></span><div class="quickindex" id="quickindex.assumeUnshared"></div>@property ref auto <code class="ddoc_psymbol">assumeUnshared</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">x</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumeShared"></span><div class="quickindex" id="quickindex.assumeShared"></div>@property ref auto <code class="ddoc_psymbol">assumeShared</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">x</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TemplateSpecializedTypeTuple"></span><div class="quickindex" id="quickindex.TemplateSpecializedTypeTuple"></div>template <code class="ddoc_psymbol">TemplateSpecializedTypeTuple</code>(T)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".variantSwitch"></span><div class="quickindex" id="quickindex.variantSwitch"></div>CommonType!(staticMap!(ReturnType, T)) <code class="ddoc_psymbol">variantSwitch</code><span class="ddoc_template_param_list" title="Template parameter list">(T...)</span>(auto ref Variant <span class="ddoc_param">var</span>, T <span class="ddoc_param">caseFunctions</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".castSwitch"></span><div class="quickindex" id="quickindex.castSwitch"></div>CommonType!(staticMap!(ReturnType, T)) <code class="ddoc_psymbol">castSwitch</code><span class="ddoc_template_param_list" title="Template parameter list">(Base, T...)</span>(Base <span class="ddoc_param">inst</span>, T <span class="ddoc_param">caseFunctions</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".indent"></span><div class="quickindex" id="quickindex.indent"></div>S <code class="ddoc_psymbol">indent</code><span class="ddoc_template_param_list" title="Template parameter list">(S)</span>(S <span class="ddoc_param">s</span>, S <span class="ddoc_param">indentStr</span> = "\x09");
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".truncate"></span><div class="quickindex" id="quickindex.truncate"></div>void <code class="ddoc_psymbol">truncate</code>(ref File <span class="ddoc_param">f</span>, size_t <span class="ddoc_param">fileSize</span> = -1);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".addPathAfter"></span><div class="quickindex" id="quickindex.addPathAfter"></div>void <code class="ddoc_psymbol">addPathAfter</code>(string <span class="ddoc_param">newpath</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">新しいパスを現在のパスの後ろに追加します</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".addPathBefore"></span><div class="quickindex" id="quickindex.addPathBefore"></div>void <code class="ddoc_psymbol">addPathBefore</code>(string <span class="ddoc_param">newpath</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">新しいパスを現在のパスの前に追加します</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromMBS"></span><div class="quickindex" id="quickindex.fromMBS"></div>string <code class="ddoc_psymbol">fromMBS</code>(in ubyte[] <span class="ddoc_param">data</span>, uint <span class="ddoc_param">codePage</span> = 0);
+<br></div></dt>
+<dd><div class="ddoc_summary">MBS(ZeroNIL)文字列からUTF8に変換</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromUTF16z"></span><div class="quickindex" id="quickindex.fromUTF16z"></div>string <code class="ddoc_psymbol">fromUTF16z</code>(in wchar* <span class="ddoc_param">data</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">UTF16(ZeroNIL)文字列からUTF8に変換</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".toMBS"></span><div class="quickindex" id="quickindex.toMBS"></div>const(char)[] <code class="ddoc_psymbol">toMBS</code>(in char[] <span class="ddoc_param">data</span>, uint <span class="ddoc_param">codePage</span> = 0);
+<br></div></dt>
+<dd><div class="ddoc_summary">UTF8からMBS(ZeroNIL)文字列に変換</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MacroType"></span><div class="quickindex" id="quickindex.MacroType"></div>enum <code class="ddoc_psymbol">MacroType</code>: <span class="ddoc_enum_basetype">int</span>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_enum_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".MacroType.str"></span><div class="quickindex" id="quickindex.MacroType.str"></div><code class="ddoc_psymbol">str</code><br></div></dt>
+<dd><div class="ddoc_summary">$xxx, ${xxx}</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MacroType.expr"></span><div class="quickindex" id="quickindex.MacroType.expr"></div><code class="ddoc_psymbol">expr</code><br></div></dt>
+<dd><div class="ddoc_summary"><span style="color:red">!!!!! UNDEFINED MACRO: "xxx" !!!!!!</span></div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".expandMacro"></span><div class="quickindex" id="quickindex.expandMacro"></div>T <code class="ddoc_psymbol">expandMacro</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Func)</span>(in T <span class="ddoc_param">str</span>, Func <span class="ddoc_param">mapFunc</span>)<br><span class="ddoc_constraint">if(isSomeString!T &amp;&amp; isCallable!Func &amp;&amp; is(ReturnType!Func : bool) &amp;&amp; (ParameterTypeTuple!Func.length &gt;= 1) &amp;&amp; is(T : ParameterTypeTuple!Func[0]) &amp;&amp; ((ParameterStorageClassTuple!Func[0] &amp; ParameterStorageClass.ref_) == ParameterStorageClass.ref_))</span>;
+<br>
+T <code class="ddoc_psymbol">expandMacro</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Func)</span>(in T <span class="ddoc_param">str</span>, Func <span class="ddoc_param">mapFunc</span>)<br><span class="ddoc_constraint">if(isSomeString!T &amp;&amp; isCallable!Func &amp;&amp; is(ReturnType!Func : T) &amp;&amp; (ParameterTypeTuple!Func.length &gt;= 1) &amp;&amp; is(T : ParameterTypeTuple!Func[0]))</span>;
+<br>
+T <code class="ddoc_psymbol">expandMacro</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MAP)</span>(in T <span class="ddoc_param">str</span>, MAP <span class="ddoc_param">map</span>)<br><span class="ddoc_constraint">if(isSomeString!T &amp;&amp; is(typeof(()
+{
+auto p = T.init in <span class="ddoc_param">map</span>;
+T tmp = *p;
+}
+)))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Expands macro variables contained within a <span class="ddoc_param">str</span></div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".expandVariable"></span><div class="quickindex" id="quickindex.expandVariable"></div>T <code class="ddoc_psymbol">expandVariable</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MAP)</span>(in T <span class="ddoc_param">str</span>, MAP <span class="ddoc_param">map</span>)<br><span class="ddoc_constraint">if(isSomeString!T &amp;&amp; is(typeof(()
+{
+auto p = T.init in <span class="ddoc_param">map</span>;
+T var = *p;
+}
+)))</span>;
+<br>
+T <code class="ddoc_psymbol">expandVariable</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Func)</span>(in T <span class="ddoc_param">str</span>, Func <span class="ddoc_param">mapFunc</span>)<br><span class="ddoc_constraint">if(isSomeString!T &amp;&amp; isCallable!Func &amp;&amp; is(ReturnType!Func : T) &amp;&amp; (ParameterTypeTuple!Func.length == 1) &amp;&amp; is(T : ParameterTypeTuple!Func[0]))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">文字列内に含まれる変数を展開します。
+</div><div class="ddoc_description"><code class="d_inlinecode donthyphenate notranslate">aaa%VAR%bbb</code>のVAR変数を展開します。変数が存在しない場合は何もしません。
+ VARがxxxであれば、<code class="d_inlinecode donthyphenate notranslate">aaaxxxbbb</code>となります。
+ VARが存在しなければ、<code class="d_inlinecode donthyphenate notranslate">aaa%VAR%bbb</code>のままです。</div>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

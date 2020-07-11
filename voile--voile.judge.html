@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.judge</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.judge</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">judgement モジュール
+</div><div class="ddoc_description">複数の要素でチェックを行いたい場合に使用することのできる Judgement が利用可能
+
+</div>
+<div class="ddoc_date"><span class="ddoc_date_header">Date:</span>
+ September 08, 2011
+</div>
+<div class="ddoc_authors"><span class="ddoc_authors_header">Authors:</span>
+ P.Knowledge, SHOO
+</div>
+<div class="ddoc_license"><span class="ddoc_license_header">License:</span>
+ NYSL ( <a href="http://www.kmonos.net/nysl/">http://www.kmonos.net/nysl/</a> )</div>
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".JudgementException"></span><div class="quickindex" id="quickindex.JudgementException"></div>class <code class="ddoc_psymbol">JudgementException</code>: <span class="ddoc_psuper_symbol">object.Exception</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">審判を含めて投げることのできる例外
+</div><div class="ddoc_description"> 投げる際にJudgementオブジェクトを含めて投げることが可能です。
+<pre class="d_code notranslate"> <span class="d_keyword">auto</span> dJudge = <span class="d_keyword">new</span> Judgement;
+ ...
+ <span class="d_keyword">if</span> (dJudge.bad)
+ {
+     <span class="d_keyword">throw</span> <span class="d_keyword">new</span> <span class="d_psymbol">JudgementException</span>(dJudge);
+ }
+</pre>
+</div>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".JudgementException.judgement"></span><div class="quickindex" id="quickindex.JudgementException.judgement"></div>Judgement <code class="ddoc_psymbol">judgement</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Judgementオブジェクトへのアクセス</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JudgementException.this"></span><div class="quickindex" id="quickindex.JudgementException.this"></div>this(Judgement <span class="ddoc_param">aJudge</span>, string <span class="ddoc_param">file</span> = null, int <span class="ddoc_param">line</span> = 0);
+<br></div></dt>
+<dd><div class="ddoc_summary">コンストラクタ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JudgementException.results"></span><div class="quickindex" id="quickindex.JudgementException.results"></div>Object[] <code class="ddoc_psymbol">results</code>();
+<br></div></dt>
+<dd><div class="ddoc_see_also"><span class="ddoc_see_also_header">See Also:</span>
+ Judgement.result()</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JudgementException.opApply"></span><div class="quickindex" id="quickindex.JudgementException.opApply"></div>int <code class="ddoc_psymbol">opApply</code>(int delegate(ref Object) <span class="ddoc_param">dg</span>);
+<br>
+int <code class="ddoc_psymbol">opApply</code>(int delegate(ref size_t, ref Object) <span class="ddoc_param">dg</span>);
+<br></div></dt>
+<dd><div class="ddoc_see_also"><span class="ddoc_see_also_header">See Also:</span>
+ Judgement.<code class="ddoc_psymbol">opApply</code>()</div>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Judgement"></span><div class="quickindex" id="quickindex.Judgement"></div>class <code class="ddoc_psymbol">Judgement</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">審判クラス
+</div><div class="ddoc_description">discuss() 関数の引数の結果が、存在するか否かで審判を下す。
+ 詳しくは discuss() 関数を参照。<br>
+ また、 discuss() 関数により審判を行ったあとは results() 関数で結果を得ること
+ が可能。 results() 関数は、 discuss() を行う際の引数に指定した文字列や Object
+ 実行する際に生じた例外などが含まれます。<br>
+ ヘルパ関数の judge() 関数と with 文と if 文、 ok ステータスを使うとスマートに
+ 見えるかも？
+</div>
+<div class="ddoc_section_nonstandard"><span class="ddoc_section_nonstandard_header">Example:</span>
+<pre class="d_code notranslate"><span class="d_keyword">void</span> checkFunc()
+{
+    <span class="d_keyword">if</span> (a.checked &amp;&amp; b.checked)
+    {
+        <span class="d_keyword">throw</span> <span class="d_keyword">new</span> Exception(<span class="d_string">"conflict switches 'a' and 'b'."</span>);
+    }
+}
+
+<span class="d_keyword">void</span> func()
+{
+    <span class="d_keyword">with</span> (judge(checkFunc))
+    {
+        <span class="d_keyword">if</span> (ok)
+        {
+            status = <span class="d_string">"OK"</span>;
+        }
+        <span class="d_keyword">else</span>
+        {
+            status = <span class="d_string">"NG ["</span> ~ messages[0].toString ~ <span class="d_string">"]"</span>;
+        }
+    }
+}
+</pre>
+</div>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Judgement.discuss"></span><div class="quickindex" id="quickindex.Judgement.discuss"></div>typeof(this) <code class="ddoc_psymbol">discuss</code><span class="ddoc_template_param_list" title="Template parameter list">(T...)</span>(lazy T <span class="ddoc_param">args</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">審議
+</div><div class="ddoc_description">引数を指定して審判を行います。<br>
+ 下記の、引数の説明にあるリストの実行結果を判定し、
+ <ul>     <li>引数                                                           </li>
+     <li>引数の実行結果                                                 </li>
+     <li>引数の実行に際して生じる例外                                   </li>
+     <li>引数のdelegateやfunctionの実行結果                             </li>
+     <li>引数のdelegateやfunctionの実行に際して生じる例外               </li>
+ </ul>
+ を検出し、結果に加えます。<br>
+ 実行の結果、nullを返すというのが良い結果であり、戻り値が発生する場合、
+ 審判に否決したということになります。<br>
+ 審判の結果は success や rejection またはそれらのすきな別名を使用して得る
+ とが可能です。<br>
+ ダイレクトに結果を得たい場合は results() 関数を呼び出すことで結果を出す
+ 過程において生じた Object の配列を得ることが可能です。
+
+</div>
+<div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">T <span class="ddoc_param">args</span></td>
+<td class="ddoc_param_desc">下記リスト参照
+     <ul>         <li>string                                                     </li>
+         <li>Object                                                     </li>
+         <li>string delegate()                                          </li>
+         <li>Object delegate()                                          </li>
+         <li>bool delegate()                                            </li>
+         <li>void delegate()                                            </li>
+         <li>string function()                                          </li>
+         <li>Object function()                                          </li>
+         <li>bool function()                                            </li>
+         <li>void function()                                            </li>
+         <li>上記delegateおよびfunctionの実行結果                       </li>
+     </ul>
+     複数の指定が可能です。<br>
+     引数のlazy属性によって、引数の順番通りの実行が保証されます。<br>
+     必ず1つ以上の引数を指定してください。</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ 自分自身を返します</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Judgement.certified"></span><div class="quickindex" id="quickindex.Judgement.certified"></div>final @property bool <code class="ddoc_psymbol">certified</code>();
+<br>
+<span class="def-anchor" id=".Judgement.ok"></span><div class="quickindex" id="quickindex.Judgement.ok"></div>alias <code class="ddoc_psymbol">ok</code> = certified;
+<br>
+<span class="def-anchor" id=".Judgement.good"></span><div class="quickindex" id="quickindex.Judgement.good"></div>alias <code class="ddoc_psymbol">good</code> = certified;
+<br>
+<span class="def-anchor" id=".Judgement.success"></span><div class="quickindex" id="quickindex.Judgement.success"></div>alias <code class="ddoc_psymbol">success</code> = certified;
+<br>
+<span class="def-anchor" id=".Judgement.succeeded"></span><div class="quickindex" id="quickindex.Judgement.succeeded"></div>alias <code class="ddoc_psymbol">succeeded</code> = certified;
+<br></div></dt>
+<dd><div class="ddoc_summary">合格しているか</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Judgement.rejected"></span><div class="quickindex" id="quickindex.Judgement.rejected"></div>final @property bool <code class="ddoc_psymbol">rejected</code>();
+<br>
+<span class="def-anchor" id=".Judgement.ng"></span><div class="quickindex" id="quickindex.Judgement.ng"></div>alias <code class="ddoc_psymbol">ng</code> = rejected;
+<br>
+<span class="def-anchor" id=".Judgement.bad"></span><div class="quickindex" id="quickindex.Judgement.bad"></div>alias <code class="ddoc_psymbol">bad</code> = rejected;
+<br>
+<span class="def-anchor" id=".Judgement.failure"></span><div class="quickindex" id="quickindex.Judgement.failure"></div>alias <code class="ddoc_psymbol">failure</code> = rejected;
+<br>
+<span class="def-anchor" id=".Judgement.failed"></span><div class="quickindex" id="quickindex.Judgement.failed"></div>alias <code class="ddoc_psymbol">failed</code> = rejected;
+<br></div></dt>
+<dd><div class="ddoc_summary">否決されているか</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Judgement.results"></span><div class="quickindex" id="quickindex.Judgement.results"></div>final @property Object[] <code class="ddoc_psymbol">results</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">結果
+</div><div class="ddoc_description">生じた Object のリストを返します。<br>
+ 審判ではこの戻り値がnullであることが望ましい。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Judgement.opApply"></span><div class="quickindex" id="quickindex.Judgement.opApply"></div>final int <code class="ddoc_psymbol">opApply</code>(int delegate(ref Object) <span class="ddoc_param">dg</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">foreach (d; judgement.result)と同義</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Judgement.opApply.2"></span><div class="quickindex" id="quickindex.Judgement.opApply.2"></div>final int <code class="ddoc_psymbol">opApply</code>(int delegate(ref size_t, ref Object) <span class="ddoc_param">dg</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">foreach (i, d; judgement.result)と同義</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Judgement.toString"></span><div class="quickindex" id="quickindex.Judgement.toString"></div>final const string <code class="ddoc_psymbol">toString</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">文字列を返す
+</div><div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ results のそれぞれのオブジェクトのtoStringで得られる文字列を改行でつ
+     ないだ文字列を返します。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Judgement.throwIfFailure"></span><div class="quickindex" id="quickindex.Judgement.throwIfFailure"></div>final void <code class="ddoc_psymbol">throwIfFailure</code>(bool <span class="ddoc_param">doCopy</span> = true);
+<br></div></dt>
+<dd><div class="ddoc_summary">例外を投げる
+</div><div class="ddoc_throws"><span class="ddoc_throws_header">Throws:</span>
+ JudgementException=自身を含めたJudgementExceptionを投げる</div>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".judge"></span><div class="quickindex" id="quickindex.judge"></div>Judgement <code class="ddoc_psymbol">judge</code><span class="ddoc_template_param_list" title="Template parameter list">(T...)</span>(lazy T <span class="ddoc_param">args</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Judgementクラスのヘルパ関数
+</div><div class="ddoc_description">インスタンスオブジェクトを生成し、審議し、返す。
+</div>
+<div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">T <span class="ddoc_param">args</span></td>
+<td class="ddoc_param_desc">Judgement.discuss() の引数</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ 審議した後の Judgement オブジェクト</div>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

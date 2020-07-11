@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.dataformatter</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.dataformatter</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">judgement モジュール
+</div><div class="ddoc_description">複数の要素でチェックを行いたい場合に使用することのできる Judgement が利用可能
+
+</div>
+<div class="ddoc_date"><span class="ddoc_date_header">Date:</span>
+ September 07, 2011
+</div>
+<div class="ddoc_authors"><span class="ddoc_authors_header">Authors:</span>
+ P.Knowledge, SHOO
+</div>
+<div class="ddoc_license"><span class="ddoc_license_header">License:</span>
+ NYSL ( <a href="http://www.kmonos.net/nysl/">http://www.kmonos.net/nysl/</a> )</div>
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DataWriter"></span><div class="quickindex" id="quickindex.DataWriter"></div>struct <code class="ddoc_psymbol">DataWriter</code>(Range, Endian rangeEndian = Endian.littleEndian) if (isOutputRange!(Range, const(ubyte)[]) || isOutputRange!(Range, ubyte) || isOutputRange!(Range, const(void)[]));
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DataWriter.put"></span><div class="quickindex" id="quickindex.DataWriter.put"></div>void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(Unqual!T == ubyte) || is(Unqual!T == char) || is(Unqual!T == byte))</span>;
+<br>
+void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(Unqual!T == const(ubyte)[]) || is(Unqual!T == const(byte)[]) || is(Unqual!T == const(char)[]) || is(Unqual!T == const(void)[]) || is(Unqual!T == immutable(ubyte)[]) || is(Unqual!T == immutable(byte)[]) || is(Unqual!T == string) || is(Unqual!T == immutable(void)[]) || is(Unqual!T == ubyte[]) || is(Unqual!T == byte[]) || is(Unqual!T == char[]) || is(Unqual!T == void[]))</span>;
+<br>
+void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(Unqual!T == ushort) || is(Unqual!T == short) || is(Unqual!T == wchar))</span>;
+<br>
+void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(Unqual!T == uint) || is(Unqual!T == int) || is(Unqual!T == float) || is(Unqual!T == ifloat) || is(Unqual!T == dchar))</span>;
+<br>
+void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(Unqual!T == ulong) || is(Unqual!T == long) || is(Unqual!T == double) || is(Unqual!T == idouble))</span>;
+<br>
+void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(Unqual!T U == enum) &amp;&amp; isOutputRange!(typeof(this), OriginalType!T))</span>;
+<br>
+void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(SrcRange)</span>(ref SrcRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isStaticArray!(Unqual!SrcRange))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DataWriter.put.2"></span><div class="quickindex" id="quickindex.DataWriter.put.2"></div>void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(SrcRange)</span>(SrcRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputRange!(Unqual!SrcRange) &amp;&amp; !is(Unqual!SrcRange == const(ubyte)[]) &amp;&amp; !is(Unqual!SrcRange == const(byte)[]) &amp;&amp; !is(Unqual!SrcRange == const(char)[]) &amp;&amp; !is(Unqual!SrcRange == const(void)[]) &amp;&amp; !is(Unqual!SrcRange == immutable(ubyte)[]) &amp;&amp; !is(Unqual!SrcRange == immutable(byte)[]) &amp;&amp; !is(Unqual!SrcRange == string) &amp;&amp; !is(Unqual!SrcRange == immutable(void)[]) &amp;&amp; !is(Unqual!SrcRange == ubyte[]) &amp;&amp; !is(Unqual!SrcRange == byte[]) &amp;&amp; !is(Unqual!SrcRange == char[]) &amp;&amp; !is(Unqual!SrcRange == void[]) &amp;&amp; is(typeof(()
+{
+foreach (e; <span class="ddoc_param">r</span>)
+{
+<code class="ddoc_psymbol">put</code>(e);
+}
+}
+())))</span>;
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".leWriter"></span><div class="quickindex" id="quickindex.leWriter"></div>DataWriter!(ElementType!Range[], Endian.littleEndian) <code class="ddoc_psymbol">leWriter</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(ref Range <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isStaticArray!Range)</span>;
+<br>
+DataWriter!(Range, Endian.littleEndian) <code class="ddoc_psymbol">leWriter</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(Range <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isOutputRange!(Range, ubyte[]) || isOutputRange!(Range, ubyte))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".beWriter"></span><div class="quickindex" id="quickindex.beWriter"></div>DataWriter!(ElementType!Range[], Endian.bigEndian) <code class="ddoc_psymbol">beWriter</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(ref Range <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isStaticArray!Range)</span>;
+<br>
+DataWriter!(Range, Endian.bigEndian) <code class="ddoc_psymbol">beWriter</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(Range <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isOutputRange!(Range, ubyte[]) || isOutputRange!(Range, ubyte))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".pick"></span><div class="quickindex" id="quickindex.pick"></div>void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(R, E)</span>(R <span class="ddoc_param">r</span>, ref E <span class="ddoc_param">e</span>)<br><span class="ddoc_constraint">if(!isArray!E)</span>;
+<br>
+void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(R, E)</span>(ref R <span class="ddoc_param">r</span>, E <span class="ddoc_param">e</span>)<br><span class="ddoc_constraint">if(isDynamicArray!E)</span>;
+<br>
+void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(R, E)</span>(ref R <span class="ddoc_param">r</span>, ref E <span class="ddoc_param">e</span>)<br><span class="ddoc_constraint">if(isStaticArray!E)</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isEntryRange"></span><div class="quickindex" id="quickindex.isEntryRange"></div>enum auto <code class="ddoc_psymbol">isEntryRange</code>(R, E);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DataReader"></span><div class="quickindex" id="quickindex.DataReader"></div>struct <code class="ddoc_psymbol">DataReader</code>(Range, Endian rangeEndian = Endian.littleEndian) if (isEntryRange!(Range, ubyte[]) || isEntryRange!(Range, ubyte) || isEntryRange!(Range, void[]));
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DataReader.this"></span><div class="quickindex" id="quickindex.DataReader.this"></div>this(Range <span class="ddoc_param">r</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DataReader.pick"></span><div class="quickindex" id="quickindex.DataReader.pick"></div>void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(T == ubyte) || is(T == char) || is(T == byte))</span>;
+<br>
+void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(T == ubyte[]) || is(T == void[]) || is(T == char[]) || is(T == byte[]))</span>;
+<br>
+void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(T == ushort) || is(T == short) || is(T == wchar))</span>;
+<br>
+void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(T == uint) || is(T == int) || is(T == float) || is(T == ifloat) || is(T == dchar))</span>;
+<br>
+void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(T == ulong) || is(T == long) || is(T == double) || is(T == idouble))</span>;
+<br>
+void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(Unqual!T U == enum) &amp;&amp; isEntryRange!(typeof(this), OriginalType!T))</span>;
+<br>
+void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(SrcRange)</span>(ref SrcRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isStaticArray!SrcRange)</span>;
+<br>
+void <code class="ddoc_psymbol">pick</code><span class="ddoc_template_param_list" title="Template parameter list">(DstRange)</span>(DstRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputRange!DstRange &amp;&amp; !is(ElementType!DstRange == ubyte) &amp;&amp; !is(DstRange == void[]) &amp;&amp; !is(ElementType!DstRange == byte) &amp;&amp; !is(DstRange == char[]) &amp;&amp; is(typeof(()
+{
+foreach (ref e; <span class="ddoc_param">r</span>)
+{
+<code class="ddoc_psymbol">pick</code>(e);
+}
+}
+())))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">EntryRange Primitive</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DataReader.empty"></span><div class="quickindex" id="quickindex.DataReader.empty"></div>const @property bool <code class="ddoc_psymbol">empty</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Range primitive</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".leReader"></span><div class="quickindex" id="quickindex.leReader"></div>DataReader!(ElementType!Range[], Endian.littleEndian) <code class="ddoc_psymbol">leReader</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(ref Range <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isStaticArray!Range)</span>;
+<br>
+DataReader!(Range, Endian.littleEndian) <code class="ddoc_psymbol">leReader</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(Range <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isOutputRange!(Range, ubyte[]) || isOutputRange!(Range, ubyte))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".beReader"></span><div class="quickindex" id="quickindex.beReader"></div>DataReader!(ElementType!Range[], Endian.bigEndian) <code class="ddoc_psymbol">beReader</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(ref Range <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isStaticArray!Range)</span>;
+<br>
+DataReader!(Range, Endian.bigEndian) <code class="ddoc_psymbol">beReader</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(Range <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isOutputRange!(Range, ubyte[]) || isOutputRange!(Range, ubyte))</span>;
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

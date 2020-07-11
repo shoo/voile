@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.unique</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.unique</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">Unique</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Unique"></span><div class="quickindex" id="quickindex.Unique"></div>struct <code class="ddoc_psymbol">Unique</code>(T);
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Unique.this"></span><div class="quickindex" id="quickindex.Unique.this"></div>this<span class="ddoc_template_param_list" title="Template parameter list">(U)</span>(Unique!U <span class="ddoc_param">u</span>)<br><span class="ddoc_constraint">if(!is(U == T) &amp;&amp; is(U : T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary"> Constructor that takes an rvalue.
+ It will ensure uniqueness, as long as the rvalue
+ isn't just a view on an lvalue (e.g., a cast)
+ Typical usage:
+<pre class="d_code notranslate">Unique!(Foo) f = unique!Bar;
+</pre>
+</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Unique.proxySwap"></span><div class="quickindex" id="quickindex.Unique.proxySwap"></div>@safe void <code class="ddoc_psymbol">proxySwap</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(ref Unique <span class="ddoc_param">u</span>)<br><span class="ddoc_constraint">if(!is(typeof(T.init.<code class="ddoc_psymbol">proxySwap</code>(T.init))))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Unique.opAssign"></span><div class="quickindex" id="quickindex.Unique.opAssign"></div>ref Unique <code class="ddoc_psymbol">opAssign</code>(Unique <span class="ddoc_param">u</span>);
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".unique"></span><div class="quickindex" id="quickindex.unique"></div>@trusted Unique!T <code class="ddoc_psymbol">unique</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if((is(T == class) || is(T == struct) || is(T == union)) &amp;&amp; !isNested!T || !(is(T == class) || is(T == struct) || is(T == union)))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".release"></span><div class="quickindex" id="quickindex.release"></div>void <code class="ddoc_psymbol">release</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref Unique!T <span class="ddoc_param">u</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isEmpty"></span><div class="quickindex" id="quickindex.isEmpty"></div>bool <code class="ddoc_psymbol">isEmpty</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref Unique!T <span class="ddoc_param">u</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".toRawData"></span><div class="quickindex" id="quickindex.toRawData"></div>auto <code class="ddoc_psymbol">toRawData</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref Unique!T <span class="ddoc_param">u</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">生データを利用できない形で返す</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".toUnique"></span><div class="quickindex" id="quickindex.toUnique"></div>auto <code class="ddoc_psymbol">toUnique</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref ReturnType!(toRawData!T) <span class="ddoc_param">d</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">生データから利用できる形のUnique型へと変換する</div></dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

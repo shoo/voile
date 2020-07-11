@@ -1,0 +1,634 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.fs</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.fs</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".splitPath"></span><div class="quickindex" id="quickindex.splitPath"></div>static pure @safe string[] <code class="ddoc_psymbol">splitPath</code>(string <span class="ddoc_param">path</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">パスを分解してパンくずリストにする
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".joinPath"></span><div class="quickindex" id="quickindex.joinPath"></div>static pure @safe string <code class="ddoc_psymbol">joinPath</code>(string[] <span class="ddoc_param">path</span>, string <span class="ddoc_param">delimiter</span> = dirSeparator);
+<br></div></dt>
+<dd><div class="ddoc_summary">パンくずリストをPosixパスに再構築する
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">delimiter</span></td>
+<td class="ddoc_param_desc">パスの区切り文字を指定する</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".joinWindowsPath"></span><div class="quickindex" id="quickindex.joinWindowsPath"></div>static pure @safe string <code class="ddoc_psymbol">joinWindowsPath</code>(string[] <span class="ddoc_param">path</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">パンくずリストをWindowsパスに再構築する
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".joinPosixPath"></span><div class="quickindex" id="quickindex.joinPosixPath"></div>static pure @safe string <code class="ddoc_psymbol">joinPosixPath</code>(string[] <span class="ddoc_param">path</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">パンくずリストをPosixパスに再構築する
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".posixPath"></span><div class="quickindex" id="quickindex.posixPath"></div>string <code class="ddoc_psymbol">posixPath</code>(string <span class="ddoc_param">path</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">パンをPosixパスに変換する(/を使うように変換)
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".windowsPath"></span><div class="quickindex" id="quickindex.windowsPath"></div>string <code class="ddoc_psymbol">windowsPath</code>(string <span class="ddoc_param">path</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">パンをWindowsパスに変換する(\を使うように変換)
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".joinNativePath"></span><div class="quickindex" id="quickindex.joinNativePath"></div>alias <code class="ddoc_psymbol">joinNativePath</code> = joinPosixPath;
+<br>
+<span class="def-anchor" id=".nativePath"></span><div class="quickindex" id="quickindex.nativePath"></div>alias <code class="ddoc_psymbol">nativePath</code> = posixPath;
+<br></div></dt>
+<dd><div class="ddoc_summary">In Posix</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem"></span><div class="quickindex" id="quickindex.FileSystem"></div>struct <code class="ddoc_psymbol">FileSystem</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">ファイルシステムの操作に関するヘルパ</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.workDir"></span><div class="quickindex" id="quickindex.FileSystem.workDir"></div>string <code class="ddoc_psymbol">workDir</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onCreating"></span><div class="quickindex" id="quickindex.FileSystem.onCreating"></div>Handler!(void delegate(string target, uint retrycnt)) <code class="ddoc_psymbol">onCreating</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">作成前に呼ばれる。作成しない場合は例外を投げる</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onCreated"></span><div class="quickindex" id="quickindex.FileSystem.onCreated"></div>Handler!(void delegate(string target)) <code class="ddoc_psymbol">onCreated</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">作成後に呼ばれる。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onCreateFailed"></span><div class="quickindex" id="quickindex.FileSystem.onCreateFailed"></div>Handler!(bool delegate(string target, Exception e)) <code class="ddoc_psymbol">onCreateFailed</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">作成に失敗したら呼ばれる。処理を継続を継続するならtrueを返す。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onCopying"></span><div class="quickindex" id="quickindex.FileSystem.onCopying"></div>Handler!(void delegate(string target, uint retrycnt)) <code class="ddoc_psymbol">onCopying</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">コピー前に呼ばれる。コピーしない場合は例外を投げる。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onCopied"></span><div class="quickindex" id="quickindex.FileSystem.onCopied"></div>Handler!(void delegate(string src, string target)) <code class="ddoc_psymbol">onCopied</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">コピー後に呼ばれる。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onCopyFailed"></span><div class="quickindex" id="quickindex.FileSystem.onCopyFailed"></div>Handler!(bool delegate(string src, string target, Exception e)) <code class="ddoc_psymbol">onCopyFailed</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">コピー失敗したら呼ばれる。処理を継続を継続するならtrueを返す。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onRemoving"></span><div class="quickindex" id="quickindex.FileSystem.onRemoving"></div>Handler!(void delegate(string target, uint retrycnt)) <code class="ddoc_psymbol">onRemoving</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">削除前に呼ばれる。削除しない場合は例外を投げる。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onRemoved"></span><div class="quickindex" id="quickindex.FileSystem.onRemoved"></div>Handler!(void delegate(string target)) <code class="ddoc_psymbol">onRemoved</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">削除後に呼ばれる。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onRemoveFailed"></span><div class="quickindex" id="quickindex.FileSystem.onRemoveFailed"></div>Handler!(bool delegate(string target, Exception e)) <code class="ddoc_psymbol">onRemoveFailed</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">削除に失敗したら呼ばれる。処理を継続を継続するならtrueを返す。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.absolutePath"></span><div class="quickindex" id="quickindex.FileSystem.absolutePath"></div>const @safe string <code class="ddoc_psymbol">absolutePath</code>();
+<br>
+const @safe string <code class="ddoc_psymbol">absolutePath</code>(string <span class="ddoc_param">target</span>);
+<br>
+const @safe string <code class="ddoc_psymbol">absolutePath</code>(string[] <span class="ddoc_param">targetPath</span>);
+<br>
+const @safe string <code class="ddoc_psymbol">absolutePath</code>(string <span class="ddoc_param">target</span>, string <span class="ddoc_param">base</span>);
+<br>
+const @safe string <code class="ddoc_psymbol">absolutePath</code>(string[] <span class="ddoc_param">targetPath</span>, string <span class="ddoc_param">base</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">絶対パスに変換する
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">target</span></td>
+<td class="ddoc_param_desc">変換したい相対パス(何も指定しないとworkDirの絶対パスが返る)</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">targetPath</span></td>
+<td class="ddoc_param_desc">変換したい相対パスのパンくずリスト</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">base</span></td>
+<td class="ddoc_param_desc">基準となるパス(このパスの基準はworkDir)</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.actualPath"></span><div class="quickindex" id="quickindex.FileSystem.actualPath"></div>const @safe string <code class="ddoc_psymbol">actualPath</code>(string <span class="ddoc_param">path</span> = ".");
+<br></div></dt>
+<dd><div class="ddoc_summary">実際のパス名に修正する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.relativePath"></span><div class="quickindex" id="quickindex.FileSystem.relativePath"></div>const @safe string <code class="ddoc_psymbol">relativePath</code>(string <span class="ddoc_param">target</span>);
+<br>
+const @safe string <code class="ddoc_psymbol">relativePath</code>(string[] <span class="ddoc_param">targetPath</span>);
+<br>
+const @safe string <code class="ddoc_psymbol">relativePath</code>(string <span class="ddoc_param">target</span>, string <span class="ddoc_param">base</span>);
+<br>
+const @safe string <code class="ddoc_psymbol">relativePath</code>(string[] <span class="ddoc_param">targetPath</span>, string <span class="ddoc_param">base</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">相対パスに変換する
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">target</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">targetPath</span></td>
+<td class="ddoc_param_desc">変換したい相対パスのパンくずリスト</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">base</span></td>
+<td class="ddoc_param_desc">基準となるパス(このパスの基準はworkDir)</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildSplittedPath"></span><div class="quickindex" id="quickindex.FileSystem.buildSplittedPath"></div>const @safe string[] <code class="ddoc_psymbol">buildSplittedPath</code>(string <span class="ddoc_param">path</span>);
+<br>
+const @safe string[] <code class="ddoc_psymbol">buildSplittedPath</code>(string[] <span class="ddoc_param">paths</span>);
+<br>
+const @safe string[] <code class="ddoc_psymbol">buildSplittedPath</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">パスをパンくず表現に変換
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">paths</span></td>
+<td class="ddoc_param_desc">変換したい相対パスのパンくずリスト</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildPosixPath"></span><div class="quickindex" id="quickindex.FileSystem.buildPosixPath"></div>const @safe string <code class="ddoc_psymbol">buildPosixPath</code>(string <span class="ddoc_param">path</span>);
+<br>
+const @safe string <code class="ddoc_psymbol">buildPosixPath</code>(string[] <span class="ddoc_param">paths</span>);
+<br>
+const @safe string <code class="ddoc_psymbol">buildPosixPath</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">パスをPosix表現に変換
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">paths</span></td>
+<td class="ddoc_param_desc">変換したい相対パスのパンくずリスト</td></tr>
+</table></div>
+
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut\\test"</span>);
+<span class="d_keyword">assert</span>(fs.<span class="d_psymbol">buildPosixPath</span>() == <span class="d_string">"ut/test"</span>);
+<span class="d_keyword">auto</span> posixPath = fs.<span class="d_psymbol">buildPosixPath</span>(<span class="d_string">"path\\to/file"</span>);
+<span class="d_keyword">assert</span>(posixPath == <span class="d_string">"ut/test/path/to/file"</span>);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildWindowsPath"></span><div class="quickindex" id="quickindex.FileSystem.buildWindowsPath"></div>const @safe string <code class="ddoc_psymbol">buildWindowsPath</code>(string <span class="ddoc_param">path</span>);
+<br>
+const @safe string <code class="ddoc_psymbol">buildWindowsPath</code>(string[] <span class="ddoc_param">paths</span>);
+<br>
+const @safe string <code class="ddoc_psymbol">buildWindowsPath</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">パスをWindows表現に変換
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">paths</span></td>
+<td class="ddoc_param_desc">変換したい相対パスのパンくずリスト</td></tr>
+</table></div>
+
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut/test"</span>);
+<span class="d_keyword">assert</span>(fs.<span class="d_psymbol">buildWindowsPath</span>() == <span class="d_string">"ut\\test"</span>);
+<span class="d_keyword">auto</span> posixPath = fs.<span class="d_psymbol">buildWindowsPath</span>(<span class="d_string">"path\\to/file"</span>);
+<span class="d_keyword">assert</span>(posixPath == <span class="d_string">"ut\\test\\path\\to\\file"</span>);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildNormalizedSplittedPath"></span><div class="quickindex" id="quickindex.FileSystem.buildNormalizedSplittedPath"></div>const @safe string[] <code class="ddoc_psymbol">buildNormalizedSplittedPath</code>(string <span class="ddoc_param">path</span>);
+<br>
+const @safe string[] <code class="ddoc_psymbol">buildNormalizedSplittedPath</code>(string[] <span class="ddoc_param">paths</span>);
+<br>
+const @safe string[] <code class="ddoc_psymbol">buildNormalizedSplittedPath</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">パスを正規化して分解してパンくずリストにする
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">paths</span></td>
+<td class="ddoc_param_desc">変換したい相対パスのパンくずリスト</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildNormalizedPosixPath"></span><div class="quickindex" id="quickindex.FileSystem.buildNormalizedPosixPath"></div>string <code class="ddoc_psymbol">buildNormalizedPosixPath</code>(string <span class="ddoc_param">path</span>);
+<br>
+string <code class="ddoc_psymbol">buildNormalizedPosixPath</code>(string[] <span class="ddoc_param">paths</span>);
+<br>
+string <code class="ddoc_psymbol">buildNormalizedPosixPath</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">パスを正規化してPosix表現に変換
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">paths</span></td>
+<td class="ddoc_param_desc">変換したい相対パスのパンくずリスト</td></tr>
+</table></div>
+
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut\\test"</span>);
+<span class="d_keyword">assert</span>(fs.<span class="d_psymbol">buildNormalizedPosixPath</span>() == <span class="d_string">"ut/test"</span>);
+<span class="d_keyword">auto</span> posixPath = fs.<span class="d_psymbol">buildNormalizedPosixPath</span>(<span class="d_string">"../path\\to/file"</span>);
+<span class="d_keyword">assert</span>(posixPath == <span class="d_string">"ut/path/to/file"</span>);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildNormalizedWindowsPath"></span><div class="quickindex" id="quickindex.FileSystem.buildNormalizedWindowsPath"></div>string <code class="ddoc_psymbol">buildNormalizedWindowsPath</code>(string <span class="ddoc_param">path</span>);
+<br>
+string <code class="ddoc_psymbol">buildNormalizedWindowsPath</code>(string[] <span class="ddoc_param">paths</span>);
+<br>
+string <code class="ddoc_psymbol">buildNormalizedWindowsPath</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">パスを正規化してWindows表現に変換
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">path</span></td>
+<td class="ddoc_param_desc">変換したい絶対/相対パス</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string[] <span class="ddoc_param">paths</span></td>
+<td class="ddoc_param_desc">変換したい相対パスのパンくずリスト</td></tr>
+</table></div>
+
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut\\./test"</span>);
+<span class="d_keyword">assert</span>(fs.<span class="d_psymbol">buildNormalizedWindowsPath</span>() == <span class="d_string">"ut\\test"</span>);
+<span class="d_keyword">auto</span> posixPath = fs.<span class="d_psymbol">buildNormalizedWindowsPath</span>(<span class="d_string">"../path\\to/file"</span>);
+<span class="d_keyword">assert</span>(posixPath == <span class="d_string">"ut\\path\\to\\file"</span>);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildNativePath"></span><div class="quickindex" id="quickindex.FileSystem.buildNativePath"></div>alias <code class="ddoc_psymbol">buildNativePath</code> = buildPosixPath;
+<br>
+<span class="def-anchor" id=".FileSystem.buildNormalizedNativePath"></span><div class="quickindex" id="quickindex.FileSystem.buildNormalizedNativePath"></div>alias <code class="ddoc_psymbol">buildNormalizedNativePath</code> = buildNormalizedPosixPath;
+<br></div></dt>
+<dd><div class="ddoc_summary">In Posix</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.exists"></span><div class="quickindex" id="quickindex.FileSystem.exists"></div>const @safe bool <code class="ddoc_psymbol">exists</code>(string <span class="ddoc_param">target</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">パスが存在するか確認する
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">target</span></td>
+<td class="ddoc_param_desc">パス</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.isFile"></span><div class="quickindex" id="quickindex.FileSystem.isFile"></div>const @safe bool <code class="ddoc_psymbol">isFile</code>(string <span class="ddoc_param">target</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">パスがファイルかどうか確認する
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">target</span></td>
+<td class="ddoc_param_desc">パス</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.isDir"></span><div class="quickindex" id="quickindex.FileSystem.isDir"></div>const @safe bool <code class="ddoc_psymbol">isDir</code>(string <span class="ddoc_param">target</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">パスがファイルかどうか確認する
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">target</span></td>
+<td class="ddoc_param_desc">パス</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.makeDir"></span><div class="quickindex" id="quickindex.FileSystem.makeDir"></div>void <code class="ddoc_psymbol">makeDir</code>(string <span class="ddoc_param">target</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
+<br></div></dt>
+<dd><div class="ddoc_summary">ディレクトリを作成する
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">target</span></td>
+<td class="ddoc_param_desc">パス</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">bool <span class="ddoc_param">force</span></td>
+<td class="ddoc_param_desc">強制的に作成</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">uint <span class="ddoc_param">retrycnt</span></td>
+<td class="ddoc_param_desc">リトライする回数</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.entries"></span><div class="quickindex" id="quickindex.FileSystem.entries"></div>auto <code class="ddoc_psymbol">entries</code>(SpanMode <span class="ddoc_param">mode</span>, bool <span class="ddoc_param">followSymlink</span> = true);
+<br>
+auto <code class="ddoc_psymbol">entries</code>(string <span class="ddoc_param">pattern</span>, SpanMode <span class="ddoc_param">mode</span> = SpanMode.shallow, bool <span class="ddoc_param">followSymlink</span> = true);
+<br>
+auto <code class="ddoc_psymbol">entries</code><span class="ddoc_template_param_list" title="Template parameter list">(Char)</span>(Regex!Char <span class="ddoc_param">pattern</span>, SpanMode <span class="ddoc_param">mode</span> = SpanMode.shallow, bool <span class="ddoc_param">followSymlink</span> = true);
+<br></div></dt>
+<dd><div class="ddoc_summary">エントリー一覧</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">scope</span> (exit)
+	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+fs.writeText(<span class="d_string">"a/b/test1.txt"</span>, <span class="d_string">"Test"</span>);
+fs.writeText(<span class="d_string">"a/c/test2.txt"</span>, <span class="d_string">"Test"</span>);
+fs.writeText(<span class="d_string">"a/b/test3.txt"</span>, <span class="d_string">"Test"</span>);
+string[] files;
+<span class="d_keyword">foreach</span> (de; fs.<span class="d_psymbol">entries</span>(SpanMode.depth))
+{
+	files ~= de.name;
+	<span class="d_keyword">assert</span>(de.name.isAbsolute);
+}
+<span class="d_keyword">assert</span>(files.length == 6);
+<span class="d_keyword">import</span> std.algorithm: sort;
+files.sort();
+<span class="d_keyword">assert</span>(fs.relativePath(files[0]).splitPath() == [<span class="d_string">"a"</span>]);
+<span class="d_keyword">assert</span>(fs.relativePath(files[1]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"b"</span>]);
+<span class="d_keyword">assert</span>(fs.relativePath(files[2]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"b"</span>, <span class="d_string">"test1.txt"</span>]);
+<span class="d_keyword">assert</span>(fs.relativePath(files[3]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"b"</span>, <span class="d_string">"test3.txt"</span>]);
+<span class="d_keyword">assert</span>(fs.relativePath(files[4]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"c"</span>]);
+<span class="d_keyword">assert</span>(fs.relativePath(files[5]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"c"</span>, <span class="d_string">"test2.txt"</span>]);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.writeText"></span><div class="quickindex" id="quickindex.FileSystem.writeText"></div>void <code class="ddoc_psymbol">writeText</code>(string <span class="ddoc_param">filename</span>, in char[] <span class="ddoc_param">text</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">テキストファイルを書き出す</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.readText"></span><div class="quickindex" id="quickindex.FileSystem.readText"></div>string <code class="ddoc_psymbol">readText</code>(string <span class="ddoc_param">filename</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">テキストファイルを読み込む</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.writeBinary"></span><div class="quickindex" id="quickindex.FileSystem.writeBinary"></div>void <code class="ddoc_psymbol">writeBinary</code>(string <span class="ddoc_param">filename</span>, in ubyte[] <span class="ddoc_param">binary</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">バイナリファイルを書き出す</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.readBinary"></span><div class="quickindex" id="quickindex.FileSystem.readBinary"></div>immutable(ubyte)[] <code class="ddoc_psymbol">readBinary</code>(string <span class="ddoc_param">filename</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">バイナリファイルを読み込む</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.writeJson"></span><div class="quickindex" id="quickindex.FileSystem.writeJson"></div>void <code class="ddoc_psymbol">writeJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(string <span class="ddoc_param">filename</span>, in T <span class="ddoc_param">data</span>, JSONOptions <span class="ddoc_param">options</span> = JSONOptions.none);
+<br></div></dt>
+<dd><div class="ddoc_summary">JSONファイルを書き出す</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.readJson"></span><div class="quickindex" id="quickindex.FileSystem.readJson"></div>T <code class="ddoc_psymbol">readJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(string <span class="ddoc_param">filename</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">JSONファイルを書き出す</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">scope</span> (exit)
+	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+fs.writeJson!<span class="d_keyword">uint</span>(<span class="d_string">"a/b/test.json"</span>, 10);
+<span class="d_keyword">assert</span>(fs.<span class="d_psymbol">readJson</span>!<span class="d_keyword">uint</span>(<span class="d_string">"a/b/test.json"</span>) == 10);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">import</span> voile.json;
+<span class="d_keyword">scope</span> (exit)
+	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">static</span> <span class="d_keyword">struct</span> A
+{
+	<span class="d_keyword">int</span> a = 123;
+	JSONValue json() <span class="d_keyword">const</span> @property
+	{
+		JSONValue v;
+		v.setValue(<span class="d_string">"a"</span>, a);
+		<span class="d_keyword">return</span> v;
+	}
+	<span class="d_keyword">void</span> json(JSONValue v) @property
+	{
+		<span class="d_keyword">assert</span>(v.type == JSONType.object);
+		a = v.getValue(<span class="d_string">"a"</span>, 123);
+	}
+}
+fs.writeJson(<span class="d_string">"a/b/test.json"</span>, A(10));
+<span class="d_keyword">assert</span>(fs.<span class="d_psymbol">readJson</span>!A(<span class="d_string">"a/b/test.json"</span>) == A(10));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.createFile"></span><div class="quickindex" id="quickindex.FileSystem.createFile"></div>File <code class="ddoc_psymbol">createFile</code>(string <span class="ddoc_param">filename</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">ファイルを新しく作成する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.openFile"></span><div class="quickindex" id="quickindex.FileSystem.openFile"></div>File <code class="ddoc_psymbol">openFile</code>(string <span class="ddoc_param">filename</span>, string <span class="ddoc_param">attr</span> = "r+");
+<br></div></dt>
+<dd><div class="ddoc_summary">ファイルを開く
+</div><div class="ddoc_description">ファイルがなければ新しく作成して開く</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.clearReadonly"></span><div class="quickindex" id="quickindex.FileSystem.clearReadonly"></div>const bool <code class="ddoc_psymbol">clearReadonly</code>(string <span class="ddoc_param">target</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.removeFiles"></span><div class="quickindex" id="quickindex.FileSystem.removeFiles"></div>bool <code class="ddoc_psymbol">removeFiles</code>(string <span class="ddoc_param">target</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
+<br>
+bool <code class="ddoc_psymbol">removeFiles</code>(string <span class="ddoc_param">targetDir</span>, string <span class="ddoc_param">blobFilter</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.copyFile"></span><div class="quickindex" id="quickindex.FileSystem.copyFile"></div>bool <code class="ddoc_psymbol">copyFile</code>(string <span class="ddoc_param">srcFile</span>, string <span class="ddoc_param">targetFile</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
+<br></div></dt>
+<dd><div class="ddoc_summary">ファイルをコピーする</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.copyFiles"></span><div class="quickindex" id="quickindex.FileSystem.copyFiles"></div>bool <code class="ddoc_psymbol">copyFiles</code>(string <span class="ddoc_param">src</span>, string <span class="ddoc_param">target</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
+<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">scope</span> (exit)
+	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/b/c.txt"</span>));
+fs.writeText(<span class="d_string">"a/b/c.txt"</span>, <span class="d_string">"aaaaa"</span>);
+fs.<span class="d_psymbol">copyFiles</span>(<span class="d_string">"a/b/c.txt"</span>, <span class="d_string">"a/c/c.txt"</span>);
+<span class="d_keyword">assert</span>(fs.isFile(<span class="d_string">"a/c/c.txt"</span>));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">scope</span> (exit)
+	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/b/c.txt"</span>));
+fs.writeText(<span class="d_string">"a/b/c.txt"</span>, <span class="d_string">"aaaaa"</span>);
+fs.<span class="d_psymbol">copyFiles</span>(<span class="d_string">"a/b"</span>, <span class="d_string">"a/c"</span>);
+<span class="d_keyword">assert</span>(fs.isFile(<span class="d_string">"a/c/c.txt"</span>));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.copyFiles.2"></span><div class="quickindex" id="quickindex.FileSystem.copyFiles.2"></div>bool <code class="ddoc_psymbol">copyFiles</code>(string <span class="ddoc_param">srcDir</span>, string <span class="ddoc_param">blobFilter</span>, string <span class="ddoc_param">targetDir</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
+<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">scope</span> (exit)
+	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/b/c.txt"</span>));
+<span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/b/d.dat"</span>));
+fs.writeText(<span class="d_string">"a/b/c.txt"</span>, <span class="d_string">"aaaaa"</span>);
+fs.writeBinary(<span class="d_string">"a/b/c.txt"</span>, [1,2,3]);
+fs.<span class="d_psymbol">copyFiles</span>(<span class="d_string">"a/b"</span>, <span class="d_string">"*.txt"</span>, <span class="d_string">"a/c"</span>);
+<span class="d_keyword">assert</span>(fs.isFile(<span class="d_string">"a/c/c.txt"</span>));
+<span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/c/d.dat"</span>));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.mirrorFiles"></span><div class="quickindex" id="quickindex.FileSystem.mirrorFiles"></div>bool <code class="ddoc_psymbol">mirrorFiles</code>(string <span class="ddoc_param">srcDir</span>, string <span class="ddoc_param">dstDir</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
+<br></div></dt>
+<dd><div class="ddoc_summary">ファイルをミラーリングする</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.moveFiles"></span><div class="quickindex" id="quickindex.FileSystem.moveFiles"></div>bool <code class="ddoc_psymbol">moveFiles</code>(string <span class="ddoc_param">src</span>, string <span class="ddoc_param">dst</span>, bool <span class="ddoc_param">force</span> = true, bool <span class="ddoc_param">retrycnt</span> = true);
+<br></div></dt>
+<dd><div class="ddoc_summary">ファイルを移動する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.setTimeStamp"></span><div class="quickindex" id="quickindex.FileSystem.setTimeStamp"></div>void <code class="ddoc_psymbol">setTimeStamp</code>(string <span class="ddoc_param">target</span>, SysTime <span class="ddoc_param">accessTime</span>, SysTime <span class="ddoc_param">modificationTime</span>);
+<br>
+void <code class="ddoc_psymbol">setTimeStamp</code>(string <span class="ddoc_param">target</span>, SysTime <span class="ddoc_param">modificationTime</span>);
+<br>
+void <code class="ddoc_psymbol">setTimeStamp</code>(string <span class="ddoc_param">target</span>, DateTime <span class="ddoc_param">accessTime</span>, DateTime <span class="ddoc_param">modificationTime</span>);
+<br>
+void <code class="ddoc_psymbol">setTimeStamp</code>(string <span class="ddoc_param">target</span>, DateTime <span class="ddoc_param">modificationTime</span>);
+<br>
+<span class="def-anchor" id=".FileSystem.getTimeStamp"></span><div class="quickindex" id="quickindex.FileSystem.getTimeStamp"></div>void <code class="ddoc_psymbol">getTimeStamp</code>(string <span class="ddoc_param">target</span>, out SysTime <span class="ddoc_param">accessTime</span>, out SysTime <span class="ddoc_param">modificationTime</span>);
+<br>
+void <code class="ddoc_psymbol">getTimeStamp</code>(string <span class="ddoc_param">target</span>, out SysTime <span class="ddoc_param">modificationTime</span>);
+<br>
+void <code class="ddoc_psymbol">getTimeStamp</code>(string <span class="ddoc_param">target</span>, out DateTime <span class="ddoc_param">accessTime</span>, out DateTime <span class="ddoc_param">modificationTime</span>);
+<br>
+void <code class="ddoc_psymbol">getTimeStamp</code>(string <span class="ddoc_param">target</span>, out DateTime <span class="ddoc_param">modificationTime</span>);
+<br>
+SysTime <code class="ddoc_psymbol">getTimeStamp</code>(string <span class="ddoc_param">target</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">タイムスタンプを変更/取得する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.searchPath"></span><div class="quickindex" id="quickindex.FileSystem.searchPath"></div>const @trusted string <code class="ddoc_psymbol">searchPath</code>(in char[] <span class="ddoc_param">executable</span>, in string[] <span class="ddoc_param">additional</span> = null);
+<br></div></dt>
+<dd><div class="ddoc_summary">パスを検索する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.spawnProcess"></span><div class="quickindex" id="quickindex.FileSystem.spawnProcess"></div>auto <code class="ddoc_psymbol">spawnProcess</code>(string[] <span class="ddoc_param">args</span>, string[string] <span class="ddoc_param">env</span> = null, std.process.Config <span class="ddoc_param">cfg</span> = std.process.Config.none);
+<br>
+auto <code class="ddoc_psymbol">spawnProcess</code>(string[] <span class="ddoc_param">args</span>, File <span class="ddoc_param">fin</span>, File <span class="ddoc_param">fout</span>, File <span class="ddoc_param">ferr</span>, string[string] <span class="ddoc_param">env</span> = null, std.process.Config <span class="ddoc_param">cfg</span> = std.process.Config.suppressConsole);
+<br>
+auto <code class="ddoc_psymbol">spawnProcess</code>(string[] <span class="ddoc_param">args</span>, Pipe <span class="ddoc_param">pin</span>, Pipe <span class="ddoc_param">pout</span>, Pipe <span class="ddoc_param">perr</span>, string[string] <span class="ddoc_param">env</span> = null, std.process.Config <span class="ddoc_param">cfg</span> = std.process.Config.suppressConsole);
+<br>
+<span class="def-anchor" id=".FileSystem.pipeProcess"></span><div class="quickindex" id="quickindex.FileSystem.pipeProcess"></div>auto <code class="ddoc_psymbol">pipeProcess</code>(string[] <span class="ddoc_param">args</span>, string[string] <span class="ddoc_param">env</span> = null, std.process.Config <span class="ddoc_param">cfg</span> = std.process.Config.suppressConsole);
+<br>
+<span class="def-anchor" id=".FileSystem.execute"></span><div class="quickindex" id="quickindex.FileSystem.execute"></div>auto <code class="ddoc_psymbol">execute</code>(string[] <span class="ddoc_param">args</span>, string[string] <span class="ddoc_param">env</span> = null, std.process.Config <span class="ddoc_param">cfg</span> = std.process.Config.suppressConsole);
+<br></div></dt>
+<dd><div class="ddoc_summary">プロセスを実行する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.string;
+<span class="d_keyword">scope</span> (exit)
+	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> pipeo = pipe();
+<span class="d_keyword">version</span> (Windows)
+{
+	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"cmd"</span>, <span class="d_string">"/C"</span>, <span class="d_string">"echo xxx"</span>];
+}
+<span class="d_keyword">else</span>
+{
+	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"bash"</span>, <span class="d_string">"-c"</span>, <span class="d_string">"echo xxx"</span>];
+}
+<span class="d_keyword">auto</span> pid = fs.<span class="d_psymbol">spawnProcess</span>(cmd, Pipe.init, pipeo, pipeo);
+pid.wait();
+<span class="d_keyword">auto</span> xxx = pipeo.readEnd().readln;
+<span class="d_keyword">assert</span>(xxx.chomp == <span class="d_string">"xxx"</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.string;
+<span class="d_keyword">scope</span> (exit)
+	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> pipeo = pipe();
+<span class="d_keyword">version</span> (Windows)
+{
+	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"cmd"</span>, <span class="d_string">"/C"</span>, <span class="d_string">"echo xxx"</span>];
+}
+<span class="d_keyword">else</span>
+{
+	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"bash"</span>, <span class="d_string">"-c"</span>, <span class="d_string">"echo xxx"</span>];
+}
+<span class="d_keyword">auto</span> pipe = fs.<span class="d_psymbol">pipeProcess</span>(cmd);
+pipe.pid.wait();
+<span class="d_keyword">auto</span> xxx = pipe.stdout().readln;
+<span class="d_keyword">assert</span>(xxx.chomp == <span class="d_string">"xxx"</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.string;
+<span class="d_keyword">scope</span> (exit)
+	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> tout = fs.createFile(<span class="d_string">"test.txt"</span>);
+<span class="d_keyword">version</span> (Windows)
+{
+	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"cmd"</span>, <span class="d_string">"/C"</span>, <span class="d_string">"echo xxx"</span>];
+}
+<span class="d_keyword">else</span>
+{
+	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"bash"</span>, <span class="d_string">"-c"</span>, <span class="d_string">"echo xxx"</span>];
+}
+<span class="d_keyword">auto</span> pid = fs.<span class="d_psymbol">spawnProcess</span>(cmd, File.init, tout, File.init);
+pid.wait();
+tout.close();
+<span class="d_keyword">auto</span> result = fs.readText(<span class="d_string">"test.txt"</span>);
+<span class="d_keyword">assert</span>(result.chomp == <span class="d_string">"xxx"</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.string;
+<span class="d_keyword">scope</span> (exit)
+	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">version</span> (Windows)
+{
+	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"cmd"</span>, <span class="d_string">"/C"</span>, <span class="d_string">"echo xxx"</span>];
+}
+<span class="d_keyword">else</span>
+{
+	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"bash"</span>, <span class="d_string">"-c"</span>, <span class="d_string">"echo xxx"</span>];
+}
+<span class="d_keyword">auto</span> result = fs.<span class="d_psymbol">execute</span>(cmd);
+<span class="d_keyword">assert</span>(result.output.chomp == <span class="d_string">"xxx"</span>);
+</pre>
+</div>
+</dd>
+</div></dl>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

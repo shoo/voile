@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.parseopt</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.parseopt</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">コマンドライン引数のパーサー
+</div><div class="ddoc_description"> getoptと同じくコマンドラインの解析を行う。
+ getoptとの違いは、getoptは関数の引数に基づいて引数の解析を行うが、
+ 本モジュールの parseOptions は、構造体の変数を引数に取ることで、構造体メンバ
+ に関連付けられたUDAによりコマンドライン引数の解析を行う。
+<div class="ddoc_blankline"></div>
+
+<pre class="d_code notranslate">@help(<span class="d_string">"Help messages for heading of application.\n"</span>)
+<span class="d_keyword">struct</span> Dat
+{
+  @help(<span class="d_string">"Description of `value`"</span>)
+  string value;
+
+  string nonHelpedValue;
+
+  @ignore
+  string ignoredValue;
+
+  @opt(<span class="d_string">"a|aaaa"</span>) @help(<span class="d_string">"Description of `i32value`"</span>)
+  <span class="d_keyword">int</span> i32value;
+
+  @opt(<span class="d_string">"f|ff"</span>)
+  <span class="d_keyword">int</span> f32value;
+}
+</pre>
+<div class="ddoc_blankline"></div>
+
+ 構造体(型)に付与できるUDAは以下の通り
+
+<ul><li>help(str) : アプリケーションのヘルプメッセージ</li>
+<li>caseSensitive : コマンドライン引数の大文字小文字を区別するかどうか。デフォルトは区別しない。</li>
+<li>passThrough : 解釈されなかったコマンドライン引数を無視するか例外としてはじくか。デフォルトは例外としてはじく。</li>
+<li>binding : 短いコマンドライン引数を、まとめて指定できるか(<code class="d_inlinecode donthyphenate notranslate">-abc</code>で<code class="d_inlinecode donthyphenate notranslate">-a -b -c</code>と同じ解釈にさせるかどうか)</li>
+<li>assignChar(str) : コマンドライン引数の「割り当て」に使用する文字を指定できる。(デフォルトは<code class="d_inlinecode donthyphenate notranslate">=</code>。<code class="d_inlinecode donthyphenate notranslate">-a=xxx</code> や <code class="d_inlinecode donthyphenate notranslate">--arg=xxx</code> など。区切り文字を変更可能。)</li>
+<li>arraySeparator(str) : コマンドライン引数の配列の区切り文字を指定できる。(デフォルトは<code class="d_inlinecode donthyphenate notranslate">,</code>(カンマ)。<code class="d_inlinecode donthyphenate notranslate">-a=xxx,yyy,zzz</code>の<code class="d_inlinecode donthyphenate notranslate">,</code>を変更可能。)</li>
+<li>endOfOptions(str) : コマンドライン引数として解釈させる最後の文字を指定できる。(デフォルトは<code class="d_inlinecode donthyphenate notranslate">--</code>で、<code class="d_inlinecode donthyphenate notranslate">-a=xxx -b=yyy -- -c=zzz</code>では、<code class="d_inlinecode donthyphenate notranslate">-a</code>と<code class="d_inlinecode donthyphenate notranslate">-b</code>だけ解釈させる区切り文字として作用する。この区切り文字を変更可能。)</li>
+<li>shortOpt(str) : 短いコマンドライン引数として解釈させるprefixを指定できる。(デフォルトは<code class="d_inlinecode donthyphenate notranslate">-</code>。<code class="d_inlinecode donthyphenate notranslate">-a</code>などのように使われる。)</li>
+<li>longOpt(str) : 短いコマンドライン引数として解釈させるprefixを指定できる。(デフォルトは<code class="d_inlinecode donthyphenate notranslate">--</code>。<code class="d_inlinecode donthyphenate notranslate">--arg</code>などのように使われる。)
+</li>
+</ul>
+ 構造体メンバーに付与できるUDAは以下の通り
+
+<ul><li>help(str) : 引数のヘルプメッセージ</li>
+<li>opt(str) : 引数。<code class="d_inlinecode donthyphenate notranslate">"a|args"</code> とすることで、<code class="d_inlinecode donthyphenate notranslate">-a</code>と<code class="d_inlinecode donthyphenate notranslate">--args</code>を同時に定義可能。指定しなければオプションとして指定できない。</li>
+<li>required : 引数を指定することを必須化する。デフォルトは<code class="d_inlinecode donthyphenate notranslate">false</code>。</li>
+<li>convBy!fn : 指定した関数<code class="d_inlinecode donthyphenate notranslate">fn</code>によって引数の値をメンバ変数の型に変換する。</li>
+<li>ignore : 指定したメンバーをコマンドライン引数の解釈に使用しない。
+</li>
+</ul>
+ コマンドライン引数の解釈の対象となるメンバーの型は以下の通り。※リストの上のものほど優先度が高い。
+
+<ul><li>convByが指定されている引数
+<ul><li>T function(string arg)</li>
+<li>void function(ref T dst, string arg)</li>
+<li>void function(out T dst, string arg)</li>
+<li>void function(in S dat, ref T dst, string arg)</li>
+<li>void function(in S dat, out T dst, string arg)</li>
+<li>void function(ref S dat, string arg)</li>
+</ul></li>
+<li>bool : 真偽値</li>
+<li>string : 文字列型</li>
+<li>T[] : 配列。std.conv.toにより、文字列がTに変換可能。</li>
+<li>V[K] : 連想配列。std.conv.toにより文字列がV, Kに変換可能。</li>
+<li>T : std.conv.toにより、文字列がTに変換可能。</li>
+<li>void function(bool shortPrefix, string arg)</li>
+<li>void function(string prefix, string arg)</li>
+<li>void function(string arg)</li>
+<li>void function(bool enabled)</li>
+<li>void function()</li>
+</ul></div>
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".help"></span><div class="quickindex" id="quickindex.help"></div>pure nothrow @nogc @safe Help <code class="ddoc_psymbol">help</code>(string <span class="ddoc_param">str</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".caseSensitive"></span><div class="quickindex" id="quickindex.caseSensitive"></div>pure nothrow @nogc @safe CaseSensitive <code class="ddoc_psymbol">caseSensitive</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".passThrough"></span><div class="quickindex" id="quickindex.passThrough"></div>pure nothrow @nogc @safe PassThrough <code class="ddoc_psymbol">passThrough</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".binding"></span><div class="quickindex" id="quickindex.binding"></div>pure nothrow @nogc @safe Binding <code class="ddoc_psymbol">binding</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".assignChar"></span><div class="quickindex" id="quickindex.assignChar"></div>pure nothrow @nogc @safe AssignChar <code class="ddoc_psymbol">assignChar</code>(dchar <span class="ddoc_param">c</span> = '=');
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".arraySeparator"></span><div class="quickindex" id="quickindex.arraySeparator"></div>pure nothrow @nogc @safe ArraySeparator <code class="ddoc_psymbol">arraySeparator</code>(dchar <span class="ddoc_param">c</span> = ',');
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".endOfOptions"></span><div class="quickindex" id="quickindex.endOfOptions"></div>EndOfOptions <code class="ddoc_psymbol">endOfOptions</code>(string <span class="ddoc_param">str</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".opt"></span><div class="quickindex" id="quickindex.opt"></div>pure nothrow @nogc @safe Opt <code class="ddoc_psymbol">opt</code>(string <span class="ddoc_param">str</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".required"></span><div class="quickindex" id="quickindex.required"></div>pure nothrow @nogc @safe Req <code class="ddoc_psymbol">required</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".optShort"></span><div class="quickindex" id="quickindex.optShort"></div>pure nothrow @nogc @safe OptShort <code class="ddoc_psymbol">optShort</code>(string[] <span class="ddoc_param">str</span>...);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".optLong"></span><div class="quickindex" id="quickindex.optLong"></div>pure nothrow @nogc @safe OptLong <code class="ddoc_psymbol">optLong</code>(string[] <span class="ddoc_param">str</span>...);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".convBy"></span><div class="quickindex" id="quickindex.convBy"></div>template <code class="ddoc_psymbol">convBy</code>(alias fn)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ignore"></span><div class="quickindex" id="quickindex.ignore"></div>alias <code class="ddoc_psymbol">ignore</code> = Ignore;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".typeOption"></span><div class="quickindex" id="quickindex.typeOption"></div>pure nothrow @nogc @safe TypeOption <code class="ddoc_psymbol">typeOption</code>(string <span class="ddoc_param">help</span> = null, bool <span class="ddoc_param">caseSensitive</span> = false, bool <span class="ddoc_param">passThrough</span> = false, bool <span class="ddoc_param">binding</span> = false, dchar <span class="ddoc_param">assignChar</span> = '=', dchar <span class="ddoc_param">arraySeparator</span> = ',', string <span class="ddoc_param">endOfOptions</span> = "--", string[] <span class="ddoc_param">shortOpt</span> = ["-"], string[] <span class="ddoc_param">longOpt</span> = ["--"]);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".option"></span><div class="quickindex" id="quickindex.option"></div>pure nothrow @nogc @safe Option <code class="ddoc_psymbol">option</code>(string <span class="ddoc_param">opt</span>, string <span class="ddoc_param">help</span> = null, bool <span class="ddoc_param">required</span> = false);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ParseOptException"></span><div class="quickindex" id="quickindex.ParseOptException"></div>class <code class="ddoc_psymbol">ParseOptException</code>: <span class="ddoc_psuper_symbol">object.Exception</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".HelpInformation"></span><div class="quickindex" id="quickindex.HelpInformation"></div>struct <code class="ddoc_psymbol">HelpInformation</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".HelpInformation.help"></span><div class="quickindex" id="quickindex.HelpInformation.help"></div>string <code class="ddoc_psymbol">help</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".HelpInformation.wanted"></span><div class="quickindex" id="quickindex.HelpInformation.wanted"></div>bool <code class="ddoc_psymbol">wanted</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".HelpInformation.opCast"></span><div class="quickindex" id="quickindex.HelpInformation.opCast"></div>const pure nothrow @nogc T <code class="ddoc_psymbol">opCast</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>()<br><span class="ddoc_constraint">if(is(T == bool))</span>;
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".parseOptions"></span><div class="quickindex" id="quickindex.parseOptions"></div>@safe HelpInformation <code class="ddoc_psymbol">parseOptions</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref string[] <span class="ddoc_param">args</span>, ref T <span class="ddoc_param">dat</span>);
+<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.exception;
+<span class="d_keyword">struct</span> Dat
+{
+	@opt(<span class="d_string">"a|arg"</span>)
+	string value;
+	
+	@opt(<span class="d_string">"b|arg2"</span>)
+	<span class="d_keyword">int</span> intValue;
+}
+Dat <span class="d_param">dat</span>;
+string[] <span class="d_param">args</span>;
+<span class="d_param">args</span> = [<span class="d_string">"xxx"</span>, <span class="d_string">"-a=vvv"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.value == <span class="d_string">"vvv"</span>);
+
+<span class="d_param">dat</span> = Dat.init;
+<span class="d_param">args</span> = [<span class="d_string">"xxx"</span>, <span class="d_string">"-ac=vvv"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.value == <span class="d_string">"c=vvv"</span>);
+
+<span class="d_param">dat</span> = Dat.init;
+<span class="d_param">args</span> = [<span class="d_string">"xxx"</span>, <span class="d_string">"-a=vvv"</span>, <span class="d_string">"--arg2=123"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.intValue == 123);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> <span class="d_param">args</span> = [<span class="d_string">"prog"</span>, <span class="d_string">"--foo"</span>, <span class="d_string">"-b"</span>];
+
+@help(<span class="d_string">"Some information about the program."</span>)
+<span class="d_keyword">struct</span> Dat
+{
+	@option(<span class="d_string">"foo|f"</span>, <span class="d_string">"Some information about foo."</span>)
+	<span class="d_keyword">bool</span> foo;
+	
+	@option(<span class="d_string">"bar|b"</span>, <span class="d_string">"Some help message about bar."</span>)
+	<span class="d_keyword">bool</span> bar;
+}
+
+Dat <span class="d_param">dat</span>;
+<span class="d_keyword">if</span> (<span class="d_keyword">auto</span> helpWanted = <span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>))
+{
+	<span class="d_keyword">import</span> std.stdio;
+	writeln(helpWanted.help);
+	<span class="d_keyword">assert</span>(0);
+}
+
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.foo);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.bar);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.exception : assertThrown;
+string[] <span class="d_param">args</span> = [<span class="d_string">"program"</span>, <span class="d_string">"-a"</span>];
+@passThrough
+<span class="d_keyword">struct</span> Dat
+{
+	@(.opt(<span class="d_string">"a"</span>))
+	<span class="d_keyword">bool</span> opt;
+}
+Dat <span class="d_param">dat</span>;
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.opt);
+
+@caseSensitive
+<span class="d_keyword">struct</span> Dat2
+{
+	@help(<span class="d_string">"help string"</span>)
+	@(.opt(<span class="d_string">"a"</span>))
+	<span class="d_keyword">bool</span> opt;
+}
+Dat2 dat2;
+<span class="d_param">args</span> = [<span class="d_string">"program"</span>, <span class="d_string">"-a"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(dat2);
+<span class="d_keyword">assert</span>(dat2.opt);
+
+<span class="d_keyword">struct</span> Dat3
+{
+	@help(<span class="d_string">"forgot to put a string"</span>)
+	@(.opt(<span class="d_string">"a"</span>))
+	<span class="d_keyword">bool</span> opt;
+}
+Dat3 dat3;
+<span class="d_param">args</span> = [<span class="d_string">"program"</span>, <span class="d_string">""</span>];
+assertThrown(
+	<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(dat3));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ This behavior is different from Phobos' std.getopt.
+<pre class="d_code notranslate"><span class="d_keyword">import</span> std.algorithm.searching : startsWith;
+@arraySeparator(',')
+<span class="d_keyword">struct</span> Dat
+{
+	@opt(<span class="d_string">"m"</span>)
+	string[string] mapping;
+}
+Dat <span class="d_param">dat</span>;
+string[] <span class="d_param">args</span> = [<span class="d_string">"testProgram"</span>, <span class="d_string">"-m"</span>, <span class="d_string">"a=b,c=\"d,e,f\""</span>];
+<span class="d_comment">// getopt may thrown but parseOptions is not
+</span><span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_string">"a"</span> <span class="d_keyword">in</span> <span class="d_param">dat</span>.mapping);
+<span class="d_keyword">assert</span>(<span class="d_string">"c"</span> <span class="d_keyword">in</span> <span class="d_param">dat</span>.mapping);
+<span class="d_keyword">assert</span>(<span class="d_string">"e"</span> <span class="d_keyword">in</span> <span class="d_param">dat</span>.mapping);
+<span class="d_keyword">assert</span>(<span class="d_string">"f\""</span> <span class="d_keyword">in</span> <span class="d_param">dat</span>.mapping);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.mapping[<span class="d_string">"a"</span>] == <span class="d_string">"b"</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.mapping[<span class="d_string">"c"</span>] == <span class="d_string">"\"d"</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.mapping[<span class="d_string">"e"</span>] == <span class="d_keyword">null</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.mapping[<span class="d_string">"f\""</span>] == <span class="d_keyword">null</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.conv;
+
+@arraySeparator(',')
+<span class="d_keyword">struct</span> Dat
+{
+	@opt(<span class="d_string">"n|name"</span>)
+	string[] names;
+}
+Dat <span class="d_param">dat</span>;
+<span class="d_keyword">auto</span> <span class="d_param">args</span> = [<span class="d_string">"program.name"</span>, <span class="d_string">"-nfoo,bar,baz"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.names == [<span class="d_string">"foo"</span>, <span class="d_string">"bar"</span>, <span class="d_string">"baz"</span>], to!string(<span class="d_param">dat</span>.names));
+
+<span class="d_param">dat</span> = Dat.init;
+<span class="d_param">args</span> = [<span class="d_string">"program.name"</span>, <span class="d_string">"-n"</span>, <span class="d_string">"foo,bar,baz"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.names == [<span class="d_string">"foo"</span>, <span class="d_string">"bar"</span>, <span class="d_string">"baz"</span>], to!string(<span class="d_param">dat</span>.names));
+
+<span class="d_param">dat</span> = Dat.init;
+<span class="d_param">args</span> = [<span class="d_string">"program.name"</span>, <span class="d_string">"--name=foo,bar,baz"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.names == [<span class="d_string">"foo"</span>, <span class="d_string">"bar"</span>, <span class="d_string">"baz"</span>], to!string(<span class="d_param">dat</span>.names));
+
+<span class="d_param">dat</span> = Dat.init;
+<span class="d_param">args</span> = [<span class="d_string">"program.name"</span>, <span class="d_string">"--name"</span>, <span class="d_string">"foo,bar,baz"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.names == [<span class="d_string">"foo"</span>, <span class="d_string">"bar"</span>, <span class="d_string">"baz"</span>], to!string(<span class="d_param">dat</span>.names));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.conv;
+
+<span class="d_keyword">struct</span> Dat
+{
+	@opt(<span class="d_string">"values|v"</span>)
+	<span class="d_keyword">int</span>[string] values;
+	
+	<span class="d_keyword">void</span> hogehoge(string x) <span class="d_comment">/+ pure but not annotation +/</span> { }
+}
+Dat <span class="d_param">dat</span>;
+
+<span class="d_param">dat</span>.values = <span class="d_param">dat</span>.values.init;
+<span class="d_keyword">auto</span> <span class="d_param">args</span> = [<span class="d_string">"program.name"</span>, <span class="d_string">"-vfoo=0,bar=1,baz=2"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.values == [<span class="d_string">"foo"</span>:0, <span class="d_string">"bar"</span>:1, <span class="d_string">"baz"</span>:2], to!string(<span class="d_param">dat</span>.values));
+
+<span class="d_param">dat</span>.values = <span class="d_param">dat</span>.values.init;
+<span class="d_param">args</span> = [<span class="d_string">"program.name"</span>, <span class="d_string">"-v"</span>, <span class="d_string">"foo=0,bar=1,baz=2"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.values == [<span class="d_string">"foo"</span>:0, <span class="d_string">"bar"</span>:1, <span class="d_string">"baz"</span>:2], to!string(<span class="d_param">dat</span>.values));
+
+<span class="d_param">dat</span>.values = <span class="d_param">dat</span>.values.init;
+<span class="d_param">args</span> = [<span class="d_string">"program.name"</span>, <span class="d_string">"--values=foo=0,bar=1,baz=2"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.values == [<span class="d_string">"foo"</span>:0, <span class="d_string">"bar"</span>:1, <span class="d_string">"baz"</span>:2], to!string(<span class="d_param">dat</span>.values));
+
+<span class="d_param">dat</span>.values = <span class="d_param">dat</span>.values.init;
+<span class="d_param">args</span> = [<span class="d_string">"program.name"</span>, <span class="d_string">"--values"</span>, <span class="d_string">"foo=0,bar=1,baz=2"</span>];
+<span class="d_comment">// call from pure
+</span>() <span class="d_keyword">pure</span> {
+	<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+} ();
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.values == [<span class="d_string">"foo"</span>:0, <span class="d_string">"bar"</span>:1, <span class="d_string">"baz"</span>:2], to!string(<span class="d_param">dat</span>.values));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.conv, std.math;
+<span class="d_keyword">static</span> <span class="d_keyword">int</span> xxxxx = 10;
+
+<span class="d_keyword">struct</span> Dat
+{
+	@opt(<span class="d_string">"foo"</span>)
+	@convBy!(a =&gt; a ~ a)
+	string valueStr;
+	
+	@ignore
+	<span class="d_keyword">static</span> <span class="d_keyword">void</span> convBar(<span class="d_keyword">ref</span> <span class="d_keyword">int</span> dst, string src)
+	{
+		<span class="d_keyword">import</span> std.conv;
+		dst = to!<span class="d_keyword">int</span>(src);
+	}
+	
+	@ignore
+	<span class="d_keyword">static</span> <span class="d_keyword">void</span> convHoge(<span class="d_keyword">ref</span> Dat dst, string src)
+	{
+		<span class="d_keyword">import</span> std.conv, std.range, std.array;
+		<span class="d_keyword">auto</span> v = to!<span class="d_keyword">int</span>(src);
+		dst.hogeLen = v;
+		dst.hoge = repeat(<span class="d_string">"hoge"</span>, v).join;
+	}
+	
+	@opt(<span class="d_string">"bar"</span>)
+	@convBy!convBar
+	<span class="d_keyword">int</span> valueI32;
+	
+	<span class="d_keyword">float</span> valueF32;
+	
+	@ignore
+	size_t hogeLen;
+	
+	@convBy!convHoge
+	string hoge;
+	
+	<span class="d_keyword">void</span> fuga(string x) <span class="d_comment">/+ impure +/</span>
+	{
+		valueF32 += valueI32 + xxxxx;
+		valueI32 += to!<span class="d_keyword">int</span>(x);
+	}
+}
+Dat <span class="d_param">dat</span>;
+
+<span class="d_param">dat</span>.valueStr = <span class="d_param">dat</span>.valueStr.init;
+<span class="d_param">dat</span>.valueI32 = <span class="d_param">dat</span>.valueI32.init;
+<span class="d_param">dat</span>.valueF32 = <span class="d_param">dat</span>.valueF32.init;
+<span class="d_keyword">auto</span> <span class="d_param">args</span> = [<span class="d_string">"program.name"</span>, <span class="d_string">"--foo=aaa"</span>, <span class="d_string">"--bar=12345"</span>, <span class="d_string">"--valueF32=10"</span>, <span class="d_string">"--hoge=3"</span>, <span class="d_string">"--fuga=5"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.valueStr == <span class="d_string">"aaaaaa"</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.valueI32 == 12345+5);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.valueF32.approxEqual(10.0f+12345 + 10));
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.hogeLen == 3);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.hoge == <span class="d_string">"hogehogehoge"</span>);
+</pre>
+</div>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

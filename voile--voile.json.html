@@ -1,0 +1,606 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.json</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.json</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".json"></span><div class="quickindex" id="quickindex.json"></div>@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T[] <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isSomeString!(T[]))</span>;
+<br>
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isIntegral!T &amp;&amp; !is(T == enum) || isFloatingPoint!T || is(Unqual!T == bool))</span>;
+<br>
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(is(T == enum))</span>;
+<br>
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T[] <span class="ddoc_param">ary</span>)<br><span class="ddoc_constraint">if(!isSomeString!(T[]) &amp;&amp; isArray!(T[]))</span>;
+<br>
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(Value, Key)</span>(auto ref const Value[Key] <span class="ddoc_param">aa</span>)<br><span class="ddoc_constraint">if(isSomeString!Key &amp;&amp; is(typeof(()
+{
+auto v = Value.init.<code class="ddoc_psymbol">json</code>;
+}
+)))</span>;
+<br>
+@property ref JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(JV)</span>(auto ref const JV <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(JV : const(JSONValue)))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">JSONValueデータを得る</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">dstring dstr = <span class="d_string">"あいうえお"</span>;
+wstring wstr = <span class="d_string">"かきくけこ"</span>;
+string  str  = <span class="d_string">"さしすせそ"</span>;
+<span class="d_keyword">auto</span> dstrjson = dstr.<span class="d_psymbol">json</span>;
+<span class="d_keyword">auto</span> wstrjson = wstr.<span class="d_psymbol">json</span>;
+<span class="d_keyword">auto</span> strjson  = str.<span class="d_psymbol">json</span>;
+<span class="d_keyword">assert</span>(dstrjson.type == JSONType.string);
+<span class="d_keyword">assert</span>(wstrjson.type == JSONType.string);
+<span class="d_keyword">assert</span>(strjson.type  == JSONType.string);
+<span class="d_keyword">assert</span>(dstrjson.str == <span class="d_string">"あいうえお"</span>);
+<span class="d_keyword">assert</span>(wstrjson.str == <span class="d_string">"かきくけこ"</span>);
+<span class="d_keyword">assert</span>(strjson.str  == <span class="d_string">"さしすせそ"</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.typetuple;
+<span class="d_keyword">foreach</span> (T; TypeTuple!(<span class="d_keyword">ubyte</span>, <span class="d_keyword">byte</span>, <span class="d_keyword">ushort</span>, <span class="d_keyword">short</span>, <span class="d_keyword">uint</span>, <span class="d_keyword">int</span>, <span class="d_keyword">ulong</span>, <span class="d_keyword">long</span>))
+{
+	T <span class="d_param">x</span> = 123;
+	<span class="d_keyword">auto</span> xjson = <span class="d_param">x</span>.<span class="d_psymbol">json</span>;
+	<span class="d_keyword">static</span> <span class="d_keyword">if</span> (isUnsigned!T)
+	{
+		<span class="d_keyword">assert</span>(xjson.type == JSONType.uinteger);
+		<span class="d_keyword">assert</span>(xjson.uinteger == 123);
+	}
+	<span class="d_keyword">else</span>
+	{
+		<span class="d_keyword">assert</span>(xjson.type == JSONType.integer);
+		<span class="d_keyword">assert</span>(xjson.integer == 123);
+	}
+}
+<span class="d_keyword">foreach</span> (T; TypeTuple!(<span class="d_keyword">float</span>, <span class="d_keyword">double</span>, <span class="d_keyword">real</span>))
+{
+	T <span class="d_param">x</span> = 0.125;
+	<span class="d_keyword">auto</span> xjson = <span class="d_param">x</span>.<span class="d_psymbol">json</span>;
+	<span class="d_keyword">assert</span>(xjson.type == JSONType.float_);
+	<span class="d_keyword">assert</span>(xjson.floating == 0.125);
+}
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">bool</span> bt = <span class="d_keyword">true</span>;
+<span class="d_keyword">bool</span> bf;
+<span class="d_keyword">auto</span> btjson = bt.<span class="d_psymbol">json</span>;
+<span class="d_keyword">auto</span> bfjson = bf.<span class="d_psymbol">json</span>;
+<span class="d_keyword">assert</span>(btjson.type == JSONType.true_);
+<span class="d_keyword">assert</span>(bfjson.type == JSONType.false_);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> EnumType
+{
+	a, b, c
+}
+<span class="d_keyword">auto</span> a = EnumType.a;
+<span class="d_keyword">auto</span> ajson = a.<span class="d_psymbol">json</span>;
+<span class="d_keyword">assert</span>(ajson.type == JSONType.string);
+<span class="d_keyword">assert</span>(ajson.str == <span class="d_string">"a"</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> <span class="d_param">ary</span> = [1,2,3];
+<span class="d_keyword">auto</span> aryjson = <span class="d_param">ary</span>.<span class="d_psymbol">json</span>;
+<span class="d_keyword">assert</span>(aryjson.type == JSONType.array);
+<span class="d_keyword">assert</span>(aryjson[0].type == JSONType.integer);
+<span class="d_keyword">assert</span>(aryjson[1].type == JSONType.integer);
+<span class="d_keyword">assert</span>(aryjson[2].type == JSONType.integer);
+<span class="d_keyword">assert</span>(aryjson[0].integer == 1);
+<span class="d_keyword">assert</span>(aryjson[1].integer == 2);
+<span class="d_keyword">assert</span>(aryjson[2].integer == 3);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> <span class="d_param">ary</span> = [<span class="d_string">"ab"</span>,<span class="d_string">"cd"</span>,<span class="d_string">"ef"</span>];
+<span class="d_keyword">auto</span> aryjson = <span class="d_param">ary</span>.<span class="d_psymbol">json</span>;
+<span class="d_keyword">assert</span>(aryjson.type == JSONType.array);
+<span class="d_keyword">assert</span>(aryjson[0].type == JSONType.string);
+<span class="d_keyword">assert</span>(aryjson[1].type == JSONType.string);
+<span class="d_keyword">assert</span>(aryjson[2].type == JSONType.string);
+<span class="d_keyword">assert</span>(aryjson[0].str == <span class="d_string">"ab"</span>);
+<span class="d_keyword">assert</span>(aryjson[1].str == <span class="d_string">"cd"</span>);
+<span class="d_keyword">assert</span>(aryjson[2].str == <span class="d_string">"ef"</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> A
+{
+	<span class="d_keyword">int</span> a = 123;
+	JSONValue <span class="d_psymbol">json</span>() <span class="d_keyword">const</span> @property
+	{
+		<span class="d_keyword">return</span> JSONValue([<span class="d_string">"a"</span>: JSONValue(a)]);
+	}
+	<span class="d_keyword">void</span> <span class="d_psymbol">json</span>(JSONValue <span class="d_param">v</span>) @property
+	{
+		a = <span class="d_param">v</span>.getValue(<span class="d_string">"a"</span>, 123);
+	}
+}
+<span class="d_keyword">auto</span> <span class="d_param">ary</span> = [A(1),A(2),A(3)];
+<span class="d_keyword">auto</span> aryjson = <span class="d_param">ary</span>.<span class="d_psymbol">json</span>;
+<span class="d_keyword">assert</span>(aryjson.type == JSONType.array);
+<span class="d_keyword">assert</span>(aryjson[0].type == JSONType.object);
+<span class="d_keyword">assert</span>(aryjson[1].type == JSONType.object);
+<span class="d_keyword">assert</span>(aryjson[2].type == JSONType.object);
+<span class="d_keyword">assert</span>(aryjson[0][<span class="d_string">"a"</span>].type == JSONType.integer);
+<span class="d_keyword">assert</span>(aryjson[1][<span class="d_string">"a"</span>].type == JSONType.integer);
+<span class="d_keyword">assert</span>(aryjson[2][<span class="d_string">"a"</span>].type == JSONType.integer);
+<span class="d_keyword">assert</span>(aryjson[0][<span class="d_string">"a"</span>].integer == 1);
+<span class="d_keyword">assert</span>(aryjson[1][<span class="d_string">"a"</span>].integer == 2);
+<span class="d_keyword">assert</span>(aryjson[2][<span class="d_string">"a"</span>].integer == 3);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".setValue"></span><div class="quickindex" id="quickindex.setValue"></div>pure nothrow @trusted void <code class="ddoc_psymbol">setValue</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">v</span>, string <span class="ddoc_param">name</span>, T <span class="ddoc_param">val</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">JSONValueデータの操作</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">JSONValue json;
+json.<span class="d_psymbol">setValue</span>(<span class="d_string">"dat"</span>, 123);
+<span class="d_keyword">assert</span>(json.type == JSONType.object);
+<span class="d_keyword">assert</span>(<span class="d_string">"dat"</span> <span class="d_keyword">in</span> json.object);
+<span class="d_keyword">assert</span>(json[<span class="d_string">"dat"</span>].type == JSONType.integer);
+<span class="d_keyword">assert</span>(json[<span class="d_string">"dat"</span>].integer == 123);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> Type
+{
+	foo, bar,
+}
+JSONValue json;
+json.<span class="d_psymbol">setValue</span>(<span class="d_string">"type"</span>, Type.foo);
+<span class="d_keyword">assert</span>(json.type == JSONType.object);
+<span class="d_keyword">assert</span>(<span class="d_string">"type"</span> <span class="d_keyword">in</span> json.object);
+<span class="d_keyword">assert</span>(json[<span class="d_string">"type"</span>].type == JSONType.string);
+<span class="d_keyword">assert</span>(json[<span class="d_string">"type"</span>].str == <span class="d_string">"foo"</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> A
+{
+	<span class="d_keyword">int</span> a = 123;
+	JSONValue json() <span class="d_keyword">const</span> @property
+	{
+		JSONValue <span class="d_param">v</span>;
+		<span class="d_param">v</span>.<span class="d_psymbol">setValue</span>(<span class="d_string">"a"</span>, a);
+		<span class="d_keyword">return</span> <span class="d_param">v</span>;
+	}
+}
+A a;
+a.a = 321;
+JSONValue json;
+json.<span class="d_psymbol">setValue</span>(<span class="d_string">"a"</span>, a);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">JSONValue json;
+json.<span class="d_psymbol">setValue</span>(<span class="d_string">"test"</span>, <span class="d_string">"あいうえお"</span>);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.getValue(<span class="d_string">"test"</span>, <span class="d_string">"かきくけこ"d</span>)) == dstring));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.getValue(<span class="d_string">"test"</span>, <span class="d_string">"かきくけこ"w</span>)) == wstring));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.getValue(<span class="d_string">"test"</span>, <span class="d_string">"かきくけこ"c</span>)) == string));
+<span class="d_keyword">assert</span>(json.getValue(<span class="d_string">"test"</span>, <span class="d_string">"かきくけこ"d</span>) == <span class="d_string">"あいうえお"d</span>);
+<span class="d_keyword">assert</span>(json.getValue(<span class="d_string">"test"</span>, <span class="d_string">"かきくけこ"w</span>) == <span class="d_string">"あいうえお"w</span>);
+<span class="d_keyword">assert</span>(json.getValue(<span class="d_string">"test"</span>, <span class="d_string">"かきくけこ"c</span>) == <span class="d_string">"あいうえお"c</span>);
+<span class="d_keyword">assert</span>(json.getValue(<span class="d_string">"hoge"</span>, <span class="d_string">"かきくけこ"c</span>) == <span class="d_string">"かきくけこ"c</span>);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromJson"></span><div class="quickindex" id="quickindex.fromJson"></div>bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">src</span>, ref T <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(isSomeString!T)</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromJson.2"></span><div class="quickindex" id="quickindex.fromJson.2"></div>bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">src</span>, ref T <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(isIntegral!T &amp;&amp; !is(T == enum))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromJson.3"></span><div class="quickindex" id="quickindex.fromJson.3"></div>bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">src</span>, ref T <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(isFloatingPoint!T)</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromJson.4"></span><div class="quickindex" id="quickindex.fromJson.4"></div>bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">src</span>, ref T <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(is(T == struct) &amp;&amp; !is(Unqual!T : JSONValue))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromJson.5"></span><div class="quickindex" id="quickindex.fromJson.5"></div>bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">src</span>, ref T <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(is(T == class))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromJson.6"></span><div class="quickindex" id="quickindex.fromJson.6"></div>bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">src</span>, ref T <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(is(T == enum))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromJson.7"></span><div class="quickindex" id="quickindex.fromJson.7"></div>bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">src</span>, ref T <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(is(T == bool))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromJson.8"></span><div class="quickindex" id="quickindex.fromJson.8"></div>bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">src</span>, ref T <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(!isSomeString!T &amp;&amp; isDynamicArray!T)</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromJson.9"></span><div class="quickindex" id="quickindex.fromJson.9"></div>bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(Value, Key)</span>(ref JSONValue <span class="ddoc_param">src</span>, ref Value[Key] <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(isSomeString!Key &amp;&amp; is(typeof(()
+{
+JSONValue val;
+<code class="ddoc_psymbol">fromJson</code>(val, <span class="ddoc_param">dst</span>[Key.init]);
+}
+)))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".fromJson.10"></span><div class="quickindex" id="quickindex.fromJson.10"></div>bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">src</span>, ref T <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(is(Unqual!T == JSONValue))</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getValue"></span><div class="quickindex" id="quickindex.getValue"></div>pure nothrow @trusted T <code class="ddoc_psymbol">getValue</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JSONValue <span class="ddoc_param">v</span>, string <span class="ddoc_param">name</span>, lazy scope T <span class="ddoc_param">defaultVal</span> = T.init);
+<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">JSONValue json;
+json.setValue(<span class="d_string">"test"</span>, 123);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, 654UL)) == <span class="d_keyword">ulong</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, 654U)) == <span class="d_keyword">uint</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, <span class="d_keyword">cast</span>(<span class="d_keyword">byte</span>)12)) == <span class="d_keyword">byte</span>));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, 654UL) == 123);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, 654U) == 123);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, <span class="d_keyword">cast</span>(<span class="d_keyword">byte</span>)12) == 123);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"hoge"</span>, <span class="d_keyword">cast</span>(<span class="d_keyword">byte</span>)12) == 12);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">JSONValue json;
+json.setValue(<span class="d_string">"test"</span>, 0.125);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, 0.25f)) == <span class="d_keyword">float</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, 0.25)) == <span class="d_keyword">double</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, 0.25L)) == <span class="d_keyword">real</span>));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, 0.25f) == 0.125f);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, 0.25) == 0.125);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test"</span>, 0.25L) == 0.125L);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"hoge"</span>, 0.25L) == 0.25L);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> A
+{
+	<span class="d_keyword">int</span> a = 123;
+	JSONValue json() <span class="d_keyword">const</span> @property
+	{
+		JSONValue <span class="d_param">v</span>;
+		<span class="d_param">v</span>.setValue(<span class="d_string">"a"</span>, a);
+		<span class="d_keyword">return</span> <span class="d_param">v</span>;
+	}
+	<span class="d_keyword">void</span> json(JSONValue <span class="d_param">v</span>) @property
+	{
+		a = <span class="d_param">v</span>.<span class="d_psymbol">getValue</span>(<span class="d_string">"a"</span>, 123);
+	}
+}
+A a;
+a.a = 321;
+JSONValue json;
+json.setValue(<span class="d_string">"a"</span>, a);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"a"</span>, A(456))) == A));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"a"</span>, A(456)).a == 321);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"b"</span>, A(456)).a == 456);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">static</span> <span class="d_keyword">class</span> A
+{
+	<span class="d_keyword">int</span> a = 123;
+	JSONValue json() <span class="d_keyword">const</span> @property
+	{
+		JSONValue <span class="d_param">v</span>;
+		<span class="d_param">v</span>.setValue(<span class="d_string">"a"</span>, a);
+		<span class="d_keyword">return</span> <span class="d_param">v</span>;
+	}
+	<span class="d_keyword">void</span> json(JSONValue <span class="d_param">v</span>) @property
+	{
+		a = <span class="d_param">v</span>.<span class="d_psymbol">getValue</span>(<span class="d_string">"a"</span>, 123);
+	}
+}
+<span class="d_keyword">auto</span> a = <span class="d_keyword">new</span> A;
+a.a = 321;
+JSONValue json;
+json.setValue(<span class="d_string">"a"</span>, a);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>!A(<span class="d_string">"a"</span>)) == A));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>!A(<span class="d_string">"a"</span>).a == 321);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>!A(<span class="d_string">"b"</span>) <span class="d_keyword">is</span> <span class="d_keyword">null</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> Type
+{
+	foo, bar
+}
+JSONValue json;
+json.setValue(<span class="d_string">"a"</span>, Type.bar);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"a"</span>, Type.foo)) == Type));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"a"</span>, Type.foo) == Type.bar);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"b"</span>, Type.foo) == Type.foo);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">JSONValue json;
+json.setValue(<span class="d_string">"t"</span>, <span class="d_keyword">true</span>);
+json.setValue(<span class="d_string">"f"</span>, <span class="d_keyword">false</span>);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"t"</span>, <span class="d_keyword">true</span>)) == <span class="d_keyword">bool</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"f"</span>, <span class="d_keyword">false</span>)) == <span class="d_keyword">bool</span>));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"t"</span>, <span class="d_keyword">true</span>) == <span class="d_keyword">true</span>);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"f"</span>, <span class="d_keyword">true</span>) == <span class="d_keyword">false</span>);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"t"</span>, <span class="d_keyword">false</span>) == <span class="d_keyword">true</span>);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"f"</span>, <span class="d_keyword">false</span>) == <span class="d_keyword">false</span>);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"x"</span>, <span class="d_keyword">true</span>) == <span class="d_keyword">true</span>);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"x"</span>, <span class="d_keyword">false</span>) == <span class="d_keyword">false</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">JSONValue json;
+json.setValue(<span class="d_string">"test1"</span>, [1,2,3]);
+<span class="d_keyword">auto</span> x = json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test1"</span>, [2,3,4]);
+
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test1"</span>, [2,3,4])) == <span class="d_keyword">int</span>[]));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test1"</span>, [2,3,4]) == [1,2,3]);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test1x"</span>, [2,3,4]) == [2,3,4]);
+
+json.setValue(<span class="d_string">"test2"</span>, [0.5,0.25,0.125]);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test2"</span>, [0.5,0.5,0.5])) == <span class="d_keyword">double</span>[]));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test2"</span>, [0.5,0.5,0.5]) == [0.5,0.25,0.125]);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test2x"</span>, [0.5,0.5,0.5]) == [0.5,0.5,0.5]);
+
+json.setValue(<span class="d_string">"test3"</span>, [<span class="d_string">"ab"</span>,<span class="d_string">"cd"</span>,<span class="d_string">"ef"</span>]);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test3"</span>, [<span class="d_string">"あい"</span>,<span class="d_string">"うえ"</span>,<span class="d_string">"おか"</span>])) == string[]));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test3"</span>, [<span class="d_string">"あい"</span>,<span class="d_string">"うえ"</span>,<span class="d_string">"おか"</span>]) == [<span class="d_string">"ab"</span>,<span class="d_string">"cd"</span>,<span class="d_string">"ef"</span>]);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test3x"</span>, [<span class="d_string">"あい"</span>,<span class="d_string">"うえ"</span>,<span class="d_string">"おか"</span>]) == [<span class="d_string">"あい"</span>,<span class="d_string">"うえ"</span>,<span class="d_string">"おか"</span>]);
+
+json.setValue(<span class="d_string">"test4"</span>, [<span class="d_keyword">true</span>, <span class="d_keyword">false</span>, <span class="d_keyword">true</span>]);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test4"</span>, [<span class="d_keyword">false</span>, <span class="d_keyword">true</span>, <span class="d_keyword">true</span>])) == <span class="d_keyword">bool</span>[]));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test4"</span>, [<span class="d_keyword">false</span>, <span class="d_keyword">true</span>, <span class="d_keyword">true</span>]) == [<span class="d_keyword">true</span>, <span class="d_keyword">false</span>, <span class="d_keyword">true</span>]);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"test4x"</span>, [<span class="d_keyword">false</span>, <span class="d_keyword">true</span>, <span class="d_keyword">true</span>]) == [<span class="d_keyword">false</span>, <span class="d_keyword">true</span>, <span class="d_keyword">true</span>]);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">static</span> <span class="d_keyword">struct</span> A
+{
+	<span class="d_keyword">int</span> a = 123;
+	JSONValue json() <span class="d_keyword">const</span> @property
+	{
+		JSONValue <span class="d_param">v</span>;
+		<span class="d_param">v</span>.setValue(<span class="d_string">"a"</span>, a);
+		<span class="d_keyword">return</span> <span class="d_param">v</span>;
+	}
+	<span class="d_keyword">void</span> json(JSONValue <span class="d_param">v</span>) @property
+	{
+		<span class="d_keyword">assert</span>(<span class="d_param">v</span>.type == JSONType.object);
+		a = <span class="d_param">v</span>.<span class="d_psymbol">getValue</span>(<span class="d_string">"a"</span>, 123);
+	}
+}
+<span class="d_keyword">auto</span> a = [A(1),A(2),A(3)];
+JSONValue json;
+json.setValue(<span class="d_string">"a"</span>, a);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"a"</span>, [A(4),A(5),A(6)])) == A[]));
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"a"</span>, [A(4),A(5),A(6)]) == [A(1),A(2),A(3)]);
+<span class="d_keyword">assert</span>(json.<span class="d_psymbol">getValue</span>(<span class="d_string">"b"</span>, [A(4),A(5),A(6)]) == [A(4),A(5),A(6)]);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JSONValueArray"></span><div class="quickindex" id="quickindex.JSONValueArray"></div>alias <code class="ddoc_psymbol">JSONValueArray</code> = const(JSONValue)[];
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JSONValueObject"></span><div class="quickindex" id="quickindex.JSONValueObject"></div>alias <code class="ddoc_psymbol">JSONValueObject</code> = std.typecons.Rebindable!(const(JSONValue[string])).Rebindable;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getArray"></span><div class="quickindex" id="quickindex.getArray"></div>bool <code class="ddoc_psymbol">getArray</code>(JSONValue <span class="ddoc_param">json</span>, string <span class="ddoc_param">name</span>, ref JSONValueArray <span class="ddoc_param">ary</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getObject"></span><div class="quickindex" id="quickindex.getObject"></div>bool <code class="ddoc_psymbol">getObject</code>(JSONValue <span class="ddoc_param">json</span>, string <span class="ddoc_param">name</span>, ref JSONValueObject <span class="ddoc_param">object</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".AttrName"></span><div class="quickindex" id="quickindex.AttrName"></div>struct <code class="ddoc_psymbol">AttrName</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".AttrName.name"></span><div class="quickindex" id="quickindex.AttrName.name"></div>string <code class="ddoc_psymbol">name</code>;
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".AttrEssential"></span><div class="quickindex" id="quickindex.AttrEssential"></div>struct <code class="ddoc_psymbol">AttrEssential</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".AttrIgnore"></span><div class="quickindex" id="quickindex.AttrIgnore"></div>struct <code class="ddoc_psymbol">AttrIgnore</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".AttrConverter"></span><div class="quickindex" id="quickindex.AttrConverter"></div>struct <code class="ddoc_psymbol">AttrConverter</code>(T);
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".AttrConverter.from"></span><div class="quickindex" id="quickindex.AttrConverter.from"></div>T function(in JSONValue v) <code class="ddoc_psymbol">from</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".AttrConverter.to"></span><div class="quickindex" id="quickindex.AttrConverter.to"></div>JSONValue function(in T v) <code class="ddoc_psymbol">to</code>;
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".name"></span><div class="quickindex" id="quickindex.name"></div>AttrName <code class="ddoc_psymbol">name</code>(string <code class="ddoc_psymbol">name</code>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Attribute forcing field <code class="ddoc_psymbol">name</code></div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".converter"></span><div class="quickindex" id="quickindex.converter"></div>AttrConverter!T <code class="ddoc_psymbol">converter</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T function(in JSONValue) <span class="ddoc_param">from</span>, JSONValue function(in T) <span class="ddoc_param">to</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Attribute converting method</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".essential"></span><div class="quickindex" id="quickindex.essential"></div>enum AttrEssential <code class="ddoc_psymbol">essential</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Attribute marking <code class="ddoc_psymbol">essential</code> field</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ignore"></span><div class="quickindex" id="quickindex.ignore"></div>enum AttrIgnore <code class="ddoc_psymbol">ignore</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Attribute marking <code class="ddoc_psymbol">ignore</code> data</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".serializeToJson"></span><div class="quickindex" id="quickindex.serializeToJson"></div>JSONValue <code class="ddoc_psymbol">serializeToJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>);
+<br>
+<span class="def-anchor" id=".serializeToJsonString"></span><div class="quickindex" id="quickindex.serializeToJsonString"></div>string <code class="ddoc_psymbol">serializeToJsonString</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, JSONOptions <span class="ddoc_param">options</span> = JSONOptions.none);
+<br>
+<span class="def-anchor" id=".serializeToJsonFile"></span><div class="quickindex" id="quickindex.serializeToJsonFile"></div>void <code class="ddoc_psymbol">serializeToJsonFile</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, string <span class="ddoc_param">jsonfile</span>, JSONOptions <span class="ddoc_param">options</span> = JSONOptions.none);
+<br></div></dt>
+<dd><div class="ddoc_summary">serialize <span class="ddoc_param">data</span> to JSON</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".deserializeFromJson"></span><div class="quickindex" id="quickindex.deserializeFromJson"></div>void <code class="ddoc_psymbol">deserializeFromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">data</span>, in JSONValue <span class="ddoc_param">json</span>);
+<br>
+<span class="def-anchor" id=".deserializeFromJsonString"></span><div class="quickindex" id="quickindex.deserializeFromJsonString"></div>void <code class="ddoc_psymbol">deserializeFromJsonString</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">data</span>, string <span class="ddoc_param">jsonContents</span>);
+<br>
+<span class="def-anchor" id=".deserializeFromJsonFile"></span><div class="quickindex" id="quickindex.deserializeFromJsonFile"></div>void <code class="ddoc_psymbol">deserializeFromJsonFile</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">data</span>, string <span class="ddoc_param">jsonFile</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">deserialize <span class="ddoc_param">data</span> from JSON</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.exception, std.datetime.systime;
+<span class="d_keyword">static</span> <span class="d_keyword">struct</span> Point
+{
+	@name(<span class="d_string">"xValue"</span>)
+	<span class="d_keyword">int</span> x;
+	@name(<span class="d_string">"yValue"</span>)
+	<span class="d_keyword">int</span> y = 10;
+}
+<span class="d_keyword">static</span> <span class="d_keyword">struct</span> Data
+{
+	string key;
+	<span class="d_keyword">int</span>    value;
+	@ignore    <span class="d_keyword">int</span>    testval;
+	@essential Point  pt;
+	Point[] points;
+	Point[string] pointMap;
+	
+	@converter!SysTime(jv=&gt;SysTime.fromISOExtString(jv.str),
+	                   v =&gt;JSONValue(v.toISOExtString()))
+	SysTime time;
+}
+Data x, y, z;
+x.key = <span class="d_string">"xxx"</span>;
+x.value = 200;
+x.pt.x = 300;
+x.pt.y = 400;
+x.testval = 100;
+y.testval = 200;
+<span class="d_keyword">auto</span> tim = Clock.currTime();
+x.time = tim;
+JSONValue jv1     = serializeToJson(x);
+string    jsonStr = jv1.toPrettyString();
+JSONValue jv2     = parseJSON(jsonStr);
+y.<span class="d_psymbol">deserializeFromJson</span>(jv2);
+<span class="d_keyword">assert</span>(x != y);
+y.testval = x.testval;
+<span class="d_keyword">assert</span>(x == y);
+<span class="d_keyword">assert</span>(jv1[<span class="d_string">"pt"</span>][<span class="d_string">"xValue"</span>].integer == 300);
+<span class="d_keyword">assert</span>(jv1[<span class="d_string">"pt"</span>][<span class="d_string">"yValue"</span>].integer == 400);
+<span class="d_keyword">assert</span>(jv1[<span class="d_string">"time"</span>].str == tim.toISOExtString());
+
+<span class="d_keyword">auto</span> e1 = z.<span class="d_psymbol">deserializeFromJson</span>(parseJSON(<span class="d_string">`{}`</span>)).collectException;
+<span class="d_keyword">import</span> std.stdio;
+<span class="d_keyword">assert</span>(e1);
+<span class="d_keyword">assert</span>(e1.msg == <span class="d_string">"Key not found: pt"</span>);
+
+<span class="d_keyword">auto</span> e2 = z.<span class="d_psymbol">deserializeFromJson</span>(parseJSON(<span class="d_string">`{"pt": {}}`</span>)).collectException;
+<span class="d_keyword">assert</span>(!e2);
+<span class="d_keyword">assert</span>(z.pt.y == 10);
+<span class="d_keyword">assert</span>(z.time == SysTime.init);
+
+<span class="d_keyword">scope</span> (exit)
+{
+	<span class="d_keyword">import</span> std.file;
+	<span class="d_keyword">if</span> (<span class="d_string">"test.json"</span>.exists)
+		<span class="d_string">"test.json"</span>.remove();
+}
+
+x.serializeToJsonFile(<span class="d_string">"test.json"</span>, JSONOptions.doNotEscapeSlashes);
+z.<span class="d_psymbol">deserializeFromJsonFile</span>(<span class="d_string">"test.json"</span>);
+<span class="d_keyword">assert</span>(x != z);
+z.testval = x.testval;
+<span class="d_keyword">assert</span>(x == z);
+
+Data[] datAry1, datAry2;
+Data[string] datMap1, datMap2;
+datAry1 = [Data(<span class="d_string">"x"</span>, 10, 0, Point(1,2), [Point(3,4)], [<span class="d_string">"PT"</span>: Point(5,6)], tim)];
+datMap1 = [<span class="d_string">"Data"</span>: Data(<span class="d_string">"x"</span>, 10, 0, Point(1,2), [Point(3,4)], [<span class="d_string">"PT"</span>: Point(5,6)], tim)];
+datAry1.serializeToJsonFile(<span class="d_string">"test.json"</span>);
+datAry2.<span class="d_psymbol">deserializeFromJsonFile</span>(<span class="d_string">"test.json"</span>);
+datMap1.serializeToJsonFile(<span class="d_string">"test.json"</span>);
+datMap2.<span class="d_psymbol">deserializeFromJsonFile</span>(<span class="d_string">"test.json"</span>);
+<span class="d_keyword">assert</span>(datAry1[0].points[0] == Point(3,4));
+<span class="d_keyword">assert</span>(datAry1[0].pointMap[<span class="d_string">"PT"</span>] == Point(5,6));
+<span class="d_keyword">assert</span>(datMap1[<span class="d_string">"Data"</span>].points[0] == Point(3,4));
+<span class="d_keyword">assert</span>(datMap1[<span class="d_string">"Data"</span>].pointMap[<span class="d_string">"PT"</span>] == Point(5,6));
+<span class="d_keyword">assert</span>(datAry2[0].points[0] == Point(3,4));
+<span class="d_keyword">assert</span>(datAry2[0].pointMap[<span class="d_string">"PT"</span>] == Point(5,6));
+<span class="d_keyword">assert</span>(datMap2[<span class="d_string">"Data"</span>].points[0] == Point(3,4));
+<span class="d_keyword">assert</span>(datMap2[<span class="d_string">"Data"</span>].pointMap[<span class="d_string">"PT"</span>] == Point(5,6));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".deepCopy"></span><div class="quickindex" id="quickindex.deepCopy"></div>@property JSONValue <code class="ddoc_psymbol">deepCopy</code>(in JSONValue <span class="ddoc_param">v</span>);
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

@@ -1,0 +1,671 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.sync</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.sync</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary"><code class="ddoc_psymbol">sync</code> モジュール
+</div><div class="ddoc_description">よく使う同期用クラスのインターフェースを利用可能。
+ <ul>     <li>Light </li>
+     <li>NamedMutex </li>
+ </ul>
+
+</div>
+<div class="ddoc_date"><span class="ddoc_date_header">Date:</span>
+ July 29, 2009
+</div>
+<div class="ddoc_authors"><span class="ddoc_authors_header">Authors:</span>
+ P.Knowledge, SHOO
+</div>
+<div class="ddoc_license"><span class="ddoc_license_header">License:</span>
+ NYSL ( <a href="http://www.kmonos.net/nysl/">http://www.kmonos.net/nysl/</a> )</div>
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent"></span><div class="quickindex" id="quickindex.SyncEvent"></div>class <code class="ddoc_psymbol">SyncEvent</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">同期イベントクラス
+</div><div class="ddoc_description">Windowsの CreateEvent や SetEvent のラッパー
+ Windows以外の環境でも動作するが、最適な実装ではないかもしれない。
+</div>
+<div class="ddoc_section_nonstandard"><span class="ddoc_section_nonstandard_header">Example:</span>
+<pre class="d_code notranslate"><span class="d_psymbol">SyncEvent</span>[3] ev;
+<span class="d_keyword">int</span> data;
+<span class="d_keyword">void</span> run1()
+{
+	data = 1;
+	ev[0].signal = <span class="d_keyword">true</span>;
+}
+
+<span class="d_keyword">void</span> run2()
+{
+	data = 2;
+	ev[1].signal = <span class="d_keyword">true</span>;
+}
+
+<span class="d_keyword">void</span> run3()
+{
+	data = 3;
+	ev[2].signal = <span class="d_keyword">true</span>;
+}
+<span class="d_keyword">void</span> main()
+{
+	ev[] = [<span class="d_keyword">new</span> Light, <span class="d_keyword">new</span> Light, <span class="d_keyword">new</span> Light];
+	<span class="d_keyword">scope</span> t = <span class="d_keyword">new</span> ThreadGroup;
+	data = 0;
+	t.create(&amp;run1);
+	ev[0].wait;
+	<span class="d_keyword">assert</span>(data == 1);
+	data = 0;
+	t.create(&amp;run2);
+	ev[1].wait;
+	<span class="d_keyword">assert</span>(data == 2);
+	data = 0;
+	t.create(&amp;run3);
+	ev[2].wait;
+	<span class="d_keyword">assert</span>(data == 3);
+}
+</pre>
+</div>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.handle"></span><div class="quickindex" id="quickindex.SyncEvent.handle"></div>@property Condition <code class="ddoc_psymbol">handle</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ハンドルを得る
+</div><div class="ddoc_description">ただしOS依存する処理をする場合にのみ使用すること</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.this"></span><div class="quickindex" id="quickindex.SyncEvent.this"></div>this(bool <span class="ddoc_param">firstCondition</span> = false);
+<br></div></dt>
+<dd><div class="ddoc_summary">コンストラクタ
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">bool <span class="ddoc_param">firstCondition</span></td>
+<td class="ddoc_param_desc">初期状態</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.signaled"></span><div class="quickindex" id="quickindex.SyncEvent.signaled"></div>@property bool <code class="ddoc_psymbol">signaled</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">シグナル状態を返す
+</div><div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ trueならシグナル状態で、waitはすぐに制御を返す
+     falseなら非シグナル状態で、waitしたらシグナル状態になるか、時間が
+     過ぎるまで制御を返さない状態であることを示す。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.signaled.2"></span><div class="quickindex" id="quickindex.SyncEvent.signaled.2"></div>@property void <code class="ddoc_psymbol">signaled</code>(bool <span class="ddoc_param">cond</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">シグナル状態を設定する
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">bool <span class="ddoc_param">cond</span></td>
+<td class="ddoc_param_desc"><div class="ddoc_blankline"></div>
+
+     trueならシグナル状態にし、waitしているスレッドの制御を返す。
+     falseなら非シグナル状態で、waitしたらシグナル状態になるまで制御を
+     返さない状態にする。</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.wait"></span><div class="quickindex" id="quickindex.SyncEvent.wait"></div>const void <code class="ddoc_psymbol">wait</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">シグナル状態になるまで待つ
+</div><div class="ddoc_description">conditionがtrueならシグナル状態であり、すぐに制御が返る。
+ conditionがfalseなら非シグナル状態で、シグナル状態になるまで制御を
+ 返さない。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.wait.2"></span><div class="quickindex" id="quickindex.SyncEvent.wait.2"></div>bool <code class="ddoc_psymbol">wait</code>(Duration <span class="ddoc_param">dur</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">シグナル状態になるまで待つ
+</div><div class="ddoc_description">conditionがtrueならシグナル状態であり、すぐに制御が返る。
+ conditionがfalseなら非シグナル状態で、シグナル状態になるか、時間が
+ 過ぎるまで制御を返さない。</div>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedMutex"></span><div class="quickindex" id="quickindex.NamedMutex"></div>class <code class="ddoc_psymbol">NamedMutex</code>: <span class="ddoc_psuper_symbol">object.Object.Monitor</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">名前付きミューテックス
+</div><div class="ddoc_description">プロセス間で共有される名前付きミューテックスの作成を行う。</div>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedMutex.this"></span><div class="quickindex" id="quickindex.NamedMutex.this"></div>this(string <span class="ddoc_param">aName</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">コンストラクタ
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">aName</span></td>
+<td class="ddoc_param_desc">名前付きミューテックスの名前を指定する。名前は128文字以内。</td></tr>
+</table></div>
+
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedMutex.name"></span><div class="quickindex" id="quickindex.NamedMutex.name"></div>const pure nothrow @nogc @property @safe string <code class="ddoc_psymbol">name</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">名前を返す。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedMutex.lock"></span><div class="quickindex" id="quickindex.NamedMutex.lock"></div>nothrow @nogc void <code class="ddoc_psymbol">lock</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ロックする
+</div><div class="ddoc_description">ロックが成功するまで制御は返らない</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedMutex.tryLock"></span><div class="quickindex" id="quickindex.NamedMutex.tryLock"></div>nothrow @nogc bool <code class="ddoc_psymbol">tryLock</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ロックの試行
+</div><div class="ddoc_description">即座に制御が返る。
+ trueが帰った場合ロックが成功している。
+ falseなら別のMutexにロックされているため、ロックされなかった。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedMutex.unlock"></span><div class="quickindex" id="quickindex.NamedMutex.unlock"></div>nothrow @nogc void <code class="ddoc_psymbol">unlock</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ロック解除</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedMutex"></span><div class="quickindex" id="quickindex.QueuedMutex"></div>class <code class="ddoc_psymbol">QueuedMutex</code>: <span class="ddoc_psuper_symbol">object.Object.Monitor</span>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedMutex.this"></span><div class="quickindex" id="quickindex.QueuedMutex.this"></div>this();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedMutex.this.2"></span><div class="quickindex" id="quickindex.QueuedMutex.this.2"></div>shared this();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedMutex.lock"></span><div class="quickindex" id="quickindex.QueuedMutex.lock"></div>@trusted void <code class="ddoc_psymbol">lock</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedMutex.lock.2"></span><div class="quickindex" id="quickindex.QueuedMutex.lock.2"></div>shared @trusted void <code class="ddoc_psymbol">lock</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedMutex.tryLock"></span><div class="quickindex" id="quickindex.QueuedMutex.tryLock"></div>@trusted bool <code class="ddoc_psymbol">tryLock</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedMutex.tryLock.2"></span><div class="quickindex" id="quickindex.QueuedMutex.tryLock.2"></div>shared @trusted bool <code class="ddoc_psymbol">tryLock</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedMutex.unlock"></span><div class="quickindex" id="quickindex.QueuedMutex.unlock"></div>@trusted void <code class="ddoc_psymbol">unlock</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedMutex.unlock.2"></span><div class="quickindex" id="quickindex.QueuedMutex.unlock.2"></div>shared @trusted void <code class="ddoc_psymbol">unlock</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedSemaphore"></span><div class="quickindex" id="quickindex.QueuedSemaphore"></div>class <code class="ddoc_psymbol">QueuedSemaphore</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedSemaphore.this"></span><div class="quickindex" id="quickindex.QueuedSemaphore.this"></div>this(size_t <span class="ddoc_param">count</span> = 0);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedSemaphore.this.2"></span><div class="quickindex" id="quickindex.QueuedSemaphore.this.2"></div>shared this(size_t <span class="ddoc_param">count</span> = 0);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedSemaphore.wait"></span><div class="quickindex" id="quickindex.QueuedSemaphore.wait"></div>@trusted void <code class="ddoc_psymbol">wait</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedSemaphore.wait.2"></span><div class="quickindex" id="quickindex.QueuedSemaphore.wait.2"></div>shared @trusted void <code class="ddoc_psymbol">wait</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedSemaphore.tryWait"></span><div class="quickindex" id="quickindex.QueuedSemaphore.tryWait"></div>@trusted bool <code class="ddoc_psymbol">tryWait</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedSemaphore.tryWait.2"></span><div class="quickindex" id="quickindex.QueuedSemaphore.tryWait.2"></div>shared @trusted bool <code class="ddoc_psymbol">tryWait</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedSemaphore.notify"></span><div class="quickindex" id="quickindex.QueuedSemaphore.notify"></div>@trusted void <code class="ddoc_psymbol">notify</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".QueuedSemaphore.notify.2"></span><div class="quickindex" id="quickindex.QueuedSemaphore.notify.2"></div>shared @trusted void <code class="ddoc_psymbol">notify</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future"></span><div class="quickindex" id="quickindex.Future"></div>class <code class="ddoc_psymbol">Future</code>(Ret);
+<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">auto</span> future = <span class="d_keyword">new</span> <span class="d_psymbol">Future</span>!<span class="d_keyword">int</span>;
+future.perform(<span class="d_keyword">delegate</span> (<span class="d_keyword">int</span> a) =&gt; a + 10, 10);
+<span class="d_keyword">assert</span>(future.yieldForce() == 20);
+future.perform(taskPool, <span class="d_keyword">delegate</span> (<span class="d_keyword">int</span> a) =&gt; a + 20, 10);
+<span class="d_keyword">assert</span>(future.yieldForce() == 30);
+<span class="d_keyword">static</span> <span class="d_keyword">int</span> foo(<span class="d_keyword">int</span> a) { <span class="d_keyword">return</span> a + 30; }
+future.perform!foo(10);
+<span class="d_keyword">assert</span>(future.yieldForce() == 40);
+future.perform!foo(taskPool, 10);
+<span class="d_keyword">assert</span>(future.yieldForce() == 40);
+
+<span class="d_keyword">auto</span> future2 = future.perform(<span class="d_keyword">delegate</span> (<span class="d_keyword">int</span> a) =&gt; a + 10, 10)
+	.then((<span class="d_keyword">int</span> a) =&gt; <span class="d_keyword">cast</span>(<span class="d_keyword">ulong</span>)(a + 20))
+	.then(a =&gt; a + 20)
+	.then!((<span class="d_keyword">ulong</span> a) =&gt; a + 60)()
+	.then(taskPool, a =&gt; <span class="d_keyword">cast</span>(<span class="d_keyword">int</span>)(a + 20))
+	.then!((<span class="d_keyword">ref</span> <span class="d_keyword">int</span> a) =&gt; a + 60)(taskPool);
+<span class="d_keyword">auto</span> future3 = future2
+	.then((<span class="d_keyword">int</span> a){ <span class="d_keyword">assert</span>(a == 200); })
+	.then(taskPool, (){  })
+	.then((){  })
+	.then!((){  })
+	.then!((){  })(taskPool);
+<span class="d_keyword">assert</span>(future2.yieldForce() == 200);
+future3.join();
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate">Exception lastEx;
+<span class="d_keyword">auto</span> feature = async({
+	<span class="d_keyword">throw</span> <span class="d_keyword">new</span> Exception(<span class="d_string">"Ex1"</span>);
+}).then({
+	<span class="d_keyword">assert</span>(0);
+}, (Exception e){
+	lastEx = e;
+});
+<span class="d_keyword">try</span>
+{
+	feature.join(<span class="d_keyword">true</span>);
+}
+<span class="d_keyword">catch</span> (Exception e)
+{
+	<span class="d_keyword">assert</span>(lastEx.msg == <span class="d_string">"Ex1"</span>);
+	<span class="d_keyword">assert</span>(lastEx <span class="d_keyword">is</span> e);
+}
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">import</span> std.exception;
+Exception e1, e2;
+<span class="d_keyword">auto</span> future1 = async({
+	<span class="d_keyword">throw</span> <span class="d_keyword">new</span> Exception(<span class="d_string">"Ex1"</span>);
+});
+<span class="d_keyword">auto</span> future2 = future1.then({
+	<span class="d_keyword">assert</span>(0);
+}, (Exception e)
+{
+	<span class="d_comment">// future1の例外処理
+</span>	e1 = e;
+});
+
+<span class="d_comment">// future1でEx1が投げられている
+</span>e2 = future1.join(<span class="d_keyword">true</span>).collectException();
+<span class="d_keyword">assert</span>(e2.msg == <span class="d_string">"Ex1"</span>);
+<span class="d_comment">// future2もEx1が投げられたことになっている
+</span>e2 = future2.join(<span class="d_keyword">true</span>).collectException();
+<span class="d_keyword">assert</span>(e2.msg == <span class="d_string">"Ex1"</span>);
+<span class="d_keyword">assert</span>(e1 <span class="d_keyword">is</span> e2);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">import</span> std.exception;
+Exception e1, e2;
+<span class="d_keyword">auto</span> future1 = async(
+{
+	<span class="d_comment">// future1の処理
+</span>});
+<span class="d_keyword">auto</span> future2 = future1.then(
+{
+	<span class="d_comment">// feature1の後続処理
+</span>	<span class="d_keyword">throw</span> <span class="d_keyword">new</span> Exception(<span class="d_string">"Ex1"</span>);
+}, (Exception e)
+{
+	<span class="d_comment">// future1の例外処理
+</span>	e1 = e;
+});
+<span class="d_keyword">auto</span> future3 = future2.then(
+{
+	<span class="d_comment">// feature2の後続処理
+</span>	<span class="d_keyword">throw</span> <span class="d_keyword">new</span> Exception(<span class="d_string">"Ex2"</span>);
+}, (Exception e)
+{
+	<span class="d_comment">// future2の例外処理
+</span>	e2 = e;
+});
+
+<span class="d_comment">// future1では例外が投げられない
+</span><span class="d_keyword">auto</span> e3 = future1.join(<span class="d_keyword">true</span>).collectException();
+<span class="d_keyword">assert</span>(e1 <span class="d_keyword">is</span> <span class="d_keyword">null</span>);
+<span class="d_keyword">assert</span>(e3 <span class="d_keyword">is</span> <span class="d_keyword">null</span>);
+<span class="d_comment">// future2ではEx1例外が投げられる
+</span><span class="d_keyword">auto</span> e4 = future2.join(<span class="d_keyword">true</span>).collectException();
+<span class="d_keyword">assert</span>(e2 !<span class="d_keyword">is</span> <span class="d_keyword">null</span>);
+<span class="d_keyword">assert</span>(e2 <span class="d_keyword">is</span> e4);
+<span class="d_keyword">assert</span>(e2.msg == <span class="d_string">"Ex1"</span>);
+<span class="d_comment">// (Ex2は投げられない)
+</span></pre>
+</div>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future.this"></span><div class="quickindex" id="quickindex.Future.this"></div>this();
+<br>
+this(SyncEvent <span class="ddoc_param">evStart</span>);
+<br>
+this(SyncEvent <span class="ddoc_param">evStart</span>, TaskPool <span class="ddoc_param">pool</span>);
+<br>
+this(ResultType <span class="ddoc_param">val</span>, SyncEvent <span class="ddoc_param">evStart</span> = null);
+<br></div></dt>
+<dd><div class="ddoc_summary">コンストラクタ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future.perform"></span><div class="quickindex" id="quickindex.Future.perform"></div>auto <code class="ddoc_psymbol">perform</code><span class="ddoc_template_param_list" title="Template parameter list">(alias func, Args...)</span>(TaskPool <span class="ddoc_param">pool</span>, Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(is(typeof(func(<span class="ddoc_param">args</span>)) == ResultType))</span>;
+<br>
+auto <code class="ddoc_psymbol">perform</code><span class="ddoc_template_param_list" title="Template parameter list">(alias func, Args...)</span>(Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(is(typeof(func(<span class="ddoc_param">args</span>)) == ResultType))</span>;
+<br>
+auto <code class="ddoc_psymbol">perform</code><span class="ddoc_template_param_list" title="Template parameter list">(F, Args...)</span>(TaskPool <span class="ddoc_param">pool</span>, F <span class="ddoc_param">dg</span>, Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(is(typeof(<span class="ddoc_param">dg</span>(<span class="ddoc_param">args</span>)) == ResultType))</span>;
+<br>
+auto <code class="ddoc_psymbol">perform</code><span class="ddoc_template_param_list" title="Template parameter list">(F, Args...)</span>(F <span class="ddoc_param">dg</span>, Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(is(typeof(<span class="ddoc_param">dg</span>(<span class="ddoc_param">args</span>)) == ResultType))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">終了したら呼ばれる</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future.then"></span><div class="quickindex" id="quickindex.Future.then"></div>auto <code class="ddoc_psymbol">then</code><span class="ddoc_template_param_list" title="Template parameter list">(Ret2)</span>(TaskPool <span class="ddoc_param">pool</span>, Ret2 delegate(ResultType) <span class="ddoc_param">callbackFinished</span>, void delegate(Exception e) nothrow <span class="ddoc_param">callbackFailed</span> = null, void delegate(Throwable e) nothrow <span class="ddoc_param">callbackFatal</span> = null)<br><span class="ddoc_constraint">if(!is(Ret == void) &amp;&amp; is(typeof(<span class="ddoc_param">callbackFinished</span>(_resultRaw))))</span>;
+<br>
+auto <code class="ddoc_psymbol">then</code><span class="ddoc_template_param_list" title="Template parameter list">(Ret2)</span>(Ret2 delegate(ResultType) <span class="ddoc_param">callbackFinished</span>, void delegate(Exception e) nothrow <span class="ddoc_param">callbackFailed</span> = null, void delegate(Throwable e) nothrow <span class="ddoc_param">callbackFatal</span> = null)<br><span class="ddoc_constraint">if(!is(Ret == void) &amp;&amp; is(typeof(<span class="ddoc_param">callbackFinished</span>(_resultRaw))))</span>;
+<br>
+auto <code class="ddoc_psymbol">then</code><span class="ddoc_template_param_list" title="Template parameter list">(alias func, Ex = Exception)</span>(TaskPool <span class="ddoc_param">pool</span>, void delegate(Ex e) nothrow <span class="ddoc_param">callbackFailed</span> = null, void delegate(Throwable e) nothrow <span class="ddoc_param">callbackFatal</span> = null)<br><span class="ddoc_constraint">if(!is(Ret == void) &amp;&amp; is(typeof(func(_resultRaw))) &amp;&amp; is(Ex == Exception))</span>;
+<br>
+auto <code class="ddoc_psymbol">then</code><span class="ddoc_template_param_list" title="Template parameter list">(alias func, Ex = Exception)</span>(void delegate(Ex e) nothrow <span class="ddoc_param">callbackFailed</span> = null, void delegate(Throwable e) nothrow <span class="ddoc_param">callbackFatal</span> = null)<br><span class="ddoc_constraint">if(!is(Ret == void) &amp;&amp; is(typeof(func(_resultRaw))) &amp;&amp; is(Ex == Exception))</span>;
+<br>
+auto <code class="ddoc_psymbol">then</code><span class="ddoc_template_param_list" title="Template parameter list">(Ret2)</span>(TaskPool <span class="ddoc_param">pool</span>, Ret2 delegate() <span class="ddoc_param">callbackFinished</span>, void delegate(Exception e) nothrow <span class="ddoc_param">callbackFailed</span> = null, void delegate(Throwable e) nothrow <span class="ddoc_param">callbackFatal</span> = null)<br><span class="ddoc_constraint">if(is(Ret == void) &amp;&amp; is(typeof(<span class="ddoc_param">callbackFinished</span>())))</span>;
+<br>
+auto <code class="ddoc_psymbol">then</code><span class="ddoc_template_param_list" title="Template parameter list">(Ret2)</span>(Ret2 delegate() <span class="ddoc_param">callbackFinished</span>, void delegate(Exception e) nothrow <span class="ddoc_param">callbackFailed</span> = null, void delegate(Throwable e) nothrow <span class="ddoc_param">callbackFatal</span> = null)<br><span class="ddoc_constraint">if(is(Ret == void) &amp;&amp; is(typeof(<span class="ddoc_param">callbackFinished</span>())))</span>;
+<br>
+auto <code class="ddoc_psymbol">then</code><span class="ddoc_template_param_list" title="Template parameter list">(alias func, Ex = Exception)</span>(TaskPool <span class="ddoc_param">pool</span>, void delegate(Ex e) nothrow <span class="ddoc_param">callbackFailed</span> = null, void delegate(Throwable e) nothrow <span class="ddoc_param">callbackFatal</span> = null)<br><span class="ddoc_constraint">if(is(Ret == void) &amp;&amp; is(typeof(func())) &amp;&amp; is(Ex == Exception))</span>;
+<br>
+auto <code class="ddoc_psymbol">then</code><span class="ddoc_template_param_list" title="Template parameter list">(alias func, Ex = Exception)</span>(void delegate(Ex e) nothrow <span class="ddoc_param">callbackFailed</span> = null, void delegate(Throwable e) nothrow <span class="ddoc_param">callbackFatal</span> = null)<br><span class="ddoc_constraint">if(is(Ret == void) &amp;&amp; is(typeof(func())) &amp;&amp; is(Ex == Exception))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">チェーン</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future.addListenerFinished"></span><div class="quickindex" id="quickindex.Future.addListenerFinished"></div>FinishedHandler.HandlerProcId <code class="ddoc_psymbol">addListenerFinished</code>(CallbackType <span class="ddoc_param">dg</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">終了したら呼ばれるコールバックをハンドラに登録
+</div><div class="ddoc_description">指定されたコールバックは並列処理が正常終了したときにのみ呼び出される。
+ 並列処理がまだ終了していない場合には並列処理を行っていたスレッドでコールバックが呼び出されるが、
+ すでに並列処理が終了していた場合には現在のスレッドで即座にコールバックが呼び出される。
+ すでに終了していて、かつコールバック内で例外が発生した場合には、Failed, Fatalのハンドラが呼び出され、
+ Futureの状態も各々の状態へと変化する。
+
+</div>
+<div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">CallbackType <span class="ddoc_param">dg</span></td>
+<td class="ddoc_param_desc">設定するコールバックを指定する。nullを指定したらハンドラに登録されたすべてのコールバックをクリアする。</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ 登録したハンドラのIDを返す。登録されなかった場合はFinishedHandler.HandlerProcId.initが返る</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future.addListenerFailed"></span><div class="quickindex" id="quickindex.Future.addListenerFailed"></div>FailedHandler.HandlerProcId <code class="ddoc_psymbol">addListenerFailed</code>(CallbackFailedType <span class="ddoc_param">dg</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">例外が発生したら呼ばれる
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">CallbackFailedType <span class="ddoc_param">dg</span></td>
+<td class="ddoc_param_desc">設定するコールバックを指定する。nullを指定したらすべてのコールバックをクリアする。</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ 登録したハンドラのIDを返す。登録されなかった場合はFailedHandler.HandlerProcId.initが返る</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future.addListenerFatal"></span><div class="quickindex" id="quickindex.Future.addListenerFatal"></div>FatalHandler.HandlerProcId <code class="ddoc_psymbol">addListenerFatal</code>(CallbackFatalType <span class="ddoc_param">dg</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">致命的エラーが発生したら呼ばれる
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">CallbackFatalType <span class="ddoc_param">dg</span></td>
+<td class="ddoc_param_desc">設定するコールバックを指定する。nullを指定したらすべてのコールバックをクリアする。</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ 登録したハンドラのIDを返す。登録されなかった場合はFatalHandler.HandlerProcId.initが返る</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future.removeListenerFinished"></span><div class="quickindex" id="quickindex.Future.removeListenerFinished"></div>void <code class="ddoc_psymbol">removeListenerFinished</code>(FinishedHandler.HandlerProcId <span class="ddoc_param">id</span>);
+<br>
+<span class="def-anchor" id=".Future.removeListenerFailed"></span><div class="quickindex" id="quickindex.Future.removeListenerFailed"></div>void <code class="ddoc_psymbol">removeListenerFailed</code>(FailedHandler.HandlerProcId <span class="ddoc_param">id</span>);
+<br>
+<span class="def-anchor" id=".Future.removeListenerFatal"></span><div class="quickindex" id="quickindex.Future.removeListenerFatal"></div>void <code class="ddoc_psymbol">removeListenerFatal</code>(FatalHandler.HandlerProcId <span class="ddoc_param">id</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">登録していたハンドラを削除する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future.done"></span><div class="quickindex" id="quickindex.Future.done"></div>const bool <code class="ddoc_psymbol">done</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">終了しているか(例外発生含む)</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future.join"></span><div class="quickindex" id="quickindex.Future.join"></div>const void <code class="ddoc_psymbol">join</code>(bool <span class="ddoc_param">rethrow</span> = false);
+<br></div></dt>
+<dd><div class="ddoc_summary">終了するまで待機する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Future.yieldForce"></span><div class="quickindex" id="quickindex.Future.yieldForce"></div>inout ref auto <code class="ddoc_psymbol">yieldForce</code>();
+<br>
+<span class="def-anchor" id=".Future.workForce"></span><div class="quickindex" id="quickindex.Future.workForce"></div>inout ref auto <code class="ddoc_psymbol">workForce</code>();
+<br>
+<span class="def-anchor" id=".Future.spinForce"></span><div class="quickindex" id="quickindex.Future.spinForce"></div>inout ref auto <code class="ddoc_psymbol">spinForce</code>();
+<br>
+<span class="def-anchor" id=".Future.result"></span><div class="quickindex" id="quickindex.Future.result"></div>inout @property ref inout(ResultType) <code class="ddoc_psymbol">result</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">結果を受け取る</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".async"></span><div class="quickindex" id="quickindex.async"></div>auto <code class="ddoc_psymbol">async</code>();
+<br>
+auto <code class="ddoc_psymbol">async</code><span class="ddoc_template_param_list" title="Template parameter list">(F, Args...)</span>(TaskPool <span class="ddoc_param">pool</span>, F <span class="ddoc_param">dg</span>, Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isCallable!F)</span>;
+<br>
+auto <code class="ddoc_psymbol">async</code><span class="ddoc_template_param_list" title="Template parameter list">(F, Args...)</span>(F <span class="ddoc_param">dg</span>, Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isCallable!F)</span>;
+<br>
+auto <code class="ddoc_psymbol">async</code><span class="ddoc_template_param_list" title="Template parameter list">(alias func, Args...)</span>(TaskPool <span class="ddoc_param">pool</span>, Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(is(typeof(func(<span class="ddoc_param">args</span>))))</span>;
+<br>
+auto <code class="ddoc_psymbol">async</code><span class="ddoc_template_param_list" title="Template parameter list">(alias func, Args...)</span>(Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!is(Args[0] == TaskPool) &amp;&amp; is(typeof(func(<span class="ddoc_param">args</span>))))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">非同期処理の開始</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared"></span><div class="quickindex" id="quickindex.ManagedShared"></div>class <code class="ddoc_psymbol">ManagedShared</code>(T): Object.Monitor;
+<br></div></dt>
+<dd><div class="ddoc_summary">管理された共有資源
+</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.this"></span><div class="quickindex" id="quickindex.ManagedShared.this"></div>pure @trusted this();
+<br>
+shared pure @trusted this();
+<br></div></dt>
+<dd><div class="ddoc_summary">コンストラクタ
+</div><div class="ddoc_description">sharedのコンストラクタを呼んだ場合の初期状態は共有資源(unlockされた状態)
+ 非sharedのコンストラクタを呼んだ場合の初期状態は非共有資源(lockされた状態)</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.mutex"></span><div class="quickindex" id="quickindex.ManagedShared.mutex"></div>inout pure nothrow @nogc @property inout(Mutex) <code class="ddoc_psymbol">mutex</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.mutex.2"></span><div class="quickindex" id="quickindex.ManagedShared.mutex.2"></div>shared inout pure nothrow @nogc @property shared(inout(Mutex)) <code class="ddoc_psymbol">mutex</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.locked"></span><div class="quickindex" id="quickindex.ManagedShared.locked"></div>@property auto <code class="ddoc_psymbol">locked</code>();
+<br>
+shared inout @property auto <code class="ddoc_psymbol">locked</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ロックされたデータを得る
+</div><div class="ddoc_description">この戻り値が破棄されるときにRAIIで自動的にロックが解除される。
+ また、戻り値はロックされた共有資源へ、非共有資源としてアクセス可能な参照として使用できる。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.tryLock"></span><div class="quickindex" id="quickindex.ManagedShared.tryLock"></div>bool <code class="ddoc_psymbol">tryLock</code>();
+<br>
+shared bool <code class="ddoc_psymbol">tryLock</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ロックを試行する。
+</div><div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ すでにロックしているならtrue
+     ロックされていなければロックしてtrue
+     別のスレッドにロックされていてロックできなければfalse</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.lock"></span><div class="quickindex" id="quickindex.ManagedShared.lock"></div>void <code class="ddoc_psymbol">lock</code>();
+<br>
+shared void <code class="ddoc_psymbol">lock</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ロックする。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.unlock"></span><div class="quickindex" id="quickindex.ManagedShared.unlock"></div>void <code class="ddoc_psymbol">unlock</code>();
+<br>
+shared void <code class="ddoc_psymbol">unlock</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ロック解除する。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.asUnshared"></span><div class="quickindex" id="quickindex.ManagedShared.asUnshared"></div>inout @property ref T <code class="ddoc_psymbol">asUnshared</code>();
+<br>
+shared inout @property ref T <code class="ddoc_psymbol">asUnshared</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">非共有資源としてアクセスする</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.asShared"></span><div class="quickindex" id="quickindex.ManagedShared.asShared"></div>inout @property ref shared(T) <code class="ddoc_psymbol">asShared</code>();
+<br>
+shared inout @property ref shared(T) <code class="ddoc_psymbol">asShared</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">共有資源としてアクセスする</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".managedShared"></span><div class="quickindex" id="quickindex.managedShared"></div>ManagedShared!T <code class="ddoc_psymbol">managedShared</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(Args <span class="ddoc_param">args</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData"></span><div class="quickindex" id="quickindex.TaskData"></div>class <code class="ddoc_psymbol">TaskData</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.type"></span><div class="quickindex" id="quickindex.TaskData.type"></div>protected immutable string <code class="ddoc_psymbol">type</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">タスクの種類</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onCall"></span><div class="quickindex" id="quickindex.TaskData.onCall"></div>protected immutable void delegate() shared <code class="ddoc_psymbol">onCall</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">タスクの本体</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.timCreate"></span><div class="quickindex" id="quickindex.TaskData.timCreate"></div>protected shared SysTime <code class="ddoc_psymbol">timCreate</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Queueに追加された時刻</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.timReady"></span><div class="quickindex" id="quickindex.TaskData.timReady"></div>protected shared SysTime <code class="ddoc_psymbol">timReady</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Poolに追加された時刻</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.timStart"></span><div class="quickindex" id="quickindex.TaskData.timStart"></div>protected shared SysTime <code class="ddoc_psymbol">timStart</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">実行開始した時刻</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.timEnd"></span><div class="quickindex" id="quickindex.TaskData.timEnd"></div>protected shared SysTime <code class="ddoc_psymbol">timEnd</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">実行終了した時刻</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.uuid"></span><div class="quickindex" id="quickindex.TaskData.uuid"></div>protected immutable UUID <code class="ddoc_psymbol">uuid</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">一意なID</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State"></span><div class="quickindex" id="quickindex.TaskData.State"></div>enum <code class="ddoc_psymbol">State</code>: <span class="ddoc_enum_basetype">int</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">状態</div><dl class="ddoc_members"><div class="ddoc_enum_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.waiting"></span><div class="quickindex" id="quickindex.TaskData.State.waiting"></div><code class="ddoc_psymbol">waiting</code><br></div></dt>
+<dd><div class="ddoc_summary">初期状態で、タスクプールに追加される前</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.ready"></span><div class="quickindex" id="quickindex.TaskData.State.ready"></div><code class="ddoc_psymbol">ready</code><br></div></dt>
+<dd><div class="ddoc_summary">タスクプールに追加された状態</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.running"></span><div class="quickindex" id="quickindex.TaskData.State.running"></div><code class="ddoc_psymbol">running</code><br></div></dt>
+<dd><div class="ddoc_summary">実行中の状態</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.finished"></span><div class="quickindex" id="quickindex.TaskData.State.finished"></div><code class="ddoc_psymbol">finished</code><br></div></dt>
+<dd><div class="ddoc_summary">実行が終了した状態</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.failed"></span><div class="quickindex" id="quickindex.TaskData.State.failed"></div><code class="ddoc_psymbol">failed</code><br></div></dt>
+<dd><div class="ddoc_summary">実行の結果、異常終了した状態</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.dropped"></span><div class="quickindex" id="quickindex.TaskData.State.dropped"></div><code class="ddoc_psymbol">dropped</code><br></div></dt>
+<dd><div class="ddoc_summary">実行されずにドロップされた状態</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.state"></span><div class="quickindex" id="quickindex.TaskData.state"></div>protected State <code class="ddoc_psymbol">state</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onReady"></span><div class="quickindex" id="quickindex.TaskData.onReady"></div>shared void <code class="ddoc_psymbol">onReady</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Poolに追加されたタイミングでコールバック</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onStart"></span><div class="quickindex" id="quickindex.TaskData.onStart"></div>shared void <code class="ddoc_psymbol">onStart</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">実行開始したタイミングでコールバック</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onEnd"></span><div class="quickindex" id="quickindex.TaskData.onEnd"></div>shared void <code class="ddoc_psymbol">onEnd</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">実行終了したタイミングでコールバック</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onFailed"></span><div class="quickindex" id="quickindex.TaskData.onFailed"></div>shared void <code class="ddoc_psymbol">onFailed</code>(Throwable);
+<br></div></dt>
+<dd><div class="ddoc_summary">実行失敗したタイミングでコールバック</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onDropped"></span><div class="quickindex" id="quickindex.TaskData.onDropped"></div>shared void <code class="ddoc_psymbol">onDropped</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">実行されずにドロップしたタイミングでコールバック</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.this"></span><div class="quickindex" id="quickindex.TaskData.this"></div>this(string <span class="ddoc_param">ty</span>, void delegate() shared <span class="ddoc_param">callback</span>, UUID <span class="ddoc_param">id</span> = randomUUID());
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue"></span><div class="quickindex" id="quickindex.MultiTaskQueue"></div>class <code class="ddoc_psymbol">MultiTaskQueue</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.this"></span><div class="quickindex" id="quickindex.MultiTaskQueue.this"></div>this(TaskPool <span class="ddoc_param">pool</span>, void delegate() <span class="ddoc_param">callbackFinishPool</span> = null);
+<br>
+shared this(TaskPool <span class="ddoc_param">pool</span>, void delegate() <span class="ddoc_param">callbackFinishPool</span> = null);
+<br>
+this(size_t <span class="ddoc_param">worker</span> = 8);
+<br>
+shared this(size_t <span class="ddoc_param">worker</span> = 8);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.dispose"></span><div class="quickindex" id="quickindex.MultiTaskQueue.dispose"></div>void <code class="ddoc_psymbol">dispose</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">インスタンスを破棄する。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.invoke"></span><div class="quickindex" id="quickindex.MultiTaskQueue.invoke"></div>bool <code class="ddoc_psymbol">invoke</code>(TaskData <span class="ddoc_param">tsk</span>);
+<br>
+shared bool <code class="ddoc_psymbol">invoke</code>(TaskData <span class="ddoc_param">tsk</span>);
+<br>
+bool <code class="ddoc_psymbol">invoke</code>(string <span class="ddoc_param">type</span>, void delegate() shared <span class="ddoc_param">dg</span>, UUID <span class="ddoc_param">id</span> = randomUUID());
+<br>
+shared bool <code class="ddoc_psymbol">invoke</code>(string <span class="ddoc_param">type</span>, void delegate() shared <span class="ddoc_param">dg</span>, UUID <span class="ddoc_param">id</span> = randomUUID());
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.drop"></span><div class="quickindex" id="quickindex.MultiTaskQueue.drop"></div>void <code class="ddoc_psymbol">drop</code>(string <span class="ddoc_param">type</span>, UUID <span class="ddoc_param">id</span>);
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

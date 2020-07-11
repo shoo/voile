@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.log</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library は、なくても特に困らない…<br>
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.log</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">ログ取得のためのユーティリティモジュール</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData"></span><div class="quickindex" id="quickindex.LogData"></div>struct <code class="ddoc_psymbol">LogData</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.id"></span><div class="quickindex" id="quickindex.LogData.id"></div>ulong <code class="ddoc_psymbol">id</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.level"></span><div class="quickindex" id="quickindex.LogData.level"></div>LogLevel <code class="ddoc_psymbol">level</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.time"></span><div class="quickindex" id="quickindex.LogData.time"></div>SysTime <code class="ddoc_psymbol">time</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.file"></span><div class="quickindex" id="quickindex.LogData.file"></div>string <code class="ddoc_psymbol">file</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.line"></span><div class="quickindex" id="quickindex.LogData.line"></div>uint <code class="ddoc_psymbol">line</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.msg"></span><div class="quickindex" id="quickindex.LogData.msg"></div>string <code class="ddoc_psymbol">msg</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.moduleName"></span><div class="quickindex" id="quickindex.LogData.moduleName"></div>string <code class="ddoc_psymbol">moduleName</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.funcName"></span><div class="quickindex" id="quickindex.LogData.funcName"></div>string <code class="ddoc_psymbol">funcName</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.prettyFuncName"></span><div class="quickindex" id="quickindex.LogData.prettyFuncName"></div>string <code class="ddoc_psymbol">prettyFuncName</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.threadId"></span><div class="quickindex" id="quickindex.LogData.threadId"></div>string <code class="ddoc_psymbol">threadId</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.json"></span><div class="quickindex" id="quickindex.LogData.json"></div>const nothrow @property @safe JSONValue <code class="ddoc_psymbol">json</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.json.2"></span><div class="quickindex" id="quickindex.LogData.json.2"></div>nothrow @property @safe void <code class="ddoc_psymbol">json</code>(JSONValue <span class="ddoc_param">v</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.toString"></span><div class="quickindex" id="quickindex.LogData.toString"></div>const string <code class="ddoc_psymbol">toString</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInput"></span><div class="quickindex" id="quickindex.LogStrageInput"></div>interface <code class="ddoc_psymbol">LogStrageInput</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInput.front"></span><div class="quickindex" id="quickindex.LogStrageInput.front"></div>abstract const @property LogData <code class="ddoc_psymbol">front</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInput.empty"></span><div class="quickindex" id="quickindex.LogStrageInput.empty"></div>abstract const @property bool <code class="ddoc_psymbol">empty</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInput.popFront"></span><div class="quickindex" id="quickindex.LogStrageInput.popFront"></div>abstract void <code class="ddoc_psymbol">popFront</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInput.reset"></span><div class="quickindex" id="quickindex.LogStrageInput.reset"></div>abstract void <code class="ddoc_psymbol">reset</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageOutput"></span><div class="quickindex" id="quickindex.LogStrageOutput"></div>interface <code class="ddoc_psymbol">LogStrageOutput</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageOutput.put"></span><div class="quickindex" id="quickindex.LogStrageOutput.put"></div>abstract void <code class="ddoc_psymbol">put</code>(LogData <span class="ddoc_param">datas</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageOutput.clear"></span><div class="quickindex" id="quickindex.LogStrageOutput.clear"></div>abstract void <code class="ddoc_psymbol">clear</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory"></span><div class="quickindex" id="quickindex.LogStrageInMemory"></div>class <code class="ddoc_psymbol">LogStrageInMemory</code>: <span class="ddoc_psuper_symbol">voile.log.LogStrageInput</span>, <span class="ddoc_psuper_symbol">voile.log.LogStrageOutput</span>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.front"></span><div class="quickindex" id="quickindex.LogStrageInMemory.front"></div>const @property LogData <code class="ddoc_psymbol">front</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.empty"></span><div class="quickindex" id="quickindex.LogStrageInMemory.empty"></div>const @property bool <code class="ddoc_psymbol">empty</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.popFront"></span><div class="quickindex" id="quickindex.LogStrageInMemory.popFront"></div>void <code class="ddoc_psymbol">popFront</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.put"></span><div class="quickindex" id="quickindex.LogStrageInMemory.put"></div>void <code class="ddoc_psymbol">put</code>(LogData <span class="ddoc_param">data</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.reset"></span><div class="quickindex" id="quickindex.LogStrageInMemory.reset"></div>pure nothrow @nogc @safe void <code class="ddoc_psymbol">reset</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.clear"></span><div class="quickindex" id="quickindex.LogStrageInMemory.clear"></div>pure nothrow @nogc @safe void <code class="ddoc_psymbol">clear</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.save"></span><div class="quickindex" id="quickindex.LogStrageInMemory.save"></div>const pure nothrow @safe LogStrageInMemory <code class="ddoc_psymbol">save</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.currentIndex"></span><div class="quickindex" id="quickindex.LogStrageInMemory.currentIndex"></div>const pure nothrow @nogc @property @safe size_t <code class="ddoc_psymbol">currentIndex</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.length"></span><div class="quickindex" id="quickindex.LogStrageInMemory.length"></div>const pure nothrow @nogc @property @safe size_t <code class="ddoc_psymbol">length</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.opSlice"></span><div class="quickindex" id="quickindex.LogStrageInMemory.opSlice"></div>const pure nothrow @safe LogStrageInMemory <code class="ddoc_psymbol">opSlice</code>();
+<br>
+const pure nothrow @safe LogStrageInMemory <code class="ddoc_psymbol">opSlice</code>(size_t <span class="ddoc_param">begin</span>, size_t <span class="ddoc_param">end</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.slice"></span><div class="quickindex" id="quickindex.LogStrageInMemory.slice"></div>const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>();
+<br>
+const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <span class="ddoc_param">begin</span>, size_t <span class="ddoc_param">end</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageInMemory.opDoller"></span><div class="quickindex" id="quickindex.LogStrageInMemory.opDoller"></div>alias <code class="ddoc_psymbol">opDoller</code> = length;
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageLogger"></span><div class="quickindex" id="quickindex.LogStrageLogger"></div>class <code class="ddoc_psymbol">LogStrageLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.core.Logger</span>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageLogger.this"></span><div class="quickindex" id="quickindex.LogStrageLogger.this"></div>@safe this(LogStrageOutput <span class="ddoc_param">logDst</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStrageLogger.writeLogMsg"></span><div class="quickindex" id="quickindex.LogStrageLogger.writeLogMsg"></div>@trusted void <code class="ddoc_psymbol">writeLogMsg</code>(ref LogEntry <span class="ddoc_param">payload</span>);
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".InMemoryLogger"></span><div class="quickindex" id="quickindex.InMemoryLogger"></div>class <code class="ddoc_psymbol">InMemoryLogger</code>: <span class="ddoc_psuper_symbol">voile.log.LogStrageLogger</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">メモリ内のロガー</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.experimental.logger: LogLevel;
+<span class="d_keyword">auto</span> logger = <span class="d_keyword">new</span> <span class="d_psymbol">InMemoryLogger</span>(LogLevel.info);
+logger.trace(<span class="d_string">"TRACETEST"</span>); <span class="d_comment">// ignore
+</span>logger.info(<span class="d_string">"INFOTEST"</span>);
+logger.warning(<span class="d_string">"WARNINGTEST"</span>);
+logger.error(<span class="d_string">"ERRORTEST"</span>);
+<span class="d_keyword">auto</span> input = logger.logStorage;
+<span class="d_keyword">assert</span>(!input.empty);
+<span class="d_keyword">assert</span>(input.front.id == 0);
+<span class="d_keyword">assert</span>(input.front.msg == <span class="d_string">"INFOTEST"</span>);
+input.popFront();
+<span class="d_keyword">assert</span>(!input.empty);
+<span class="d_keyword">assert</span>(input.front.id == 1);
+<span class="d_keyword">assert</span>(input.front.msg == <span class="d_string">"WARNINGTEST"</span>);
+input.popFront();
+<span class="d_keyword">assert</span>(!input.empty);
+<span class="d_keyword">assert</span>(input.front.id == 2);
+<span class="d_keyword">assert</span>(input.front.msg == <span class="d_string">"ERRORTEST"</span>);
+input.popFront();
+<span class="d_keyword">assert</span>(input.empty);
+</pre>
+</div>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".InMemoryLogger.this"></span><div class="quickindex" id="quickindex.InMemoryLogger.this"></div>@safe this(LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".InMemoryLogger.logStorage"></span><div class="quickindex" id="quickindex.InMemoryLogger.logStorage"></div>inout pure nothrow @property @safe inout(LogStrageInMemory) <code class="ddoc_psymbol">logStorage</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".InMemoryLogger.slice"></span><div class="quickindex" id="quickindex.InMemoryLogger.slice"></div>const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>();
+<br>
+const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <span class="ddoc_param">begin</span>, size_t <span class="ddoc_param">end</span>);
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TextFileLogger"></span><div class="quickindex" id="quickindex.TextFileLogger"></div>class <code class="ddoc_psymbol">TextFileLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.filelogger.FileLogger</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">テキストファイルのロガー</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".TextFileLogger.this"></span><div class="quickindex" id="quickindex.TextFileLogger.this"></div>@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br>
+@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span>, CreateFolder <span class="ddoc_param">createFileNameFolder</span>);
+<br>
+@safe this(File <span class="ddoc_param">file</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TextFileLogger.beginLogMsg"></span><div class="quickindex" id="quickindex.TextFileLogger.beginLogMsg"></div>protected @safe void <code class="ddoc_psymbol">beginLogMsg</code>(string <span class="ddoc_param">file</span>, int <span class="ddoc_param">line</span>, string <span class="ddoc_param">funcName</span>, string <span class="ddoc_param">prettyFuncName</span>, string <span class="ddoc_param">moduleName</span>, LogLevel <span class="ddoc_param">logLevel</span>, Tid <span class="ddoc_param">threadId</span>, SysTime <span class="ddoc_param">timestamp</span>, Logger <span class="ddoc_param">logger</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TextFileLogger.logMsgPart"></span><div class="quickindex" id="quickindex.TextFileLogger.logMsgPart"></div>protected void <code class="ddoc_psymbol">logMsgPart</code>(scope const(char)[] <span class="ddoc_param">msg</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TextFileLogger.finishLogMsg"></span><div class="quickindex" id="quickindex.TextFileLogger.finishLogMsg"></div>protected void <code class="ddoc_psymbol">finishLogMsg</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JsonFileLogger"></span><div class="quickindex" id="quickindex.JsonFileLogger"></div>class <code class="ddoc_psymbol">JsonFileLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.core.Logger</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">JSONファイルのロガー</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".JsonFileLogger.this"></span><div class="quickindex" id="quickindex.JsonFileLogger.this"></div>@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br>
+@trusted this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span>, CreateFolder <span class="ddoc_param">createFileNameFolder</span>);
+<br>
+@safe this(File <span class="ddoc_param">file</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JsonFileLogger.writeLogMsg"></span><div class="quickindex" id="quickindex.JsonFileLogger.writeLogMsg"></div>@trusted void <code class="ddoc_psymbol">writeLogMsg</code>(ref LogEntry <span class="ddoc_param">payload</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JsonFileLogger.getFilename"></span><div class="quickindex" id="quickindex.JsonFileLogger.getFilename"></div>string <code class="ddoc_psymbol">getFilename</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JsonFileLogger.loadFromFile"></span><div class="quickindex" id="quickindex.JsonFileLogger.loadFromFile"></div>static LogStrageInput <code class="ddoc_psymbol">loadFromFile</code>(string <span class="ddoc_param">fileName</span>);
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".XmlFileLogger"></span><div class="quickindex" id="quickindex.XmlFileLogger"></div>class <code class="ddoc_psymbol">XmlFileLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.core.Logger</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">XMLファイルのロガー</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".XmlFileLogger.this"></span><div class="quickindex" id="quickindex.XmlFileLogger.this"></div>@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br>
+@trusted this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span>, CreateFolder <span class="ddoc_param">createFileNameFolder</span>);
+<br>
+@safe this(File <span class="ddoc_param">file</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".XmlFileLogger.writeLogMsg"></span><div class="quickindex" id="quickindex.XmlFileLogger.writeLogMsg"></div>@trusted void <code class="ddoc_psymbol">writeLogMsg</code>(ref LogEntry <span class="ddoc_param">payload</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".XmlFileLogger.getFilename"></span><div class="quickindex" id="quickindex.XmlFileLogger.getFilename"></div>string <code class="ddoc_psymbol">getFilename</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CsvFileLogger"></span><div class="quickindex" id="quickindex.CsvFileLogger"></div>class <code class="ddoc_psymbol">CsvFileLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.core.Logger</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">CSVファイルのロガー</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".CsvFileLogger.this"></span><div class="quickindex" id="quickindex.CsvFileLogger.this"></div>@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br>
+@trusted this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span>, CreateFolder <span class="ddoc_param">createFileNameFolder</span>);
+<br>
+@safe this(File <span class="ddoc_param">file</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CsvFileLogger.writeLogMsg"></span><div class="quickindex" id="quickindex.CsvFileLogger.writeLogMsg"></div>@trusted void <code class="ddoc_psymbol">writeLogMsg</code>(ref LogEntry <span class="ddoc_param">payload</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CsvFileLogger.getFilename"></span><div class="quickindex" id="quickindex.CsvFileLogger.getFilename"></div>string <code class="ddoc_psymbol">getFilename</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TsvFileLogger"></span><div class="quickindex" id="quickindex.TsvFileLogger"></div>class <code class="ddoc_psymbol">TsvFileLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.core.Logger</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">TSVファイルのロガー</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".TsvFileLogger.this"></span><div class="quickindex" id="quickindex.TsvFileLogger.this"></div>@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br>
+@trusted this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span>, CreateFolder <span class="ddoc_param">createFileNameFolder</span>);
+<br>
+@safe this(File <span class="ddoc_param">file</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TsvFileLogger.writeLogMsg"></span><div class="quickindex" id="quickindex.TsvFileLogger.writeLogMsg"></div>@trusted void <code class="ddoc_psymbol">writeLogMsg</code>(ref LogEntry <span class="ddoc_param">payload</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TsvFileLogger.getFilename"></span><div class="quickindex" id="quickindex.TsvFileLogger.getFilename"></div>string <code class="ddoc_psymbol">getFilename</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedLogger"></span><div class="quickindex" id="quickindex.NamedLogger"></div>class <code class="ddoc_psymbol">NamedLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.multilogger.MultiLogger</span>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedLogger.getLogger"></span><div class="quickindex" id="quickindex.NamedLogger.getLogger"></div>@safe Logger <code class="ddoc_psymbol">getLogger</code>(string <span class="ddoc_param">name</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">ロガーを取得する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedLogger.insertLogger"></span><div class="quickindex" id="quickindex.NamedLogger.insertLogger"></div>@safe void <code class="ddoc_psymbol">insertLogger</code>(string <span class="ddoc_param">name</span>, Logger <span class="ddoc_param">l</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">ロガーを追加する
+</div><div class="ddoc_description">重複チェックをする</div>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger"></span><div class="quickindex" id="quickindex.DispatchLogger"></div>class <code class="ddoc_psymbol">DispatchLogger</code>: <span class="ddoc_psuper_symbol">voile.log.NamedLogger</span>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter"></div>struct <code class="ddoc_psymbol">Filter</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.file"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.file"></div>Regex!char <code class="ddoc_psymbol">file</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.moduleName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.moduleName"></div>Regex!char <code class="ddoc_psymbol">moduleName</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.funcName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.funcName"></div>Regex!char <code class="ddoc_psymbol">funcName</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.prettyFuncName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.prettyFuncName"></div>Regex!char <code class="ddoc_psymbol">prettyFuncName</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.msg"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.msg"></div>Regex!char <code class="ddoc_psymbol">msg</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.lineMax"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.lineMax"></div>size_t <code class="ddoc_psymbol">lineMax</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.lineMin"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.lineMin"></div>size_t <code class="ddoc_psymbol">lineMin</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.logLevel"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.logLevel"></div>LogLevel <code class="ddoc_psymbol">logLevel</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.targetName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.targetName"></div>string <code class="ddoc_psymbol">targetName</code>;
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter"></div>struct <code class="ddoc_psymbol">MatchFilter</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.file"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.file"></div>string <code class="ddoc_psymbol">file</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.moduleName"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.moduleName"></div>string <code class="ddoc_psymbol">moduleName</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.funcName"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.funcName"></div>string <code class="ddoc_psymbol">funcName</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.prettyFuncName"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.prettyFuncName"></div>string <code class="ddoc_psymbol">prettyFuncName</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.msg"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.msg"></div>string <code class="ddoc_psymbol">msg</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.lineMax"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.lineMax"></div>size_t <code class="ddoc_psymbol">lineMax</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.lineMin"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.lineMin"></div>size_t <code class="ddoc_psymbol">lineMin</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.logLevel"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.logLevel"></div>LogLevel <code class="ddoc_psymbol">logLevel</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.targetName"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.targetName"></div>string <code class="ddoc_psymbol">targetName</code>;
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.addFilter"></span><div class="quickindex" id="quickindex.DispatchLogger.addFilter"></div>void <code class="ddoc_psymbol">addFilter</code>(Filter <span class="ddoc_param">filter</span>);
+<br>
+void <code class="ddoc_psymbol">addFilter</code>(MatchFilter <span class="ddoc_param">filter</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.writeLogMsg"></span><div class="quickindex" id="quickindex.DispatchLogger.writeLogMsg"></div>@safe void <code class="ddoc_psymbol">writeLogMsg</code>(ref LogEntry <span class="ddoc_param">payload</span>);
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Logging"></span><div class="quickindex" id="quickindex.Logging"></div>template <code class="ddoc_psymbol">Logging</code>(loggerAlias...)<br></div></dt>
+<dd><div class="ddoc_summary">クラス内で使用するロガーを切り替えるためのミックスインテンプレート</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getLogger"></span><div class="quickindex" id="quickindex.getLogger"></div>Logger <code class="ddoc_psymbol">getLogger</code>(string <span class="ddoc_param">name</span>, Logger <span class="ddoc_param">defaultLogger</span> = sharedLog);
+<br></div></dt>
+<dd><div class="ddoc_summary">名前からロガーを取得する</div></dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>
