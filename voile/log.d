@@ -117,7 +117,7 @@ struct LogData
 /*******************************************************************************
  * 
  */
-interface LogStrageInput
+interface LogStorageInput
 {
 	///
 	LogData front() const @property;
@@ -132,7 +132,7 @@ interface LogStrageInput
 /*******************************************************************************
  * 
  */
-interface LogStrageOutput
+interface LogStorageOutput
 {
 	import std.datetime;
 	///
@@ -140,8 +140,8 @@ interface LogStrageOutput
 	///
 	void clear();
 }
-static assert(isInputRange!(LogStrageInput));
-static assert(isOutputRange!(LogStrageOutput, LogData));
+static assert(isInputRange!(LogStorageInput));
+static assert(isOutputRange!(LogStorageOutput, LogData));
 
 
 
@@ -150,7 +150,7 @@ static assert(isOutputRange!(LogStrageOutput, LogData));
 /*******************************************************************************
  * 
  */
-class LogStrageInMemory: LogStrageInput, LogStrageOutput
+class LogStorageInMemory: LogStorageInput, LogStorageOutput
 {
 private:
 	const(LogData)[] _datas;
@@ -193,9 +193,9 @@ public:
 	}
 	
 	///
-	LogStrageInMemory save() pure nothrow @safe const
+	LogStorageInMemory save() pure nothrow @safe const
 	{
-		auto ls = new LogStrageInMemory;
+		auto ls = new LogStorageInMemory;
 		ls._idx   = _idx;
 		ls._datas = _datas;
 		return ls;
@@ -214,15 +214,15 @@ public:
 	}
 	
 	/// 
-	LogStrageInMemory opSlice() pure nothrow @safe const
+	LogStorageInMemory opSlice() pure nothrow @safe const
 	{
 		return save();
 	}
 	
 	/// ditto
-	LogStrageInMemory opSlice(size_t begin, size_t end) pure nothrow @safe const
+	LogStorageInMemory opSlice(size_t begin, size_t end) pure nothrow @safe const
 	{
-		auto ls = new LogStrageInMemory;
+		auto ls = new LogStorageInMemory;
 		ls._idx   = 0;
 		ls._datas = _datas[begin..end];
 		return ls;
@@ -244,28 +244,28 @@ public:
 	alias opDoller = length;
 }
 
-static assert(isForwardRange!LogStrageInMemory);
-static assert(hasLength!LogStrageInMemory);
-static assert(hasSlicing!LogStrageInMemory);
-static assert(hasLength!(typeof(LogStrageInMemory.slice())));
-static assert(hasSlicing!(typeof(LogStrageInMemory.slice())));
-static assert(hasLength!(typeof(LogStrageInMemory.slice(0,0))));
-static assert(hasSlicing!(typeof(LogStrageInMemory.slice(0,0))));
+static assert(isForwardRange!LogStorageInMemory);
+static assert(hasLength!LogStorageInMemory);
+static assert(hasSlicing!LogStorageInMemory);
+static assert(hasLength!(typeof(LogStorageInMemory.slice())));
+static assert(hasSlicing!(typeof(LogStorageInMemory.slice())));
+static assert(hasLength!(typeof(LogStorageInMemory.slice(0,0))));
+static assert(hasSlicing!(typeof(LogStorageInMemory.slice(0,0))));
 
 
 /*******************************************************************************
  * 
  */
-class LogStrageLogger : Logger
+class LogStorageLogger : Logger
 {
 private:
 	import std.experimental.logger: LogLevel;
 	size_t _currentId;
-	LogStrageOutput _logDst;
+	LogStorageOutput _logDst;
 public:
 	
 	///
-	this(LogStrageOutput logDst, LogLevel lv = LogLevel.all) @safe
+	this(LogStorageOutput logDst, LogLevel lv = LogLevel.all) @safe
 	{
 		_logDst = logDst;
 		_currentId = 0;
@@ -294,11 +294,11 @@ public:
 /*******************************************************************************
  * メモリ内のロガー
  */
-class InMemoryLogger: LogStrageLogger
+class InMemoryLogger: LogStorageLogger
 {
 private:
 	import std.experimental.logger: LogLevel;
-	LogStrageInMemory _logStorage;
+	LogStorageInMemory _logStorage;
 	
 	
 public:
@@ -306,12 +306,12 @@ public:
 	///
 	this(LogLevel lv = LogLevel.all) @safe
 	{
-		_logStorage = new LogStrageInMemory;
+		_logStorage = new LogStorageInMemory;
 		super(_logStorage, lv);
 	}
 	
 	///
-	inout(LogStrageInMemory) logStorage() pure nothrow @safe inout @property
+	inout(LogStorageInMemory) logStorage() pure nothrow @safe inout @property
 	{
 		return _logStorage;
 	}
@@ -523,9 +523,9 @@ public:
 	}
 	
 	///
-	static LogStrageInput loadFromFile(string fileName)
+	static LogStorageInput loadFromFile(string fileName)
 	{
-		return new class LogStrageInput
+		return new class LogStorageInput
 		{
 			import std.stdio;
 			File file;
