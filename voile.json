@@ -10694,7 +10694,7 @@
     "endchar" : 1
    },
    {
-    "name" : "LogStrageInput",
+    "name" : "LogStorageInput",
     "kind" : "interface",
     "comment" : "\n",
     "line" : 120,
@@ -10747,7 +10747,7 @@
     ]
    },
    {
-    "name" : "LogStrageOutput",
+    "name" : "LogStorageOutput",
     "kind" : "interface",
     "comment" : "\n",
     "line" : 135,
@@ -10791,14 +10791,14 @@
     ]
    },
    {
-    "name" : "LogStrageInMemory",
+    "name" : "LogStorageInMemory",
     "kind" : "class",
     "comment" : "\n",
     "line" : 153,
     "char" : 1,
     "interfaces" : [
-     "voile.log.LogStrageInput",
-     "voile.log.LogStrageOutput"
+     "voile.log.LogStorageInput",
+     "voile.log.LogStorageOutput"
     ],
     "members" : [
      {
@@ -10830,7 +10830,7 @@
       "endline" : 163,
       "endchar" : 2,
       "overrides" : [
-       "voile.log.LogStrageInput.front"
+       "voile.log.LogStorageInput.front"
       ]
      },
      {
@@ -10843,7 +10843,7 @@
       "endline" : 169,
       "endchar" : 2,
       "overrides" : [
-       "voile.log.LogStrageInput.empty"
+       "voile.log.LogStorageInput.empty"
       ]
      },
      {
@@ -10856,7 +10856,7 @@
       "endline" : 175,
       "endchar" : 2,
       "overrides" : [
-       "voile.log.LogStrageInput.popFront"
+       "voile.log.LogStorageInput.popFront"
       ]
      },
      {
@@ -10875,7 +10875,7 @@
       "endline" : 181,
       "endchar" : 2,
       "overrides" : [
-       "voile.log.LogStrageOutput.put"
+       "voile.log.LogStorageOutput.put"
       ]
      },
      {
@@ -10888,7 +10888,7 @@
       "endline" : 187,
       "endchar" : 2,
       "overrides" : [
-       "voile.log.LogStrageInput.reset"
+       "voile.log.LogStorageInput.reset"
       ]
      },
      {
@@ -10901,7 +10901,7 @@
       "endline" : 193,
       "endchar" : 2,
       "overrides" : [
-       "voile.log.LogStrageOutput.clear"
+       "voile.log.LogStorageOutput.clear"
       ]
      },
      {
@@ -10909,8 +10909,8 @@
       "kind" : "function",
       "comment" : "\n",
       "line" : 196,
-      "char" : 20,
-      "deco" : "xFNaNbNfZC5voile3log17LogStrageInMemory",
+      "char" : 21,
+      "deco" : "xFNaNbNfZC5voile3log18LogStorageInMemory",
       "endline" : 202,
       "endchar" : 2
      },
@@ -10941,8 +10941,8 @@
       "kind" : "function",
       "comment" : "\n",
       "line" : 217,
-      "char" : 20,
-      "deco" : "xFNaNbNfZC5voile3log17LogStrageInMemory",
+      "char" : 21,
+      "deco" : "xFNaNbNfZC5voile3log18LogStorageInMemory",
       "endline" : 220,
       "endchar" : 2
      },
@@ -10951,9 +10951,9 @@
       "kind" : "function",
       "comment" : "ditto\n",
       "line" : 223,
-      "char" : 20,
-      "deco" : "xFNaNbNfmmZC5voile3log17LogStrageInMemory",
-      "originalType" : "const pure nothrow @safe LogStrageInMemory(size_t begin, size_t end)",
+      "char" : 21,
+      "deco" : "xFNaNbNfmmZC5voile3log18LogStorageInMemory",
+      "originalType" : "const pure nothrow @safe LogStorageInMemory(size_t begin, size_t end)",
       "parameters" : [
        {
         "name" : "begin",
@@ -11016,7 +11016,7 @@
     ]
    },
    {
-    "name" : "LogStrageLogger",
+    "name" : "LogStorageLogger",
     "kind" : "class",
     "comment" : "\n",
     "line" : 259,
@@ -11048,9 +11048,9 @@
       "kind" : "variable",
       "protection" : "private",
       "line" : 264,
-      "char" : 18,
-      "deco" : "C5voile3log15LogStrageOutput",
-      "originalType" : "LogStrageOutput",
+      "char" : 19,
+      "deco" : "C5voile3log16LogStorageOutput",
+      "originalType" : "LogStorageOutput",
       "offset" : 192
      },
      {
@@ -11059,12 +11059,12 @@
       "comment" : "\n",
       "line" : 268,
       "char" : 2,
-      "deco" : "FNfC5voile3log15LogStrageOutputE3std12experimental6logger4core8LogLevelZCQCrQCo15LogStrageLogger",
-      "originalType" : "@safe (LogStrageOutput logDst, LogLevel lv = LogLevel.all)",
+      "deco" : "FNfC5voile3log16LogStorageOutputE3std12experimental6logger4core8LogLevelZCQCsQCp16LogStorageLogger",
+      "originalType" : "@safe (LogStorageOutput logDst, LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
         "name" : "logDst",
-        "deco" : "C5voile3log15LogStrageOutput"
+        "deco" : "C5voile3log16LogStorageOutput"
        },
        {
         "name" : "lv",
@@ -11108,7 +11108,7 @@
     "comment" : " メモリ内のロガー\n",
     "line" : 297,
     "char" : 1,
-    "base" : "voile.log.LogStrageLogger",
+    "base" : "voile.log.LogStorageLogger",
     "members" : [
      {
       "name" : "std.experimental.logger",
@@ -11125,9 +11125,9 @@
       "kind" : "variable",
       "protection" : "private",
       "line" : 301,
-      "char" : 20,
-      "deco" : "C5voile3log17LogStrageInMemory",
-      "originalType" : "LogStrageInMemory",
+      "char" : 21,
+      "deco" : "C5voile3log18LogStorageInMemory",
+      "originalType" : "LogStorageInMemory",
       "offset" : 200
      },
      {
@@ -11153,8 +11153,8 @@
       "kind" : "function",
       "comment" : "\n",
       "line" : 314,
-      "char" : 27,
-      "deco" : "NgFNaNbNdNfZNgC5voile3log17LogStrageInMemory",
+      "char" : 28,
+      "deco" : "NgFNaNbNdNfZNgC5voile3log18LogStorageInMemory",
       "endline" : 317,
       "endchar" : 2
      },
@@ -11606,11 +11606,11 @@
       "kind" : "function",
       "comment" : "\n",
       "line" : 526,
-      "char" : 24,
+      "char" : 25,
       "storageClass" : [
        "static"
       ],
-      "deco" : "FAyaZC5voile3log14LogStrageInput",
+      "deco" : "FAyaZC5voile3log15LogStorageInput",
       "parameters" : [
        {
         "name" : "fileName",
