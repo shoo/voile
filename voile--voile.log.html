@@ -383,88 +383,75 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 <dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter"></div>struct <code class="ddoc_psymbol">Filter</code>;
 <br></div></dt>
 <dd>
-<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.file"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.file"></div>Regex!char <code class="ddoc_psymbol">file</code>;
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.file"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.file"></div>inout @property @safe inout(Regex!char) <code class="ddoc_psymbol">file</code>();
+<br>
+@property @safe void <code class="ddoc_psymbol">file</code>(string <span class="ddoc_param">pattern</span>);
+<br>
+@property @safe void <code class="ddoc_psymbol">file</code>(Regex!char <span class="ddoc_param">r</span>);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.moduleName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.moduleName"></div>Regex!char <code class="ddoc_psymbol">moduleName</code>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.moduleName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.moduleName"></div>inout @property @safe inout(Regex!char) <code class="ddoc_psymbol">moduleName</code>();
+<br>
+@property @safe void <code class="ddoc_psymbol">moduleName</code>(string <span class="ddoc_param">pattern</span>);
+<br>
+@property @safe void <code class="ddoc_psymbol">moduleName</code>(Regex!char <span class="ddoc_param">r</span>);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.funcName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.funcName"></div>Regex!char <code class="ddoc_psymbol">funcName</code>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.funcName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.funcName"></div>inout @property @safe inout(Regex!char) <code class="ddoc_psymbol">funcName</code>();
+<br>
+@property @safe void <code class="ddoc_psymbol">funcName</code>(string <span class="ddoc_param">pattern</span>);
+<br>
+@property @safe void <code class="ddoc_psymbol">funcName</code>(Regex!char <span class="ddoc_param">r</span>);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.prettyFuncName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.prettyFuncName"></div>Regex!char <code class="ddoc_psymbol">prettyFuncName</code>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.prettyFuncName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.prettyFuncName"></div>inout @property @safe inout(Regex!char) <code class="ddoc_psymbol">prettyFuncName</code>();
+<br>
+@property @safe void <code class="ddoc_psymbol">prettyFuncName</code>(string <span class="ddoc_param">pattern</span>);
+<br>
+@property @safe void <code class="ddoc_psymbol">prettyFuncName</code>(Regex!char <span class="ddoc_param">r</span>);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.msg"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.msg"></div>Regex!char <code class="ddoc_psymbol">msg</code>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.msg"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.msg"></div>inout @property @safe inout(Regex!char) <code class="ddoc_psymbol">msg</code>();
+<br>
+@property @safe void <code class="ddoc_psymbol">msg</code>(string <span class="ddoc_param">pattern</span>);
+<br>
+@property @safe void <code class="ddoc_psymbol">msg</code>(Regex!char <span class="ddoc_param">r</span>);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.lineMax"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.lineMax"></div>size_t <code class="ddoc_psymbol">lineMax</code>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.targetName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.targetName"></div>inout @property @safe string <code class="ddoc_psymbol">targetName</code>();
+<br>
+@property @safe void <code class="ddoc_psymbol">targetName</code>(string <span class="ddoc_param">name</span>);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.lineMin"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.lineMin"></div>size_t <code class="ddoc_psymbol">lineMin</code>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.lineMax"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.lineMax"></div>const @property @safe size_t <code class="ddoc_psymbol">lineMax</code>();
+<br>
+@property @safe void <code class="ddoc_psymbol">lineMax</code>(size_t <span class="ddoc_param">num</span>);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.logLevel"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.logLevel"></div>LogLevel <code class="ddoc_psymbol">logLevel</code>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.lineMin"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.lineMin"></div>const @property @safe size_t <code class="ddoc_psymbol">lineMin</code>();
+<br>
+@property @safe void <code class="ddoc_psymbol">lineMin</code>(size_t <span class="ddoc_param">num</span>);
+<br>
+<span class="def-anchor" id=".DispatchLogger.Filter.setLineSpan"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.setLineSpan"></div>@safe void <code class="ddoc_psymbol">setLineSpan</code>(size_t <span class="ddoc_param">min</span>, size_t <span class="ddoc_param">max</span>);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.targetName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.targetName"></div>string <code class="ddoc_psymbol">targetName</code>;
-<br></div></dt>
-<dd>
-</dd>
-</div></dl>
-</dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter"></div>struct <code class="ddoc_psymbol">MatchFilter</code>;
-<br></div></dt>
-<dd>
-<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.file"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.file"></div>string <code class="ddoc_psymbol">file</code>;
-<br></div></dt>
-<dd>
-</dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.moduleName"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.moduleName"></div>string <code class="ddoc_psymbol">moduleName</code>;
-<br></div></dt>
-<dd>
-</dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.funcName"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.funcName"></div>string <code class="ddoc_psymbol">funcName</code>;
-<br></div></dt>
-<dd>
-</dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.prettyFuncName"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.prettyFuncName"></div>string <code class="ddoc_psymbol">prettyFuncName</code>;
-<br></div></dt>
-<dd>
-</dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.msg"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.msg"></div>string <code class="ddoc_psymbol">msg</code>;
-<br></div></dt>
-<dd>
-</dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.lineMax"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.lineMax"></div>size_t <code class="ddoc_psymbol">lineMax</code>;
-<br></div></dt>
-<dd>
-</dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.lineMin"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.lineMin"></div>size_t <code class="ddoc_psymbol">lineMin</code>;
-<br></div></dt>
-<dd>
-</dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.logLevel"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.logLevel"></div>LogLevel <code class="ddoc_psymbol">logLevel</code>;
-<br></div></dt>
-<dd>
-</dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.MatchFilter.targetName"></span><div class="quickindex" id="quickindex.DispatchLogger.MatchFilter.targetName"></div>string <code class="ddoc_psymbol">targetName</code>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.logLevel"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.logLevel"></div>const @property @safe LogLevel <code class="ddoc_psymbol">logLevel</code>();
+<br>
+@property @safe void <code class="ddoc_psymbol">logLevel</code>(LogLevel <span class="ddoc_param">lv</span>);
 <br></div></dt>
 <dd>
 </dd>
 </div></dl>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.addFilter"></span><div class="quickindex" id="quickindex.DispatchLogger.addFilter"></div>void <code class="ddoc_psymbol">addFilter</code>(Filter <span class="ddoc_param">filter</span>);
-<br>
-void <code class="ddoc_psymbol">addFilter</code>(MatchFilter <span class="ddoc_param">filter</span>);
 <br></div></dt>
 <dd>
 </dd>
@@ -476,7 +463,7 @@ void <code class="ddoc_psymbol">addFilter</code>(MatchFilter <span class="ddoc_p
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Logging"></span><div class="quickindex" id="quickindex.Logging"></div>template <code class="ddoc_psymbol">Logging</code>(loggerAlias...)<br></div></dt>
 <dd><div class="ddoc_summary">クラス内で使用するロガーを切り替えるためのミックスインテンプレート</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getLogger"></span><div class="quickindex" id="quickindex.getLogger"></div>Logger <code class="ddoc_psymbol">getLogger</code>(string <span class="ddoc_param">name</span>, Logger <span class="ddoc_param">defaultLogger</span> = sharedLog);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getLogger"></span><div class="quickindex" id="quickindex.getLogger"></div>@safe Logger <code class="ddoc_psymbol">getLogger</code>(string <span class="ddoc_param">name</span>, Logger <span class="ddoc_param">defaultLogger</span> = sharedLog);
 <br></div></dt>
 <dd><div class="ddoc_summary">名前からロガーを取得する</div></dd>
 </div></dl>

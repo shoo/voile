@@ -12289,187 +12289,438 @@
       "char" : 2,
       "members" : [
        {
-        "name" : "file",
+        "name" : "_file",
         "kind" : "variable",
+        "protection" : "private",
         "comment" : "\n",
-        "line" : 920,
+        "line" : 921,
         "char" : 14,
         "deco" : "S3std5regex8internal2ir__T5RegexTaZQj",
         "offset" : 0
        },
        {
-        "name" : "moduleName",
+        "name" : "_moduleName",
         "kind" : "variable",
+        "protection" : "private",
         "comment" : "\n",
-        "line" : 922,
+        "line" : 923,
         "char" : 14,
         "deco" : "S3std5regex8internal2ir__T5RegexTaZQj",
         "offset" : 168
        },
        {
-        "name" : "funcName",
+        "name" : "_funcName",
         "kind" : "variable",
+        "protection" : "private",
         "comment" : "\n",
-        "line" : 924,
+        "line" : 925,
         "char" : 14,
         "deco" : "S3std5regex8internal2ir__T5RegexTaZQj",
         "offset" : 336
        },
        {
-        "name" : "prettyFuncName",
+        "name" : "_prettyFuncName",
         "kind" : "variable",
+        "protection" : "private",
         "comment" : "\n",
-        "line" : 926,
+        "line" : 927,
         "char" : 14,
         "deco" : "S3std5regex8internal2ir__T5RegexTaZQj",
         "offset" : 504
        },
        {
-        "name" : "msg",
+        "name" : "_msg",
         "kind" : "variable",
+        "protection" : "private",
         "comment" : "\n",
-        "line" : 928,
+        "line" : 929,
         "char" : 14,
         "deco" : "S3std5regex8internal2ir__T5RegexTaZQj",
         "offset" : 672
        },
        {
-        "name" : "lineMax",
+        "name" : "_targetName",
         "kind" : "variable",
+        "protection" : "private",
         "comment" : "\n",
-        "line" : 930,
-        "char" : 10,
-        "deco" : "m",
-        "originalType" : "size_t",
-        "init" : "18446744073709551615LU",
+        "line" : 931,
+        "char" : 14,
+        "deco" : "Aya",
         "offset" : 840
        },
        {
-        "name" : "lineMin",
+        "name" : "_lineMax",
         "kind" : "variable",
+        "protection" : "private",
         "comment" : "\n",
-        "line" : 932,
-        "char" : 10,
-        "deco" : "m",
-        "originalType" : "size_t",
-        "init" : "0LU",
-        "offset" : 848
-       },
-       {
-        "name" : "logLevel",
-        "kind" : "variable",
-        "comment" : "\n",
-        "line" : 934,
+        "line" : 933,
         "char" : 14,
-        "deco" : "E3std12experimental6logger4core8LogLevel",
-        "init" : "cast(LogLevel)cast(ubyte)1u",
-        "offset" : 856
-       },
-       {
-        "name" : "targetName",
-        "kind" : "variable",
-        "comment" : "\n",
-        "line" : 936,
-        "char" : 14,
-        "deco" : "Aya",
-        "init" : "\"default\"",
-        "offset" : 864
-       }
-      ]
-     },
-     {
-      "name" : "MatchFilter",
-      "kind" : "struct",
-      "comment" : "\n",
-      "line" : 941,
-      "char" : 2,
-      "members" : [
-       {
-        "name" : "file",
-        "kind" : "variable",
-        "comment" : "\n",
-        "line" : 944,
-        "char" : 10,
-        "deco" : "Aya",
-        "offset" : 0
-       },
-       {
-        "name" : "moduleName",
-        "kind" : "variable",
-        "comment" : "\n",
-        "line" : 946,
-        "char" : 10,
-        "deco" : "Aya",
-        "offset" : 16
-       },
-       {
-        "name" : "funcName",
-        "kind" : "variable",
-        "comment" : "\n",
-        "line" : 948,
-        "char" : 10,
-        "deco" : "Aya",
-        "offset" : 32
-       },
-       {
-        "name" : "prettyFuncName",
-        "kind" : "variable",
-        "comment" : "\n",
-        "line" : 950,
-        "char" : 10,
-        "deco" : "Aya",
-        "offset" : 48
-       },
-       {
-        "name" : "msg",
-        "kind" : "variable",
-        "comment" : "\n",
-        "line" : 952,
-        "char" : 10,
-        "deco" : "Aya",
-        "offset" : 64
-       },
-       {
-        "name" : "lineMax",
-        "kind" : "variable",
-        "comment" : "\n",
-        "line" : 954,
-        "char" : 10,
         "deco" : "m",
         "originalType" : "size_t",
         "init" : "18446744073709551615LU",
-        "offset" : 80
+        "offset" : 856
        },
        {
-        "name" : "lineMin",
+        "name" : "_lineMin",
         "kind" : "variable",
+        "protection" : "private",
         "comment" : "\n",
-        "line" : 956,
-        "char" : 10,
+        "line" : 935,
+        "char" : 14,
         "deco" : "m",
         "originalType" : "size_t",
         "init" : "0LU",
-        "offset" : 88
+        "offset" : 864
        },
        {
-        "name" : "logLevel",
+        "name" : "_logLevel",
         "kind" : "variable",
+        "protection" : "private",
         "comment" : "\n",
-        "line" : 958,
+        "line" : 937,
         "char" : 14,
         "deco" : "E3std12experimental6logger4core8LogLevel",
         "init" : "cast(LogLevel)cast(ubyte)1u",
-        "offset" : 96
+        "offset" : 872
+       },
+       {
+        "name" : "file",
+        "kind" : "function",
+        "comment" : "\n",
+        "line" : 940,
+        "char" : 21,
+        "deco" : "NgFNdNfZNgS3std5regex8internal2ir__T5RegexTaZQj",
+        "endline" : 943,
+        "endchar" : 3
+       },
+       {
+        "name" : "file",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 945,
+        "char" : 8,
+        "deco" : "FNdNfAyaZv",
+        "parameters" : [
+         {
+          "name" : "pattern",
+          "deco" : "Aya"
+         }
+        ],
+        "endline" : 948,
+        "endchar" : 3
+       },
+       {
+        "name" : "file",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 950,
+        "char" : 8,
+        "deco" : "FNdNfS3std5regex8internal2ir__T5RegexTaZQjZv",
+        "parameters" : [
+         {
+          "name" : "r",
+          "deco" : "S3std5regex8internal2ir__T5RegexTaZQj"
+         }
+        ],
+        "endline" : 953,
+        "endchar" : 3
+       },
+       {
+        "name" : "moduleName",
+        "kind" : "function",
+        "comment" : "\n",
+        "line" : 955,
+        "char" : 21,
+        "deco" : "NgFNdNfZNgS3std5regex8internal2ir__T5RegexTaZQj",
+        "endline" : 958,
+        "endchar" : 3
+       },
+       {
+        "name" : "moduleName",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 960,
+        "char" : 8,
+        "deco" : "FNdNfAyaZv",
+        "parameters" : [
+         {
+          "name" : "pattern",
+          "deco" : "Aya"
+         }
+        ],
+        "endline" : 963,
+        "endchar" : 3
+       },
+       {
+        "name" : "moduleName",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 965,
+        "char" : 8,
+        "deco" : "FNdNfS3std5regex8internal2ir__T5RegexTaZQjZv",
+        "parameters" : [
+         {
+          "name" : "r",
+          "deco" : "S3std5regex8internal2ir__T5RegexTaZQj"
+         }
+        ],
+        "endline" : 968,
+        "endchar" : 3
+       },
+       {
+        "name" : "funcName",
+        "kind" : "function",
+        "comment" : "\n",
+        "line" : 970,
+        "char" : 21,
+        "deco" : "NgFNdNfZNgS3std5regex8internal2ir__T5RegexTaZQj",
+        "endline" : 973,
+        "endchar" : 3
+       },
+       {
+        "name" : "funcName",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 975,
+        "char" : 8,
+        "deco" : "FNdNfAyaZv",
+        "parameters" : [
+         {
+          "name" : "pattern",
+          "deco" : "Aya"
+         }
+        ],
+        "endline" : 978,
+        "endchar" : 3
+       },
+       {
+        "name" : "funcName",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 980,
+        "char" : 8,
+        "deco" : "FNdNfS3std5regex8internal2ir__T5RegexTaZQjZv",
+        "parameters" : [
+         {
+          "name" : "r",
+          "deco" : "S3std5regex8internal2ir__T5RegexTaZQj"
+         }
+        ],
+        "endline" : 983,
+        "endchar" : 3
+       },
+       {
+        "name" : "prettyFuncName",
+        "kind" : "function",
+        "comment" : "\n",
+        "line" : 985,
+        "char" : 21,
+        "deco" : "NgFNdNfZNgS3std5regex8internal2ir__T5RegexTaZQj",
+        "endline" : 988,
+        "endchar" : 3
+       },
+       {
+        "name" : "prettyFuncName",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 990,
+        "char" : 8,
+        "deco" : "FNdNfAyaZv",
+        "parameters" : [
+         {
+          "name" : "pattern",
+          "deco" : "Aya"
+         }
+        ],
+        "endline" : 993,
+        "endchar" : 3
+       },
+       {
+        "name" : "prettyFuncName",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 995,
+        "char" : 8,
+        "deco" : "FNdNfS3std5regex8internal2ir__T5RegexTaZQjZv",
+        "parameters" : [
+         {
+          "name" : "r",
+          "deco" : "S3std5regex8internal2ir__T5RegexTaZQj"
+         }
+        ],
+        "endline" : 998,
+        "endchar" : 3
+       },
+       {
+        "name" : "msg",
+        "kind" : "function",
+        "comment" : "\n",
+        "line" : 1000,
+        "char" : 21,
+        "deco" : "NgFNdNfZNgS3std5regex8internal2ir__T5RegexTaZQj",
+        "endline" : 1003,
+        "endchar" : 3
+       },
+       {
+        "name" : "msg",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 1005,
+        "char" : 8,
+        "deco" : "FNdNfAyaZv",
+        "parameters" : [
+         {
+          "name" : "pattern",
+          "deco" : "Aya"
+         }
+        ],
+        "endline" : 1008,
+        "endchar" : 3
+       },
+       {
+        "name" : "msg",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 1010,
+        "char" : 8,
+        "deco" : "FNdNfS3std5regex8internal2ir__T5RegexTaZQjZv",
+        "parameters" : [
+         {
+          "name" : "r",
+          "deco" : "S3std5regex8internal2ir__T5RegexTaZQj"
+         }
+        ],
+        "endline" : 1013,
+        "endchar" : 3
        },
        {
         "name" : "targetName",
-        "kind" : "variable",
+        "kind" : "function",
         "comment" : "\n",
-        "line" : 960,
-        "char" : 14,
-        "deco" : "Aya",
-        "init" : "\"default\"",
-        "offset" : 104
+        "line" : 1015,
+        "char" : 10,
+        "deco" : "NgFNdNfZAya",
+        "endline" : 1018,
+        "endchar" : 3
+       },
+       {
+        "name" : "targetName",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 1020,
+        "char" : 8,
+        "deco" : "FNdNfAyaZv",
+        "parameters" : [
+         {
+          "name" : "name",
+          "deco" : "Aya"
+         }
+        ],
+        "endline" : 1023,
+        "endchar" : 3
+       },
+       {
+        "name" : "lineMax",
+        "kind" : "function",
+        "comment" : "\n",
+        "line" : 1025,
+        "char" : 10,
+        "deco" : "xFNdNfZm",
+        "originalType" : "const @property @safe size_t()",
+        "endline" : 1028,
+        "endchar" : 3
+       },
+       {
+        "name" : "lineMax",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 1030,
+        "char" : 8,
+        "deco" : "FNdNfmZv",
+        "originalType" : "@property @safe void(size_t num)",
+        "parameters" : [
+         {
+          "name" : "num",
+          "deco" : "m"
+         }
+        ],
+        "endline" : 1033,
+        "endchar" : 3
+       },
+       {
+        "name" : "lineMin",
+        "kind" : "function",
+        "comment" : "\n",
+        "line" : 1035,
+        "char" : 10,
+        "deco" : "xFNdNfZm",
+        "originalType" : "const @property @safe size_t()",
+        "endline" : 1038,
+        "endchar" : 3
+       },
+       {
+        "name" : "lineMin",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 1040,
+        "char" : 8,
+        "deco" : "FNdNfmZv",
+        "originalType" : "@property @safe void(size_t num)",
+        "parameters" : [
+         {
+          "name" : "num",
+          "deco" : "m"
+         }
+        ],
+        "endline" : 1043,
+        "endchar" : 3
+       },
+       {
+        "name" : "setLineSpan",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 1045,
+        "char" : 8,
+        "deco" : "FNfmmZv",
+        "originalType" : "@safe void(size_t min, size_t max)",
+        "parameters" : [
+         {
+          "name" : "min",
+          "deco" : "m"
+         },
+         {
+          "name" : "max",
+          "deco" : "m"
+         }
+        ],
+        "endline" : 1049,
+        "endchar" : 3
+       },
+       {
+        "name" : "logLevel",
+        "kind" : "function",
+        "comment" : "\n",
+        "line" : 1051,
+        "char" : 12,
+        "deco" : "xFNdNfZE3std12experimental6logger4core8LogLevel",
+        "endline" : 1054,
+        "endchar" : 3
+       },
+       {
+        "name" : "logLevel",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 1056,
+        "char" : 8,
+        "deco" : "FNdNfE3std12experimental6logger4core8LogLevelZv",
+        "parameters" : [
+         {
+          "name" : "lv",
+          "deco" : "E3std12experimental6logger4core8LogLevel"
+         }
+        ],
+        "endline" : 1059,
+        "endchar" : 3
        }
       ]
      },
@@ -12477,7 +12728,7 @@
       "name" : "_filters",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 963,
+      "line" : 1063,
       "char" : 11,
       "deco" : "AS5voile3log14DispatchLogger6Filter",
       "offset" : 200
@@ -12486,7 +12737,7 @@
       "name" : "addFilter",
       "kind" : "function",
       "comment" : "\n",
-      "line" : 968,
+      "line" : 1068,
       "char" : 7,
       "deco" : "FS5voile3log14DispatchLogger6FilterZv",
       "parameters" : [
@@ -12495,30 +12746,14 @@
         "deco" : "S5voile3log14DispatchLogger6Filter"
        }
       ],
-      "endline" : 971,
-      "endchar" : 2
-     },
-     {
-      "name" : "addFilter",
-      "kind" : "function",
-      "comment" : "ditto\n",
-      "line" : 973,
-      "char" : 7,
-      "deco" : "FS5voile3log14DispatchLogger11MatchFilterZv",
-      "parameters" : [
-       {
-        "name" : "filter",
-        "deco" : "S5voile3log14DispatchLogger11MatchFilter"
-       }
-      ],
-      "endline" : 983,
+      "endline" : 1071,
       "endchar" : 2
      },
      {
       "name" : "writeLogMsg",
       "kind" : "function",
       "comment" : "\n",
-      "line" : 987,
+      "line" : 1075,
       "char" : 16,
       "storageClass" : [
        "override"
@@ -12533,7 +12768,7 @@
         ]
        }
       ],
-      "endline" : 1007,
+      "endline" : 1106,
       "endchar" : 2,
       "overrides" : [
        "std.experimental.logger.multilogger.MultiLogger.writeLogMsg"
@@ -12552,7 +12787,7 @@
    {
     "kind" : "template",
     "comment" : " クラス内で使用するロガーを切り替えるためのミックスインテンプレート\n",
-    "line" : 1014,
+    "line" : 1113,
     "char" : 7,
     "name" : "Logging",
     "parameters" : [
@@ -12565,7 +12800,7 @@
      {
       "name" : "std.experimental.logger",
       "kind" : "import",
-      "line" : 1016,
+      "line" : 1115,
       "char" : 17,
       "protection" : "private",
       "selective" : [
@@ -12576,7 +12811,7 @@
      {
       "name" : "std.string",
       "kind" : "import",
-      "line" : 1017,
+      "line" : 1116,
       "char" : 17,
       "protection" : "private",
       "selective" : [
@@ -12586,15 +12821,15 @@
      {
       "name" : "logger",
       "kind" : "function",
-      "line" : 1020,
+      "line" : 1119,
       "char" : 49,
       "type" : "const typeof(loggerAlias[0])()",
-      "endline" : 1023,
+      "endline" : 1122,
       "endchar" : 3
      },
      {
       "kind" : "template",
-      "line" : 1033,
+      "line" : 1132,
       "char" : 30,
       "name" : "log",
       "parameters" : [
@@ -12643,7 +12878,7 @@
        {
         "name" : "log",
         "kind" : "function",
-        "line" : 1033,
+        "line" : 1132,
         "char" : 30,
         "type" : "const void(Args args)",
         "parameters" : [
@@ -12652,14 +12887,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1066,
+        "endline" : 1165,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1067,
+      "line" : 1166,
       "char" : 30,
       "name" : "trace",
       "parameters" : [
@@ -12708,7 +12943,7 @@
        {
         "name" : "trace",
         "kind" : "function",
-        "line" : 1067,
+        "line" : 1166,
         "char" : 30,
         "type" : "const void(Args args)",
         "parameters" : [
@@ -12717,14 +12952,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1088,
+        "endline" : 1187,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1089,
+      "line" : 1188,
       "char" : 30,
       "name" : "info",
       "parameters" : [
@@ -12773,7 +13008,7 @@
        {
         "name" : "info",
         "kind" : "function",
-        "line" : 1089,
+        "line" : 1188,
         "char" : 30,
         "type" : "const void(Args args)",
         "parameters" : [
@@ -12782,14 +13017,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1110,
+        "endline" : 1209,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1111,
+      "line" : 1210,
       "char" : 30,
       "name" : "warning",
       "parameters" : [
@@ -12838,7 +13073,7 @@
        {
         "name" : "warning",
         "kind" : "function",
-        "line" : 1111,
+        "line" : 1210,
         "char" : 30,
         "type" : "const void(Args args)",
         "parameters" : [
@@ -12847,14 +13082,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1132,
+        "endline" : 1231,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1133,
+      "line" : 1232,
       "char" : 30,
       "name" : "error",
       "parameters" : [
@@ -12903,7 +13138,7 @@
        {
         "name" : "error",
         "kind" : "function",
-        "line" : 1133,
+        "line" : 1232,
         "char" : 30,
         "type" : "const void(Args args)",
         "parameters" : [
@@ -12912,14 +13147,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1154,
+        "endline" : 1253,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1155,
+      "line" : 1254,
       "char" : 30,
       "name" : "fatal",
       "parameters" : [
@@ -12968,7 +13203,7 @@
        {
         "name" : "fatal",
         "kind" : "function",
-        "line" : 1155,
+        "line" : 1254,
         "char" : 30,
         "type" : "const void(Args args)",
         "parameters" : [
@@ -12977,14 +13212,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1176,
+        "endline" : 1275,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1177,
+      "line" : 1276,
       "char" : 30,
       "name" : "critical",
       "parameters" : [
@@ -13033,7 +13268,7 @@
        {
         "name" : "critical",
         "kind" : "function",
-        "line" : 1177,
+        "line" : 1276,
         "char" : 30,
         "type" : "const void(Args args)",
         "parameters" : [
@@ -13042,7 +13277,7 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1198,
+        "endline" : 1297,
         "endchar" : 2
        }
       ]
@@ -13053,10 +13288,10 @@
     "name" : "getLogger",
     "kind" : "function",
     "comment" : " 名前からロガーを取得する\n",
-    "line" : 1205,
+    "line" : 1304,
     "char" : 8,
-    "deco" : "FAyaC3std12experimental6logger4core6LoggerZQBn",
-    "originalType" : "Logger(string name, Logger defaultLogger = sharedLog)",
+    "deco" : "FNfAyaC3std12experimental6logger4core6LoggerZQBn",
+    "originalType" : "@safe Logger(string name, Logger defaultLogger = sharedLog)",
     "parameters" : [
      {
       "name" : "name",
@@ -13068,7 +13303,7 @@
       "default" : "sharedLog()"
      }
     ],
-    "endline" : 1215,
+    "endline" : 1314,
     "endchar" : 1
    }
   ]
