@@ -916,49 +916,149 @@ class DispatchLogger: NamedLogger
 	 */
 	struct Filter
 	{
+	private:
 		///
-		Regex!char file;
+		Regex!char _file;
 		///
-		Regex!char moduleName;
+		Regex!char _moduleName;
 		///
-		Regex!char funcName;
+		Regex!char _funcName;
 		///
-		Regex!char prettyFuncName;
+		Regex!char _prettyFuncName;
 		///
-		Regex!char msg;
+		Regex!char _msg;
 		///
-		size_t lineMax = size_t.max;
+		string     _targetName;
 		///
-		size_t lineMin = size_t.min;
+		size_t     _lineMax = size_t.max;
 		///
-		LogLevel   logLevel = LogLevel.all;
+		size_t     _lineMin = size_t.min;
 		///
-		string     targetName = "default";
+		LogLevel   _logLevel = LogLevel.all;
+	public:
+		///
+		inout(Regex!char) file() @safe inout @property
+		{
+			return _file;
+		}
+		/// ditto
+		void file(string pattern) @safe @property
+		{
+			_file = regex(pattern);
+		}
+		/// ditto
+		void file(Regex!char r) @safe @property
+		{
+			_file = r;
+		}
+		///
+		inout(Regex!char) moduleName() @safe inout @property
+		{
+			return _moduleName;
+		}
+		/// ditto
+		void moduleName(string pattern) @safe @property
+		{
+			_moduleName = regex(pattern);
+		}
+		/// ditto
+		void moduleName(Regex!char r) @safe @property
+		{
+			_moduleName = r;
+		}
+		///
+		inout(Regex!char) funcName() @safe inout @property
+		{
+			return _funcName;
+		}
+		/// ditto
+		void funcName(string pattern) @safe @property
+		{
+			_funcName = regex(pattern);
+		}
+		/// ditto
+		void funcName(Regex!char r) @safe @property
+		{
+			_funcName = r;
+		}
+		///
+		inout(Regex!char) prettyFuncName() @safe inout @property
+		{
+			return _prettyFuncName;
+		}
+		/// ditto
+		void prettyFuncName(string pattern) @safe @property
+		{
+			_prettyFuncName = regex(pattern);
+		}
+		/// ditto
+		void prettyFuncName(Regex!char r) @safe @property
+		{
+			_prettyFuncName = r;
+		}
+		///
+		inout(Regex!char) msg() @safe inout @property
+		{
+			return _msg;
+		}
+		/// ditto
+		void msg(string pattern) @safe @property
+		{
+			_msg = regex(pattern);
+		}
+		/// ditto
+		void msg(Regex!char r) @safe @property
+		{
+			_msg = r;
+		}
+		///
+		string targetName() @safe inout @property
+		{
+			return _targetName;
+		}
+		/// ditto
+		void targetName(string name) @safe @property
+		{
+			_targetName = name;
+		}
+		///
+		size_t lineMax() @safe const @property
+		{
+			return _lineMax;
+		}
+		/// ditto
+		void lineMax(size_t num) @safe @property
+		{
+			_lineMax = num;
+		}
+		///
+		size_t lineMin() @safe const @property
+		{
+			return _lineMin;
+		}
+		/// ditto
+		void lineMin(size_t num) @safe @property
+		{
+			_lineMin = num;
+		}
+		/// ditto
+		void setLineSpan(size_t min, size_t max) @safe
+		{
+			_lineMin = min;
+			_lineMax = max;
+		}
+		///
+		LogLevel logLevel() @safe const @property
+		{
+			return _logLevel;
+		}
+		/// ditto
+		void logLevel(LogLevel lv) @safe @property
+		{
+			_logLevel = lv;
+		}
 	}
-	/***************************************************************************
-	 * 
-	 */
-	struct MatchFilter
-	{
-		///
-		string file;
-		///
-		string moduleName;
-		///
-		string funcName;
-		///
-		string prettyFuncName;
-		///
-		string msg;
-		///
-		size_t lineMax = size_t.max;
-		///
-		size_t lineMin = size_t.min;
-		///
-		LogLevel   logLevel = LogLevel.all;
-		///
-		string     targetName = "default";
-	}
+	
 private:
 	Filter[] _filters;
 public:
@@ -969,18 +1069,6 @@ public:
 	{
 		_filters ~= filter;
 	}
-	/// ditto
-	void addFilter(MatchFilter filter)
-	{
-		addFilter(Filter(
-			filter.file.length           == 0 ? Regex!char.init : regex(filter.file),
-			filter.moduleName.length     == 0 ? Regex!char.init : regex(filter.moduleName),
-			filter.funcName.length       == 0 ? Regex!char.init : regex(filter.funcName),
-			filter.prettyFuncName.length == 0 ? Regex!char.init : regex(filter.prettyFuncName),
-			filter.msg.length            == 0 ? Regex!char.init : regex(filter.msg),
-			filter.lineMax, filter.lineMin, filter.logLevel,
-			filter.targetName));
-	}
 	/***************************************************************************
 	 * 
 	 */
@@ -990,20 +1078,31 @@ public:
 		foreach (f; _filters)
 		{
 			bool filtered = true;
-			filtered = filtered && (f.file           is Regex!char.init || payload.file.matchFirst(f.file));
-			filtered = filtered && (f.moduleName     is Regex!char.init || payload.moduleName.matchFirst(f.moduleName));
-			filtered = filtered && (f.funcName       is Regex!char.init || payload.funcName.matchFirst(f.funcName));
-			filtered = filtered && (f.prettyFuncName is Regex!char.init || payload.prettyFuncName.matchFirst(f.prettyFuncName));
-			filtered = filtered && (f.msg            is Regex!char.init || payload.msg.matchFirst(f.msg));
-			filtered = filtered && (f.logLevel <= payload.logLevel);
-			filtered = filtered && ((f.lineMax >= payload.line) && (f.lineMin <= payload.line));
-			if (filtered)
+			filtered = filtered && (f._file           is Regex!char.init || payload.file.matchFirst(f._file));
+			filtered = filtered && (f._moduleName     is Regex!char.init || payload.moduleName.matchFirst(f._moduleName));
+			filtered = filtered && (f._funcName       is Regex!char.init || payload.funcName.matchFirst(f._funcName));
+			filtered = filtered && (f._prettyFuncName is Regex!char.init || payload.prettyFuncName.matchFirst(f._prettyFuncName));
+			filtered = filtered && (f._msg            is Regex!char.init || payload.msg.matchFirst(f._msg));
+			filtered = filtered && (f._logLevel <= payload.logLevel);
+			filtered = filtered && ((f._lineMax >= payload.line) && (f._lineMin <= payload.line));
+			// フィルタにかからない場合は次
+			if (!filtered)
+				continue;
+			if (auto logger = getLogger(f._targetName))
 			{
-				getLogger(f.targetName).enforce("Cannot find Logger").writeLogMsg(payload);
-				break;
+				// 宛先がある場合は、宛先にのみ分配
+				logger.writeLogMsg(payload);
+				return;
+			}
+			else
+			{
+				// 宛先がない場合は全てに分配
+				super.writeLogMsg(payload);
+				return;
 			}
 		}
-		super.writeLogMsg(payload);
+		// 全てのフィルタに引っかからなかった場合は破棄
+		return;
 	}
 }
 
@@ -1202,7 +1301,7 @@ mixin template Logging(loggerAlias...)
 /*******************************************************************************
  * 名前からロガーを取得する
  */
-Logger getLogger(string name, Logger defaultLogger = sharedLog)
+Logger getLogger(string name, Logger defaultLogger = sharedLog) @safe
 {
 	import std.experimental.logger;
 	auto logger = cast(NamedLogger)sharedLog;
