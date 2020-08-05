@@ -1,0 +1,7 @@
+{
+	"name": "data",
+	"dependencies": {
+		"voile": {"path": "../..", "version": "*"}
+	},
+	"sourceFiles": ["../../ci/ut.d"]
+}
