@@ -3,7 +3,7 @@
  * 
  * Fine-tune the output destination of coverage, etc.
  */
-module ut;
+module ci.ut;
 
 debug shared static this()
 {

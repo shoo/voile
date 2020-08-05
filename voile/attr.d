@@ -45,7 +45,11 @@ private template isDesiredUDA(alias attribute)
  */
 template getParameterUDAs(alias Func, size_t i)
 {
-	static if (__traits(compiles, __traits(getAttributes, Parameters!Func[i..i+1])))
+	static if (__traits(compiles, { static assert(__traits(getAttributes, Parameters!Func[i]).length > 0); }))
+	{
+		alias getParameterUDAs = __traits(getAttributes, Parameters!Func[i]);
+	}
+	else static if (__traits(compiles, __traits(getAttributes, Parameters!Func[i..i+1])))
 	{
 		alias getParameterUDAs = __traits(getAttributes, Parameters!Func[i..i+1]);
 	}
@@ -226,7 +230,7 @@ enum bool hasParameterTypeUDA(alias Func, size_t i, alias attr) = getParameterTy
  * Params:
  *      Func = 関数
  *      i    = 引数の番号(最初の引数は0番目)
- *      uda  = チェックするUDA
+ *      attr = チェックするUDA
  * Returns:
  *      UDAがあったらtrue
  */

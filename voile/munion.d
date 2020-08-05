@@ -1470,7 +1470,6 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 	U dat;
 	static assert(U._inst.sizeof == long.sizeof);
 	static assert(!U.hasType!char);
-	static assert(U.sizeof == long.sizeof + size_t.sizeof);
 	static assert(U.hasType!short);
 	static assert(U.getTypeIndex!short == 1);
 	static assert(U.getAssignableIndex!short == 1);
@@ -1479,6 +1478,7 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 	static assert(U.getAssignableIndex!byte  == 0);
 	static assert(!U.hasType!char);
 	
+	static assert(ManagedUnion!(ulong, long, uint, int).sizeof == ManagedUnion!(ubyte, byte, ushort, long).sizeof);
 	
 	dat = 1;
 	
