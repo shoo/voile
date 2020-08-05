@@ -7,21 +7,249 @@ module voile.attr;
 import std.traits;
 import std.meta;
 
-///
-enum Ignore;
+// from phobos private template in std.traits
+private template isDesiredUDA(alias attribute)
+{
+	template isDesiredUDA(alias toCheck)
+	{
+		static if (is(typeof(attribute)) && !__traits(isTemplate, attribute))
+		{
+			static if (__traits(compiles, toCheck == attribute))
+				enum isDesiredUDA = toCheck == attribute;
+			else
+				enum isDesiredUDA = false;
+		}
+		else static if (is(typeof(toCheck)))
+		{
+			static if (__traits(isTemplate, attribute))
+				enum isDesiredUDA =  isInstanceOf!(attribute, typeof(toCheck));
+			else
+				enum isDesiredUDA = is(typeof(toCheck) == attribute);
+		}
+		else static if (__traits(isTemplate, attribute))
+			enum isDesiredUDA = isInstanceOf!(attribute, toCheck);
+		else
+			enum isDesiredUDA = is(toCheck == attribute);
+	}
+}
 
+/*******************************************************************************
+ * 関数のパラメータに付与されたUDAを取り出す。
+ * 
+ * Params:
+ *      Func = 関数
+ *      i    = 引数の番号(最初の引数は0番目)
+ *      attr = UDAの種類を指定できます(指定しないとすべて返します)
+ * Returns:
+ *      UDAのタプルが返ります
+ */
+template getParameterUDAs(alias Func, size_t i)
+{
+	static if (__traits(compiles, __traits(getAttributes, Parameters!Func[i..i+1])))
+	{
+		alias getParameterUDAs = __traits(getAttributes, Parameters!Func[i..i+1]);
+	}
+	else
+	{
+		alias getParameterUDAs = AliasSeq!();
+	}
+}
+/// ditto
+alias getParameterUDAs(alias Func, size_t i, alias attr) = Filter!(isDesiredUDA!attr, getParameterUDAs!(Func, i));
 ///
-alias ignore = Ignore;
+@safe @nogc nothrow pure unittest
+{
+	@(30) struct S {}
+	enum Test;
+	alias lambda = (@(10) int x, @(15) @(Test) long y, int z, S s) => x;
+	
+	alias uda1 = getParameterUDAs!(lambda, 0);
+	static assert(uda1.length == 1);
+	static assert(uda1[0] == 10);
+	alias uda2 = getParameterUDAs!(lambda, 1);
+	static assert(uda2.length == 2);
+	static assert(uda2[0] == 15);
+	static assert(is(uda2[1] == Test));
+	alias uda3 = getParameterUDAs!(lambda, 2);
+	static assert(uda3.length == 0);
+	alias uda4 = getParameterUDAs!(lambda, 3);
+	static assert(uda4.length == 1);
+	static assert(uda4[0] == 30);
+	
+	static assert(getParameterUDAs!(lambda, 0, int).length  == 1);
+	static assert(getParameterUDAs!(lambda, 0, Test).length == 0);
+	static assert(getParameterUDAs!(lambda, 1, Test).length == 1);
+}
 
-///
-struct ConvBy(alias T){}
 
+/*******************************************************************************
+ * 関数のパラメータに付与されたUDAのうち、型についたUDAを取り出す。
+ * 
+ * Params:
+ *      Func = 関数
+ *      i    = 引数の番号(最初の引数は0番目)
+ *      attr = UDAの種類を指定できます(指定しないとすべて返します)
+ * Returns:
+ *      UDAのタプルが返ります
+ */
+template getParameterTypeUDAs(alias Func, size_t i)
+{
+	static if (__traits(compiles, __traits(getAttributes, Parameters!Func[i])))
+	{
+		alias getParameterTypeUDAs = __traits(getAttributes, Parameters!Func[i]);
+	}
+	else
+	{
+		alias getParameterTypeUDAs = AliasSeq!();
+	}
+}
+/// ditto
+alias getParameterTypeUDAs(alias Func, size_t i, alias attr)
+	= Filter!(isDesiredUDA!attr, getParameterTypeUDAs!(Func, i));
 ///
-alias convBy = ConvBy;
+@safe @nogc nothrow pure unittest
+{
+	@(30) struct S {}
+	enum Test;
+	alias lambda = (@(10) int x, @(15) @(Test) long y, int z, S s) => x;
+	
+	alias uda1 = getParameterTypeUDAs!(lambda, 0);
+	static assert(uda1.length == 0);
+	alias uda2 = getParameterTypeUDAs!(lambda, 1);
+	static assert(uda2.length == 0);
+	alias uda3 = getParameterTypeUDAs!(lambda, 2);
+	static assert(uda3.length == 0);
+	alias uda4 = getParameterTypeUDAs!(lambda, 3);
+	static assert(uda4.length == 1);
+	static assert(uda4[0] == 30);
+}
+
+/*******************************************************************************
+ * 関数のパラメータに付与されたUDAのうち、引数についたUDAを取り出す。
+ * 
+ * Params:
+ *      Func = 関数
+ *      i    = 引数の番号(最初の引数は0番目)
+ *      attr = UDAの種類を指定できます(指定しないとすべて返します)
+ * Returns:
+ *      UDAのタプルが返ります
+ */
+template getParameterArgUDAs(alias Func, size_t i)
+{
+	enum bool notFoundInType(alias val) = staticIndexOf!(val, getParameterTypeUDAs!(Func, i)) == -1;
+	alias getParameterArgUDAs = Filter!(notFoundInType, getParameterUDAs!(Func, i));
+}
+/// ditto
+alias getParameterArgUDAs(alias Func, size_t i, alias attr) = Filter!(isDesiredUDA!attr, getParameterArgUDAs!(Func, i));
+///
+@safe @nogc nothrow pure unittest
+{
+	@(30) struct S {}
+	enum Test;
+	alias lambda = (@(10) int x, @(15) @(Test) long y, int z, S s) => x;
+	
+	alias uda1 = getParameterArgUDAs!(lambda, 0);
+	static assert(uda1.length == 1);
+	static assert(uda1[0] == 10);
+	alias uda2 = getParameterArgUDAs!(lambda, 1);
+	static assert(uda2.length == 2);
+	static assert(uda2[0] == 15);
+	static assert(is(uda2[1] == Test));
+	alias uda3 = getParameterArgUDAs!(lambda, 2);
+	static assert(uda3.length == 0);
+	alias uda4 = getParameterArgUDAs!(lambda, 3);
+	static assert(uda4.length == 0);
+	
+	static assert(getParameterUDAs!(lambda, 0, int).length  == 1);
+	static assert(getParameterUDAs!(lambda, 0, Test).length == 0);
+	static assert(getParameterUDAs!(lambda, 1, Test).length == 1);
+}
+
+
+/*******************************************************************************
+ * 関数のパラメータにUDAが付与されているか確認します
+ * 
+ * Params:
+ *      Func = 関数
+ *      i    = 引数の番号(最初の引数は0番目)
+ *      attr = チェックするUDA
+ * Returns:
+ *      UDAがあったらtrue
+ */
+enum bool hasParameterUDA(alias Func, size_t i, alias attr) = getParameterUDAs!(Func, i, attr).length != 0;
+///
+@safe @nogc nothrow pure unittest
+{
+	@(30) struct S {}
+	enum Test;
+	alias lambda = (@(10) int x, @(15) @Test long y, int z, S s) => x;
+	
+	static assert( hasParameterUDA!(lambda, 0, 10));
+	static assert(!hasParameterUDA!(lambda, 0, 15));
+	static assert( hasParameterUDA!(lambda, 1, 15));
+	static assert( hasParameterUDA!(lambda, 1, Test));
+	static assert(!hasParameterUDA!(lambda, 2, 15));
+	static assert( hasParameterUDA!(lambda, 3, 30));
+}
+
+
+/*******************************************************************************
+ * 関数のパラメータに付与されたUDAのうち、型にUDAがついているか確認します
+ * 
+ * Params:
+ *      Func = 関数
+ *      i    = 引数の番号(最初の引数は0番目)
+ *      attr = チェックするUDA
+ * Returns:
+ *      UDAがあったらtrue
+ */
+enum bool hasParameterTypeUDA(alias Func, size_t i, alias attr) = getParameterTypeUDAs!(Func, i, attr).length != 0;
+///
+@safe @nogc nothrow pure unittest
+{
+	@(30) struct S {}
+	enum Test;
+	alias lambda = (@(10) int x, @(15) @Test long y, int z, S s) => x;
+	
+	static assert(!hasParameterTypeUDA!(lambda, 0, 10));
+	static assert(!hasParameterTypeUDA!(lambda, 0, 15));
+	static assert(!hasParameterTypeUDA!(lambda, 1, 15));
+	static assert(!hasParameterTypeUDA!(lambda, 1, Test));
+	static assert(!hasParameterTypeUDA!(lambda, 2, 15));
+	static assert( hasParameterTypeUDA!(lambda, 3, 30));
+}
+
+
+/*******************************************************************************
+ * 関数のパラメータに付与されたUDAのうち、引数にUDAがついているか確認します
+ * 
+ * Params:
+ *      Func = 関数
+ *      i    = 引数の番号(最初の引数は0番目)
+ *      uda  = チェックするUDA
+ * Returns:
+ *      UDAがあったらtrue
+ */
+enum bool hasParameterArgUDA(alias Func, size_t i, alias attr) = getParameterArgUDAs!(Func, i, attr).length != 0;
+///
+@safe @nogc nothrow pure unittest
+{
+	@(30) struct S {}
+	enum Test;
+	alias lambda = (@(10) int x, @(15) @Test long y, int z, S s) => x;
+	
+	static assert( hasParameterArgUDA!(lambda, 0, 10));
+	static assert(!hasParameterArgUDA!(lambda, 0, 15));
+	static assert( hasParameterArgUDA!(lambda, 1, 15));
+	static assert( hasParameterArgUDA!(lambda, 1, Test));
+	static assert(!hasParameterArgUDA!(lambda, 2, 15));
+	static assert(!hasParameterArgUDA!(lambda, 3, 30));
+}
 
 ///
 enum bool hasIgnore(alias value) = hasUDA!(value, ignore);
 
+///
 @safe unittest
 {
 	struct A
@@ -45,8 +273,17 @@ enum bool hasIgnore(alias value) = hasUDA!(value, ignore);
 	static assert( hasIgnore!(a.foo));
 }
 
+///
+enum Ignore;
 
+///
+alias ignore = Ignore;
 
+///
+struct ConvBy(alias T){}
+
+///
+alias convBy = ConvBy;
 
 ///
 enum bool isConvByAttr(alias Attr) = isInstanceOf!(convBy, Attr);
@@ -154,7 +391,17 @@ if (hasConvBy!value)
 }
 
 ///
-enum canConvTo(alias value, T) = hasConvBy!value && getConvToStyle!(value, T) != ConvStyle.none;
+template canConvTo(alias value, T)
+{
+	static if (hasConvBy!value)
+	{
+		enum bool canConvTo = getConvToStyle!(value, T) != ConvStyle.none;
+	}
+	else
+	{
+		enum bool canConvTo = false;
+	}
+}
 
 
 ///
@@ -255,7 +502,16 @@ if (hasConvBy!value)
 }
 
 ///
-enum canConvFrom(alias value, T) = hasConvBy!value && getConvFromStyle!(value, T) != ConvStyle.none;
+template canConvFrom(alias value, T)
+{
+	static if (hasConvBy!value) {
+		enum bool canConvFrom = getConvFromStyle!(value, T) != ConvStyle.none;
+	}
+	else
+	{
+		enum bool canConvFrom = false;
+	}
+}
 
 ///
 template convFrom(alias value, Src)

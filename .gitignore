@@ -12,6 +12,7 @@
 !.gendoc
 !.github
 *-test-*
+*-ut
 testcases/*/*
 !testcases/*/dub.json
 !testcases/*/source
