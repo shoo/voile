@@ -167,7 +167,6 @@ version (D_Coverage)
 			enum rootDir = __FILE_FULL_PATH__.dirName.dirName.buildNormalizedPath();
 			if (!covopt.dir.exists) mkdirRecurse(covopt.dir);
 			dmd_coverSetMerge(covopt.merge);
-			dmd_coverSourcePath(rootDir);
 			dmd_coverDestPath(covopt.dir);
 		}
 	}

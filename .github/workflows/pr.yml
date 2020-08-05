@@ -49,16 +49,16 @@ jobs:
   #        compiler: ${COMPILER}
   #    # UT:テストをする場合は以下を実行
   #    - name: Run unit tests
-  #      run: rdmd ./.github/runner.d -a=${ARCH} --mode=unit-test
+  #      run: rdmd ./ci/runner.d -a=${ARCH} --mode=unit-test
   #    # TT:テストをする場合は以下を実行
   #    - name: Run unit tests
-  #      run: rdmd ./.github/runner.d -a=${ARCH} --mode=integration-test
+  #      run: rdmd ./ci/runner.d -a=${ARCH} --mode=integration-test
   #    # BLD:ビルドをする場合は以下を実行
   #    - name: Build tests
   #      run: dub build -a=${ARCH} -b=release -c=default
   #    # DOC:ドキュメント生成をする場合は以下を実行
   #    - name: Generate document tests
-  #      run: rdmd ./.github/runner.d -a=${ARCH} --mode=generate-document
+  #      run: rdmd ./ci/runner.d -a=${ARCH} --mode=generate-document
   #    # DOC:ドキュメントを記録する場合は以下を実行(Artifactに6か月保管されます)
   #    - name: Upload generated pages
   #      uses: actions/upload-artifact@v2
@@ -84,7 +84,7 @@ jobs:
         with:
           compiler: dmd-latest
       - name: Run unit tests
-        run: rdmd ./.github/runner.d -a=x86 --mode=unit-test --exdubopts=--build-mode=singleFile
+        run: rdmd ./ci/runner.d -a=x86 --mode=unit-test --exdubopts=--build-mode=singleFile
 
   # No. OS      ARCH    COMPILER   UT  TT  BLD DOC COV
   #  2. Windows x86     ldc        x   o   o   x   x
@@ -98,7 +98,7 @@ jobs:
         with:
           compiler: ldc-latest
       - name: Run integration tests
-        run: rdmd ./.github/runner.d -a=x86 --mode=integration-test
+        run: rdmd ./ci/runner.d -a=x86 --mode=integration-test
       - name: Build tests
         run: dub build -a=x86 -b=release -c=default
 
@@ -122,9 +122,9 @@ jobs:
         with:
           compiler: dmd-latest
       - name: Run unit tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=unit-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
       - name: Run integration tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=integration-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=integration-test
       - name: Upload coverage result
         uses: actions/upload-artifact@v2
         with:
@@ -143,11 +143,11 @@ jobs:
         with:
           compiler: ldc-latest
       - name: Run unit tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=unit-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
       - name: Build tests
         run: dub build -a=x86_64 -b=release -c=default
       - name: Generate document tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=generate-document
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=generate-document
 
   # No. OS      ARCH    COMPILER   UT  TT  BLD DOC COV
   #  7. Windows x86_64  dmd-master x   x   x   x   x
@@ -166,9 +166,9 @@ jobs:
           compiler: ldc-master
           gh_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run unit tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=unit-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
       - name: Run integration tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=integration-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=integration-test
       - name: Build tests
         run: dub build -a=x86_64 -b=release -c=default
 
@@ -192,7 +192,7 @@ jobs:
           sudo apt update
           sudo apt install gcc-multilib
       - name: Run unit tests
-        run: rdmd ./.github/runner.d -a=x86 --mode=unit-test
+        run: rdmd ./ci/runner.d -a=x86 --mode=unit-test
       - name: Build tests
         run: dub build -a=x86 -b=release -c=default
 
@@ -216,11 +216,11 @@ jobs:
         with:
           compiler: dmd-latest
       - name: Run unit tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=unit-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
       - name: Build tests
         run: dub build -a=x86_64 -b=release -c=default
       - name: Generate document tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=generate-document
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=generate-document
       - name: Upload generated pages
         uses: actions/upload-artifact@v2
         with:
@@ -239,9 +239,9 @@ jobs:
         with:
           compiler: ldc-latest
       - name: Run unit tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=unit-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
       - name: Run integration tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=integration-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=integration-test
       - name: Upload coverage result
         uses: actions/upload-artifact@v2
         with:
@@ -260,9 +260,9 @@ jobs:
         with:
           compiler: dmd-master
       - name: Run unit tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=unit-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
       - name: Run integration tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=integration-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=integration-test
       - name: Build tests
         run: dub build -a=x86_64 -b=release -c=default
 
@@ -298,9 +298,9 @@ jobs:
         with:
           compiler: dmd-latest
       - name: Run unit tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=unit-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
       - name: Run integration tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=integration-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=integration-test
       - name: Upload coverage result
         uses: actions/upload-artifact@v2
         with:
@@ -320,11 +320,11 @@ jobs:
         with:
           compiler: ldc-latest
       - name: Run unit tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=unit-test
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
       - name: Build tests
         run: dub build -a=x86_64 -b=release -c=default
       - name: Generate document tests
-        run: rdmd ./.github/runner.d -a=x86_64 --mode=generate-document
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=generate-document
 
   # No. OS      ARCH    COMPILER   UT  TT  BLD DOC COV
   # 23. macOS   x86_64  dmd-master x   x   x   x   x
@@ -345,20 +345,26 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: coverage-windows
-          path: coverage-windows
+          path: .
+      - run: basename -a ./*.lst
       - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }} -s coverage-windows
+        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
+      - run: rm *.lst
       - name: Download coverage result
         uses: actions/download-artifact@v2
         with:
           name: coverage-linux
-          path: coverage-linux
+          path: .
+      - run: basename -a ./*.lst
       - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }} -s coverage-linux
+        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
+      - run: rm *.lst
       - name: Download coverage result
         uses: actions/download-artifact@v2
         with:
           name: coverage-osx
-          path: coverage-osx
+          path: .
+      - run: basename -a ./*.lst
       - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }} -s coverage-osx
+        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
+      - run: rm *.lst
