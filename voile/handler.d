@@ -1514,3 +1514,13 @@ debug (workaround)
 	}
 
 }
+
+/// コピー禁止・ムーブ可
+@system unittest
+{
+	import std.algorithm: move;
+	Handler!(void delegate()) h1;
+	Handler!(void delegate()) h2;
+	static assert(!__traits(compiles, h2 = h1));
+	static assert(__traits(compiles, h2 = h1.move()));
+}
