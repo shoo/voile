@@ -11,7 +11,7 @@ import std.traits, std.typetuple, std.variant;
  * 
  */
 auto ref assumeAttr(alias fn, alias attrs, Args...)(auto ref Args args)
-	if (!is(typeof(fn!Args)) && isCallable!fn)
+if (isFunction!fn)
 {
 	alias Func = SetFunctionAttributes!(typeof(&fn), functionLinkage!fn, attrs);
 //	if (!__ctfe)
@@ -24,7 +24,7 @@ auto ref assumeAttr(alias fn, alias attrs, Args...)(auto ref Args args)
 
 /// ditto
 auto ref assumeAttr(alias fn, alias attrs, Args...)(auto ref Args args)
-	if (is(typeof(fn!Args)) && isCallable!(fn!Args))
+if (__traits(isTemplate, fn) && isCallable!(fn!Args))
 {
 	alias Func = SetFunctionAttributes!(typeof(&(fn!Args)), functionLinkage!(fn!Args), attrs);
 //	if (!__ctfe)
@@ -170,6 +170,60 @@ auto ref assumeUnshared(T)(ref T x) @property
 auto ref assumeShared(T)(ref T x) @property
 {
 	return *cast(shared)&x;
+}
+
+
+/*******************************************************************************
+ * 
+ */
+template nogcEnforce(E : Throwable = Exception)
+if (is(typeof(new E(string.init, __FILE__, __LINE__)) : Throwable)
+ || is(typeof(new E(__FILE__, __LINE__)) : Throwable))
+{
+	T nogcEnforce(T)(T value, string msg = null, string file = __FILE__, size_t line = __LINE__) @safe @nogc
+	if (is(typeof({ if (!value) {} })))
+	{
+		if (!value) (() @trusted => assumePure!(nogcBailOut!E)(file, line, msg))();
+		return value;
+	}
+}
+/// ditto
+T nogcEnforce(T, Dg, string file = __FILE__, size_t line = __LINE__)(T value, scope Dg dg) @safe @nogc
+if (isSomeFunction!Dg && is(typeof(dg())) && is(typeof(() { if (!value) { } } )))
+{
+	if (!value) dg();
+}
+
+private void nogcBailOut(E)(string file, size_t line, string msg) @safe @nogc
+{
+	import std.conv: emplace;
+	static void[__traits(classInstanceSize, E)] _nogcExceptionBuffer;
+	static if (is(typeof(new E(string.init, string.init, size_t.init))))
+	{
+		throw emplace!E((() @trusted => cast(E)(_nogcExceptionBuffer.ptr))(), msg, file, line);
+	}
+	else static if (is(typeof(new E(string.init, size_t.init))))
+	{
+		throw emplace!E((() @trusted => cast(E)(_nogcExceptionBuffer.ptr))(), file, line);
+	}
+	else static assert(0);
+}
+
+@safe @nogc unittest
+{
+	import std.exception;
+	long x = 10;
+	try nogcEnforce(x, "xxx");
+	catch (Exception e) assert(0);
+	
+	x = 0;
+	try nogcEnforce(x, "xxx");
+	catch (Exception e)
+	{
+		x = 1;
+	}
+	assert(x == 1);
+	
 }
 
 /*******************************************************************************
