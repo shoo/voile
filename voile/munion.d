@@ -137,11 +137,14 @@ if (is(Instance == union) && (Fields!Instance.length == tags.length || tags.leng
 	{
 		enum TagType getTag(IndexType idx) = cast(TagType)idx;
 		enum IndexType getIndex(TagType t) = cast(IndexType)t;
+		import std.range: iota;
+		alias allTags = aliasSeqOf!(iota(0, MemberTypes.length));
 	}
 	else
 	{
 		enum TagType getTag(IndexType idx) = tags[idx];
 		enum IndexType getIndex(TagType t) = cast(IndexType)staticIndexOf!(t, tags);
+		alias allTags = tags;
 	}
 	
 	enum TagType notfoundTag = cast(TagType)(-1);
@@ -1262,13 +1265,65 @@ if (is(T == enum))
 
 
 
+private template isCallableWith(alias F, Args...)
+if (__traits(isTemplate, F))
+{
+	enum bool isCallableWith = __traits(compiles, isCallable!(F!Args));
+}
+
+private template getTempFuncParamUDAs(alias F, size_t idx, Type, CandidateTypes...)
+if (__traits(isTemplate, F))
+{
+	import std.typecons: Tuple;
+	import voile.attr: getParameterUDAs;
+	static if (CandidateTypes.length == 0)
+	{
+		alias getTempFuncParamUDAs = AliasSeq!();
+	}
+	else static if (isInstanceOf!(Tuple, CandidateTypes[0]))
+	{
+		static if (isCallableWith!(F, CandidateTypes[0].Types))
+		{
+			alias getTempFuncParamUDAs = getParameterUDAs!(F!(CandidateTypes[0].Types), idx, Type);
+		}
+		else
+		{
+			alias getTempFuncParamUDAs = getTempFuncParamUDAs!(F, idx, Type, CandidateTypes[1..$]);
+		}
+	}
+	else
+	{
+		static if (isCallableWith!(F, CandidateTypes[0]))
+		{
+			alias getTempFuncParamUDAs = getParameterUDAs!(F!(CandidateTypes[0]), idx, Type);
+		}
+		else
+		{
+			alias getTempFuncParamUDAs = getTempFuncParamUDAs!(F, idx, Type, CandidateTypes[1..$]);
+		}
+	}
+}
+
+@safe unittest
+{
+	import std.typecons: Tuple;
+	enum E { @data!int a, @data!string b }
+	static assert(getTempFuncParamUDAs!((@(E.a) x) => x + 1, 0, E, AliasSeq!(int, long))[0] == E.a);
+	static assert(getTempFuncParamUDAs!((@(E.b) x) => x + 1, 0, E, AliasSeq!(int, long))[0] == E.b);
+	static assert(getTempFuncParamUDAs!((@(E.b) @(E.a) x) => x + 1, 0, E, AliasSeq!(int, long))[0] == E.b);
+	static assert(getTempFuncParamUDAs!((@(E.b) @(E.a) x) => x + 1, 0, E, AliasSeq!(int, long))[1] == E.a);
+	static assert(getTempFuncParamUDAs!((@(E.a) x, @(E.b) y) => x + 1, 0, E, AliasSeq!(Tuple!(int, int)))[0] == E.a);
+	static assert(getTempFuncParamUDAs!((@(E.a) x, @(E.b) y) => x + 1, 1, E, AliasSeq!(Tuple!(int, int)))[0] == E.b);
+}
+
 
 private template matchFuncInfo(MU, alias F)
 if (isInstanceOf!(ManagedUnion, MU))
 {
-	alias IndexType   = MU.IndexType;
-	alias TagType     = MU.TagType;
-	alias notfoundTag = MU.notfoundTag;
+	alias IndexType   = MU._impl.IndexType;
+	alias TagType     = MU._impl.TagType;
+	alias notfoundTag = MU._impl.notfoundTag;
+	alias MemberTypes = MU._impl.MemberTypes;
 	
 	static if (isCallable!F)
 	{
@@ -1297,6 +1352,18 @@ if (isInstanceOf!(ManagedUnion, MU))
 			enum IndexType index = notfoundTag;
 		}
 		alias RetType = ReturnType!F;
+	}
+	else static if (__traits(isTemplate, F))
+	{
+		// other => ...
+		alias params         = AliasSeq!();
+		enum TagType   tag   = notfoundTag;
+		enum IndexType index = MU._impl.getIndex!tag;
+		enum bool isDefault  = true;
+		enum bool isCatch    = false;
+		enum bool isCallback = false;
+		alias RetTypeWith(T) = ReturnType!(F!T);
+		alias RetType = CommonType!(staticMap!(RetTypeWith, Filter!(ApplyLeft!(isCallableWith, F), MemberTypes)));
 	}
 	else
 	{
@@ -1332,6 +1399,12 @@ if (isInstanceOf!(ManagedUnion, MU))
 	static assert(is(matchFuncInfo!(U, (Exception x) => 1).RetType == int));
 	static assert(is(matchFuncInfo!(U, () => 1).RetType == int));
 	static assert(is(matchFuncInfo!(U, 1).RetType == int));
+	
+	static assert(matchFuncInfo!(U, other => 1).tag == U._impl.notfoundTag);
+	static assert( matchFuncInfo!(U, other => 1).isDefault);
+	static assert(!matchFuncInfo!(U, other => 1).isCallback);
+	static assert(!matchFuncInfo!(U, other => 1).isCatch);
+	static assert(is(matchFuncInfo!(U, other => 1).RetType == int));
 }
 
 private template matchFuncInfo(ED, alias F)
@@ -1340,6 +1413,7 @@ if (isInstanceOf!(Endata, ED))
 	alias IndexType   = ED._impl.IndexType;
 	alias TagType     = ED._impl.TagType;
 	alias notfoundTag = ED._impl.notfoundTag;
+	alias MemberTypes = ED._impl.MemberTypes;
 	
 	static if (isCallable!F)
 	{
@@ -1378,6 +1452,37 @@ if (isInstanceOf!(Endata, ED))
 			enum IndexType index = ED._impl.getIndex!tag;
 		}
 		alias RetType = ReturnType!F;
+	}
+	else static if (__traits(isTemplate, F))
+	{
+		// テンプレート関数が渡された場合、まずタグの有無を確認する
+		alias tags = getTempFuncParamUDAs!(F, 0, TagType, MemberTypes);
+		static if (tags.length == 0)
+		{
+			// タグがない場合、デフォルト
+			// other => ...
+			alias params         = AliasSeq!();
+			enum TagType   tag   = notfoundTag;
+			enum IndexType index = ED._impl.getIndex!tag;
+			enum bool isDefault  = true;
+			enum bool isCatch    = false;
+			enum bool isCallback = false;
+			alias RetTypeWith(T) = ReturnType!(F!T);
+			alias RetType = CommonType!(staticMap!(RetTypeWith, Filter!(ApplyLeft!(isCallableWith, F), MemberTypes)));
+		}
+		else
+		{
+			// タグがある場合、タグに対応した型を使用して実体化
+			// @tag val => ...
+			enum TagType   tag    = tags[0];
+			enum IndexType index  = ED._impl.getIndex!(tags[0]);
+			alias          params = Parameters!(F!(MemberTypes[index]));
+			static assert(params.length > 0);
+			enum bool isDefault  = false;
+			enum bool isCatch    = false;
+			enum bool isCallback = true;
+			alias RetType = ReturnType!(F!(MemberTypes[index]));
+		}
 	}
 	else
 	{
@@ -1422,6 +1527,24 @@ if (isInstanceOf!(Endata, ED))
 	static assert( matchFuncInfo!(U, (@a int x) => x + 1).isCallback);
 	static assert(!matchFuncInfo!(U, (@a int x) => x + 1).isCatch);
 	static assert(is(matchFuncInfo!(U, (@a int x) => x + 1).RetType == int));
+	
+	static assert(matchFuncInfo!(U, (@a x) => x + 1).tag == a);
+	static assert(!matchFuncInfo!(U, (@a x) => x + 1).isDefault);
+	static assert( matchFuncInfo!(U, (@a x) => x + 1).isCallback);
+	static assert(!matchFuncInfo!(U, (@a x) => x + 1).isCatch);
+	static assert(is(matchFuncInfo!(U, (@a x) => x + 1).RetType == int));
+	
+	static assert(matchFuncInfo!(U, (@b x) => x ~ "x").tag == b);
+	static assert(!matchFuncInfo!(U, (@b x) => x ~ "x").isDefault);
+	static assert( matchFuncInfo!(U, (@b x) => x ~ "x").isCallback);
+	static assert(!matchFuncInfo!(U, (@b x) => x ~ "x").isCatch);
+	static assert(is(matchFuncInfo!(U, (@b x) => x ~ "x").RetType == string));
+	
+	static assert(matchFuncInfo!(U, other => "x").tag == U._impl.notfoundTag);
+	static assert( matchFuncInfo!(U, other => "x").isDefault);
+	static assert(!matchFuncInfo!(U, other => "x").isCallback);
+	static assert(!matchFuncInfo!(U, other => "x").isCatch);
+	static assert(is(matchFuncInfo!(U, other => "x").RetType == string));
 }
 
 private template matchInfo(MU, Funcs...)
@@ -1440,13 +1563,17 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 	alias getParams(alias F)         = matchFuncInfo!(MU, F).params;
 	alias getRetType(alias F)        = matchFuncInfo!(MU, F).RetType;
 	
-	alias RetType          = CommonType!(staticMap!(getRetType, Funcs));
-	enum bool canMatch     = allSatisfy!(isMatchFunc, Funcs) && !is(returnType == void);
-	enum size_t defaultIdx = staticIndexOf!(true, staticMap!(isDefault, Funcs));
-	enum bool hasDefault   = defaultIdx != -1;
-	alias callbacks        = Filter!(isCallback, Funcs);
-	alias catches          = Filter!(isCatch, Funcs);
-	enum bool hasCatch     = catches.length;
+	alias RetType           = CommonType!(staticMap!(getRetType, Funcs));
+	enum bool canMatch      = allSatisfy!(isMatchFunc, Funcs) && !is(returnType == void);
+	enum size_t defaultIdx  = staticIndexOf!(true, staticMap!(isDefault, Funcs));
+	enum bool hasDefault    = defaultIdx != -1;
+	alias callbacks         = Filter!(isCallback, Funcs);
+	alias catches           = Filter!(isCatch, Funcs);
+	enum bool hasCatch      = catches.length;
+	
+	alias callbackTags                 = staticMap!(getTag, callbacks);
+	enum bool isCallbackTag(TagType t) = staticIndexOf!(t, callbackTags) != -1;
+	alias defaultTags                  = Filter!(templateNot!isCallbackTag, MU._impl.allTags);
 	
 	// コールバックはメンバの数以下しかかけない
 	static assert(callbacks.length <= MU._impl.memberCount);
@@ -1535,14 +1662,17 @@ template match(Funcs...)
 		{
 			static if (minfo.hasDefault)
 			{
-				switch (dat._impl._tag)
+				final switch (dat._impl._tag)
 				{
 				static foreach (F; minfo.callbacks) case minfo.getTag!F:
 					return F(cast(inout)(ref () @trusted 
 						=> *cast(minfo.getParams!F[0]*)&dat._impl._inst.tupleof[minfo.getIndex!F])());
-				default:
+				case dat._impl.notfoundTag:
+				static foreach (tag; minfo.defaultTags) case tag:
 					static if (isCallable!(Funcs[minfo.defaultIdx]))
 						return Funcs[minfo.defaultIdx]();
+					else static if (__traits(isTemplate, Funcs[minfo.defaultIdx]))
+						return Funcs[minfo.defaultIdx](dat._impl._inst.tupleof[dat._impl.getIndex!tag]);
 					else
 						return Funcs[minfo.defaultIdx];
 				}
@@ -1608,7 +1738,7 @@ template match(Funcs...)
 	dat = cast(long)5;
 	assert(dat.match!(
 		(Exception e) => 100, /* call 2 */
-		()            => 50,
+		other         => 50,
 		(long x)      => nogcEnforce(0)/* call 1 */) == 100);
 }
 
@@ -1626,11 +1756,11 @@ template match(Funcs...)
 	assert(dat.match!(
 		(Data!x x) => x + 11 /* call */,
 		()          => 10) == 111);
-	// マッチ関数を呼び出し 引数に @tag を指定することでマッチ対象指定(現状引数の型が必ず必要(ラムダNG))
+	// マッチ関数を呼び出し 引数に @tag を指定することでマッチ対象指定
 	dat.str = "test";
 	assert(dat.match!(
-		(@str string x) => (cast(string)x).length + 11,
-		()           => 10) == 4 + 11);
+		(@str x) => (cast(string)x).length + 11,
+		other    => 10) == 4 + 11);
 }
 
 @safe pure @nogc nothrow unittest
