@@ -27,9 +27,9 @@
                 <div class="quickindex" id="quickindex"></div>
                 
                 
-<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumeAttr"></span><div class="quickindex" id="quickindex.assumeAttr"></div>ref auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, alias attrs, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!is(typeof(fn!Args)) &amp;&amp; isCallable!fn)</span>;
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumeAttr"></span><div class="quickindex" id="quickindex.assumeAttr"></div>ref auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, alias attrs, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isFunction!fn)</span>;
 <br>
-ref auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, alias attrs, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(is(typeof(fn!Args)) &amp;&amp; isCallable!(fn!Args))</span>;
+ref auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, alias attrs, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(__traits(isTemplate, fn) &amp;&amp; isCallable!(fn!Args))</span>;
 <br>
 auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias attrs, Fn)</span>(Fn <span class="ddoc_param">t</span>)<br><span class="ddoc_constraint">if(isFunctionPointer!Fn || isDelegate!Fn)</span>;
 <br></div></dt>
@@ -61,6 +61,17 @@ auto <code class="ddoc_psymbol">assumeNothrow</code><span class="ddoc_template_p
 <dd>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumeShared"></span><div class="quickindex" id="quickindex.assumeShared"></div>@property ref auto <code class="ddoc_psymbol">assumeShared</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">x</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".nogcEnforce"></span><div class="quickindex" id="quickindex.nogcEnforce"></div>template <code class="ddoc_psymbol">nogcEnforce</code>(E : Throwable = Exception) if (is(typeof(new E(string.init, "/tmp/.gendocwork-7c8b155b-d2b3-42be-83f6-dbf6979dd6f7/voile--voile.misc.d", 180)) : Throwable) || is(typeof(new E("/tmp/.gendocwork-7c8b155b-d2b3-42be-83f6-dbf6979dd6f7/voile--voile.misc.d", 181)) : Throwable))<br>
+@nogc @safe T <code class="ddoc_psymbol">nogcEnforce</code>(T, Dg, string file = __FILE__, size_t line = __LINE__)(T <span class="ddoc_param">value</span>, scope Dg <span class="ddoc_param">dg</span>)<br><span class="ddoc_constraint">if(isSomeFunction!Dg &amp;&amp; is(typeof(<span class="ddoc_param">dg</span>())) &amp;&amp; is(typeof(()
+{
+if (!<span class="ddoc_param">value</span>)
+{
+}
+}
+)))</span>;
 <br></div></dt>
 <dd>
 </dd>

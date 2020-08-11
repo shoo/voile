@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.refcnt</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul><span style="color:red">!!!!! UNDEFINED MACRO: "MODULE_MENU" !!!!!!</span></ul>
+</div>
+            <div class="content">                <h1>voile.refcnt</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">参照カウンタ</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Allocator"></span><div class="quickindex" id="quickindex.Allocator"></div>alias <code class="ddoc_psymbol">Allocator</code> = CountedInstance* delegate() pure nothrow;
+<br></div></dt>
+<dd><div class="ddoc_summary">アロケータ
+</div><div class="ddoc_description">CountedDataを作成する際、メモリを割り当てる関数の型。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Deallocator"></span><div class="quickindex" id="quickindex.Deallocator"></div>alias <code class="ddoc_psymbol">Deallocator</code> = void delegate(CountedInstance* instance) pure nothrow @nogc;
+<br></div></dt>
+<dd><div class="ddoc_summary">デアロケータ
+</div><div class="ddoc_description">CountedDataを解放する際、メモリを解放する関数の型。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isAllocator"></span><div class="quickindex" id="quickindex.isAllocator"></div>template <code class="ddoc_psymbol">isAllocator</code>(T...) if (T.length &gt; 0 &amp;&amp; isCallable!(T[0]))<br></div></dt>
+<dd><div class="ddoc_summary">アロケータかどうかを判定する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isAllocator</span>!(CountedInstance* <span class="d_keyword">delegate</span>() @safe <span class="d_keyword">pure</span> <span class="d_keyword">nothrow</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isAllocator</span>!(CountedInstance* <span class="d_keyword">delegate</span>() @system <span class="d_keyword">pure</span> <span class="d_keyword">nothrow</span> <span class="d_keyword">const</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isAllocator</span>!(CountedInstance* <span class="d_keyword">delegate</span>() @system <span class="d_keyword">pure</span> <span class="d_keyword">nothrow</span> @nogc));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isAllocator</span>!(CountedInstance* <span class="d_keyword">delegate</span>() @system <span class="d_keyword">nothrow</span> @nogc));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isAllocator</span>!(CountedInstance* <span class="d_keyword">delegate</span>() @system <span class="d_keyword">pure</span> @nogc));
+
+<span class="d_keyword">void</span> aaa();
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isAllocator</span>!aaa);
+CountedInstance* bbb() <span class="d_keyword">pure</span> <span class="d_keyword">nothrow</span>;
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isAllocator</span>!bbb);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isDeallocator"></span><div class="quickindex" id="quickindex.isDeallocator"></div>template <code class="ddoc_psymbol">isDeallocator</code>(T...) if (T.length &gt; 0 &amp;&amp; isCallable!(T[0]))<br></div></dt>
+<dd><div class="ddoc_summary">デアロケータかどうかを判定する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isDeallocator</span>!(<span class="d_keyword">void</span> <span class="d_keyword">delegate</span>(CountedInstance*) @safe <span class="d_keyword">pure</span> <span class="d_keyword">nothrow</span> @nogc));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isDeallocator</span>!(<span class="d_keyword">void</span> <span class="d_keyword">delegate</span>(CountedInstance*) @system <span class="d_keyword">pure</span> <span class="d_keyword">nothrow</span> @nogc));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isDeallocator</span>!(<span class="d_keyword">void</span> <span class="d_keyword">delegate</span>(CountedInstance*) @system <span class="d_keyword">pure</span> <span class="d_keyword">nothrow</span> @nogc <span class="d_keyword">inout</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isDeallocator</span>!(<span class="d_keyword">void</span> <span class="d_keyword">delegate</span>(CountedInstance*) @system <span class="d_keyword">nothrow</span> @nogc <span class="d_keyword">const</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isDeallocator</span>!(<span class="d_keyword">void</span> <span class="d_keyword">delegate</span>(CountedInstance*) @system <span class="d_keyword">pure</span> @nogc));
+
+<span class="d_keyword">void</span> aaa();
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isDeallocator</span>!aaa);
+<span class="d_keyword">void</span> bbb(CountedInstance*) <span class="d_keyword">pure</span> <span class="d_keyword">nothrow</span> @nogc;
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isDeallocator</span>!bbb);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".defaultAllocatorByMalloc"></span><div class="quickindex" id="quickindex.defaultAllocatorByMalloc"></div>pure nothrow @nogc @safe auto <code class="ddoc_psymbol">defaultAllocatorByMalloc</code>(size_t <span class="ddoc_param">bufSize</span> = 0);
+<br></div></dt>
+<dd><div class="ddoc_summary">malloc/freeによるアロケータ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".defaultAllocatorByGC"></span><div class="quickindex" id="quickindex.defaultAllocatorByGC"></div>pure nothrow auto <code class="ddoc_psymbol">defaultAllocatorByGC</code>(size_t <span class="ddoc_param">bufSize</span> = 0);
+<br></div></dt>
+<dd><div class="ddoc_summary">GCによるアロケータ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedInstance"></span><div class="quickindex" id="quickindex.CountedInstance"></div>struct <code class="ddoc_psymbol">CountedInstance</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタ用のデータを作成する</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedInstance.counter"></span><div class="quickindex" id="quickindex.CountedInstance.counter"></div>int <code class="ddoc_psymbol">counter</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedInstance.rawData"></span><div class="quickindex" id="quickindex.CountedInstance.rawData"></div>ubyte[] <code class="ddoc_psymbol">rawData</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">生データ(データのインスタンスと拡張領域を含むメモリ領域全体)</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedInstance.deallocator"></span><div class="quickindex" id="quickindex.CountedInstance.deallocator"></div>Deallocator <code class="ddoc_psymbol">deallocator</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">解放時に呼び出すためのコールバック</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedImpl"></span><div class="quickindex" id="quickindex.CountedImpl"></div>template <code class="ddoc_psymbol">CountedImpl</code>(T)<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタ用のデータを作成するmixinテンプレート</div><dl class="ddoc_members"><div class="ddoc_template_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedImpl.buffer"></span><div class="quickindex" id="quickindex.CountedImpl.buffer"></div>inout pure nothrow @nogc @property @safe inout(ubyte)[] <code class="ddoc_psymbol">buffer</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">生データ(データのインスタンスと拡張領域を含むメモリ領域全体)</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedImpl.data"></span><div class="quickindex" id="quickindex.CountedImpl.data"></div>inout pure nothrow @nogc @property ref @trusted inout(T) <code class="ddoc_psymbol">data</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">データのインスタンス</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedImpl.extra"></span><div class="quickindex" id="quickindex.CountedImpl.extra"></div>inout pure nothrow @nogc @property @safe inout(ubyte)[] <code class="ddoc_psymbol">extra</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">拡張データ領域</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedImpl.initializeCountedInstance"></span><div class="quickindex" id="quickindex.CountedImpl.initializeCountedInstance"></div>pure @nogc @system void <code class="ddoc_psymbol">initializeCountedInstance</code>(ubyte[] <span class="ddoc_param">refbuf</span>);
+<br>
+pure @nogc @system void <code class="ddoc_psymbol">initializeCountedInstance</code>(size_t <span class="ddoc_param">bufSize</span> = T.sizeof);
+<br>
+void <code class="ddoc_psymbol">initializeCountedInstance</code><span class="ddoc_template_param_list" title="Template parameter list">(Alloc)</span>(scope Alloc <span class="ddoc_param">alloc</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">初期化する
+</div><div class="ddoc_section_nonstandard"><span class="ddoc_section_nonstandard_header">Note:</span>
+本関数を呼び出して初期化した場合、正しくrelease(CountedInstanceのdeallocatorの呼び出し)をしなければ
+      メモリリークする</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedImpl.opCast"></span><div class="quickindex" id="quickindex.CountedImpl.opCast"></div>const pure nothrow @nogc @safe bool <code class="ddoc_psymbol">opCast</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>()<br><span class="ddoc_constraint">if(is(T == bool))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">キャスト</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedImpl.addRef"></span><div class="quickindex" id="quickindex.CountedImpl.addRef"></div>pure @nogc @system int <code class="ddoc_psymbol">addRef</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタ加算</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedImpl.release"></span><div class="quickindex" id="quickindex.CountedImpl.release"></div>pure @system int <code class="ddoc_psymbol">release</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタ減算と解放</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CountedData"></span><div class="quickindex" id="quickindex.CountedData"></div>struct <code class="ddoc_psymbol">CountedData</code>(T);
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウントを持つを形成する(RefCounted専用)
+</div><div class="ddoc_description">CountedImplを実装しており、isCountedData!Tでtrueを返す型です。
+ ただし、メソッドはすべてモジュール内ローカルとなっており、アクセスは許されません。
+ かならずRefCountedを通してアクセスしてください。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isCountedData"></span><div class="quickindex" id="quickindex.isCountedData"></div>template <code class="ddoc_psymbol">isCountedData</code>(T)<br></div></dt>
+<dd><div class="ddoc_summary">RefCountedにできるデータか検証する
+</div><div class="ddoc_description">RefCountedに直接対応可能な型は以下の特徴を備えています。
+<ul><li>参照型か、ポインタのサイズと同じサイズ</li>
+<li>releaseまたはRelease関数を備えていて、それらは整数を返す</li>
+<li>addRefまたはAddRef関数を備えていて、それらは整数を返す
+</li>
+</ul>
+ 上記に該当しない場合、RefCounted!Tとすると、自動的に上記特徴を備えたCountedData!Tが内部的に使用されます。
+
+</div>
+<div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">T</td>
+<td class="ddoc_param_desc">調べたい型</td></tr>
+</table></div>
+
+<div class="ddoc_see_also"><span class="ddoc_see_also_header">See Also:</span>
+ <a href="#.CountedData">CountedData</a></div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">static</span> <span class="d_keyword">struct</span> S1 {}
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isCountedData</span>!S1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isCountedData</span>!(CountedData!S1));
+<span class="d_keyword">static</span> <span class="d_keyword">struct</span> S2 { size_t x; <span class="d_keyword">uint</span> release() {<span class="d_keyword">return</span> 0;} <span class="d_keyword">uint</span> addRef(){<span class="d_keyword">return</span> 0;} }
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isCountedData</span>!S2);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isCountedData</span>!(CountedData!S2));
+
+<span class="d_keyword">class</span> C1 {}
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isCountedData</span>!C1);
+<span class="d_keyword">class</span> C2 { <span class="d_keyword">uint</span> release(){<span class="d_keyword">return</span> 0;} <span class="d_keyword">uint</span> addRef(){<span class="d_keyword">return</span> 0;}}
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">isCountedData</span>!C2);
+
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isCountedData</span>!<span class="d_keyword">int</span>);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isCountedData</span>!(<span class="d_keyword">int</span>*));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isCountedData</span>!(CountedData!<span class="d_keyword">int</span>));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RefCounted"></span><div class="quickindex" id="quickindex.RefCounted"></div>struct <code class="ddoc_psymbol">RefCounted</code>(T);
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタのあるデータを管理する
+</div><div class="ddoc_description">isCountedDataなデータの参照カウントをコピーの発生や寿命の終了で自動的に増減させる。
+
+</div>
+<div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">T</td>
+<td class="ddoc_param_desc">isCountedDataなclass/interface/structのポインタ/size_tと同サイズのstruct、およびCountedDataのインスタンス</td></tr>
+</table></div>
+
+<div class="ddoc_see_also"><span class="ddoc_see_also_header">See Also:</span>
+ <a href="#.isCountedData">isCountedData</a></div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">string[] msg;
+<span class="d_keyword">static</span> <span class="d_keyword">class</span> C
+{
+	<span class="d_keyword">int</span> cnt;
+	string[]* msg;
+	<span class="d_keyword">this</span>(<span class="d_keyword">int</span> x, string[]* m) {cnt = x; msg = m; }
+	~<span class="d_keyword">this</span>() @trusted {*msg ~= <span class="d_string">"dtor"</span>; }
+	<span class="d_keyword">int</span> release() @trusted { cnt--; <span class="d_keyword">return</span> cnt; }
+	<span class="d_keyword">int</span> addRef(){  cnt++; <span class="d_keyword">return</span> cnt;}
+}
+
+{
+	<span class="d_comment">// コンストラクタを使うとカウント値が増える
+</span>	<span class="d_psymbol">RefCounted</span>!C dat1 = <span class="d_keyword">new</span> C(0, (() @trusted =&gt; &amp;msg)());
+	<span class="d_keyword">assert</span>(dat1.cnt == 1);
+}
+<span class="d_comment">// スコープを抜けてRefCountedのインスタンスの寿命が終わると、デストラクタが呼ばれる
+</span><span class="d_keyword">assert</span>(msg == [<span class="d_string">"dtor"</span>]);
+</pre>
+</div>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".RefCounted.this"></span><div class="quickindex" id="quickindex.RefCounted.this"></div>@trusted this<span class="ddoc_template_param_list" title="Template parameter list">(U)</span>(U <span class="ddoc_param">newRefData</span>)<br><span class="ddoc_constraint">if(is(U : RefType!T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタを保持してアタッチ＆加算する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RefCounted.opAssign"></span><div class="quickindex" id="quickindex.RefCounted.opAssign"></div>void <code class="ddoc_psymbol">opAssign</code><span class="ddoc_template_param_list" title="Template parameter list">(U)</span>(U <span class="ddoc_param">newRefData</span>)<br><span class="ddoc_constraint">if(is(U : RefType!T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタを保持してアタッチ＆加算する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RefCounted.opUnary"></span><div class="quickindex" id="quickindex.RefCounted.opUnary"></div>ref auto <code class="ddoc_psymbol">opUnary</code><span class="ddoc_template_param_list" title="Template parameter list">(string op)</span>()<br><span class="ddoc_constraint">if(op == "*")</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">参照外し</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isRefCounted"></span><div class="quickindex" id="quickindex.isRefCounted"></div>enum auto <code class="ddoc_psymbol">isRefCounted</code>(T);
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタかどうか確認します</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isRefCounted</span>!(RefCounted!<span class="d_keyword">int</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isRefCounted</span>!(<span class="d_keyword">int</span>*));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RefCountedTypeOf"></span><div class="quickindex" id="quickindex.RefCountedTypeOf"></div>template <code class="ddoc_psymbol">RefCountedTypeOf</code>(T) if (isRefCounted!T)<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタの元データの型を得ます</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_psymbol">RefCountedTypeOf</span>!(RefCounted!<span class="d_keyword">int</span>) == <span class="d_keyword">int</span>));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isInitialized"></span><div class="quickindex" id="quickindex.isInitialized"></div>bool <code class="ddoc_psymbol">isInitialized</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref RefCounted!T <span class="ddoc_param">dat</span>);
+<br>
+<span class="def-anchor" id=".isEmpty"></span><div class="quickindex" id="quickindex.isEmpty"></div>bool <code class="ddoc_psymbol">isEmpty</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref RefCounted!T <span class="ddoc_param">dat</span>);
+<br>
+<span class="def-anchor" id=".isNull"></span><div class="quickindex" id="quickindex.isNull"></div>alias <code class="ddoc_psymbol">isNull</code> = isEmpty(T)(ref RefCounted!T dat);
+<br></div></dt>
+<dd><div class="ddoc_summary">参照が初期化されているか確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">RefCounted!<span class="d_keyword">int</span> x;
+<span class="d_keyword">assert</span>(!x.<span class="d_psymbol">isInitialized</span>());
+<span class="d_keyword">assert</span>(x.<span class="d_psymbol">isEmpty</span>());
+<span class="d_keyword">assert</span>(x.<span class="d_psymbol">isNull</span>());
+x = createRefCounted!<span class="d_keyword">int</span>(1);
+<span class="d_keyword">assert</span>(x.<span class="d_psymbol">isInitialized</span>());
+<span class="d_keyword">assert</span>(!x.<span class="d_psymbol">isEmpty</span>());
+<span class="d_keyword">assert</span>(!x.<span class="d_psymbol">isNull</span>());
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".attach"></span><div class="quickindex" id="quickindex.attach"></div>pure nothrow @property void <code class="ddoc_psymbol">attach</code><span class="ddoc_template_param_list" title="Template parameter list">(T, U)</span>(ref RefCounted!T <span class="ddoc_param">rc</span>, auto ref U <span class="ddoc_param">newRefData</span>)<br><span class="ddoc_constraint">if(is(U : RefType!T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタ加算せずにアタッチする</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">static</span> <span class="d_keyword">class</span> C
+{
+	<span class="d_keyword">int</span> cnt;
+	<span class="d_keyword">this</span>(<span class="d_keyword">int</span> x) {cnt = x;}
+	<span class="d_keyword">int</span> release() @trusted { cnt--; <span class="d_keyword">return</span> cnt; }
+	<span class="d_keyword">int</span> addRef(){  cnt++; <span class="d_keyword">return</span> cnt;}
+}
+
+<span class="d_comment">// コンストラクタを使うとカウント値が増える
+</span>RefCounted!C dat1 = <span class="d_keyword">new</span> C(1);
+<span class="d_keyword">assert</span>(dat1.cnt == 2);
+dat1.release();
+
+<span class="d_comment">// attachを使うとカウント値が増えない
+</span>RefCounted!C dat2;
+dat2.<span class="d_psymbol">attach</span>(<span class="d_keyword">new</span> C(1));
+<span class="d_keyword">assert</span>(dat2.cnt == 1);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".deref"></span><div class="quickindex" id="quickindex.deref"></div>pure nothrow ref inout<span class="ddoc_template_param_list" title="Template parameter list">(T)</span> <code class="ddoc_psymbol">deref</code>(T)(ref inout RefCounted!T <span class="ddoc_param">rc</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">参照外し</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> x = createRefCounted!<span class="d_keyword">int</span>(1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span> (<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(x.<span class="d_psymbol">deref</span>) == <span class="d_keyword">int</span>));
+x.<span class="d_psymbol">deref</span> = 2;
+<span class="d_keyword">assert</span>(x == 2);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ptr"></span><div class="quickindex" id="quickindex.ptr"></div>pure nothrow inout<span class="ddoc_template_param_list" title="Template parameter list">(T)</span>* <code class="ddoc_psymbol">ptr</code>(T)(ref inout RefCounted!T <span class="ddoc_param">rc</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">ポインタを得る</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> x = createRefCounted!<span class="d_keyword">int</span>(1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span> (<span class="d_keyword">is</span>(<span class="d_keyword">typeof</span>(x.<span class="d_psymbol">ptr</span>) == <span class="d_keyword">int</span>*));
+*x = 2;
+<span class="d_keyword">assert</span>(x == 2);
+(() @trusted =&gt; *(x.<span class="d_psymbol">ptr</span>) = 3)();
+<span class="d_keyword">assert</span>(x == 3);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".createRefCounted"></span><div class="quickindex" id="quickindex.createRefCounted"></div>@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isRefCounted!T)</span>;
+<br>
+@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(is(T == class) &amp;&amp; isCountedData!T)</span>;
+<br>
+@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!isPointer!T &amp;&amp; (is(T == struct) || is(T == union)) &amp;&amp; isCountedData!T)</span>;
+<br>
+@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isPointer!T &amp;&amp; (is(PointerTarget!T == struct) || is(PointerTarget!T == union)) &amp;&amp; isCountedData!T)</span>;
+<br>
+@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!isCountedData!T)</span>;
+<br>
+@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, alias allocator, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!isCountedData!T &amp;&amp; isAllocator!allocator)</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタを生成</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> <span class="d_keyword">short</span> initCnt = 1;
+<span class="d_comment">// class
+</span><span class="d_keyword">static</span> <span class="d_keyword">class</span> C
+{
+	<span class="d_keyword">short</span> cnt;
+	<span class="d_keyword">this</span>(<span class="d_keyword">int</span> x) {cnt = 1;}
+	<span class="d_keyword">int</span> release(){ cnt--; <span class="d_keyword">return</span> cnt; }
+	<span class="d_keyword">int</span> addRef(){  cnt++; <span class="d_keyword">return</span> cnt;}
+}
+<span class="d_keyword">auto</span> c = <span class="d_psymbol">createRefCounted</span>!C(1);
+<span class="d_keyword">auto</span> c2 = c;
+<span class="d_keyword">assert</span>(c.cnt == 2);
+
+<span class="d_comment">// struct
+</span><span class="d_keyword">static</span> <span class="d_keyword">struct</span> S
+{
+	<span class="d_keyword">short</span> cnt;
+	<span class="d_keyword">int</span> release(){ cnt--; <span class="d_keyword">return</span> cnt; }
+	<span class="d_keyword">int</span> addRef(){  cnt++; <span class="d_keyword">return</span> cnt;}
+}
+<span class="d_comment">// struct - for pointer
+</span><span class="d_keyword">auto</span> s1 = <span class="d_psymbol">createRefCounted</span>!(S*)(initCnt);
+<span class="d_keyword">assert</span>(s1.cnt == 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(isCountedData!(S*));
+<span class="d_comment">// struct - for CountedData
+</span><span class="d_keyword">auto</span> s2 = <span class="d_psymbol">createRefCounted</span>!S(initCnt);
+<span class="d_keyword">auto</span> s3 = s1;
+<span class="d_keyword">assert</span>(s1.cnt == 2);
+<span class="d_keyword">auto</span> s4 = s2;
+<span class="d_comment">// s2, s4はCountedDataなので、インスタンスの中身ではなく
+</span><span class="d_comment">// CountedDataのcounterが増加する
+</span><span class="d_keyword">assert</span>(s2.cnt == 1);
+<span class="d_keyword">assert</span>(s2.counter == 2);
+
+<span class="d_comment">// for union
+</span><span class="d_keyword">static</span> <span class="d_keyword">union</span> U
+{
+	<span class="d_keyword">short</span> cnt;
+	<span class="d_keyword">int</span> release(){ cnt--; <span class="d_keyword">return</span> cnt; }
+	<span class="d_keyword">int</span> addRef(){  cnt++; <span class="d_keyword">return</span> cnt;}
+}
+<span class="d_keyword">auto</span> u1 = <span class="d_psymbol">createRefCounted</span>!(U*)(initCnt);
+<span class="d_keyword">assert</span>(u1.cnt == 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(isCountedData!(U*));
+<span class="d_keyword">auto</span> u2 = <span class="d_psymbol">createRefCounted</span>!U(initCnt);
+<span class="d_keyword">assert</span>(u2.cnt == 1);
+<span class="d_keyword">auto</span> u3 = u1;
+<span class="d_keyword">assert</span>(u1.cnt == 2);
+<span class="d_keyword">auto</span> u4 = u2;
+<span class="d_comment">// u2, u4はCountedDataなので、インスタンスの中身ではなく
+</span><span class="d_comment">// CountedDataのcounterが増加する
+</span><span class="d_keyword">assert</span>(u2.cnt == 1);
+<span class="d_keyword">assert</span>(u2.counter == 2);
+
+<span class="d_comment">// for scalar data
+</span><span class="d_keyword">auto</span> int1 = <span class="d_psymbol">createRefCounted</span>!<span class="d_keyword">int</span>(1);
+
+<span class="d_comment">// with allocator
+</span><span class="d_keyword">auto</span> long1 = <span class="d_psymbol">createRefCounted</span>!(<span class="d_keyword">long</span>, defaultAllocatorByGC(<span class="d_keyword">long</span>.sizeof))(1);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".attachRefCounted"></span><div class="quickindex" id="quickindex.attachRefCounted"></div>RefCounted!T <code class="ddoc_psymbol">attachRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(RefType!T <span class="ddoc_param">newRefData</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">参照カウンタを追加せずにRefCountedを得る</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".buffer"></span><div class="quickindex" id="quickindex.buffer"></div>pure nothrow @nogc @property @system inout(ubyte)[] <code class="ddoc_psymbol">buffer</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref inout RefCounted!T <span class="ddoc_param">rc</span>)<br><span class="ddoc_constraint">if(!isCountedData!T || isInstanceOf!(CountedData, T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">バッファ領域へアクセス
+</div><div class="ddoc_description">バッファ領域は、Tのインスタンスと拡張領域のメモリ領域全体を指す。
+
+</div>
+<div class="ddoc_section_nonstandard"><span class="ddoc_section_nonstandard_header">Note:</span>
+release後に触れた場合、ダングリングポインタへのアクセスの可能性がある。
+      また、書き換えた場合、本来RefCountedで管理しているデータが損失する可能性がある。</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> dat = createRefCounted!<span class="d_keyword">int</span>(1);
+<span class="d_keyword">assert</span>(dat.<span class="d_psymbol">buffer</span>.length == 4);
+<span class="d_keyword">assert</span>(dat == *<span class="d_keyword">cast</span>(<span class="d_keyword">int</span>*)dat.<span class="d_psymbol">buffer</span>.ptr);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".extraBuffer"></span><div class="quickindex" id="quickindex.extraBuffer"></div>pure nothrow @nogc @property @system inout(ubyte)[] <code class="ddoc_psymbol">extraBuffer</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref inout RefCounted!T <span class="ddoc_param">rc</span>)<br><span class="ddoc_constraint">if(!isCountedData!T || isInstanceOf!(CountedData, T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">拡張データ領域へアクセス
+</div><div class="ddoc_description">初期化時にTのインスタンスより大きなバッファを与えることで、拡張データ領域を持つことができる。
+ この関数は拡張データ領域へのアクセス手段を提供する。
+
+</div>
+<div class="ddoc_section_nonstandard"><span class="ddoc_section_nonstandard_header">Note:</span>
+release後に触れた場合、ダングリングポインタへのアクセスの可能性がある。
+      また、書き換えた場合、本来RefCountedで管理しているデータが損失する可能性がある。</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> dat = createRefCounted!(<span class="d_keyword">int</span>, defaultAllocatorByMalloc(<span class="d_keyword">int</span>.sizeof + 4))(1);
+<span class="d_keyword">assert</span>(dat.buffer.length == 8);
+<span class="d_keyword">assert</span>(dat.<span class="d_psymbol">extraBuffer</span>.length == 4);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".counter"></span><div class="quickindex" id="quickindex.counter"></div>pure nothrow @nogc @property @safe int <code class="ddoc_psymbol">counter</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref RefCounted!T <span class="ddoc_param">rc</span>)<br><span class="ddoc_constraint">if(!isCountedData!T || isInstanceOf!(CountedData, T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">カウント値を得る</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> dat1 = createRefCounted!<span class="d_keyword">int</span>(1);
+<span class="d_keyword">assert</span>(dat1.<span class="d_psymbol">counter</span> == 1);
+{
+	<span class="d_keyword">auto</span> dat2 = dat1;
+	<span class="d_keyword">assert</span>(dat1.<span class="d_psymbol">counter</span> == 2);
+}
+<span class="d_keyword">assert</span>(dat1.<span class="d_psymbol">counter</span> == 1);
+</pre>
+</div>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>
