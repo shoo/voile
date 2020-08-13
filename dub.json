@@ -15,11 +15,17 @@
             "name": "default"
         },
         {
-            "name": "unittest",
+            "name": "unittest-debug",
             "targetType": "executable",
             "targetName": "voile-ut",
             "sourceFiles": ["ci/ut.d"],
-            "mainSourceFile": "ci/dummy.d"
+            "dflags": ["-main", "-mixin=.dub/mixin.d"]
+        },
+        {
+            "name": "unittest",
+            "targetType": "library",
+            "sourceFiles": ["ci/ut.d"],
+            "dflags": ["-mixin=.dub/mixin.d"]
         }
     ]
 }

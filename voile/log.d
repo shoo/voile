@@ -575,9 +575,7 @@ public:
 @system unittest
 {
 	import voile.fs;
-	auto fs = FileSystem("ut");
-	scope (exit)
-		fs.removeFiles("ut");
+	auto fs = createDisposableDir("ut");
 	auto logger = new JsonFileLogger(fs.absolutePath("jsonlogger.json"));
 	logger.trace("TRACETEST");
 	logger.info("INFOTEST");

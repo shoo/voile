@@ -117,7 +117,7 @@ else
 struct FileSystem
 {
 	///
-	string workDir = ".";
+	string workDir;
 	
 	/// 作成前に呼ばれる。作成しない場合は例外を投げる
 	Handler!(void delegate(string target, uint retrycnt))           onCreating;
@@ -137,6 +137,25 @@ struct FileSystem
 	Handler!(void delegate(string target))                          onRemoved;
 	/// 削除に失敗したら呼ばれる。処理を継続を継続するならtrueを返す。
 	Handler!(bool delegate(string target, Exception e))             onRemoveFailed;
+	/// インスタンスが破棄される際に呼ばれる
+	Handler!(void delegate(string target))                          onDestroyed;
+	
+	/***************************************************************************
+	 * ムーブの後に呼ばれる
+	 */
+	void onPostMove()
+	{
+		workDir = null;
+	}
+	
+	/***************************************************************************
+	 * 破棄する際に workDir に値がある場合に呼ばれる
+	 */
+	~this() @trusted
+	{
+		if (workDir)
+			onDestroyed(workDir);
+	}
 	
 	/***************************************************************************
 	 * 絶対パスに変換する
@@ -535,7 +554,7 @@ struct FileSystem
 	 * Params:
 	 *     target = パス
 	 */
-	bool exists(string target) const @safe
+	bool exists(string target = ".") const @safe
 	{
 		return existsImpl!true(target);
 	}
@@ -601,12 +620,12 @@ struct FileSystem
 		return .exists(target) && .isDir(target);
 	}
 	
-	private bool makeDirImpl(bool absConvert)(string target, bool force, uint retrycnt)
+	private bool makeDirImpl(bool absConvert)(string target, bool force, uint retrycnt) @safe
 	{
 		return makeDirImpl!false(absolutePath(target), force, retrycnt);
 	}
 	
-	private bool makeDirImpl(bool absConvert: false)(string target, bool force, uint retrycnt)
+	private bool makeDirImpl(bool absConvert: false)(string target, bool force, uint retrycnt) @trusted
 	{
 		if (isDir(target))
 			return true;
@@ -651,16 +670,15 @@ struct FileSystem
 	 *     force    = 強制的に作成
 	 *     retrycnt = リトライする回数
 	 */
-	void makeDir(string target, bool force = true, uint retrycnt = 5)
+	void makeDir(string target, bool force = true, uint retrycnt = 5) @safe
 	{
 		makeDirImpl!true(target, force, retrycnt);
 	}
 	
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
+		
 		fs.onCreating ~= (string target, uint i)
 		{
 			assert(i == 0);
@@ -724,9 +742,7 @@ struct FileSystem
 	///
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		fs.writeText("a/b/test1.txt", "Test");
 		fs.writeText("a/c/test2.txt", "Test");
 		fs.writeText("a/b/test3.txt", "Test");
@@ -769,9 +785,7 @@ struct FileSystem
 	///
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		assert(!fs.isDir("a/b"));
 		assert(!fs.isFile("a/b/test.txt"));
 		fs.writeText("a/b/test.txt", "Test");
@@ -803,9 +817,7 @@ struct FileSystem
 	///
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		fs.writeText("a/b/test.txt", "Test");
 		assert(fs.readText("a/b/test.txt") == "Test");
 	}
@@ -832,9 +844,7 @@ struct FileSystem
 	///
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		assert(!fs.isDir("a/b"));
 		assert(!fs.isFile("a/b/test.dat"));
 		fs.writeBinary("a/b/test.dat", cast(ubyte[])[1,2,3,4,5]);
@@ -865,9 +875,7 @@ struct FileSystem
 	///
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		fs.writeBinary("a/b/test.dat", cast(ubyte[])[1,2,3,4,5]);
 		assert(fs.readBinary("a/b/test.dat") == cast(ubyte[])[1,2,3,4,5]);
 	}
@@ -900,9 +908,7 @@ struct FileSystem
 	///
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		fs.writeJson!uint("a/b/test.json", 10);
 		assert(fs.readJson!uint("a/b/test.json") == 10);
 	}
@@ -911,9 +917,7 @@ struct FileSystem
 	@system unittest
 	{
 		import voile.json;
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		static struct A
 		{
 			int a = 123;
@@ -993,11 +997,11 @@ struct FileSystem
 	}
 	
 	
-	private bool removeFilesImpl(bool absConvert)(string target, bool force, uint retrycnt)
+	private bool removeFilesImpl(bool absConvert)(string target, bool force, uint retrycnt) @safe
 	{
 		return removeFilesImpl!false(absolutePath(target), force, retrycnt);
 	}
-	private bool removeFilesImpl(bool absConvert: false)(string target, bool force, uint retrycnt)
+	private bool removeFilesImpl(bool absConvert: false)(string target, bool force, uint retrycnt) @trusted
 	{
 		if (!target.exists)
 			return true;
@@ -1061,13 +1065,13 @@ struct FileSystem
 	/*******************************************************************************
 	 * 
 	 */
-	bool removeFiles(string target, bool force = true, uint retrycnt = 5)
+	bool removeFiles(string target, bool force = true, uint retrycnt = 5) @safe
 	{
 		return removeFilesImpl!true(target, force, retrycnt);
 	}
 	@system unittest
 	{
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		assert(!fs.isDir("a/b/c"));
 		fs.makeDir("a/b/c");
 		assert(fs.isDir("a/b/c"));
@@ -1078,8 +1082,8 @@ struct FileSystem
 		fs.makeDir("a/b/c");
 		std.file.write(fs.absolutePath("a/b/test.txt"), "abcde");
 		assert(fs.isFile("a/b/test.txt"));
-		assert(.exists("ut/a/b/test.txt"));
-		assert(cast(string)std.file.read("ut/a/b/test.txt") == "abcde");
+		assert(.exists(buildPath(fs.workDir, "a/b/test.txt")));
+		assert(cast(string)std.file.read(buildPath(fs.workDir, "a/b/test.txt")) == "abcde");
 		fs.removeFiles("a");
 		assert(!fs.isFile("a/b/test.txt"));
 		assert(!fs.isDir("a/b/c"));
@@ -1089,7 +1093,7 @@ struct FileSystem
 		assert(fs.isDir("."));
 		fs.removeFiles(".");
 		assert(!fs.isDir("."));
-		assert(!.exists("ut"));
+		assert(!.exists(fs.workDir));
 	}
 	
 	/// ditto
@@ -1118,7 +1122,7 @@ struct FileSystem
 	}
 	@system unittest
 	{
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		fs.makeDir("a/b/c");
 		std.file.write(fs.absolutePath("a/b/test.txt"), "abcde");
 		std.file.write(fs.absolutePath("a/b/test.csv"), "a,b,c,d,e");
@@ -1134,7 +1138,7 @@ struct FileSystem
 		assert(fs.isFile("a/test.txt"));
 		assert(!fs.isFile("a/test.csv"));
 		fs.removeFiles(".");
-		assert(!.exists("ut"));
+		assert(!.exists(fs.workDir));
 	}
 	
 	private bool copyFileImpl(bool absConvert)(string src, string target, bool force, uint retrycnt)
@@ -1201,9 +1205,7 @@ struct FileSystem
 	}
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		assert(!fs.isFile("a/b/c.txt"));
 		fs.writeText("a/b/c.txt", "aaaaa");
 		fs.copyFile("a/b/c.txt", "a/c/c.txt");
@@ -1288,9 +1290,7 @@ struct FileSystem
 	///
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		assert(!fs.isFile("a/b/c.txt"));
 		fs.writeText("a/b/c.txt", "aaaaa");
 		fs.copyFiles("a/b/c.txt", "a/c/c.txt");
@@ -1299,9 +1299,7 @@ struct FileSystem
 	///
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		assert(!fs.isFile("a/b/c.txt"));
 		fs.writeText("a/b/c.txt", "aaaaa");
 		fs.copyFiles("a/b", "a/c");
@@ -1318,9 +1316,7 @@ struct FileSystem
 	///
 	@system unittest
 	{
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		assert(!fs.isFile("a/b/c.txt"));
 		assert(!fs.isFile("a/b/d.dat"));
 		fs.writeText("a/b/c.txt", "aaaaa");
@@ -1588,55 +1584,52 @@ struct FileSystem
 	
 	@system unittest
 	{
-		mkdirRecurse("ut/filestest/src");
-		mkdirRecurse("ut/filestest/dst");
-		auto fs = FileSystem("ut");
-		scope (exit)
-			fs.removeFiles(".");
+		auto fs = createDisposableDir("ut");
+		auto fs2 = createDisposableDir("ut");
 		auto timMod = Clock.currTime;
 		auto timAcc = timMod;
-		fs.writeText(   "filestest/src/test1-1.txt", "1");
-		fs.setTimeStamp("filestest/src/test1-1.txt", timAcc, timMod+1.msecs);
-		fs.writeText(   "filestest/src/test1-2.txt", "1");
-		fs.setTimeStamp("filestest/src/test1-2.txt", timAcc, timMod+1.msecs);
-		fs.writeText(   "filestest/src/test2-1.txt", "2");
-		fs.setTimeStamp("filestest/src/test2-1.txt", timAcc, timMod+2.msecs);
-		fs.writeText(   "filestest/src/test2-2.txt", "2");
-		fs.setTimeStamp("filestest/src/test2-2.txt", timAcc, timMod+2.msecs);
-		fs.copyFile(    "filestest/src/test2-1.txt", "testcase/filestest/dst/test2-1.txt");
-		fs.copyFile(    "filestest/src/test2-2.txt", "testcase/filestest/dst/test2-2.txt");
-		fs.writeText(   "filestest/src/test4.txt", "4");
-		fs.setTimeStamp("filestest/src/test4.txt", timAcc, timMod+4.msecs);
-		fs.writeText(   "filestest/dst/test3.txt", "3");
-		fs.setTimeStamp("filestest/dst/test3.txt", timAcc, timMod+3.msecs);
-		fs.writeText(   "filestest/dst/test4.txt", "4x");
-		fs.setTimeStamp("filestest/dst/test4.txt", timAcc, timMod+8.msecs);
-		fs.writeText(   "filestest/src/test5-11.txt", "5");
-		fs.setTimeStamp("filestest/src/test5-11.txt", timAcc, timMod+10.msecs);
-		fs.writeText(   "filestest/src/test5-21.txt", "5");
-		fs.setTimeStamp("filestest/src/test5-21.txt", timAcc, timMod+10.msecs);
-		fs.writeText(   "filestest/dst/test5-12.txt", "5");
-		fs.setTimeStamp("filestest/dst/test5-12.txt", timAcc, timMod+10.msecs);
-		fs.writeText(   "filestest/dst/test5-22.txt", "5");
-		fs.setTimeStamp("filestest/dst/test5-22.txt", timAcc, timMod+10.msecs);
-		fs.mirrorFiles( "filestest/src", "filestest/dst");
-		assert( "ut/filestest/src/test1-1.txt".exists);
-		assert( "ut/filestest/src/test1-2.txt".exists);
-		assert( "ut/filestest/src/test2-1.txt".exists);
-		assert( "ut/filestest/src/test2-2.txt".exists);
-		assert(!"ut/filestest/src/test3.txt".exists);
-		assert( "ut/filestest/src/test4.txt".exists);
-		assert( "ut/filestest/dst/test1-1.txt".exists);
-		assert( "ut/filestest/dst/test1-2.txt".exists);
-		assert( "ut/filestest/dst/test2-1.txt".exists);
-		assert( "ut/filestest/dst/test2-2.txt".exists);
-		assert(!"ut/filestest/dst/test3.txt".exists);
-		assert( "ut/filestest/dst/test4.txt".exists);
-		assert((cast(string)std.file.read("ut/filestest/dst/test1-1.txt")) == "1");
-		assert((cast(string)std.file.read("ut/filestest/dst/test1-2.txt")) == "1");
-		assert((cast(string)std.file.read("ut/filestest/dst/test2-1.txt")) == "2");
-		assert((cast(string)std.file.read("ut/filestest/dst/test2-2.txt")) == "2");
-		assert((cast(string)std.file.read("ut/filestest/dst/test4.txt")) == "4");
+		fs.writeText(   "src/test1-1.txt", "1");
+		fs.setTimeStamp("src/test1-1.txt", timAcc, timMod+1.msecs);
+		fs.writeText(   "src/test1-2.txt", "1");
+		fs.setTimeStamp("src/test1-2.txt", timAcc, timMod+1.msecs);
+		fs.writeText(   "src/test2-1.txt", "2");
+		fs.setTimeStamp("src/test2-1.txt", timAcc, timMod+2.msecs);
+		fs.writeText(   "src/test2-2.txt", "2");
+		fs.setTimeStamp("src/test2-2.txt", timAcc, timMod+2.msecs);
+		fs.copyFile(    "src/test2-1.txt", fs2.relativePath("dst/test2-1.txt"));
+		fs.copyFile(    "src/test2-2.txt", fs2.relativePath("dst/test2-2.txt"));
+		fs.writeText(   "src/test4.txt", "4");
+		fs.setTimeStamp("src/test4.txt", timAcc, timMod+4.msecs);
+		fs.writeText(   "dst/test3.txt", "3");
+		fs.setTimeStamp("dst/test3.txt", timAcc, timMod+3.msecs);
+		fs.writeText(   "dst/test4.txt", "4x");
+		fs.setTimeStamp("dst/test4.txt", timAcc, timMod+8.msecs);
+		fs.writeText(   "src/test5-11.txt", "5");
+		fs.setTimeStamp("src/test5-11.txt", timAcc, timMod+10.msecs);
+		fs.writeText(   "src/test5-21.txt", "5");
+		fs.setTimeStamp("src/test5-21.txt", timAcc, timMod+10.msecs);
+		fs.writeText(   "dst/test5-12.txt", "5");
+		fs.setTimeStamp("dst/test5-12.txt", timAcc, timMod+10.msecs);
+		fs.writeText(   "dst/test5-22.txt", "5");
+		fs.setTimeStamp("dst/test5-22.txt", timAcc, timMod+10.msecs);
+		fs.mirrorFiles( "src", "dst");
+		assert( fs.workDir.buildPath("src/test1-1.txt").exists);
+		assert( fs.workDir.buildPath("src/test1-2.txt").exists);
+		assert( fs.workDir.buildPath("src/test2-1.txt").exists);
+		assert( fs.workDir.buildPath("src/test2-2.txt").exists);
+		assert(!fs.workDir.buildPath("src/test3.txt").exists);
+		assert( fs.workDir.buildPath("src/test4.txt").exists);
+		assert( fs.workDir.buildPath("dst/test1-1.txt").exists);
+		assert( fs.workDir.buildPath("dst/test1-2.txt").exists);
+		assert( fs.workDir.buildPath("dst/test2-1.txt").exists);
+		assert( fs.workDir.buildPath("dst/test2-2.txt").exists);
+		assert(!fs.workDir.buildPath("dst/test3.txt").exists);
+		assert( fs.workDir.buildPath("dst/test4.txt").exists);
+		assert((cast(string)std.file.read(fs.workDir.buildPath("dst/test1-1.txt"))) == "1");
+		assert((cast(string)std.file.read(fs.workDir.buildPath("dst/test1-2.txt"))) == "1");
+		assert((cast(string)std.file.read(fs.workDir.buildPath("dst/test2-1.txt"))) == "2");
+		assert((cast(string)std.file.read(fs.workDir.buildPath("dst/test2-2.txt"))) == "2");
+		assert((cast(string)std.file.read(fs.workDir.buildPath("dst/test4.txt"))) == "4");
 	}
 	
 	
@@ -1744,9 +1737,7 @@ struct FileSystem
 	@system unittest
 	{
 		import std.string;
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		auto pipeo = pipe();
 		version (Windows)
 		{
@@ -1766,9 +1757,7 @@ struct FileSystem
 	@system unittest
 	{
 		import std.string;
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		auto pipeo = pipe();
 		version (Windows)
 		{
@@ -1788,9 +1777,7 @@ struct FileSystem
 	@system unittest
 	{
 		import std.string;
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		auto tout = fs.createFile("test.txt");
 		version (Windows)
 		{
@@ -1811,9 +1798,7 @@ struct FileSystem
 	@system unittest
 	{
 		import std.string;
-		scope (exit)
-			std.file.rmdirRecurse("ut");
-		auto fs = FileSystem("ut");
+		auto fs = createDisposableDir("ut");
 		version (Windows)
 		{
 			auto cmd = ["cmd", "/C", "echo xxx"];
@@ -1825,4 +1810,77 @@ struct FileSystem
 		auto result = fs.execute(cmd);
 		assert(result.output.chomp == "xxx");
 	}
+}
+/// コピー禁止とムーブ、インスタンス削除の例
+@system unittest
+{
+	import std.algorithm: move;
+	string[] msgDestroyed;
+	{
+		FileSystem fs1 = FileSystem(".");
+		FileSystem fs2;
+		static assert(!__traits(compiles, fs2 = fs1));
+		static assert(__traits(compiles, fs2 = fs1.move()));
+		fs1.onDestroyed ~= (string x) { msgDestroyed ~= "fs1"; };
+		fs2.onDestroyed ~= (string x) { msgDestroyed ~= "fs2"; };
+	}
+	assert(msgDestroyed == ["fs1"]);
+}
+
+/*******************************************************************************
+ * 一時ディレクトリを作成し、作成したディレクトリのFileSystemを返す
+ */
+FileSystem createTempDir(string basePath = tempDir, string prefix = "voile-", uint retrycnt = 5) @safe
+{
+	import std.uuid;
+	import std.algorithm: move;
+	import core.thread: Thread, msecs;
+	FileSystem ret;
+	foreach (tryCnt; 0..retrycnt)
+	{
+		try
+		{
+			auto id = randomUUID().toString();
+			auto newpath = basePath.buildPath(prefix ~ id);
+			if (newpath.exists)
+				continue;
+			ret.workDir = newpath;
+			ret.makeDir(".", true, retrycnt);
+			break;
+		}
+		catch (Exception e)
+		{
+			continue;
+		}
+	}
+	ret.exists.enforce();
+	return ret.move();
+}
+
+/*******************************************************************************
+ * 使い捨ての一時ディレクトリを作成
+ * 
+ * 作成したディレクトリのFileSystemを返す。返されたFileSystemは、インスタンスの破棄時に削除される。
+ */
+FileSystem createDisposableDir(string basePath = tempDir, string prefix = "voile-", uint retrycnt = 5) @safe
+{
+	import std.algorithm: move;
+	auto fs = createTempDir(basePath, prefix, retrycnt);
+	(() @trusted => fs.onDestroyed ~= (string dir)
+	{
+		if (.exists(dir))
+			FileSystem(dir).removeFiles(".", true, retrycnt);
+	})();
+	return fs.move();
+}
+
+///
+@safe unittest
+{
+	string dir;
+	{
+		auto fs = createDisposableDir("ut");
+		dir = fs.workDir;
+	}
+	assert(!dir.exists);
 }
