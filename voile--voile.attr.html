@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.attr</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul><span style="color:red">!!!!! UNDEFINED MACRO: "MODULE_MENU" !!!!!!</span></ul>
+</div>
+            <div class="content">                <h1>voile.attr</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">UDA</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".getParameterUDAs"></span><div class="quickindex" id="quickindex.getParameterUDAs"></div>template <code class="ddoc_psymbol">getParameterUDAs</code>(alias Func, size_t i)<br>
+template <code class="ddoc_psymbol">getParameterUDAs</code>(alias Func, size_t i, alias attr)<br></div></dt>
+<dd><div class="ddoc_summary">関数のパラメータに付与されたUDAを取り出す。
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">Func</td>
+<td class="ddoc_param_desc">関数</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">i</td>
+<td class="ddoc_param_desc">引数の番号(最初の引数は0番目)</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">attr</td>
+<td class="ddoc_param_desc">UDAの種類を指定できます(指定しないとすべて返します)</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ UDAのタプルが返ります</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">@(30) <span class="d_keyword">struct</span> S {}
+<span class="d_keyword">enum</span> Test;
+<span class="d_keyword">alias</span> lambda = (@(10) <span class="d_keyword">int</span> x, @(15) @(Test) <span class="d_keyword">long</span> y, <span class="d_keyword">int</span> z, S s) =&gt; x;
+
+<span class="d_keyword">alias</span> uda1 = <span class="d_psymbol">getParameterUDAs</span>!(lambda, 0);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda1.length == 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda1[0] == 10);
+<span class="d_keyword">alias</span> uda2 = <span class="d_psymbol">getParameterUDAs</span>!(lambda, 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda2.length == 2);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda2[0] == 15);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(uda2[1] == Test));
+<span class="d_keyword">alias</span> uda3 = <span class="d_psymbol">getParameterUDAs</span>!(lambda, 2);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda3.length == 0);
+<span class="d_keyword">alias</span> uda4 = <span class="d_psymbol">getParameterUDAs</span>!(lambda, 3);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda4.length == 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda4[0] == 30);
+
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getParameterUDAs</span>!(lambda, 0, <span class="d_keyword">int</span>).length  == 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getParameterUDAs</span>!(lambda, 0, Test).length == 0);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getParameterUDAs</span>!(lambda, 1, Test).length == 1);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getParameterTypeUDAs"></span><div class="quickindex" id="quickindex.getParameterTypeUDAs"></div>template <code class="ddoc_psymbol">getParameterTypeUDAs</code>(alias Func, size_t i)<br>
+template <code class="ddoc_psymbol">getParameterTypeUDAs</code>(alias Func, size_t i, alias attr)<br></div></dt>
+<dd><div class="ddoc_summary">関数のパラメータに付与されたUDAのうち、型についたUDAを取り出す。
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">Func</td>
+<td class="ddoc_param_desc">関数</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">i</td>
+<td class="ddoc_param_desc">引数の番号(最初の引数は0番目)</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">attr</td>
+<td class="ddoc_param_desc">UDAの種類を指定できます(指定しないとすべて返します)</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ UDAのタプルが返ります</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">@(30) <span class="d_keyword">struct</span> S {}
+<span class="d_keyword">enum</span> Test;
+<span class="d_keyword">alias</span> lambda = (@(10) <span class="d_keyword">int</span> x, @(15) @(Test) <span class="d_keyword">long</span> y, <span class="d_keyword">int</span> z, S s) =&gt; x;
+
+<span class="d_keyword">alias</span> uda1 = <span class="d_psymbol">getParameterTypeUDAs</span>!(lambda, 0);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda1.length == 0);
+<span class="d_keyword">alias</span> uda2 = <span class="d_psymbol">getParameterTypeUDAs</span>!(lambda, 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda2.length == 0);
+<span class="d_keyword">alias</span> uda3 = <span class="d_psymbol">getParameterTypeUDAs</span>!(lambda, 2);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda3.length == 0);
+<span class="d_keyword">alias</span> uda4 = <span class="d_psymbol">getParameterTypeUDAs</span>!(lambda, 3);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda4.length == 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda4[0] == 30);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getParameterArgUDAs"></span><div class="quickindex" id="quickindex.getParameterArgUDAs"></div>template <code class="ddoc_psymbol">getParameterArgUDAs</code>(alias Func, size_t i)<br>
+template <code class="ddoc_psymbol">getParameterArgUDAs</code>(alias Func, size_t i, alias attr)<br></div></dt>
+<dd><div class="ddoc_summary">関数のパラメータに付与されたUDAのうち、引数についたUDAを取り出す。
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">Func</td>
+<td class="ddoc_param_desc">関数</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">i</td>
+<td class="ddoc_param_desc">引数の番号(最初の引数は0番目)</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">attr</td>
+<td class="ddoc_param_desc">UDAの種類を指定できます(指定しないとすべて返します)</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ UDAのタプルが返ります</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">@(30) <span class="d_keyword">struct</span> S {}
+<span class="d_keyword">enum</span> Test;
+<span class="d_keyword">alias</span> lambda = (@(10) <span class="d_keyword">int</span> x, @(15) @(Test) <span class="d_keyword">long</span> y, <span class="d_keyword">int</span> z, S s) =&gt; x;
+
+<span class="d_keyword">alias</span> uda1 = <span class="d_psymbol">getParameterArgUDAs</span>!(lambda, 0);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda1.length == 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda1[0] == 10);
+<span class="d_keyword">alias</span> uda2 = <span class="d_psymbol">getParameterArgUDAs</span>!(lambda, 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda2.length == 2);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda2[0] == 15);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(uda2[1] == Test));
+<span class="d_keyword">alias</span> uda3 = <span class="d_psymbol">getParameterArgUDAs</span>!(lambda, 2);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda3.length == 0);
+<span class="d_keyword">alias</span> uda4 = <span class="d_psymbol">getParameterArgUDAs</span>!(lambda, 3);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(uda4.length == 0);
+
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(getParameterUDAs!(lambda, 0, <span class="d_keyword">int</span>).length  == 1);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(getParameterUDAs!(lambda, 0, Test).length == 0);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(getParameterUDAs!(lambda, 1, Test).length == 1);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasParameterUDA"></span><div class="quickindex" id="quickindex.hasParameterUDA"></div>enum bool <code class="ddoc_psymbol">hasParameterUDA</code>(alias Func, size_t i, alias attr);
+<br></div></dt>
+<dd><div class="ddoc_summary">関数のパラメータにUDAが付与されているか確認します
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">Func</td>
+<td class="ddoc_param_desc">関数</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">i</td>
+<td class="ddoc_param_desc">引数の番号(最初の引数は0番目)</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">attr</td>
+<td class="ddoc_param_desc">チェックするUDA</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ UDAがあったらtrue</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">@(30) <span class="d_keyword">struct</span> S {}
+<span class="d_keyword">enum</span> Test;
+<span class="d_keyword">alias</span> lambda = (@(10) <span class="d_keyword">int</span> x, @(15) @Test <span class="d_keyword">long</span> y, <span class="d_keyword">int</span> z, S s) =&gt; x;
+
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasParameterUDA</span>!(lambda, 0, 10));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasParameterUDA</span>!(lambda, 0, 15));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasParameterUDA</span>!(lambda, 1, 15));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasParameterUDA</span>!(lambda, 1, Test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasParameterUDA</span>!(lambda, 2, 15));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasParameterUDA</span>!(lambda, 3, 30));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasParameterTypeUDA"></span><div class="quickindex" id="quickindex.hasParameterTypeUDA"></div>enum bool <code class="ddoc_psymbol">hasParameterTypeUDA</code>(alias Func, size_t i, alias attr);
+<br></div></dt>
+<dd><div class="ddoc_summary">関数のパラメータに付与されたUDAのうち、型にUDAがついているか確認します
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">Func</td>
+<td class="ddoc_param_desc">関数</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">i</td>
+<td class="ddoc_param_desc">引数の番号(最初の引数は0番目)</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">attr</td>
+<td class="ddoc_param_desc">チェックするUDA</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ UDAがあったらtrue</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">@(30) <span class="d_keyword">struct</span> S {}
+<span class="d_keyword">enum</span> Test;
+<span class="d_keyword">alias</span> lambda = (@(10) <span class="d_keyword">int</span> x, @(15) @Test <span class="d_keyword">long</span> y, <span class="d_keyword">int</span> z, S s) =&gt; x;
+
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasParameterTypeUDA</span>!(lambda, 0, 10));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasParameterTypeUDA</span>!(lambda, 0, 15));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasParameterTypeUDA</span>!(lambda, 1, 15));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasParameterTypeUDA</span>!(lambda, 1, Test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasParameterTypeUDA</span>!(lambda, 2, 15));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasParameterTypeUDA</span>!(lambda, 3, 30));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasParameterArgUDA"></span><div class="quickindex" id="quickindex.hasParameterArgUDA"></div>enum bool <code class="ddoc_psymbol">hasParameterArgUDA</code>(alias Func, size_t i, alias attr);
+<br></div></dt>
+<dd><div class="ddoc_summary">関数のパラメータに付与されたUDAのうち、引数にUDAがついているか確認します
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">Func</td>
+<td class="ddoc_param_desc">関数</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">i</td>
+<td class="ddoc_param_desc">引数の番号(最初の引数は0番目)</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">attr</td>
+<td class="ddoc_param_desc">チェックするUDA</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ UDAがあったらtrue</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">@(30) <span class="d_keyword">struct</span> S {}
+<span class="d_keyword">enum</span> Test;
+<span class="d_keyword">alias</span> lambda = (@(10) <span class="d_keyword">int</span> x, @(15) @Test <span class="d_keyword">long</span> y, <span class="d_keyword">int</span> z, S s) =&gt; x;
+
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasParameterArgUDA</span>!(lambda, 0, 10));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasParameterArgUDA</span>!(lambda, 0, 15));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasParameterArgUDA</span>!(lambda, 1, 15));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasParameterArgUDA</span>!(lambda, 1, Test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasParameterArgUDA</span>!(lambda, 2, 15));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasParameterArgUDA</span>!(lambda, 3, 30));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasIgnore"></span><div class="quickindex" id="quickindex.hasIgnore"></div>enum bool <code class="ddoc_psymbol">hasIgnore</code>(alias value);
+<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> A
+{
+	<span class="d_keyword">int</span> test;
+	
+	@ignore
+	<span class="d_keyword">int</span> foo;
+}
+
+<span class="d_keyword">struct</span> B
+{
+	<span class="d_keyword">int</span> test;
+}
+
+A a;
+B b;
+
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasIgnore</span>!(a.test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasIgnore</span>!(b.test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasIgnore</span>!(a.foo));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Ignore"></span><div class="quickindex" id="quickindex.Ignore"></div>enum <code class="ddoc_psymbol">Ignore</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ignore"></span><div class="quickindex" id="quickindex.ignore"></div>alias <code class="ddoc_psymbol">ignore</code> = Ignore;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ConvBy"></span><div class="quickindex" id="quickindex.ConvBy"></div>struct <code class="ddoc_psymbol">ConvBy</code>(alias T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".convBy"></span><div class="quickindex" id="quickindex.convBy"></div>alias <code class="ddoc_psymbol">convBy</code> = ConvBy(alias T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isConvByAttr"></span><div class="quickindex" id="quickindex.isConvByAttr"></div>enum bool <code class="ddoc_psymbol">isConvByAttr</code>(alias Attr);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getConvByAttr"></span><div class="quickindex" id="quickindex.getConvByAttr"></div>template <code class="ddoc_psymbol">getConvByAttr</code>(alias Attr) if (isConvByAttr!Attr)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ProxyList"></span><div class="quickindex" id="quickindex.ProxyList"></div>template <code class="ddoc_psymbol">ProxyList</code>(alias value)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getConvBy"></span><div class="quickindex" id="quickindex.getConvBy"></div>template <code class="ddoc_psymbol">getConvBy</code>(alias value)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasConvBy"></span><div class="quickindex" id="quickindex.hasConvBy"></div>enum bool <code class="ddoc_psymbol">hasConvBy</code>(alias value);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".canConvTo"></span><div class="quickindex" id="quickindex.canConvTo"></div>template <code class="ddoc_psymbol">canConvTo</code>(alias value, T)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".convTo"></span><div class="quickindex" id="quickindex.convTo"></div>template <code class="ddoc_psymbol">convTo</code>(alias value, Dst) if (canConvTo!(value, Dst))<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getConvFromStyle"></span><div class="quickindex" id="quickindex.getConvFromStyle"></div>template <code class="ddoc_psymbol">getConvFromStyle</code>(alias value, Src) if (hasConvBy!value)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".canConvFrom"></span><div class="quickindex" id="quickindex.canConvFrom"></div>template <code class="ddoc_psymbol">canConvFrom</code>(alias value, T)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".convFrom"></span><div class="quickindex" id="quickindex.convFrom"></div>template <code class="ddoc_psymbol">convFrom</code>(alias value, Src) if (canConvFrom!(value, Src))<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".convertTo"></span><div class="quickindex" id="quickindex.convertTo"></div>template <code class="ddoc_psymbol">convertTo</code>(alias value)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".convertFrom"></span><div class="quickindex" id="quickindex.convertFrom"></div>template <code class="ddoc_psymbol">convertFrom</code>(alias value)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isConvertible"></span><div class="quickindex" id="quickindex.isConvertible"></div>enum auto <code class="ddoc_psymbol">isConvertible</code>(alias value, T);
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

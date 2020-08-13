@@ -90,7 +90,22 @@
 <dd><div class="ddoc_summary">In Posix</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem"></span><div class="quickindex" id="quickindex.FileSystem"></div>struct <code class="ddoc_psymbol">FileSystem</code>;
 <br></div></dt>
-<dd><div class="ddoc_summary">ファイルシステムの操作に関するヘルパ</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.workDir"></span><div class="quickindex" id="quickindex.FileSystem.workDir"></div>string <code class="ddoc_psymbol">workDir</code>;
+<dd><div class="ddoc_summary">ファイルシステムの操作に関するヘルパ</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ コピー禁止とムーブ、インスタンス削除の例
+<pre class="d_code notranslate"><span class="d_keyword">import</span> std.algorithm: move;
+string[] msgDestroyed;
+{
+	<span class="d_psymbol">FileSystem</span> fs1 = <span class="d_psymbol">FileSystem</span>(<span class="d_string">"."</span>);
+	<span class="d_psymbol">FileSystem</span> fs2;
+	<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_keyword">__traits</span>(compiles, fs2 = fs1));
+	<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">__traits</span>(compiles, fs2 = fs1.move()));
+	fs1.onDestroyed ~= (string x) { msgDestroyed ~= <span class="d_string">"fs1"</span>; };
+	fs2.onDestroyed ~= (string x) { msgDestroyed ~= <span class="d_string">"fs2"</span>; };
+}
+<span class="d_keyword">assert</span>(msgDestroyed == [<span class="d_string">"fs1"</span>]);
+</pre>
+</div>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.workDir"></span><div class="quickindex" id="quickindex.FileSystem.workDir"></div>string <code class="ddoc_psymbol">workDir</code>;
 <br></div></dt>
 <dd>
 </dd>
@@ -121,6 +136,12 @@
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onRemoveFailed"></span><div class="quickindex" id="quickindex.FileSystem.onRemoveFailed"></div>Handler!(bool delegate(string target, Exception e)) <code class="ddoc_psymbol">onRemoveFailed</code>;
 <br></div></dt>
 <dd><div class="ddoc_summary">削除に失敗したら呼ばれる。処理を継続を継続するならtrueを返す。</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onDestroyed"></span><div class="quickindex" id="quickindex.FileSystem.onDestroyed"></div>Handler!(void delegate(string target)) <code class="ddoc_psymbol">onDestroyed</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">インスタンスが破棄される際に呼ばれる</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onPostMove"></span><div class="quickindex" id="quickindex.FileSystem.onPostMove"></div>void <code class="ddoc_psymbol">onPostMove</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ムーブの後に呼ばれる</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.absolutePath"></span><div class="quickindex" id="quickindex.FileSystem.absolutePath"></div>const @safe string <code class="ddoc_psymbol">absolutePath</code>();
 <br>
 const @safe string <code class="ddoc_psymbol">absolutePath</code>(string <span class="ddoc_param">target</span>);
@@ -291,7 +312,7 @@ string <code class="ddoc_psymbol">buildNormalizedWindowsPath</code>();
 <span class="def-anchor" id=".FileSystem.buildNormalizedNativePath"></span><div class="quickindex" id="quickindex.FileSystem.buildNormalizedNativePath"></div>alias <code class="ddoc_psymbol">buildNormalizedNativePath</code> = buildNormalizedPosixPath;
 <br></div></dt>
 <dd><div class="ddoc_summary">In Posix</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.exists"></span><div class="quickindex" id="quickindex.FileSystem.exists"></div>const @safe bool <code class="ddoc_psymbol">exists</code>(string <span class="ddoc_param">target</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.exists"></span><div class="quickindex" id="quickindex.FileSystem.exists"></div>const @safe bool <code class="ddoc_psymbol">exists</code>(string <span class="ddoc_param">target</span> = ".");
 <br></div></dt>
 <dd><div class="ddoc_summary">パスが存在するか確認する
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -318,7 +339,7 @@ string <code class="ddoc_psymbol">buildNormalizedWindowsPath</code>();
 </table></div>
 
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.makeDir"></span><div class="quickindex" id="quickindex.FileSystem.makeDir"></div>void <code class="ddoc_psymbol">makeDir</code>(string <span class="ddoc_param">target</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.makeDir"></span><div class="quickindex" id="quickindex.FileSystem.makeDir"></div>@safe void <code class="ddoc_psymbol">makeDir</code>(string <span class="ddoc_param">target</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
 <br></div></dt>
 <dd><div class="ddoc_summary">ディレクトリを作成する
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -338,9 +359,7 @@ auto <code class="ddoc_psymbol">entries</code>(string <span class="ddoc_param">p
 auto <code class="ddoc_psymbol">entries</code><span class="ddoc_template_param_list" title="Template parameter list">(Char)</span>(Regex!Char <span class="ddoc_param">pattern</span>, SpanMode <span class="ddoc_param">mode</span> = SpanMode.shallow, bool <span class="ddoc_param">followSymlink</span> = true);
 <br></div></dt>
 <dd><div class="ddoc_summary">エントリー一覧</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
- <pre class="d_code notranslate"><span class="d_keyword">scope</span> (exit)
-	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
-<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
 fs.writeText(<span class="d_string">"a/b/test1.txt"</span>, <span class="d_string">"Test"</span>);
 fs.writeText(<span class="d_string">"a/c/test2.txt"</span>, <span class="d_string">"Test"</span>);
 fs.writeText(<span class="d_string">"a/b/test3.txt"</span>, <span class="d_string">"Test"</span>);
@@ -380,9 +399,7 @@ files.sort();
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.readJson"></span><div class="quickindex" id="quickindex.FileSystem.readJson"></div>T <code class="ddoc_psymbol">readJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(string <span class="ddoc_param">filename</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">JSONファイルを書き出す</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
- <pre class="d_code notranslate"><span class="d_keyword">scope</span> (exit)
-	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
-<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
 fs.writeJson!<span class="d_keyword">uint</span>(<span class="d_string">"a/b/test.json"</span>, 10);
 <span class="d_keyword">assert</span>(fs.<span class="d_psymbol">readJson</span>!<span class="d_keyword">uint</span>(<span class="d_string">"a/b/test.json"</span>) == 10);
 </pre>
@@ -390,9 +407,7 @@ fs.writeJson!<span class="d_keyword">uint</span>(<span class="d_string">"a/b/tes
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  ditto
 <pre class="d_code notranslate"><span class="d_keyword">import</span> voile.json;
-<span class="d_keyword">scope</span> (exit)
-	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
-<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
 <span class="d_keyword">static</span> <span class="d_keyword">struct</span> A
 {
 	<span class="d_keyword">int</span> a = 123;
@@ -425,7 +440,7 @@ fs.writeJson(<span class="d_string">"a/b/test.json"</span>, A(10));
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.removeFiles"></span><div class="quickindex" id="quickindex.FileSystem.removeFiles"></div>bool <code class="ddoc_psymbol">removeFiles</code>(string <span class="ddoc_param">target</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.removeFiles"></span><div class="quickindex" id="quickindex.FileSystem.removeFiles"></div>@safe bool <code class="ddoc_psymbol">removeFiles</code>(string <span class="ddoc_param">target</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
 <br>
 bool <code class="ddoc_psymbol">removeFiles</code>(string <span class="ddoc_param">targetDir</span>, string <span class="ddoc_param">blobFilter</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
 <br></div></dt>
@@ -437,9 +452,7 @@ bool <code class="ddoc_psymbol">removeFiles</code>(string <span class="ddoc_para
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.copyFiles"></span><div class="quickindex" id="quickindex.FileSystem.copyFiles"></div>bool <code class="ddoc_psymbol">copyFiles</code>(string <span class="ddoc_param">src</span>, string <span class="ddoc_param">target</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
 <br></div></dt>
 <dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
- <pre class="d_code notranslate"><span class="d_keyword">scope</span> (exit)
-	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
-<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
 <span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/b/c.txt"</span>));
 fs.writeText(<span class="d_string">"a/b/c.txt"</span>, <span class="d_string">"aaaaa"</span>);
 fs.<span class="d_psymbol">copyFiles</span>(<span class="d_string">"a/b/c.txt"</span>, <span class="d_string">"a/c/c.txt"</span>);
@@ -447,9 +460,7 @@ fs.<span class="d_psymbol">copyFiles</span>(<span class="d_string">"a/b/c.txt"</
 </pre>
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
- <pre class="d_code notranslate"><span class="d_keyword">scope</span> (exit)
-	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
-<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
 <span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/b/c.txt"</span>));
 fs.writeText(<span class="d_string">"a/b/c.txt"</span>, <span class="d_string">"aaaaa"</span>);
 fs.<span class="d_psymbol">copyFiles</span>(<span class="d_string">"a/b"</span>, <span class="d_string">"a/c"</span>);
@@ -460,9 +471,7 @@ fs.<span class="d_psymbol">copyFiles</span>(<span class="d_string">"a/b"</span>,
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.copyFiles.2"></span><div class="quickindex" id="quickindex.FileSystem.copyFiles.2"></div>bool <code class="ddoc_psymbol">copyFiles</code>(string <span class="ddoc_param">srcDir</span>, string <span class="ddoc_param">blobFilter</span>, string <span class="ddoc_param">targetDir</span>, bool <span class="ddoc_param">force</span> = true, uint <span class="ddoc_param">retrycnt</span> = 5);
 <br></div></dt>
 <dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
- <pre class="d_code notranslate"><span class="d_keyword">scope</span> (exit)
-	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
-<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+ <pre class="d_code notranslate"><span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
 <span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/b/c.txt"</span>));
 <span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/b/d.dat"</span>));
 fs.writeText(<span class="d_string">"a/b/c.txt"</span>, <span class="d_string">"aaaaa"</span>);
@@ -513,9 +522,7 @@ auto <code class="ddoc_psymbol">spawnProcess</code>(string[] <span class="ddoc_p
 <br></div></dt>
 <dd><div class="ddoc_summary">プロセスを実行する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">import</span> std.string;
-<span class="d_keyword">scope</span> (exit)
-	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
-<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
 <span class="d_keyword">auto</span> pipeo = pipe();
 <span class="d_keyword">version</span> (Windows)
 {
@@ -533,9 +540,7 @@ pid.wait();
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">import</span> std.string;
-<span class="d_keyword">scope</span> (exit)
-	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
-<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
 <span class="d_keyword">auto</span> pipeo = pipe();
 <span class="d_keyword">version</span> (Windows)
 {
@@ -553,9 +558,7 @@ pipe.pid.wait();
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">import</span> std.string;
-<span class="d_keyword">scope</span> (exit)
-	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
-<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
 <span class="d_keyword">auto</span> tout = fs.createFile(<span class="d_string">"test.txt"</span>);
 <span class="d_keyword">version</span> (Windows)
 {
@@ -574,9 +577,7 @@ tout.close();
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">import</span> std.string;
-<span class="d_keyword">scope</span> (exit)
-	std.file.rmdirRecurse(<span class="d_string">"ut"</span>);
-<span class="d_keyword">auto</span> fs = FileSystem(<span class="d_string">"ut"</span>);
+<span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
 <span class="d_keyword">version</span> (Windows)
 {
 	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"cmd"</span>, <span class="d_string">"/C"</span>, <span class="d_string">"echo xxx"</span>];
@@ -591,6 +592,23 @@ tout.close();
 </div>
 </dd>
 </div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".createTempDir"></span><div class="quickindex" id="quickindex.createTempDir"></div>@safe FileSystem <code class="ddoc_psymbol">createTempDir</code>(string <span class="ddoc_param">basePath</span> = tempDir, string <span class="ddoc_param">prefix</span> = "voile-", uint <span class="ddoc_param">retrycnt</span> = 5);
+<br></div></dt>
+<dd><div class="ddoc_summary">一時ディレクトリを作成し、作成したディレクトリのFileSystemを返す</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".createDisposableDir"></span><div class="quickindex" id="quickindex.createDisposableDir"></div>@safe FileSystem <code class="ddoc_psymbol">createDisposableDir</code>(string <span class="ddoc_param">basePath</span> = tempDir, string <span class="ddoc_param">prefix</span> = "voile-", uint <span class="ddoc_param">retrycnt</span> = 5);
+<br></div></dt>
+<dd><div class="ddoc_summary">使い捨ての一時ディレクトリを作成
+</div><div class="ddoc_description">作成したディレクトリのFileSystemを返す。返されたFileSystemは、インスタンスの破棄時に削除される。</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">string dir;
+{
+	<span class="d_keyword">auto</span> fs = <span class="d_psymbol">createDisposableDir</span>(<span class="d_string">"ut"</span>);
+	dir = fs.workDir;
+}
+<span class="d_keyword">assert</span>(!dir.exists);
+</pre>
+</div>
 </dd>
 </div></dl>
 

@@ -1,0 +1,486 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.munion</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul><span style="color:red">!!!!! UNDEFINED MACRO: "MODULE_MENU" !!!!!!</span></ul>
+</div>
+            <div class="content">                <h1>voile.munion</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">管理された共用体を提供する</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedUnion"></span><div class="quickindex" id="quickindex.ManagedUnion"></div>struct <code class="ddoc_psymbol">ManagedUnion</code>(Types...) if (Types.length &gt; 0 &amp;&amp; (NoDuplicates!Types.length == Types.length));
+<br></div></dt>
+<dd><div class="ddoc_summary">タグ付き共用体</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">alias</span> U = <span class="d_psymbol">ManagedUnion</span>!(<span class="d_keyword">int</span>, string);
+U dat;
+<span class="d_comment">// assign
+</span>dat = 1;
+dat = U(<span class="d_string">"foo"</span>);
+dat.initialize!<span class="d_keyword">int</span>(1);
+
+<span class="d_comment">// cast
+</span><span class="d_keyword">assert</span>(<span class="d_keyword">cast</span>(<span class="d_keyword">int</span>)dat == 1);
+
+<span class="d_comment">// check
+</span><span class="d_keyword">assert</span>(!dat.empty);
+<span class="d_keyword">assert</span>(dat.check!<span class="d_keyword">int</span>);
+<span class="d_keyword">assert</span>(!dat.check!string);
+<span class="d_keyword">assert</span>(dat.check!0);
+<span class="d_keyword">assert</span>(!dat.check!1);
+
+<span class="d_comment">// getter/setter
+</span><span class="d_keyword">assert</span>(dat.tag == 0);
+<span class="d_keyword">assert</span>(dat.get!<span class="d_keyword">int</span> == 1);
+dat.set!<span class="d_keyword">int</span> = 5;
+<span class="d_keyword">assert</span>(dat.get!<span class="d_keyword">int</span> == 5);
+dat.set!1 = <span class="d_string">"foo"</span>;
+<span class="d_keyword">assert</span>(dat.get!1 == <span class="d_string">"foo"</span>);
+
+<span class="d_comment">// clear
+</span>dat.clear();
+<span class="d_keyword">assert</span>(dat.empty);
+
+<span class="d_comment">// match
+</span>dat = <span class="d_string">"foo"</span>;
+<span class="d_keyword">assert</span>(dat.match!(
+	(<span class="d_keyword">int</span> x)      =&gt; x,
+	(string str) =&gt; str.length) == <span class="d_string">"foo"</span>.length);
+</pre>
+</div>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedUnion.this"></span><div class="quickindex" id="quickindex.ManagedUnion.this"></div>this<span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref T <span class="ddoc_param">val</span>)<br><span class="ddoc_constraint">if(isAssignable!T)</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">コンストラクタ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedUnion.opAssign"></span><div class="quickindex" id="quickindex.ManagedUnion.opAssign"></div>void <code class="ddoc_psymbol">opAssign</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref T <span class="ddoc_param">val</span>)<br><span class="ddoc_constraint">if(isAssignable!T &amp;&amp; !isManagedUnion)</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">代入</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedUnion.opCast"></span><div class="quickindex" id="quickindex.ManagedUnion.opCast"></div>inout inout<span class="ddoc_template_param_list" title="Template parameter list">(T)</span> <code class="ddoc_psymbol">opCast</code>(T)()<br><span class="ddoc_constraint">if(isAssignable!T &amp;&amp; !isManagedUnion)</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">キャスト</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedUnion.opDispatch"></span><div class="quickindex" id="quickindex.ManagedUnion.opDispatch"></div>ref auto <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_param_list" title="Template parameter list">(string member)</span>()<br><span class="ddoc_constraint">if(isManagedUnion &amp;&amp; hasMember!(Instance, member))</span>;
+<br>
+void <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_param_list" title="Template parameter list">(string member)</span>(auto ref MemberTypes[staticIndexOf!(member, FieldNameTuple!Instance)] <span class="ddoc_param">val</span>)<br><span class="ddoc_constraint">if(isManagedUnion &amp;&amp; hasMember!(Instance, member))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">名前アクセス
+</div><div class="ddoc_description">ManagedUnionの引数に共用体を与えた場合は名前でのアクセスを許可する。
+</div>
+<div class="ddoc_see_also"><span class="ddoc_see_also_header">See Also:</span>
+ <code class="d_inlinecode donthyphenate notranslate"><a href="voile--voile.munion.html#.Managed">Managed</a></code></div>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Managed"></span><div class="quickindex" id="quickindex.Managed"></div>template <code class="ddoc_psymbol">Managed</code>(T) if (is(T == union))<br></div></dt>
+<dd><div class="ddoc_summary">共用体に管理機能を付与する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">union</span> U
+{
+	<span class="d_keyword">uint</span>   x;
+	<span class="d_keyword">uint</span>   y;
+	string str;
+}
+
+<span class="d_keyword">alias</span> MU = ManagedUnion!U;
+
+MU dat;
+
+dat.x = 10;
+<span class="d_keyword">assert</span>(dat.tag == 0);
+<span class="d_keyword">assert</span>(dat.x == 10);
+<span class="d_keyword">assert</span>(dat.get!0 == 10);
+dat.str = <span class="d_string">"xxx"</span>;
+<span class="d_keyword">assert</span>(dat.get!2 == <span class="d_string">"xxx"</span>);
+<span class="d_keyword">assert</span>(dat.str == <span class="d_string">"xxx"</span>);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata"></span><div class="quickindex" id="quickindex.Endata"></div>struct <code class="ddoc_psymbol">Endata</code>(E);
+<br></div></dt>
+<dd><div class="ddoc_summary">データ付きのenum</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E
+{
+	@data!<span class="d_keyword">int</span>     id,
+	ignored,
+	@data!string  str,
+	@data!<span class="d_keyword">int</span>     number,
+	@data!string  get,
+}
+<span class="d_keyword">mixin</span> EnumMemberAlieses!E;
+
+<span class="d_keyword">alias</span> EnumData = <span class="d_psymbol">Endata</span>!E;
+EnumData dat;
+
+<span class="d_comment">// assign
+</span>dat.initialize!str(<span class="d_string">"test"</span>);
+dat.number = 10;
+
+<span class="d_comment">// check
+</span><span class="d_keyword">assert</span>(!dat.empty);
+<span class="d_keyword">assert</span>(dat.check!number);
+<span class="d_keyword">assert</span>(!dat.check!str);
+
+<span class="d_comment">// getter/setter
+</span><span class="d_keyword">assert</span>(dat.tag == number);
+<span class="d_keyword">assert</span>(.get!number(dat) == 10);
+dat.set!id = 5;
+<span class="d_keyword">assert</span>(dat.tag == id);
+
+<span class="d_comment">// clear
+</span>dat.clear();
+<span class="d_keyword">assert</span>(dat.empty);
+
+<span class="d_comment">// ignored member
+</span><span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_keyword">__traits</span>(compiles, dat.set!ignore(0)));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TagType"></span><div class="quickindex" id="quickindex.TagType"></div>template <code class="ddoc_psymbol">TagType</code>(MU) if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))<br></div></dt>
+<dd><div class="ddoc_summary">ManagedUnionのタグ型を得る</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_psymbol">TagType</span>!(ManagedUnion!(<span class="d_keyword">int</span>, string)) == <span class="d_keyword">ubyte</span>));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!string str }
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">is</span>(<span class="d_psymbol">TagType</span>!(Endata!E) == E));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isAvailableTag"></span><div class="quickindex" id="quickindex.isAvailableTag"></div>template <code class="ddoc_psymbol">isAvailableTag</code>(MU, alias tag) if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))<br></div></dt>
+<dd><div class="ddoc_summary">有効なタグか確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = ManagedUnion!(<span class="d_keyword">int</span>, string);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">isAvailableTag</span>!(MU, 1));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isAvailableTag</span>!(MU, 2));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!string str }
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isAvailableTag</span>!(Endata!E, E.x));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">isAvailableTag</span>!(Endata!E, E.str));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isAvailableTag</span>!(Endata!E, getNotFoundTag!(Endata!E)));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isAvailableTag</span>!(Endata!E, <span class="d_keyword">cast</span>(E)3));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getNotFoundTag"></span><div class="quickindex" id="quickindex.getNotFoundTag"></div>template <code class="ddoc_psymbol">getNotFoundTag</code>(MU) if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))<br></div></dt>
+<dd><div class="ddoc_summary">無効なタグを取得する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = ManagedUnion!(<span class="d_keyword">int</span>, string);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getNotFoundTag</span>!MU != 0);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getNotFoundTag</span>!MU != 1);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!string str }
+<span class="d_keyword">alias</span> MU = Endata!E;
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getNotFoundTag</span>!MU != E.x);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getNotFoundTag</span>!MU != E.str);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasType"></span><div class="quickindex" id="quickindex.hasType"></div>template <code class="ddoc_psymbol">hasType</code>(MU, T) if (isInstanceOf!(ManagedUnion, MU))<br></div></dt>
+<dd><div class="ddoc_summary">型を持っているか確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = ManagedUnion!(<span class="d_keyword">int</span>, string);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">hasType</span>!(MU, <span class="d_keyword">int</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">hasType</span>!(MU, string));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasType</span>!(MU, <span class="d_keyword">long</span>));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".tag"></span><div class="quickindex" id="quickindex.tag"></div>TagType!MU <code class="ddoc_psymbol">tag</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto ref MU <span class="ddoc_param">tu</span>)<br><span class="ddoc_constraint">if(isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">タグを確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = ManagedUnion!(<span class="d_keyword">int</span>, string);
+MU <span class="d_param">tu</span>;
+<span class="d_keyword">assert</span>(<span class="d_psymbol">tag</span>(<span class="d_param">tu</span>) == getNotFoundTag!MU);
+<span class="d_param">tu</span> = 1;
+<span class="d_keyword">assert</span>(<span class="d_psymbol">tag</span>(<span class="d_param">tu</span>) != getNotFoundTag!MU);
+<span class="d_keyword">assert</span>(<span class="d_psymbol">tag</span>(<span class="d_param">tu</span>) == 0);
+<span class="d_param">tu</span> = <span class="d_string">"1"</span>;
+<span class="d_keyword">assert</span>(<span class="d_psymbol">tag</span>(<span class="d_param">tu</span>) != getNotFoundTag!MU);
+<span class="d_keyword">assert</span>(<span class="d_psymbol">tag</span>(<span class="d_param">tu</span>) == 1);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!string str }
+<span class="d_keyword">mixin</span> EnumMemberAlieses!E;
+<span class="d_keyword">alias</span> ED = Endata!E;
+ED dat;
+
+<span class="d_keyword">assert</span>(<span class="d_psymbol">tag</span>(dat) == getNotFoundTag!ED);
+dat.x = 1;
+<span class="d_keyword">assert</span>(<span class="d_psymbol">tag</span>(dat) != getNotFoundTag!ED);
+<span class="d_keyword">assert</span>(<span class="d_psymbol">tag</span>(dat) == x);
+dat.str = <span class="d_string">"1"</span>;
+<span class="d_keyword">assert</span>(<span class="d_psymbol">tag</span>(dat) != getNotFoundTag!ED);
+<span class="d_keyword">assert</span>(<span class="d_psymbol">tag</span>(dat) == str);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".initialize"></span><div class="quickindex" id="quickindex.initialize"></div>void <code class="ddoc_psymbol">initialize</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU, Args...)</span>(auto ref MU <span class="ddoc_param">dat</span>, auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isInstanceOf!(ManagedUnion, MU) &amp;&amp; isAvailableTag!(MU, tag))</span>;
+<br>
+void <code class="ddoc_psymbol">initialize</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU, Args...)</span>(auto ref MU <span class="ddoc_param">dat</span>, auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isInstanceOf!(ManagedUnion, MU) &amp;&amp; hasType!(MU, T))</span>;
+<br>
+void <code class="ddoc_psymbol">initialize</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, E, Args...)</span>(auto ref Endata!E <span class="ddoc_param">e</span>, auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isAvailableTag!(Endata!E, tag))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">初期化する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> S { <span class="d_keyword">int</span> x; }
+<span class="d_keyword">alias</span> MU = ManagedUnion!(<span class="d_keyword">int</span>, S);
+MU <span class="d_param">dat</span>;
+<span class="d_psymbol">initialize</span>!0(<span class="d_param">dat</span>, 1);
+<span class="d_keyword">assert</span>(get!0(<span class="d_param">dat</span>) == 1);
+<span class="d_psymbol">initialize</span>!1(<span class="d_param">dat</span>, 100);
+<span class="d_keyword">assert</span>(get!1(<span class="d_param">dat</span>) == S(100));
+<span class="d_comment">// for type
+</span><span class="d_psymbol">initialize</span>!<span class="d_keyword">int</span>(<span class="d_param">dat</span>, 1000);
+<span class="d_keyword">assert</span>(get!0(<span class="d_param">dat</span>) == 1000);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.datetime: Date;
+<span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!Date date }
+<span class="d_keyword">mixin</span> EnumMemberAlieses!E;
+<span class="d_keyword">alias</span> ED = Endata!E;
+ED <span class="d_param">dat</span>;
+
+<span class="d_psymbol">initialize</span>!x(<span class="d_param">dat</span>, 1);
+<span class="d_keyword">assert</span>(get!x(<span class="d_param">dat</span>) == 1);
+<span class="d_psymbol">initialize</span>!date(<span class="d_param">dat</span>, Date(2020, 8, 5));
+<span class="d_keyword">assert</span>(get!date(<span class="d_param">dat</span>) == Date(2020, 8, 5));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".set"></span><div class="quickindex" id="quickindex.set"></div>void <code class="ddoc_psymbol">set</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU, T)</span>(auto ref MU <span class="ddoc_param">dat</span>, auto ref T <span class="ddoc_param">val</span>)<br><span class="ddoc_constraint">if(isInstanceOf!(ManagedUnion, MU) &amp;&amp; isAvailableTag!(MU, tag))</span>;
+<br>
+void <code class="ddoc_psymbol">set</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU)</span>(auto ref MU <span class="ddoc_param">dat</span>, auto ref T <span class="ddoc_param">val</span>)<br><span class="ddoc_constraint">if(isInstanceOf!(ManagedUnion, MU) &amp;&amp; hasType!(MU, T))</span>;
+<br>
+void <code class="ddoc_psymbol">set</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, E, T)</span>(auto ref Endata!E <span class="ddoc_param">e</span>, auto ref T <span class="ddoc_param">val</span>)<br><span class="ddoc_constraint">if(isAvailableTag!(Endata!E, tag))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">データをセットする</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> S { <span class="d_keyword">int</span> x; }
+<span class="d_keyword">alias</span> MU = ManagedUnion!(<span class="d_keyword">int</span>, S);
+MU <span class="d_param">dat</span>;
+<span class="d_psymbol">set</span>!0(<span class="d_param">dat</span>, 1);
+<span class="d_keyword">assert</span>(get!0(<span class="d_param">dat</span>) == 1);
+<span class="d_psymbol">set</span>!1(<span class="d_param">dat</span>, S(100));
+<span class="d_keyword">assert</span>(get!1(<span class="d_param">dat</span>) == S(100));
+<span class="d_comment">// for type
+</span><span class="d_psymbol">set</span>!<span class="d_keyword">int</span>(<span class="d_param">dat</span>, 10);
+<span class="d_keyword">assert</span>(get!0(<span class="d_param">dat</span>) == 10);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!string str }
+<span class="d_keyword">mixin</span> EnumMemberAlieses!E;
+<span class="d_keyword">alias</span> ED = Endata!E;
+ED <span class="d_param">dat</span>;
+
+<span class="d_psymbol">set</span>!x(<span class="d_param">dat</span>, 1);
+<span class="d_keyword">assert</span>(tag(<span class="d_param">dat</span>) == x);
+<span class="d_psymbol">set</span>!str(<span class="d_param">dat</span>, <span class="d_string">"test"</span>);
+<span class="d_keyword">assert</span>(tag(<span class="d_param">dat</span>) == str);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".get"></span><div class="quickindex" id="quickindex.get"></div>ref auto <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU)</span>(auto ref inout MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if((isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)) &amp;&amp; isAvailableTag!(MU, tag))</span>;
+<br>
+ref auto <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU)</span>(auto ref inout MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isInstanceOf!(ManagedUnion, MU) &amp;&amp; hasType!(MU, T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">データを取得する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> core.exception: AssertError;
+<span class="d_keyword">import</span> std.exception;
+<span class="d_keyword">alias</span> MU = ManagedUnion!(<span class="d_keyword">int</span>, string);
+MU tu;
+(() @trusted =&gt; assertThrown!AssertError(<span class="d_psymbol">get</span>!0(tu) == 1) )();
+set!1(tu, <span class="d_string">"test"</span>);
+<span class="d_keyword">assert</span>(<span class="d_psymbol">get</span>!1(tu) == <span class="d_string">"test"</span>);
+<span class="d_comment">// for type
+</span><span class="d_keyword">assert</span>(<span class="d_psymbol">get</span>!string(tu) == <span class="d_string">"test"</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!string str }
+<span class="d_keyword">mixin</span> EnumMemberAlieses!E;
+<span class="d_keyword">alias</span> ED = Endata!E;
+ED <span class="d_param">dat</span>;
+
+set!x(<span class="d_param">dat</span>, 1);
+<span class="d_keyword">assert</span>(.<span class="d_psymbol">get</span>!x(<span class="d_param">dat</span>) == 1);
+set!str(<span class="d_param">dat</span>, <span class="d_string">"test"</span>);
+<span class="d_keyword">assert</span>(.<span class="d_psymbol">get</span>!str(<span class="d_param">dat</span>) == <span class="d_string">"test"</span>);
+<span class="d_keyword">assert</span>(check!str(<span class="d_param">dat</span>));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".check"></span><div class="quickindex" id="quickindex.check"></div>bool <code class="ddoc_psymbol">check</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU)</span>(auto ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if((isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)) &amp;&amp; isAvailableTag!(MU, tag))</span>;
+<br>
+bool <code class="ddoc_psymbol">check</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU)</span>(auto ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isInstanceOf!(ManagedUnion, MU) &amp;&amp; hasType!(MU, T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">データが入っていることを確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = ManagedUnion!(<span class="d_keyword">int</span>, string);
+MU tu;
+<span class="d_keyword">assert</span>(!<span class="d_psymbol">check</span>!0(tu));
+<span class="d_keyword">assert</span>(!<span class="d_psymbol">check</span>!1(tu));
+set!1(tu, <span class="d_string">"test"</span>);
+<span class="d_keyword">assert</span>(!<span class="d_psymbol">check</span>!0(tu));
+<span class="d_keyword">assert</span>(<span class="d_psymbol">check</span>!1(tu));
+<span class="d_comment">// for type
+</span><span class="d_keyword">assert</span>(<span class="d_psymbol">check</span>!string(tu));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!string str }
+<span class="d_keyword">mixin</span> EnumMemberAlieses!E;
+<span class="d_keyword">alias</span> ED = Endata!E;
+ED <span class="d_param">dat</span>;
+
+set!x(<span class="d_param">dat</span>, 1);
+<span class="d_keyword">assert</span>(<span class="d_psymbol">check</span>!x(<span class="d_param">dat</span>));
+set!str(<span class="d_param">dat</span>, <span class="d_string">"test"</span>);
+<span class="d_keyword">assert</span>(<span class="d_psymbol">check</span>!str(<span class="d_param">dat</span>));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".clear"></span><div class="quickindex" id="quickindex.clear"></div>void <code class="ddoc_psymbol">clear</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">データをクリアする</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = ManagedUnion!(<span class="d_keyword">int</span>, string);
+MU tu;
+<span class="d_keyword">assert</span>(!check!0(tu));
+<span class="d_keyword">assert</span>(!check!1(tu));
+set!1(tu, <span class="d_string">"test"</span>);
+<span class="d_keyword">assert</span>(!check!0(tu));
+<span class="d_keyword">assert</span>(check!1(tu));
+<span class="d_psymbol">clear</span>(tu);
+<span class="d_keyword">assert</span>(!check!0(tu));
+<span class="d_keyword">assert</span>(!check!1(tu));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!string str }
+<span class="d_keyword">mixin</span> EnumMemberAlieses!E;
+<span class="d_keyword">alias</span> ED = Endata!E;
+ED <span class="d_param">dat</span>;
+
+set!x(<span class="d_param">dat</span>, 1);
+<span class="d_keyword">assert</span>(check!x(<span class="d_param">dat</span>));
+set!str(<span class="d_param">dat</span>, <span class="d_string">"test"</span>);
+<span class="d_keyword">assert</span>(check!str(<span class="d_param">dat</span>));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".empty"></span><div class="quickindex" id="quickindex.empty"></div>bool <code class="ddoc_psymbol">empty</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">データがクリアされているか確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = ManagedUnion!(<span class="d_keyword">int</span>, string);
+MU tu;
+<span class="d_keyword">assert</span>(<span class="d_psymbol">empty</span>(tu));
+set!1(tu, <span class="d_string">"test"</span>);
+<span class="d_keyword">assert</span>(!<span class="d_psymbol">empty</span>(tu));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!string str }
+<span class="d_keyword">mixin</span> EnumMemberAlieses!E;
+<span class="d_keyword">alias</span> ED = Endata!E;
+ED <span class="d_param">dat</span>;
+
+<span class="d_keyword">assert</span>(<span class="d_psymbol">empty</span>(<span class="d_param">dat</span>));
+set!x(<span class="d_param">dat</span>, 1);
+<span class="d_keyword">assert</span>(!<span class="d_psymbol">empty</span>(<span class="d_param">dat</span>));
+set!str(<span class="d_param">dat</span>, <span class="d_string">"test"</span>);
+<span class="d_keyword">assert</span>(check!str(<span class="d_param">dat</span>));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".data"></span><div class="quickindex" id="quickindex.data"></div>alias <code class="ddoc_psymbol">data</code> = AttrData(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasData"></span><div class="quickindex" id="quickindex.hasData"></div>template <code class="ddoc_psymbol">hasData</code>(alias value)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getDatas"></span><div class="quickindex" id="quickindex.getDatas"></div>template <code class="ddoc_psymbol">getDatas</code>(alias value) if (hasData!value)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Data"></span><div class="quickindex" id="quickindex.Data"></div>union <code class="ddoc_psymbol">Data</code>(alias e) if (hasData!e);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".EnumMemberAlieses"></span><div class="quickindex" id="quickindex.EnumMemberAlieses"></div>template <code class="ddoc_psymbol">EnumMemberAlieses</code>(T) if (is(T == enum))<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".match"></span><div class="quickindex" id="quickindex.match"></div>template <code class="ddoc_psymbol">match</code>(Funcs...)<br></div></dt>
+<dd><div class="ddoc_summary">パターンマッチ</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.exception;
+<span class="d_keyword">import</span> std.conv: ConvException;
+<span class="d_keyword">import</span> voile.misc: nogcEnforce;
+<span class="d_keyword">alias</span> U = ManagedUnion!(<span class="d_keyword">int</span>, <span class="d_keyword">short</span>, <span class="d_keyword">long</span>);
+U dat;
+
+<span class="d_comment">// マッチ関数を呼び出し
+</span>dat.set!0 = 1;
+<span class="d_keyword">assert</span>(dat.<span class="d_psymbol">match</span>!(
+	(<span class="d_keyword">int</span> x)  =&gt; x + 1, <span class="d_comment">/* call */</span>
+	()       =&gt; 50,
+	(<span class="d_keyword">long</span> x) =&gt; x + 100) == 2);
+
+<span class="d_comment">// デフォルトを設定できる(empty || どれにもヒットしない)
+</span>dat.clear();
+<span class="d_keyword">assert</span>(dat.<span class="d_psymbol">match</span>!(
+	(<span class="d_keyword">int</span> x)  =&gt; x + 1,
+	()       =&gt; 50, <span class="d_comment">/* call */</span>
+	(<span class="d_keyword">long</span> x) =&gt; x + 100) == 50);
+<span class="d_comment">// 例外をキャッチできる
+</span>dat = <span class="d_keyword">cast</span>(<span class="d_keyword">long</span>)5;
+<span class="d_keyword">assert</span>(dat.<span class="d_psymbol">match</span>!(
+	(Exception e) =&gt; 100, <span class="d_comment">/* call 2 */</span>
+	other         =&gt; 50,
+	(<span class="d_keyword">long</span> x)      =&gt; nogcEnforce(0)<span class="d_comment">/* call 1 */</span>) == 100);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!string str }
+<span class="d_keyword">mixin</span> EnumMemberAlieses!E;
+
+<span class="d_keyword">alias</span> ED = Endata!E;
+ED dat;
+
+<span class="d_comment">// マッチ関数を呼び出し 引数に Data!tag を指定することでマッチ対象指定
+</span>dat.x = 100;
+<span class="d_keyword">assert</span>(dat.<span class="d_psymbol">match</span>!(
+	(Data!x x) =&gt; x + 11 <span class="d_comment">/* call */</span>,
+	()          =&gt; 10) == 111);
+<span class="d_comment">// マッチ関数を呼び出し 引数に @tag を指定することでマッチ対象指定
+</span>dat.str = <span class="d_string">"test"</span>;
+<span class="d_keyword">assert</span>(dat.<span class="d_psymbol">match</span>!(
+	(@str x) =&gt; (<span class="d_keyword">cast</span>(string)x).length + 11,
+	other    =&gt; 10) == 4 + 11);
+</pre>
+</div>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

@@ -35,6 +35,15 @@
 </div><div class="ddoc_description">$(_123 a, bbb) = xxx
 
 </div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ コピー禁止・ムーブ可
+<pre class="d_code notranslate"><span class="d_keyword">import</span> std.algorithm: move;
+<span class="d_psymbol">Handler</span>!(<span class="d_keyword">void</span> <span class="d_keyword">delegate</span>()) h1;
+<span class="d_psymbol">Handler</span>!(<span class="d_keyword">void</span> <span class="d_keyword">delegate</span>()) h2;
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_keyword">__traits</span>(compiles, h2 = h1));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">__traits</span>(compiles, h2 = h1.move()));
+</pre>
+</div>
 <dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.emit"></span><div class="quickindex" id="quickindex.Handler.emit"></div>RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>);
 <br>
 const RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>);
