@@ -242,7 +242,7 @@ void integrationTest(string[] exDubOpts = null)
 			"project_root": config.scriptDir.absolutePath().buildNormalizedPath(".."),
 			"test_dir": entry.absolutePath().buildNormalizedPath(),
 		];
-		auto getRunOpts()
+		auto getOpts(string defaultname, string optfile, string ignorefile)
 		{
 			struct Opt
 			{
@@ -253,16 +253,16 @@ void integrationTest(string[] exDubOpts = null)
 				string[] args;
 				string[string] env;
 			}
-			if (entry.buildPath(".no_run").exists)
+			if (entry.buildPath(ignorefile).exists)
 				return Opt[].init;
-			if (!entry.buildPath(".run_opts").exists)
+			if (!entry.buildPath(optfile).exists)
 				return [Opt("default", entry, [], entry, [], env)];
 			Opt[] ret;
 			import std.file: read;
-			auto jvRoot = parseJSON(cast(string)read(entry.buildPath(".run_opts")));
+			auto jvRoot = parseJSON(cast(string)read(entry.buildPath(optfile)));
 			foreach (i, jvOpt; jvRoot.array)
 			{
-				auto dat = Opt(text("run", i), entry, [], entry, [], env);
+				auto dat = Opt(text(defaultname, i), entry, [], entry, [], env);
 				if (auto str = jvOpt.getStr("name", expMap))
 					dat.name = str;
 				if (auto str = jvOpt.getStr("dubWorkDir", expMap))
@@ -277,71 +277,11 @@ void integrationTest(string[] exDubOpts = null)
 			}
 			return ret;
 		}
-		auto getBuildOpts()
-		{
-			struct Opt
-			{
-				string name;
-				string workDir;
-				string[] args;
-				string[string] env;
-			}
-			if (entry.buildPath(".no_build").exists)
-				return Opt[].init;
-			if (!entry.buildPath(".build_opts").exists)
-				return [Opt("default", entry, [], env)];
-			Opt[] ret;
-			import std.file: read;
-			auto jvRoot = parseJSON(cast(string)read(entry.buildPath(".build_opts")));
-			foreach (i, jvOpt; jvRoot.array)
-			{
-				auto dat = Opt(text("build", i), entry, [], env);
-				if (auto str = jvOpt.getStr("name", expMap))
-					dat.name = str;
-				if (auto str = jvOpt.getStr("workDir", expMap))
-					dat.workDir = str;
-				dat.args = jvOpt.getAry("args", expMap);
-				foreach (k, v; jvOpt.getObj("env", expMap))
-					dat.env[k] = v;
-				ret ~= dat;
-			}
-			return ret;
-		}
-		auto getTestOpts()
-		{
-			struct Opt
-			{
-				string name;
-				string workDir;
-				string[] args;
-				string[string] env;
-			}
-			if (entry.buildPath(".no_test").exists)
-				return Opt[].init;
-			if (!entry.buildPath(".test_opts").exists)
-				return [Opt("default", entry, [], env)];
-			Opt[] ret;
-			import std.file: read;
-			auto jvRoot = parseJSON(cast(string)read(entry.buildPath(".test_opts")));
-			foreach (i, jvOpt; jvRoot.array)
-			{
-				auto dat = Opt(text("test", i), entry, [], env);
-				if (auto str = jvOpt.getStr("name", expMap))
-					dat.name = str;
-				if (auto str = jvOpt.getStr("workDir", expMap))
-					dat.workDir = str;
-				dat.args = jvOpt.getAry("args", expMap);
-				foreach (k, v; jvOpt.getObj("env", expMap))
-					dat.env[k] = v;
-				ret ~= dat;
-			}
-			return ret;
-		}
 		if (entry.isDir)
 		{
-			auto buildOpts   = getBuildOpts();
-			auto testOpts    = getTestOpts();
-			auto runOpts     = getRunOpts();
+			auto buildOpts   = getOpts("build", ".build_opts", ".no_build");
+			auto testOpts    = getOpts("test", ".test_opts", ".no_test");
+			auto runOpts     = getOpts("run", ".run_opts", ".no_run");
 			auto no_coverage = entry.buildPath(".no_coverage").exists;
 			auto dubCommonArgs = [
 				"-a",         config.targetArch,
@@ -349,24 +289,24 @@ void integrationTest(string[] exDubOpts = null)
 			foreach (buildOpt; buildOpts)
 			{
 				auto dubArgs = (buildOpt.args.length > 0 ? dubCommonArgs ~ buildOpt.args : dubCommonArgs);
-				exec(["dub", "build", "-b=release"] ~ dubArgs, entry, env);
+				exec(["dub", "build", "-b=release", "--root=" ~ buildOpt.dubWorkDir] ~ dubArgs, null, env);
 			}
 			foreach (testOpt; testOpts)
 			{
 				auto dubArgs = (testOpt.args.length > 0 ? dubCommonArgs ~ testOpt.args : dubCommonArgs)
 				             ~ (!no_coverage ? ["--coverage"] : null);
-				exec(["dub", "test"]  ~ dubArgs, entry, env);
+				exec(["dub", "test", "--root=" ~ testOpt.dubWorkDir]  ~ dubArgs, null, env);
 			}
 			foreach (runOpt; runOpts)
 			{
 				auto dubArgs = (runOpt.dubArgs.length > 0 ? dubCommonArgs ~ runOpt.dubArgs : dubCommonArgs)
-				             ~ (!no_coverage ? ["-b=cov"] : ["-b=debug"]);
-				auto desc = cmd(["dub", "describe", "--verror"] ~ dubArgs, runOpt.dubWorkDir, runOpt.env).parseJSON();
+				             ~ (!no_coverage ? ["-b=cov"] : ["-b=debug"]) ~ ["--root=" ~ runOpt.dubWorkDir];
+				auto desc = cmd(["dub", "describe", "--verror"] ~ dubArgs, null, runOpt.env).parseJSON();
 				auto targetExe = buildNormalizedPath(
 					desc["packages"][0]["path"].str,
 					desc["packages"][0]["targetPath"].str,
 					desc["packages"][0]["targetFileName"].str);
-				exec(["dub", "build"] ~ dubArgs, runOpt.dubWorkDir);
+				exec(["dub", "build"] ~ dubArgs);
 				exec([targetExe] ~ runOpt.args, runOpt.workDir, runOpt.env);
 			}
 			return !(buildOpts.length == 0 && testOpts.length == 0 && runOpts.length == 0);

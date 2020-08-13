@@ -44,7 +44,7 @@ jobs:
   #  steps:
   #    - uses: actions/checkout@v2
   #    - name: Install D compiler
-  #      uses: mihails-strasuns/setup-dlang@v1
+  #      uses: dlang-community/setup-dlang@v1
   #      with:
   #        compiler: ${COMPILER}
   #    # UT:テストをする場合は以下を実行
@@ -80,7 +80,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
       - name: Run unit tests
@@ -94,7 +94,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-latest
       - name: Run integration tests
@@ -118,7 +118,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
       - name: Run unit tests
@@ -139,7 +139,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-latest
       - name: Run unit tests
@@ -161,7 +161,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-master
           gh_token: ${{ secrets.GITHUB_TOKEN }}
@@ -184,7 +184,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-latest
       - name: Install gcc-multilib
@@ -212,7 +212,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
       - name: Run unit tests
@@ -235,7 +235,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-latest
       - name: Run unit tests
@@ -256,7 +256,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           #compiler: dmd-master ... change to beta tempolarily
           compiler: dmd-beta
@@ -295,7 +295,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
       - name: Run unit tests
@@ -317,7 +317,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-latest
       - name: Run unit tests
@@ -346,26 +346,20 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: coverage-windows
-          path: .
-      - run: basename -a ./*.lst
+          path: coverage-windows
       - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
-      - run: rm *.lst
+        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }} -s coverage-windows
       - name: Download coverage result
         uses: actions/download-artifact@v2
         with:
           name: coverage-linux
-          path: .
-      - run: basename -a ./*.lst
+          path: coverage-linux
       - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
-      - run: rm *.lst
+        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }} -s coverage-linux
       - name: Download coverage result
         uses: actions/download-artifact@v2
         with:
           name: coverage-osx
-          path: .
-      - run: basename -a ./*.lst
+          path: coverage-osx
       - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
-      - run: rm *.lst
+        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }} -s coverage-osx

@@ -1,4 +1,6 @@
 ﻿/+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Voile The Magic Library
+
 Voile The Magic Library は、なくても特に困らない…$(BR)
 というか、使おうと思わない限り使わなそうな小物を集めたもの。$(BR)
 まぁ、ある意味無駄ってやつよ。$(BR)
@@ -9,16 +11,16 @@ See_Also:
 $(UL
 	$(LI $(LINK2 _index.html, voile)
 	$(UL
-		$(LI $(LINK2 _voile.benchmark.html, benchmark))
-		$(LI $(LINK2 _voile.dataformatter.html, dataformatter))
-		$(LI $(LINK2 _voile.handler.html, handler))
-		$(LI $(LINK2 _voile.json.html, json))
-		$(LI $(LINK2 _voile.judge.html, judge))
-		$(LI $(LINK2 _voile.misc.html, misc))
-		$(LI $(LINK2 _voile.stm.html, stm))
-		$(LI $(LINK2 _voile.sync.html, sync))
-		$(LI $(LINK2 _voile.unique.html, unique))
-		$(LI $(LINK2 _voile.fs.html, fs))
+		$(LI $(LINK2 _voile--_voile.benchmark.html, benchmark))
+		$(LI $(LINK2 _voile--_voile.dataformatter.html, dataformatter))
+		$(LI $(LINK2 _voile--_voile.handler.html, handler))
+		$(LI $(LINK2 _voile--_voile.json.html, json))
+		$(LI $(LINK2 _voile--_voile.judge.html, judge))
+		$(LI $(LINK2 _voile--_voile.misc.html, misc))
+		$(LI $(LINK2 _voile--_voile.stm.html, stm))
+		$(LI $(LINK2 _voile--_voile.sync.html, sync))
+		$(LI $(LINK2 _voile--_voile.unique.html, unique))
+		$(LI $(LINK2 _voile--_voile.fs.html, fs))
 	))
 )
 Authors: P.Knowledge, SHOO
@@ -36,6 +38,7 @@ public import voile.json;
 public import voile.judge;
 public import voile.log;
 public import voile.misc;
+public import voile.munion;
 public import voile.parseopt;
 public import voile.sync;
 public import voile.unique;

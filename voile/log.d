@@ -1076,13 +1076,13 @@ public:
 		foreach (f; _filters)
 		{
 			bool filtered = true;
-			filtered = filtered && (f._file           is Regex!char.init || payload.file.matchFirst(f._file));
-			filtered = filtered && (f._moduleName     is Regex!char.init || payload.moduleName.matchFirst(f._moduleName));
-			filtered = filtered && (f._funcName       is Regex!char.init || payload.funcName.matchFirst(f._funcName));
-			filtered = filtered && (f._prettyFuncName is Regex!char.init || payload.prettyFuncName.matchFirst(f._prettyFuncName));
-			filtered = filtered && (f._msg            is Regex!char.init || payload.msg.matchFirst(f._msg));
-			filtered = filtered && (f._logLevel <= payload.logLevel);
-			filtered = filtered && ((f._lineMax >= payload.line) && (f._lineMin <= payload.line));
+			filtered &= (f._file           is Regex!char.init || payload.file.matchFirst(f._file));
+			filtered &= (f._moduleName     is Regex!char.init || payload.moduleName.matchFirst(f._moduleName));
+			filtered &= (f._funcName       is Regex!char.init || payload.funcName.matchFirst(f._funcName));
+			filtered &= (f._prettyFuncName is Regex!char.init || payload.prettyFuncName.matchFirst(f._prettyFuncName));
+			filtered &= (f._msg            is Regex!char.init || payload.msg.matchFirst(f._msg));
+			filtered &= (f._logLevel <= payload.logLevel);
+			filtered &= ((f._lineMax >= payload.line) && (f._lineMin <= payload.line));
 			// フィルタにかからない場合は次
 			if (!filtered)
 				continue;

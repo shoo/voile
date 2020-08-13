@@ -49,7 +49,7 @@ jobs:
   #      with:
   #        ref: master
   #    - name: Install D compiler
-  #      uses: mihails-strasuns/setup-dlang@v1
+  #      uses: dlang-community/setup-dlang@v1
   #      with:
   #        compiler: ${COMPILER}
   #    # UT:テストをする場合は以下を実行
@@ -87,7 +87,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
       - name: Run unit tests
@@ -103,7 +103,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-latest
       - name: Run integration tests
@@ -129,7 +129,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
       - name: Run unit tests
@@ -152,7 +152,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-latest
       - name: Run unit tests
@@ -176,7 +176,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-master
           gh_token: ${{ secrets.GITHUB_TOKEN }}
@@ -201,7 +201,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-latest
       - name: Install gcc-multilib
@@ -231,7 +231,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
       - name: Run unit tests
@@ -256,7 +256,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-latest
       - name: Run unit tests
@@ -279,7 +279,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           #compiler: dmd-master ... change to beta tempolarily
           compiler: dmd-beta
@@ -320,7 +320,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: dmd-latest
       - name: Run unit tests
@@ -344,7 +344,7 @@ jobs:
         with:
           ref: master
       - name: Install D compiler
-        uses: mihails-strasuns/setup-dlang@v1
+        uses: dlang-community/setup-dlang@v1
         with:
           compiler: ldc-latest
       - name: Run unit tests

@@ -3,7 +3,7 @@
  * 
  * Fine-tune the output destination of coverage, etc.
  */
-module ut;
+module ci.ut;
 
 debug shared static this()
 {
@@ -164,9 +164,10 @@ version (D_Coverage)
 		auto covopt = getCovOpt();
 		if (covopt.dir.length > 0)
 		{
-			enum rootDir = __FILE_FULL_PATH__.dirName.dirName.buildNormalizedPath();
+			enum rootDir = __FILE_FULL_PATH__.absolutePath.dirName.dirName.buildNormalizedPath();
 			if (!covopt.dir.exists) mkdirRecurse(covopt.dir);
 			dmd_coverSetMerge(covopt.merge);
+			dmd_coverSourcePath(rootDir);
 			dmd_coverDestPath(covopt.dir);
 		}
 	}
