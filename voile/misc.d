@@ -177,8 +177,8 @@ auto ref assumeShared(T)(ref T x) @property
  * 
  */
 template nogcEnforce(E : Throwable = Exception)
-if (is(typeof(new E(string.init, __FILE__, __LINE__)) : Throwable)
- || is(typeof(new E(__FILE__, __LINE__)) : Throwable))
+if (is(typeof(new E(string.init, string.init, size_t.init)) : Throwable)
+ || is(typeof(new E(string.init, size_t.init)) : Throwable))
 {
 	T nogcEnforce(T)(T value, string msg = null, string file = __FILE__, size_t line = __LINE__) @safe @nogc
 	if (is(typeof({ if (!value) {} })))
