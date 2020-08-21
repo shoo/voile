@@ -16641,13 +16641,69 @@
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 101,
+    "endline" : 104,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 101,
+    "line" : 104,
+    "char" : 9,
+    "name" : "uniqueMemberName",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "name",
+      "kind" : "value",
+      "deco" : "Aya",
+      "defaultValue" : "\"_uniqueMemberName\""
+     },
+     {
+      "name" : "num",
+      "kind" : "value",
+      "deco" : "k",
+      "defaultValue" : "0"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "std.conv",
+      "kind" : "import",
+      "line" : 106,
+      "char" : 9,
+      "protection" : "private"
+     },
+     {
+      "name" : "candidate",
+      "kind" : "variable",
+      "line" : 107,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "type" : "string",
+      "init" : "num == 0 ? name : text(name, num)"
+     },
+     {
+      "name" : "uniqueMemberName",
+      "kind" : "variable",
+      "line" : 110,
+      "char" : 15,
+      "storageClass" : [
+       "enum"
+      ],
+      "type" : "string",
+      "init" : "uniqueMemberName!(T, name, num + 1)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 118,
     "char" : 15,
     "name" : "ManagedUnionImpl",
     "parameters" : [
@@ -16660,11 +16716,10 @@
       "kind" : "tuple"
      }
     ],
-    "constraint" : "is(Instance == union) && (Fields!Instance.length == tags.length || tags.length == 0)",
     "members" : [
      {
       "kind" : "template",
-      "line" : 104,
+      "line" : 120,
       "char" : 10,
       "name" : "GetIndexType",
       "parameters" : [
@@ -16678,7 +16733,7 @@
        {
         "name" : "GetIndexType",
         "kind" : "alias",
-        "line" : 108,
+        "line" : 124,
         "char" : 4,
         "deco" : "h"
        }
@@ -16687,21 +16742,21 @@
      {
       "name" : "IndexType",
       "kind" : "alias",
-      "line" : 124,
+      "line" : 140,
       "char" : 2,
       "type" : "GetIndexType!(FieldNameTuple!Instance.length)"
      },
      {
       "name" : "TagType",
       "kind" : "alias",
-      "line" : 127,
+      "line" : 143,
       "char" : 3,
       "type" : "IndexType"
      },
      {
       "name" : "memberCount",
       "kind" : "variable",
-      "line" : 131,
+      "line" : 147,
       "char" : 17,
       "storageClass" : [
        "enum"
@@ -16712,14 +16767,14 @@
      {
       "name" : "MemberTypes",
       "kind" : "alias",
-      "line" : 132,
+      "line" : 148,
       "char" : 2,
       "type" : "Fields!Instance"
      },
      {
       "name" : "hasDestructor",
       "kind" : "variable",
-      "line" : 134,
+      "line" : 150,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -16730,7 +16785,7 @@
      {
       "name" : "hasNestedData",
       "kind" : "variable",
-      "line" : 135,
+      "line" : 151,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -16740,7 +16795,7 @@
      },
      {
       "kind" : "template",
-      "line" : 138,
+      "line" : 154,
       "char" : 16,
       "name" : "getTag",
       "parameters" : [
@@ -16754,7 +16809,7 @@
        {
         "name" : "getTag",
         "kind" : "variable",
-        "line" : 138,
+        "line" : 154,
         "char" : 16,
         "storageClass" : [
          "enum"
@@ -16766,7 +16821,7 @@
      },
      {
       "kind" : "template",
-      "line" : 139,
+      "line" : 155,
       "char" : 18,
       "name" : "getIndex",
       "parameters" : [
@@ -16780,7 +16835,7 @@
        {
         "name" : "getIndex",
         "kind" : "variable",
-        "line" : 139,
+        "line" : 155,
         "char" : 18,
         "storageClass" : [
          "enum"
@@ -16793,7 +16848,7 @@
      {
       "name" : "std.range",
       "kind" : "import",
-      "line" : 140,
+      "line" : 156,
       "char" : 10,
       "protection" : "private",
       "selective" : [
@@ -16803,14 +16858,14 @@
      {
       "name" : "allTags",
       "kind" : "alias",
-      "line" : 141,
+      "line" : 157,
       "char" : 3,
       "type" : "aliasSeqOf!(iota(0, MemberTypes.length))"
      },
      {
       "name" : "notfoundTag",
       "kind" : "variable",
-      "line" : 150,
+      "line" : 166,
       "char" : 15,
       "storageClass" : [
        "enum"
@@ -16821,22 +16876,22 @@
      {
       "name" : "_tag",
       "kind" : "variable",
-      "line" : 152,
-      "char" : 11,
+      "line" : 170,
+      "char" : 12,
       "type" : "TagType",
       "init" : "notfoundTag"
      },
      {
       "name" : "_inst",
       "kind" : "variable",
-      "line" : 153,
-      "char" : 11,
+      "line" : 171,
+      "char" : 12,
       "type" : "Instance"
      },
      {
       "kind" : "template",
       "comment" : "\n",
-      "line" : 158,
+      "line" : 177,
       "char" : 10,
       "name" : "this",
       "parameters" : [],
@@ -16844,7 +16899,7 @@
        {
         "name" : "this",
         "kind" : "constructor",
-        "line" : 158,
+        "line" : 177,
         "char" : 10,
         "type" : "(auto ref Instance inst)",
         "parameters" : [
@@ -16857,7 +16912,7 @@
           ]
          }
         ],
-        "endline" : 161,
+        "endline" : 180,
         "endchar" : 2
        }
       ]
@@ -16865,7 +16920,7 @@
      {
       "kind" : "template",
       "comment" : "\n",
-      "line" : 166,
+      "line" : 185,
       "char" : 10,
       "name" : "this",
       "parameters" : [],
@@ -16873,7 +16928,7 @@
        {
         "name" : "this",
         "kind" : "constructor",
-        "line" : 166,
+        "line" : 185,
         "char" : 10,
         "type" : "(auto ref Instance inst, TagType t)",
         "parameters" : [
@@ -16890,33 +16945,25 @@
           "type" : "TagType"
          }
         ],
-        "endline" : 170,
+        "endline" : 189,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "~this",
-      "kind" : "destructor",
-      "line" : 175,
-      "char" : 10,
-      "endline" : 189,
-      "endchar" : 3
-     },
-     {
       "name" : "tag",
       "kind" : "function",
       "comment" : " タグ\n",
-      "line" : 195,
+      "line" : 194,
       "char" : 10,
       "type" : "const pure nothrow @nogc @property @safe TagType()",
-      "endline" : 198,
+      "endline" : 197,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "comment" : " 初期化する\n",
-      "line" : 203,
+      "line" : 202,
       "char" : 7,
       "name" : "initialize",
       "parameters" : [
@@ -16935,7 +16982,7 @@
        {
         "name" : "initialize",
         "kind" : "function",
-        "line" : 203,
+        "line" : 202,
         "char" : 7,
         "type" : "void(auto ref Args args)",
         "parameters" : [
@@ -16948,7 +16995,7 @@
           ]
          }
         ],
-        "endline" : 210,
+        "endline" : 209,
         "endchar" : 2
        }
       ]
@@ -16956,7 +17003,7 @@
      {
       "kind" : "template",
       "comment" : " データをセットする\n",
-      "line" : 215,
+      "line" : 214,
       "char" : 7,
       "name" : "set",
       "parameters" : [
@@ -16971,7 +17018,7 @@
        {
         "name" : "set",
         "kind" : "function",
-        "line" : 215,
+        "line" : 214,
         "char" : 7,
         "type" : "@property void(auto ref MemberTypes[getIndex!t] val)",
         "parameters" : [
@@ -16984,7 +17031,7 @@
           ]
          }
         ],
-        "endline" : 225,
+        "endline" : 224,
         "endchar" : 2
        }
       ]
@@ -16992,7 +17039,7 @@
      {
       "kind" : "template",
       "comment" : " データを取得する\n",
-      "line" : 230,
+      "line" : 229,
       "char" : 11,
       "name" : "get",
       "parameters" : [
@@ -17007,13 +17054,13 @@
        {
         "name" : "get",
         "kind" : "function",
-        "line" : 230,
+        "line" : 229,
         "char" : 11,
         "storageClass" : [
          "auto"
         ],
         "type" : "inout pure nothrow @nogc @property ref ()",
-        "endline" : 235,
+        "endline" : 234,
         "endchar" : 2
        }
       ]
@@ -17021,7 +17068,7 @@
      {
       "kind" : "template",
       "comment" : " データがセットされているかチェックする\n",
-      "line" : 240,
+      "line" : 239,
       "char" : 7,
       "name" : "check",
       "parameters" : [
@@ -17036,10 +17083,10 @@
        {
         "name" : "check",
         "kind" : "function",
-        "line" : 240,
+        "line" : 239,
         "char" : 7,
         "type" : "const pure nothrow @nogc @safe bool()",
-        "endline" : 244,
+        "endline" : 243,
         "endchar" : 2
        }
       ]
@@ -17048,16 +17095,16 @@
       "name" : "empty",
       "kind" : "function",
       "comment" : " 何もデータが入っていないか確認する\n",
-      "line" : 249,
+      "line" : 248,
       "char" : 7,
       "type" : "const pure nothrow @nogc @property @safe bool()",
-      "endline" : 252,
+      "endline" : 251,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "comment" : " データをクリアする\n",
-      "line" : 257,
+      "line" : 256,
       "char" : 7,
       "name" : "clear",
       "parameters" : [],
@@ -17065,10 +17112,10 @@
        {
         "name" : "clear",
         "kind" : "function",
-        "line" : 257,
+        "line" : 256,
         "char" : 7,
         "type" : "void()",
-        "endline" : 261,
+        "endline" : 275,
         "endchar" : 2
        }
       ]
@@ -17077,65 +17124,76 @@
    },
    {
     "kind" : "template",
-    "comment" : " タグ付き共用体\n",
-    "line" : 267,
-    "char" : 1,
-    "name" : "ManagedUnion",
+    "protection" : "private",
+    "comment" : " 型列挙\n",
+    "line" : 281,
+    "char" : 9,
+    "name" : "TypeEnumImpl",
     "parameters" : [
      {
       "name" : "Types",
       "kind" : "tuple"
      }
     ],
-    "constraint" : "Types.length > 0 && (NoDuplicates!Types.length == Types.length)",
     "members" : [
      {
-      "name" : "ManagedUnion",
-      "kind" : "struct",
-      "line" : 267,
-      "char" : 1,
+      "name" : "TypeEnumImpl",
+      "kind" : "union",
+      "line" : 281,
+      "char" : 9,
       "members" : [
-       {
-        "name" : "isManagedUnion",
-        "kind" : "variable",
-        "line" : 272,
-        "char" : 12,
-        "storageClass" : [
-         "enum"
-        ],
-        "deco" : "b",
-        "init" : "Types.length == 1 && is(Types[0] == union)"
-       },
        {
         "name" : "FieldTypes",
         "kind" : "alias",
-        "line" : 276,
-        "char" : 3,
-        "type" : "Fields!(Types[0])"
+        "line" : 283,
+        "char" : 2,
+        "type" : "Types"
        },
        {
         "name" : "Instance",
-        "kind" : "alias",
-        "line" : 286,
-        "char" : 3,
-        "type" : "Types[0]"
+        "kind" : "union",
+        "line" : 285,
+        "char" : 2,
+        "members" : [
+         {
+          "kind" : "template",
+          "line" : 287,
+          "char" : 9,
+          "name" : "DefineMember",
+          "parameters" : [
+           {
+            "name" : "T",
+            "kind" : "type"
+           }
+          ],
+          "members" : [
+           {
+            "name" : "_value",
+            "kind" : "variable",
+            "line" : 289,
+            "char" : 6,
+            "type" : "T"
+           }
+          ]
+         }
+        ]
        },
        {
         "name" : "ManagedUnionImpl!Instance",
         "kind" : "mixin",
-        "line" : 300,
+        "line" : 294,
         "char" : 2
        },
        {
         "kind" : "template",
-        "line" : 302,
+        "line" : 296,
         "char" : 2,
         "name" : "WithType",
         "parameters" : [],
         "members" : [
          {
           "kind" : "template",
-          "line" : 304,
+          "line" : 298,
           "char" : 3,
           "name" : "TargetTypeInfo",
           "parameters" : [
@@ -17148,7 +17206,7 @@
            {
             "name" : "typeIndex",
             "kind" : "variable",
-            "line" : 306,
+            "line" : 300,
             "char" : 19,
             "storageClass" : [
              "enum"
@@ -17159,7 +17217,7 @@
            {
             "name" : "hasType",
             "kind" : "variable",
-            "line" : 307,
+            "line" : 301,
             "char" : 14,
             "storageClass" : [
              "enum"
@@ -17170,7 +17228,7 @@
            {
             "name" : "isAssignable",
             "kind" : "variable",
-            "line" : 310,
+            "line" : 304,
             "char" : 20,
             "storageClass" : [
              "enum"
@@ -17181,7 +17239,7 @@
            {
             "name" : "assignableIndex",
             "kind" : "variable",
-            "line" : 311,
+            "line" : 305,
             "char" : 20,
             "storageClass" : [
              "enum"
@@ -17194,7 +17252,7 @@
          {
           "kind" : "template",
           "comment" : "\n",
-          "line" : 322,
+          "line" : 316,
           "char" : 3,
           "name" : "hasType",
           "parameters" : [
@@ -17207,7 +17265,7 @@
            {
             "name" : "hasType",
             "kind" : "alias",
-            "line" : 322,
+            "line" : 316,
             "char" : 3,
             "type" : "TargetTypeInfo!T.hasType"
            }
@@ -17216,7 +17274,7 @@
          {
           "kind" : "template",
           "comment" : "\n",
-          "line" : 324,
+          "line" : 318,
           "char" : 3,
           "name" : "getTypeIndex",
           "parameters" : [
@@ -17229,7 +17287,7 @@
            {
             "name" : "getTypeIndex",
             "kind" : "alias",
-            "line" : 324,
+            "line" : 318,
             "char" : 3,
             "type" : "TargetTypeInfo!T.typeIndex"
            }
@@ -17238,7 +17296,7 @@
          {
           "kind" : "template",
           "comment" : "\n",
-          "line" : 326,
+          "line" : 320,
           "char" : 3,
           "name" : "isAssignable",
           "parameters" : [
@@ -17251,7 +17309,7 @@
            {
             "name" : "isAssignable",
             "kind" : "alias",
-            "line" : 326,
+            "line" : 320,
             "char" : 3,
             "type" : "TargetTypeInfo!T.isAssignable"
            }
@@ -17260,7 +17318,7 @@
          {
           "kind" : "template",
           "comment" : "\n",
-          "line" : 328,
+          "line" : 322,
           "char" : 3,
           "name" : "getAssignableIndex",
           "parameters" : [
@@ -17273,7 +17331,7 @@
            {
             "name" : "getAssignableIndex",
             "kind" : "alias",
-            "line" : 328,
+            "line" : 322,
             "char" : 3,
             "type" : "TargetTypeInfo!T.assignableIndex"
            }
@@ -17282,7 +17340,7 @@
          {
           "kind" : "template",
           "comment" : " 初期化する\n",
-          "line" : 334,
+          "line" : 328,
           "char" : 8,
           "name" : "initialize",
           "parameters" : [
@@ -17295,12 +17353,12 @@
             "kind" : "tuple"
            }
           ],
-          "constraint" : "hasType!T && !isManagedUnion",
+          "constraint" : "hasType!T",
           "members" : [
            {
             "name" : "initialize",
             "kind" : "function",
-            "line" : 334,
+            "line" : 328,
             "char" : 8,
             "type" : "void(auto ref Args args)",
             "parameters" : [
@@ -17313,7 +17371,7 @@
               ]
              }
             ],
-            "endline" : 342,
+            "endline" : 336,
             "endchar" : 3
            }
           ]
@@ -17321,7 +17379,7 @@
          {
           "kind" : "template",
           "comment" : " データをセットする\n",
-          "line" : 347,
+          "line" : 341,
           "char" : 8,
           "name" : "set",
           "parameters" : [
@@ -17330,12 +17388,12 @@
             "kind" : "type"
            }
           ],
-          "constraint" : "isAssignable!T && !isManagedUnion",
+          "constraint" : "isAssignable!T",
           "members" : [
            {
             "name" : "set",
             "kind" : "function",
-            "line" : 347,
+            "line" : 341,
             "char" : 8,
             "type" : "@property void(auto ref T val)",
             "parameters" : [
@@ -17348,7 +17406,7 @@
               ]
              }
             ],
-            "endline" : 358,
+            "endline" : 352,
             "endchar" : 3
            }
           ]
@@ -17356,7 +17414,7 @@
          {
           "kind" : "template",
           "comment" : " データを取得する\n",
-          "line" : 363,
+          "line" : 357,
           "char" : 12,
           "name" : "get",
           "parameters" : [
@@ -17365,18 +17423,18 @@
             "kind" : "type"
            }
           ],
-          "constraint" : "hasType!T && !isManagedUnion",
+          "constraint" : "hasType!T",
           "members" : [
            {
             "name" : "get",
             "kind" : "function",
-            "line" : 363,
+            "line" : 357,
             "char" : 12,
             "storageClass" : [
              "auto"
             ],
             "type" : "inout pure nothrow @nogc @property ref ()",
-            "endline" : 369,
+            "endline" : 363,
             "endchar" : 3
            }
           ]
@@ -17384,7 +17442,7 @@
          {
           "kind" : "template",
           "comment" : " データがセットされているかチェックする\n",
-          "line" : 374,
+          "line" : 368,
           "char" : 8,
           "name" : "check",
           "parameters" : [
@@ -17393,15 +17451,15 @@
             "kind" : "type"
            }
           ],
-          "constraint" : "hasType!T && !isManagedUnion",
+          "constraint" : "hasType!T",
           "members" : [
            {
             "name" : "check",
             "kind" : "function",
-            "line" : 374,
+            "line" : 368,
             "char" : 8,
             "type" : "const pure nothrow @nogc @safe bool()",
-            "endline" : 378,
+            "endline" : 372,
             "endchar" : 3
            }
           ]
@@ -17411,13 +17469,44 @@
        {
         "name" : "WithType!()",
         "kind" : "mixin",
-        "line" : 380,
+        "line" : 374,
         "char" : 2
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " 型列挙\n",
+    "line" : 381,
+    "char" : 1,
+    "name" : "TypeEnum",
+    "parameters" : [
+     {
+      "name" : "Types",
+      "kind" : "tuple"
+     }
+    ],
+    "constraint" : "Types.length > 0 && (NoDuplicates!Types.length == Types.length)",
+    "members" : [
+     {
+      "name" : "TypeEnum",
+      "kind" : "struct",
+      "line" : 381,
+      "char" : 1,
+      "members" : [
+       {
+        "name" : "_inst",
+        "kind" : "variable",
+        "line" : 384,
+        "char" : 29,
+        "type" : "TypeEnumImpl!Types"
        },
        {
         "kind" : "template",
         "comment" : " コンストラクタ\n",
-        "line" : 386,
+        "line" : 388,
         "char" : 2,
         "name" : "this",
         "parameters" : [
@@ -17426,12 +17515,12 @@
           "kind" : "type"
          }
         ],
-        "constraint" : "isAssignable!T",
+        "constraint" : "_inst.isAssignable!T",
         "members" : [
          {
           "name" : "this",
           "kind" : "constructor",
-          "line" : 386,
+          "line" : 388,
           "char" : 2,
           "type" : "(auto ref T val)",
           "parameters" : [
@@ -17444,15 +17533,23 @@
             ]
            }
           ],
-          "endline" : 395,
+          "endline" : 397,
           "endchar" : 2
          }
         ]
        },
        {
+        "name" : "~this",
+        "kind" : "destructor",
+        "line" : 403,
+        "char" : 10,
+        "endline" : 406,
+        "endchar" : 3
+       },
+       {
         "kind" : "template",
         "comment" : " 代入\n",
-        "line" : 400,
+        "line" : 412,
         "char" : 7,
         "name" : "opAssign",
         "parameters" : [
@@ -17461,12 +17558,12 @@
           "kind" : "type"
          }
         ],
-        "constraint" : "isAssignable!T && !isManagedUnion",
+        "constraint" : "_inst.isAssignable!T",
         "members" : [
          {
           "name" : "opAssign",
           "kind" : "function",
-          "line" : 400,
+          "line" : 412,
           "char" : 7,
           "type" : "void(auto ref T val)",
           "parameters" : [
@@ -17479,7 +17576,7 @@
             ]
            }
           ],
-          "endline" : 409,
+          "endline" : 421,
           "endchar" : 2
          }
         ]
@@ -17487,7 +17584,7 @@
        {
         "kind" : "template",
         "comment" : " キャスト\n",
-        "line" : 414,
+        "line" : 426,
         "char" : 11,
         "name" : "opCast",
         "parameters" : [
@@ -17496,23 +17593,209 @@
           "kind" : "type"
          }
         ],
-        "constraint" : "isAssignable!T && !isManagedUnion",
+        "constraint" : "_inst.isAssignable!T",
         "members" : [
          {
           "name" : "opCast",
           "kind" : "function",
-          "line" : 414,
+          "line" : 426,
           "char" : 11,
           "type" : "inout inout(T)()",
-          "endline" : 418,
+          "endline" : 430,
           "endchar" : 2
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L434_C26",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 434,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 474,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L474_C26",
+    "kind" : "function",
+    "line" : 474,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 498,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "comment" : " タグ付き共用体\n",
+    "line" : 498,
+    "char" : 9,
+    "name" : "TaggedImpl",
+    "parameters" : [
+     {
+      "name" : "U",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "TaggedImpl",
+      "kind" : "union",
+      "line" : 498,
+      "char" : 9,
+      "members" : [
+       {
+        "name" : "FieldTypes",
+        "kind" : "alias",
+        "line" : 500,
+        "char" : 2,
+        "type" : "Fields!U"
+       },
+       {
+        "name" : "Instance",
+        "kind" : "alias",
+        "line" : 501,
+        "char" : 2,
+        "type" : "U"
+       },
+       {
+        "name" : "ManagedUnionImpl!Instance",
+        "kind" : "mixin",
+        "line" : 502,
+        "char" : 2
+       },
+       {
+        "name" : "memberNames",
+        "kind" : "alias",
+        "line" : 503,
+        "char" : 2,
+        "type" : "FieldNameTuple!Instance"
+       },
+       {
+        "kind" : "template",
+        "line" : 504,
+        "char" : 23,
+        "name" : "getIndex",
+        "parameters" : [
+         {
+          "name" : "member",
+          "kind" : "value",
+          "type" : "string"
+         }
+        ],
+        "members" : [
+         {
+          "name" : "getIndex",
+          "kind" : "variable",
+          "line" : 504,
+          "char" : 23,
+          "storageClass" : [
+           "enum"
+          ],
+          "type" : "_impl.IndexType",
+          "init" : "cast(_impl.IndexType)staticIndexOf!(member, memberNames)"
          }
         ]
        },
        {
         "kind" : "template",
-        "comment" : " 名前アクセス\n\n ManagedUnionの引数に共用体を与えた場合は名前でのアクセスを許可する。\n See_Also: $(D $(LINK2 _voile--_voile.munion.html#.Managed, Managed))\n",
-        "line" : 426,
+        "line" : 505,
+        "char" : 23,
+        "name" : "getTag",
+        "parameters" : [
+         {
+          "name" : "member",
+          "kind" : "value",
+          "type" : "string"
+         }
+        ],
+        "members" : [
+         {
+          "name" : "getTag",
+          "kind" : "variable",
+          "line" : 505,
+          "char" : 23,
+          "storageClass" : [
+           "enum"
+          ],
+          "type" : "_impl.TagType",
+          "init" : "_impl.getTag!(getIndex!member)"
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "line" : 506,
+        "char" : 2,
+        "name" : "MemberType",
+        "parameters" : [
+         {
+          "name" : "member",
+          "kind" : "value",
+          "type" : "string"
+         }
+        ],
+        "members" : [
+         {
+          "name" : "MemberType",
+          "kind" : "alias",
+          "line" : 506,
+          "char" : 2,
+          "type" : "_impl.MemberTypes[getIndex!member]"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " タグ付き共用体\n",
+    "line" : 513,
+    "char" : 1,
+    "name" : "Tagged",
+    "parameters" : [
+     {
+      "name" : "U",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "is(U == union)",
+    "members" : [
+     {
+      "name" : "Tagged",
+      "kind" : "struct",
+      "line" : 513,
+      "char" : 1,
+      "members" : [
+       {
+        "name" : "~this",
+        "kind" : "destructor",
+        "line" : 521,
+        "char" : 10,
+        "endline" : 535,
+        "endchar" : 3
+       },
+       {
+        "kind" : "template",
+        "comment" : " 名前アクセス\n\n Taggedの引数に共用体を与えた場合は名前でのアクセスを許可する。\n See_Also: $(D $(LINK2 _voile--_voile.munion.html#.Managed, Managed))\n",
+        "line" : 544,
         "char" : 11,
         "name" : "opDispatch",
         "parameters" : [
@@ -17522,18 +17805,18 @@
           "type" : "string"
          }
         ],
-        "constraint" : "isManagedUnion && hasMember!(Instance, member)",
+        "constraint" : "hasMember!(TaggedImpl!U.Instance, member)",
         "members" : [
          {
           "name" : "opDispatch",
           "kind" : "function",
-          "line" : 426,
+          "line" : 544,
           "char" : 11,
           "storageClass" : [
            "auto"
           ],
           "type" : "ref ()",
-          "endline" : 430,
+          "endline" : 548,
           "endchar" : 2
          }
         ]
@@ -17541,7 +17824,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 432,
+        "line" : 550,
         "char" : 7,
         "name" : "opDispatch",
         "parameters" : [
@@ -17551,25 +17834,25 @@
           "type" : "string"
          }
         ],
-        "constraint" : "isManagedUnion && hasMember!(Instance, member)",
+        "constraint" : "hasMember!(TaggedImpl!U.Instance, member)",
         "members" : [
          {
           "name" : "opDispatch",
           "kind" : "function",
-          "line" : 432,
+          "line" : 550,
           "char" : 7,
-          "type" : "void(auto ref MemberTypes[staticIndexOf!(member, FieldNameTuple!Instance)] val)",
+          "type" : "void(auto ref TaggedImpl!U.MemberType!member val)",
           "parameters" : [
            {
             "name" : "val",
-            "type" : "MemberTypes[staticIndexOf!(member, FieldNameTuple!Instance)]",
+            "type" : "TaggedImpl!U.MemberType!member",
             "storageClass" : [
              "auto",
              "ref"
             ]
            }
           ],
-          "endline" : 436,
+          "endline" : 554,
           "endchar" : 2
          }
         ]
@@ -17579,75 +17862,23 @@
     ]
    },
    {
-    "name" : "__unittest_L440_C26",
+    "name" : "__unittest_L558_C7",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 440,
-    "char" : 26,
-    "storageClass" : [
-     "nothrow",
-     "pure",
-     "@nogc",
-     "@safe"
-    ],
-    "endline" : 478,
-    "endchar" : 1
-   },
-   {
-    "name" : "__unittest_L478_C26",
-    "kind" : "function",
-    "line" : 478,
-    "char" : 26,
-    "storageClass" : [
-     "nothrow",
-     "pure",
-     "@nogc",
-     "@safe"
-    ],
-    "endline" : 503,
-    "endchar" : 1
-   },
-   {
-    "kind" : "template",
-    "comment" : " 共用体に管理機能を付与する\n",
-    "line" : 503,
-    "char" : 1,
-    "name" : "Managed",
-    "parameters" : [
-     {
-      "name" : "T",
-      "kind" : "type"
-     }
-    ],
-    "constraint" : "is(T == union)",
-    "members" : [
-     {
-      "name" : "Managed",
-      "kind" : "alias",
-      "line" : 506,
-      "char" : 2,
-      "type" : "ManagedUnion!T"
-     }
-    ]
-   },
-   {
-    "name" : "__unittest_L511_C7",
-    "kind" : "function",
-    "comment" : "\n",
-    "line" : 511,
+    "line" : 558,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 539,
+    "endline" : 580,
     "endchar" : 1
    },
    {
     "kind" : "template",
-    "comment" : " データ付きのenum\n",
-    "line" : 539,
-    "char" : 1,
-    "name" : "Endata",
+    "protection" : "private",
+    "line" : 580,
+    "char" : 9,
+    "name" : "EndataImpl",
     "parameters" : [
      {
       "name" : "E",
@@ -17656,110 +17887,210 @@
     ],
     "members" : [
      {
-      "name" : "Endata",
-      "kind" : "struct",
-      "line" : 539,
-      "char" : 1,
+      "name" : "EndataImpl",
+      "kind" : "union",
+      "line" : 580,
+      "char" : 9,
       "members" : [
        {
+        "name" : "Instance",
+        "kind" : "union",
+        "line" : 582,
+        "char" : 2,
+        "members" : []
+       },
+       {
+        "name" : "tags",
+        "kind" : "alias",
+        "line" : 590,
+        "char" : 2,
+        "type" : "Filter!(hasData, EnumMembers!E)"
+       },
+       {
+        "name" : "ManagedUnionImpl!(Instance, tags)",
+        "kind" : "mixin",
+        "line" : 591,
+        "char" : 2
+       },
+       {
+        "name" : "memberNames",
+        "kind" : "alias",
+        "line" : 592,
+        "char" : 2,
+        "type" : "FieldNameTuple!Instance"
+       },
+       {
         "kind" : "template",
-        "line" : 542,
-        "char" : 8,
-        "name" : "Impl",
-        "parameters" : [],
+        "line" : 593,
+        "char" : 23,
+        "name" : "getIndex",
+        "parameters" : [
+         {
+          "name" : "member",
+          "kind" : "value",
+          "type" : "string"
+         }
+        ],
         "members" : [
          {
-          "name" : "Instance",
-          "kind" : "union",
-          "line" : 544,
-          "char" : 3,
-          "members" : []
-         },
-         {
-          "name" : "tags",
-          "kind" : "alias",
-          "line" : 552,
-          "char" : 3,
-          "type" : "Filter!(hasData, EnumMembers!E)"
-         },
-         {
-          "name" : "ManagedUnionImpl!(Instance, tags)",
-          "kind" : "mixin",
-          "line" : 553,
-          "char" : 3
-         },
-         {
-          "name" : "memberNames",
-          "kind" : "alias",
-          "line" : 554,
-          "char" : 3,
-          "type" : "FieldNameTuple!Instance"
-         },
-         {
-          "kind" : "template",
-          "line" : 555,
-          "char" : 16,
-          "name" : "getTag",
-          "parameters" : [
-           {
-            "name" : "member",
-            "kind" : "value",
-            "type" : "string"
-           }
+          "name" : "getIndex",
+          "kind" : "variable",
+          "line" : 593,
+          "char" : 23,
+          "storageClass" : [
+           "enum"
           ],
-          "members" : [
-           {
-            "name" : "getTag",
-            "kind" : "variable",
-            "line" : 555,
-            "char" : 16,
-            "storageClass" : [
-             "enum"
-            ],
-            "type" : "TagType",
-            "init" : "__traits(getMember, E, member)"
-           }
-          ]
-         },
-         {
-          "kind" : "template",
-          "line" : 556,
-          "char" : 3,
-          "name" : "MemberType",
-          "parameters" : [
-           {
-            "name" : "member",
-            "kind" : "value",
-            "type" : "string"
-           }
-          ],
-          "members" : [
-           {
-            "name" : "MemberType",
-            "kind" : "alias",
-            "line" : 556,
-            "char" : 3,
-            "type" : "MemberTypes[staticIndexOf!(member, memberNames)]"
-           }
-          ]
+          "type" : "_impl.IndexType",
+          "init" : "cast(_impl.IndexType)staticIndexOf!(member, memberNames)"
          }
         ]
        },
        {
-        "name" : "Impl!()",
-        "kind" : "mixin",
-        "line" : 558,
-        "char" : 2
+        "kind" : "template",
+        "line" : 594,
+        "char" : 23,
+        "name" : "getTag",
+        "parameters" : [
+         {
+          "name" : "member",
+          "kind" : "value",
+          "type" : "string"
+         }
+        ],
+        "members" : [
+         {
+          "name" : "getTag",
+          "kind" : "variable",
+          "line" : 594,
+          "char" : 23,
+          "storageClass" : [
+           "enum"
+          ],
+          "type" : "_impl.TagType",
+          "init" : "_impl.getTag!(getIndex!member)"
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "line" : 595,
+        "char" : 2,
+        "name" : "MemberType",
+        "parameters" : [
+         {
+          "name" : "member",
+          "kind" : "value",
+          "type" : "string"
+         }
+        ],
+        "members" : [
+         {
+          "name" : "MemberType",
+          "kind" : "alias",
+          "line" : 595,
+          "char" : 2,
+          "type" : "_impl.MemberTypes[getIndex!member]"
+         }
+        ]
        }
       ]
      }
     ]
    },
    {
-    "name" : "__unittest_L582_C26",
+    "kind" : "template",
+    "comment" : " データ付きのenum\n",
+    "line" : 602,
+    "char" : 1,
+    "name" : "Endata",
+    "parameters" : [
+     {
+      "name" : "E",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "is(E == enum)",
+    "members" : [
+     {
+      "name" : "Endata",
+      "kind" : "struct",
+      "line" : 602,
+      "char" : 1,
+      "members" : [
+       {
+        "kind" : "template",
+        "comment" : " 名前アクセス\n",
+        "line" : 610,
+        "char" : 11,
+        "name" : "opDispatch",
+        "parameters" : [
+         {
+          "name" : "member",
+          "kind" : "value",
+          "type" : "string"
+         }
+        ],
+        "constraint" : "hasMember!(EndataImpl!E.Instance, member)",
+        "members" : [
+         {
+          "name" : "opDispatch",
+          "kind" : "function",
+          "line" : 610,
+          "char" : 11,
+          "storageClass" : [
+           "auto"
+          ],
+          "type" : "ref ()",
+          "endline" : 614,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 616,
+        "char" : 7,
+        "name" : "opDispatch",
+        "parameters" : [
+         {
+          "name" : "member",
+          "kind" : "value",
+          "type" : "string"
+         }
+        ],
+        "constraint" : "hasMember!(EndataImpl!E.Instance, member)",
+        "members" : [
+         {
+          "name" : "opDispatch",
+          "kind" : "function",
+          "line" : 616,
+          "char" : 7,
+          "type" : "void(auto ref EndataImpl!E.MemberType!member val)",
+          "parameters" : [
+           {
+            "name" : "val",
+            "type" : "EndataImpl!E.MemberType!member",
+            "storageClass" : [
+             "auto",
+             "ref"
+            ]
+           }
+          ],
+          "endline" : 620,
+          "endchar" : 2
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L624_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 582,
+    "line" : 624,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -17767,26 +18098,237 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 620,
+    "endline" : 662,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L620_C20",
+    "name" : "__unittest_L662_C20",
     "kind" : "function",
-    "line" : 620,
+    "line" : 662,
     "char" : 20,
     "storageClass" : [
      "nothrow",
      "pure",
      "@safe"
     ],
-    "endline" : 653,
+    "endline" : 698,
     "endchar" : 1
    },
    {
     "kind" : "template",
+    "comment" : " 引数によって実装を切り替えるManagedUnion\n\n - 引数が1つでunionならTaggedになる\n - 引数が1つでenumならEndataになる\n - それ以外ならTypeEnumになる\n",
+    "line" : 698,
+    "char" : 1,
+    "name" : "ManagedUnion",
+    "parameters" : [
+     {
+      "name" : "Types",
+      "kind" : "tuple"
+     }
+    ],
+    "constraint" : "Types.length > 0",
+    "members" : [
+     {
+      "name" : "ManagedUnion",
+      "kind" : "alias",
+      "line" : 703,
+      "char" : 3,
+      "type" : "Tagged!Types"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " TypeEnumか判定する\n",
+    "line" : 720,
+    "char" : 11,
+    "name" : "isTypeEnum",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isTypeEnum",
+      "kind" : "variable",
+      "line" : 720,
+      "char" : 11,
+      "storageClass" : [
+       "enum"
+      ],
+      "deco" : "b",
+      "init" : "isInstanceOf!(TypeEnum, MU)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " Taggedか判定する\n",
+    "line" : 725,
+    "char" : 11,
+    "name" : "isTagged",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isTagged",
+      "kind" : "variable",
+      "line" : 725,
+      "char" : 11,
+      "storageClass" : [
+       "enum"
+      ],
+      "deco" : "b",
+      "init" : "isInstanceOf!(Tagged, MU)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " Endataか判定する\n",
+    "line" : 730,
+    "char" : 11,
+    "name" : "isEndata",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isEndata",
+      "kind" : "variable",
+      "line" : 730,
+      "char" : 11,
+      "storageClass" : [
+       "enum"
+      ],
+      "deco" : "b",
+      "init" : "isInstanceOf!(Endata, MU)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " ManagedUnionか判定する\n",
+    "line" : 735,
+    "char" : 11,
+    "name" : "isManagedUnion",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isManagedUnion",
+      "kind" : "variable",
+      "line" : 735,
+      "char" : 11,
+      "storageClass" : [
+       "enum"
+      ],
+      "deco" : "b",
+      "init" : "isTypeEnum!MU || isTagged!MU || isEndata!MU"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 741,
+    "char" : 28,
+    "name" : "getInstance",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "getInstance",
+      "kind" : "function",
+      "line" : 741,
+      "char" : 28,
+      "type" : "pure nothrow @nogc ref @safe (ref MU dat)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "MU",
+        "storageClass" : [
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 752,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 753,
+    "char" : 9,
+    "name" : "ImplOf",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "A",
+      "kind" : "alias",
+      "line" : 755,
+      "char" : 2,
+      "type" : "TemplateArgsOf!MU"
+     },
+     {
+      "name" : "ImplOf",
+      "kind" : "alias",
+      "line" : 758,
+      "char" : 3,
+      "type" : "TypeEnumImpl!A._impl"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 771,
+    "char" : 9,
+    "name" : "TypeImplOf",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "TypeImplOf",
+      "kind" : "alias",
+      "line" : 771,
+      "char" : 9,
+      "type" : "TypeEnumImpl!(TemplateArgsOf!MU)._implT"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
     "comment" : " ManagedUnionのタグ型を得る\n",
-    "line" : 653,
+    "line" : 776,
     "char" : 1,
     "name" : "TagType",
     "parameters" : [
@@ -17795,22 +18337,22 @@
       "kind" : "type"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)",
+    "constraint" : "isManagedUnion!MU",
     "members" : [
      {
       "name" : "TagType",
       "kind" : "alias",
-      "line" : 656,
+      "line" : 779,
       "char" : 2,
-      "type" : "MU._impl.TagType"
+      "type" : "ImplOf!MU.TagType"
      }
     ]
    },
    {
-    "name" : "__unittest_L659_C26",
+    "name" : "__unittest_L782_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 659,
+    "line" : 782,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -17818,14 +18360,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 664,
+    "endline" : 787,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L664_C26",
+    "name" : "__unittest_L787_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 664,
+    "line" : 787,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -17833,13 +18375,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 673,
+    "endline" : 796,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " 有効なタグか確認する\n",
-    "line" : 673,
+    "line" : 796,
     "char" : 1,
     "name" : "isAvailableTag",
     "parameters" : [
@@ -17852,26 +18394,26 @@
       "kind" : "alias"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)",
+    "constraint" : "isManagedUnion!MU",
     "members" : [
      {
       "name" : "isAvailableTag",
       "kind" : "variable",
-      "line" : 678,
+      "line" : 801,
       "char" : 13,
       "storageClass" : [
        "enum"
       ],
       "deco" : "b",
-      "init" : "MU._impl.getIndex!tag < MU._impl.memberCount"
+      "init" : "ImplOf!MU.getIndex!tag < ImplOf!MU.memberCount"
      }
     ]
    },
    {
-    "name" : "__unittest_L686_C26",
+    "name" : "__unittest_L809_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 686,
+    "line" : 809,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -17879,14 +18421,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 693,
+    "endline" : 816,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L693_C26",
+    "name" : "__unittest_L816_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 693,
+    "line" : 816,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -17894,13 +18436,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 705,
+    "endline" : 828,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " 無効なタグを取得する\n",
-    "line" : 705,
+    "line" : 828,
     "char" : 1,
     "name" : "getNotFoundTag",
     "parameters" : [
@@ -17909,26 +18451,26 @@
       "kind" : "type"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)",
+    "constraint" : "isManagedUnion!MU",
     "members" : [
      {
       "name" : "getNotFoundTag",
       "kind" : "variable",
-      "line" : 708,
-      "char" : 24,
+      "line" : 831,
+      "char" : 25,
       "storageClass" : [
        "enum"
       ],
-      "type" : "MU._impl.TagType",
-      "init" : "MU._impl.notfoundTag"
+      "type" : "ImplOf!MU.TagType",
+      "init" : "ImplOf!MU.notfoundTag"
      }
     ]
    },
    {
-    "name" : "__unittest_L711_C26",
+    "name" : "__unittest_L834_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 711,
+    "line" : 834,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -17936,14 +18478,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 718,
+    "endline" : 841,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L718_C26",
+    "name" : "__unittest_L841_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 718,
+    "line" : 841,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -17951,13 +18493,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 729,
+    "endline" : 852,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " 型を持っているか確認する\n",
-    "line" : 729,
+    "line" : 852,
     "char" : 1,
     "name" : "hasType",
     "parameters" : [
@@ -17970,26 +18512,26 @@
       "kind" : "type"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU)",
+    "constraint" : "isTypeEnum!MU",
     "members" : [
      {
       "name" : "hasType",
       "kind" : "variable",
-      "line" : 732,
+      "line" : 855,
       "char" : 12,
       "storageClass" : [
        "enum"
       ],
       "deco" : "b",
-      "init" : "MU._implT.hasType!T"
+      "init" : "TypeImplOf!MU.hasType!T"
      }
     ]
    },
    {
-    "name" : "__unittest_L735_C26",
+    "name" : "__unittest_L858_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 735,
+    "line" : 858,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -17997,50 +18539,37 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 747,
+    "endline" : 871,
     "endchar" : 1
    },
    {
     "kind" : "template",
-    "comment" : " タグを確認する\n",
-    "line" : 747,
-    "char" : 12,
-    "name" : "tag",
+    "comment" : " 持っている型を列挙する\n",
+    "line" : 871,
+    "char" : 1,
+    "name" : "EnumMemberTypes",
     "parameters" : [
      {
       "name" : "MU",
       "kind" : "type"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)",
+    "constraint" : "isManagedUnion!MU",
     "members" : [
      {
-      "name" : "tag",
-      "kind" : "function",
-      "line" : 747,
-      "char" : 12,
-      "type" : "TagType!MU(auto ref MU tu)",
-      "parameters" : [
-       {
-        "name" : "tu",
-        "type" : "MU",
-        "storageClass" : [
-         "auto",
-         "in",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 751,
-      "endchar" : 1
+      "name" : "EnumMemberTypes",
+      "kind" : "alias",
+      "line" : 874,
+      "char" : 2,
+      "type" : "ImplOf!MU.MemberTypes"
      }
     ]
    },
    {
-    "name" : "__unittest_L753_C26",
+    "name" : "__unittest_L877_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 753,
+    "line" : 877,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -18048,486 +18577,64 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 766,
-    "endchar" : 1
-   },
-   {
-    "name" : "__unittest_L766_C26",
-    "kind" : "function",
-    "comment" : "\n",
-    "line" : 766,
-    "char" : 26,
-    "storageClass" : [
-     "nothrow",
-     "pure",
-     "@nogc",
-     "@safe"
-    ],
-    "endline" : 785,
+    "endline" : 889,
     "endchar" : 1
    },
    {
     "kind" : "template",
-    "comment" : " 初期化する\n",
-    "line" : 785,
-    "char" : 6,
-    "name" : "initialize",
-    "parameters" : [
-     {
-      "name" : "tag",
-      "kind" : "alias"
-     },
-     {
-      "name" : "MU",
-      "kind" : "type"
-     },
-     {
-      "name" : "Args",
-      "kind" : "tuple"
-     }
-    ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) && isAvailableTag!(MU, tag)",
-    "members" : [
-     {
-      "name" : "initialize",
-      "kind" : "function",
-      "line" : 785,
-      "char" : 6,
-      "type" : "void(auto ref MU dat, auto ref Args args)",
-      "parameters" : [
-       {
-        "name" : "dat",
-        "type" : "MU",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       },
-       {
-        "name" : "args",
-        "type" : "Args",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 789,
-      "endchar" : 1
-     }
-    ]
-   },
-   {
-    "kind" : "template",
-    "comment" : "ditto\n",
-    "line" : 791,
-    "char" : 6,
-    "name" : "initialize",
-    "parameters" : [
-     {
-      "name" : "T",
-      "kind" : "type"
-     },
-     {
-      "name" : "MU",
-      "kind" : "type"
-     },
-     {
-      "name" : "Args",
-      "kind" : "tuple"
-     }
-    ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) && hasType!(MU, T)",
-    "members" : [
-     {
-      "name" : "initialize",
-      "kind" : "function",
-      "line" : 791,
-      "char" : 6,
-      "type" : "void(auto ref MU dat, auto ref Args args)",
-      "parameters" : [
-       {
-        "name" : "dat",
-        "type" : "MU",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       },
-       {
-        "name" : "args",
-        "type" : "Args",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 795,
-      "endchar" : 1
-     }
-    ]
-   },
-   {
-    "kind" : "template",
-    "comment" : "ditto\n",
-    "line" : 797,
-    "char" : 6,
-    "name" : "initialize",
-    "parameters" : [
-     {
-      "name" : "tag",
-      "kind" : "alias"
-     },
-     {
-      "name" : "E",
-      "kind" : "type"
-     },
-     {
-      "name" : "Args",
-      "kind" : "tuple"
-     }
-    ],
-    "constraint" : "isAvailableTag!(Endata!E, tag)",
-    "members" : [
-     {
-      "name" : "initialize",
-      "kind" : "function",
-      "line" : 797,
-      "char" : 6,
-      "type" : "void(auto ref Endata!E e, auto ref Args args)",
-      "parameters" : [
-       {
-        "name" : "e",
-        "type" : "Endata!E",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       },
-       {
-        "name" : "args",
-        "type" : "Args",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 801,
-      "endchar" : 1
-     }
-    ]
-   },
-   {
-    "name" : "__unittest_L803_C26",
-    "kind" : "function",
-    "comment" : "\n",
-    "line" : 803,
-    "char" : 26,
-    "storageClass" : [
-     "nothrow",
-     "pure",
-     "@nogc",
-     "@safe"
-    ],
-    "endline" : 817,
-    "endchar" : 1
-   },
-   {
-    "name" : "__unittest_L817_C7",
-    "kind" : "function",
-    "comment" : "\n",
-    "line" : 817,
-    "char" : 7,
-    "storageClass" : [
-     "@safe"
-    ],
-    "endline" : 835,
-    "endchar" : 1
-   },
-   {
-    "kind" : "template",
-    "comment" : " データをセットする\n",
-    "line" : 835,
-    "char" : 6,
-    "name" : "set",
-    "parameters" : [
-     {
-      "name" : "tag",
-      "kind" : "alias"
-     },
-     {
-      "name" : "MU",
-      "kind" : "type"
-     },
-     {
-      "name" : "T",
-      "kind" : "type"
-     }
-    ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) && isAvailableTag!(MU, tag)",
-    "members" : [
-     {
-      "name" : "set",
-      "kind" : "function",
-      "line" : 835,
-      "char" : 6,
-      "type" : "void(auto ref MU dat, auto ref T val)",
-      "parameters" : [
-       {
-        "name" : "dat",
-        "type" : "MU",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       },
-       {
-        "name" : "val",
-        "type" : "T",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 839,
-      "endchar" : 1
-     }
-    ]
-   },
-   {
-    "kind" : "template",
-    "comment" : "ditto\n",
-    "line" : 841,
-    "char" : 6,
-    "name" : "set",
-    "parameters" : [
-     {
-      "name" : "T",
-      "kind" : "type"
-     },
-     {
-      "name" : "MU",
-      "kind" : "type"
-     }
-    ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) && hasType!(MU, T)",
-    "members" : [
-     {
-      "name" : "set",
-      "kind" : "function",
-      "line" : 841,
-      "char" : 6,
-      "type" : "void(auto ref MU dat, auto ref T val)",
-      "parameters" : [
-       {
-        "name" : "dat",
-        "type" : "MU",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       },
-       {
-        "name" : "val",
-        "type" : "T",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 845,
-      "endchar" : 1
-     }
-    ]
-   },
-   {
-    "kind" : "template",
-    "comment" : "ditto\n",
-    "line" : 847,
-    "char" : 6,
-    "name" : "set",
-    "parameters" : [
-     {
-      "name" : "tag",
-      "kind" : "alias"
-     },
-     {
-      "name" : "E",
-      "kind" : "type"
-     },
-     {
-      "name" : "T",
-      "kind" : "type"
-     }
-    ],
-    "constraint" : "isAvailableTag!(Endata!E, tag)",
-    "members" : [
-     {
-      "name" : "set",
-      "kind" : "function",
-      "line" : 847,
-      "char" : 6,
-      "type" : "void(auto ref Endata!E e, auto ref T val)",
-      "parameters" : [
-       {
-        "name" : "e",
-        "type" : "Endata!E",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       },
-       {
-        "name" : "val",
-        "type" : "T",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 851,
-      "endchar" : 1
-     }
-    ]
-   },
-   {
-    "name" : "__unittest_L853_C26",
-    "kind" : "function",
-    "comment" : "\n",
-    "line" : 853,
-    "char" : 26,
-    "storageClass" : [
-     "nothrow",
-     "pure",
-     "@nogc",
-     "@safe"
-    ],
-    "endline" : 867,
-    "endchar" : 1
-   },
-   {
-    "name" : "__unittest_L867_C26",
-    "kind" : "function",
-    "comment" : "\n",
-    "line" : 867,
-    "char" : 26,
-    "storageClass" : [
-     "nothrow",
-     "pure",
-     "@nogc",
-     "@safe"
-    ],
-    "endline" : 883,
-    "endchar" : 1
-   },
-   {
-    "kind" : "template",
-    "comment" : " データを取得する\n",
-    "line" : 883,
-    "char" : 10,
-    "name" : "get",
-    "parameters" : [
-     {
-      "name" : "tag",
-      "kind" : "alias"
-     },
-     {
-      "name" : "MU",
-      "kind" : "type"
-     }
-    ],
-    "constraint" : "(isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)) && isAvailableTag!(MU, tag)",
-    "members" : [
-     {
-      "name" : "get",
-      "kind" : "function",
-      "line" : 883,
-      "char" : 10,
-      "storageClass" : [
-       "auto"
-      ],
-      "type" : "ref (auto ref inout MU dat)",
-      "parameters" : [
-       {
-        "name" : "dat",
-        "type" : "MU",
-        "storageClass" : [
-         "auto",
-         "inout",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 887,
-      "endchar" : 1
-     }
-    ]
-   },
-   {
-    "kind" : "template",
-    "comment" : "ditto\n",
+    "comment" : " タグを列挙する\n",
     "line" : 889,
-    "char" : 10,
-    "name" : "get",
+    "char" : 1,
+    "name" : "memberTags",
     "parameters" : [
-     {
-      "name" : "T",
-      "kind" : "type"
-     },
      {
       "name" : "MU",
       "kind" : "type"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) && hasType!(MU, T)",
+    "constraint" : "isManagedUnion!MU",
     "members" : [
      {
-      "name" : "get",
-      "kind" : "function",
-      "line" : 889,
-      "char" : 10,
+      "name" : "memberTags",
+      "kind" : "variable",
+      "line" : 892,
+      "char" : 27,
       "storageClass" : [
-       "auto"
+       "enum"
       ],
-      "type" : "ref (auto ref inout MU dat)",
-      "parameters" : [
-       {
-        "name" : "dat",
-        "type" : "MU",
-        "storageClass" : [
-         "auto",
-         "inout",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 893,
-      "endchar" : 1
+      "type" : "ImplOf!MU.TagType[]",
+      "init" : "()\n{\nImplOf!MU.TagType[] ret;\nstatic foreach (i; 0 .. ImplOf!MU.MemberTypes.length)\n{\nret ~= ImplOf!MU.getTag!i;\n}\nreturn ret;\n}\n()"
      }
     ]
    },
    {
-    "name" : "__unittest_L895_C7",
-    "kind" : "function",
-    "comment" : "\n",
-    "line" : 895,
-    "char" : 7,
-    "storageClass" : [
-     "@safe"
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 901,
+    "char" : 1,
+    "name" : "EnumMemberTags",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
     ],
-    "endline" : 908,
-    "endchar" : 1
+    "constraint" : "isManagedUnion!MU",
+    "members" : [
+     {
+      "name" : "EnumMemberTags",
+      "kind" : "alias",
+      "line" : 904,
+      "char" : 2,
+      "type" : "aliasSeqOf!(memberTags!MU)"
+     }
+    ]
    },
    {
-    "name" : "__unittest_L908_C26",
+    "name" : "__unittest_L907_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 908,
+    "line" : 907,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -18540,8 +18647,516 @@
    },
    {
     "kind" : "template",
-    "comment" : " データが入っていることを確認する\n",
+    "comment" : " タグから型を得る\n",
     "line" : 925,
+    "char" : 1,
+    "name" : "TypeFromTag",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     },
+     {
+      "name" : "tag",
+      "kind" : "alias"
+     }
+    ],
+    "constraint" : "isManagedUnion!MU",
+    "members" : [
+     {
+      "name" : "TypeFromTag",
+      "kind" : "alias",
+      "line" : 928,
+      "char" : 2,
+      "type" : "ImplOf!MU.MemberTypes[ImplOf!MU.getIndex!tag]"
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L931_C26",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 931,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 941,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "comment" : " 型が代入可能か\n",
+    "line" : 941,
+    "char" : 1,
+    "name" : "isTypeAssignable",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isTypeEnum!MU",
+    "members" : [
+     {
+      "name" : "isTypeAssignable",
+      "kind" : "variable",
+      "line" : 944,
+      "char" : 12,
+      "storageClass" : [
+       "enum"
+      ],
+      "deco" : "b",
+      "init" : "TypeImplOf!MU.isAssignable!T"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " タグを確認する\n",
+    "line" : 950,
+    "char" : 12,
+    "name" : "tag",
+    "parameters" : [
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isManagedUnion!MU",
+    "members" : [
+     {
+      "name" : "tag",
+      "kind" : "function",
+      "line" : 950,
+      "char" : 12,
+      "type" : "TagType!MU(auto ref MU dat)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "MU",
+        "storageClass" : [
+         "auto",
+         "in",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 954,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L956_C26",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 956,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 969,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L969_C26",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 969,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 988,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "comment" : " 初期化する\n",
+    "line" : 988,
+    "char" : 6,
+    "name" : "initialize",
+    "parameters" : [
+     {
+      "name" : "tag",
+      "kind" : "alias"
+     },
+     {
+      "name" : "MU",
+      "kind" : "type"
+     },
+     {
+      "name" : "Args",
+      "kind" : "tuple"
+     }
+    ],
+    "constraint" : "isManagedUnion!MU && isAvailableTag!(MU, tag)",
+    "members" : [
+     {
+      "name" : "initialize",
+      "kind" : "function",
+      "line" : 988,
+      "char" : 6,
+      "type" : "void(auto ref MU dat, auto ref Args args)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "MU",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       },
+       {
+        "name" : "args",
+        "type" : "Args",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 992,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 994,
+    "char" : 6,
+    "name" : "initialize",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "MU",
+      "kind" : "type"
+     },
+     {
+      "name" : "Args",
+      "kind" : "tuple"
+     }
+    ],
+    "constraint" : "isTypeEnum!MU && hasType!(MU, T)",
+    "members" : [
+     {
+      "name" : "initialize",
+      "kind" : "function",
+      "line" : 994,
+      "char" : 6,
+      "type" : "void(auto ref MU dat, auto ref Args args)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "MU",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       },
+       {
+        "name" : "args",
+        "type" : "Args",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 998,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1000_C26",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 1000,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 1014,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L1014_C7",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 1014,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1032,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "comment" : " データをセットする\n",
+    "line" : 1032,
+    "char" : 6,
+    "name" : "set",
+    "parameters" : [
+     {
+      "name" : "tag",
+      "kind" : "alias"
+     },
+     {
+      "name" : "MU",
+      "kind" : "type"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isManagedUnion!MU && isAvailableTag!(MU, tag)",
+    "members" : [
+     {
+      "name" : "set",
+      "kind" : "function",
+      "line" : 1032,
+      "char" : 6,
+      "type" : "@property void(auto ref MU dat, auto ref T val)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "MU",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       },
+       {
+        "name" : "val",
+        "type" : "T",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 1038,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 1040,
+    "char" : 6,
+    "name" : "set",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isTypeEnum!MU && hasType!(MU, T)",
+    "members" : [
+     {
+      "name" : "set",
+      "kind" : "function",
+      "line" : 1040,
+      "char" : 6,
+      "type" : "@property void(ref MU dat, auto ref T val)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "MU",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "val",
+        "type" : "T",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 1046,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1048_C26",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 1048,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 1062,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L1062_C26",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 1062,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 1078,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "comment" : " データを取得する\n",
+    "line" : 1078,
+    "char" : 10,
+    "name" : "get",
+    "parameters" : [
+     {
+      "name" : "tag",
+      "kind" : "alias"
+     },
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isManagedUnion!MU && isAvailableTag!(MU, tag)",
+    "members" : [
+     {
+      "name" : "get",
+      "kind" : "function",
+      "line" : 1078,
+      "char" : 10,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "ref (auto ref inout MU dat)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "MU",
+        "storageClass" : [
+         "auto",
+         "inout",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 1082,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 1084,
+    "char" : 10,
+    "name" : "get",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "MU",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isTypeEnum!MU && hasType!(MU, T)",
+    "members" : [
+     {
+      "name" : "get",
+      "kind" : "function",
+      "line" : 1084,
+      "char" : 10,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "ref (auto ref inout MU dat)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "MU",
+        "storageClass" : [
+         "auto",
+         "inout",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 1088,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1090_C7",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 1090,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1103,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L1103_C26",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 1103,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 1120,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "comment" : " データが入っていることを確認する\n",
+    "line" : 1120,
     "char" : 6,
     "name" : "check",
     "parameters" : [
@@ -18554,12 +19169,12 @@
       "kind" : "type"
      }
     ],
-    "constraint" : "(isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)) && isAvailableTag!(MU, tag)",
+    "constraint" : "isManagedUnion!MU && isAvailableTag!(MU, tag)",
     "members" : [
      {
       "name" : "check",
       "kind" : "function",
-      "line" : 925,
+      "line" : 1120,
       "char" : 6,
       "type" : "bool(auto ref MU dat)",
       "parameters" : [
@@ -18573,7 +19188,7 @@
         ]
        }
       ],
-      "endline" : 929,
+      "endline" : 1124,
       "endchar" : 1
      }
     ]
@@ -18581,7 +19196,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 931,
+    "line" : 1126,
     "char" : 6,
     "name" : "check",
     "parameters" : [
@@ -18594,12 +19209,12 @@
       "kind" : "type"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) && hasType!(MU, T)",
+    "constraint" : "isTypeEnum!MU && hasType!(MU, T)",
     "members" : [
      {
       "name" : "check",
       "kind" : "function",
-      "line" : 931,
+      "line" : 1126,
       "char" : 6,
       "type" : "bool(auto ref MU dat)",
       "parameters" : [
@@ -18613,28 +19228,28 @@
         ]
        }
       ],
-      "endline" : 935,
+      "endline" : 1130,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L937_C7",
+    "name" : "__unittest_L1132_C7",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 937,
+    "line" : 1132,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 950,
+    "endline" : 1145,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L950_C26",
+    "name" : "__unittest_L1145_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 950,
+    "line" : 1145,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -18642,13 +19257,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 966,
+    "endline" : 1161,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " データをクリアする\n",
-    "line" : 966,
+    "line" : 1161,
     "char" : 6,
     "name" : "clear",
     "parameters" : [
@@ -18657,12 +19272,12 @@
       "kind" : "type"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)",
+    "constraint" : "isManagedUnion!MU",
     "members" : [
      {
       "name" : "clear",
       "kind" : "function",
-      "line" : 966,
+      "line" : 1161,
       "char" : 6,
       "type" : "void(auto ref MU dat)",
       "parameters" : [
@@ -18675,16 +19290,16 @@
         ]
        }
       ],
-      "endline" : 970,
+      "endline" : 1165,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L972_C26",
+    "name" : "__unittest_L1167_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 972,
+    "line" : 1167,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -18692,14 +19307,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 986,
+    "endline" : 1181,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L986_C26",
+    "name" : "__unittest_L1181_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 986,
+    "line" : 1181,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -18707,13 +19322,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1002,
+    "endline" : 1197,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " データがクリアされているか確認する\n",
-    "line" : 1002,
+    "line" : 1197,
     "char" : 6,
     "name" : "empty",
     "parameters" : [
@@ -18722,12 +19337,12 @@
       "kind" : "type"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)",
+    "constraint" : "isManagedUnion!MU",
     "members" : [
      {
       "name" : "empty",
       "kind" : "function",
-      "line" : 1002,
+      "line" : 1197,
       "char" : 6,
       "type" : "bool(auto ref MU dat)",
       "parameters" : [
@@ -18741,16 +19356,16 @@
         ]
        }
       ],
-      "endline" : 1006,
+      "endline" : 1201,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1008_C26",
+    "name" : "__unittest_L1203_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1008,
+    "line" : 1203,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -18758,14 +19373,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1017,
+    "endline" : 1212,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1017_C26",
+    "name" : "__unittest_L1212_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1017,
+    "line" : 1212,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -18773,24 +19388,24 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1031,
+    "endline" : 1226,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1031_C7",
+    "name" : "__unittest_L1226_C7",
     "kind" : "function",
-    "line" : 1031,
+    "line" : 1226,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1183,
+    "endline" : 1377,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1183,
+    "line" : 1377,
     "char" : 9,
     "name" : "AttrData",
     "parameters" : [
@@ -18803,7 +19418,7 @@
      {
       "name" : "AttrData",
       "kind" : "struct",
-      "line" : 1183,
+      "line" : 1377,
       "char" : 9,
       "members" : []
      }
@@ -18813,14 +19428,14 @@
     "name" : "data",
     "kind" : "alias",
     "comment" : "\n",
-    "line" : 1188,
+    "line" : 1382,
     "char" : 1,
     "originalType" : "AttrData"
    },
    {
     "kind" : "template",
     "comment" : "\n",
-    "line" : 1194,
+    "line" : 1388,
     "char" : 1,
     "name" : "hasData",
     "parameters" : [
@@ -18833,7 +19448,7 @@
      {
       "name" : "hasData",
       "kind" : "variable",
-      "line" : 1198,
+      "line" : 1392,
       "char" : 13,
       "storageClass" : [
        "enum"
@@ -18846,7 +19461,7 @@
    {
     "kind" : "template",
     "comment" : "\n",
-    "line" : 1213,
+    "line" : 1407,
     "char" : 1,
     "name" : "getDatas",
     "parameters" : [
@@ -18860,7 +19475,7 @@
      {
       "name" : "getDatas",
       "kind" : "alias",
-      "line" : 1216,
+      "line" : 1410,
       "char" : 2,
       "type" : "staticMap!(TemplateArgsOf, getUDAs!(value, AttrData))"
      }
@@ -18869,7 +19484,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1219,
+    "line" : 1413,
     "char" : 9,
     "name" : "DataType",
     "parameters" : [
@@ -18883,14 +19498,14 @@
      {
       "name" : "std.typecons",
       "kind" : "import",
-      "line" : 1222,
+      "line" : 1416,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "DataType",
       "kind" : "alias",
-      "line" : 1225,
+      "line" : 1419,
       "char" : 3,
       "type" : "getDatas!e[0]"
      }
@@ -18899,7 +19514,7 @@
    {
     "kind" : "template",
     "comment" : "\n",
-    "line" : 1236,
+    "line" : 1430,
     "char" : 1,
     "name" : "Data",
     "parameters" : [
@@ -18913,12 +19528,12 @@
      {
       "name" : "Data",
       "kind" : "union",
-      "line" : 1239,
+      "line" : 1433,
       "char" : 5,
       "members" : [
        {
         "kind" : "template",
-        "line" : 1241,
+        "line" : 1435,
         "char" : 3,
         "name" : "Value",
         "parameters" : [],
@@ -18926,7 +19541,7 @@
          {
           "name" : "_instance_of_value_",
           "kind" : "variable",
-          "line" : 1243,
+          "line" : 1437,
           "char" : 15,
           "type" : "DataType!e"
          }
@@ -18935,7 +19550,7 @@
        {
         "name" : "Value!()",
         "kind" : "mixin",
-        "line" : 1245,
+        "line" : 1439,
         "char" : 3
        }
       ]
@@ -18945,7 +19560,7 @@
    {
     "kind" : "template",
     "comment" : "\n",
-    "line" : 1254,
+    "line" : 1448,
     "char" : 7,
     "name" : "EnumMemberAlieses",
     "parameters" : [
@@ -18960,7 +19575,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1268,
+    "line" : 1461,
     "char" : 9,
     "name" : "isCallableWith",
     "parameters" : [
@@ -18978,7 +19593,7 @@
      {
       "name" : "isCallableWith",
       "kind" : "variable",
-      "line" : 1271,
+      "line" : 1464,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -18991,7 +19606,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1274,
+    "line" : 1467,
     "char" : 9,
     "name" : "getTempFuncParamUDAs",
     "parameters" : [
@@ -19018,7 +19633,7 @@
      {
       "name" : "std.typecons",
       "kind" : "import",
-      "line" : 1277,
+      "line" : 1470,
       "char" : 9,
       "protection" : "private",
       "selective" : [
@@ -19028,7 +19643,7 @@
      {
       "name" : "voile.attr",
       "kind" : "import",
-      "line" : 1278,
+      "line" : 1471,
       "char" : 9,
       "protection" : "private",
       "selective" : [
@@ -19038,27 +19653,27 @@
      {
       "name" : "getTempFuncParamUDAs",
       "kind" : "alias",
-      "line" : 1281,
+      "line" : 1474,
       "char" : 3,
       "type" : "AliasSeq!()"
      }
     ]
    },
    {
-    "name" : "__unittest_L1307_C7",
+    "name" : "__unittest_L1500_C7",
     "kind" : "function",
-    "line" : 1307,
+    "line" : 1500,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1320,
+    "endline" : 1513,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1320,
+    "line" : 1513,
     "char" : 9,
     "name" : "matchFuncInfo",
     "parameters" : [
@@ -19071,47 +19686,47 @@
       "kind" : "alias"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU)",
+    "constraint" : "isTypeEnum!MU || isTagged!MU",
     "members" : [
      {
       "name" : "IndexType",
       "kind" : "alias",
-      "line" : 1323,
+      "line" : 1516,
       "char" : 2,
-      "type" : "MU._impl.IndexType"
+      "type" : "ImplOf!MU.IndexType"
      },
      {
       "name" : "TagType",
       "kind" : "alias",
-      "line" : 1324,
+      "line" : 1517,
       "char" : 2,
-      "type" : "MU._impl.TagType"
+      "type" : "ImplOf!MU.TagType"
      },
      {
       "name" : "notfoundTag",
       "kind" : "alias",
-      "line" : 1325,
+      "line" : 1518,
       "char" : 2,
-      "type" : "MU._impl.notfoundTag"
+      "type" : "ImplOf!MU.notfoundTag"
      },
      {
       "name" : "MemberTypes",
       "kind" : "alias",
-      "line" : 1326,
+      "line" : 1519,
       "char" : 2,
-      "type" : "MU._impl.MemberTypes"
+      "type" : "ImplOf!MU.MemberTypes"
      },
      {
       "name" : "params",
       "kind" : "alias",
-      "line" : 1330,
+      "line" : 1523,
       "char" : 3,
       "type" : "Parameters!F"
      },
      {
       "name" : "isDefault",
       "kind" : "variable",
-      "line" : 1331,
+      "line" : 1524,
       "char" : 13,
       "storageClass" : [
        "enum"
@@ -19122,7 +19737,7 @@
      {
       "name" : "isCatch",
       "kind" : "variable",
-      "line" : 1334,
+      "line" : 1527,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -19133,47 +19748,47 @@
      {
       "name" : "isCallback",
       "kind" : "variable",
-      "line" : 1335,
+      "line" : 1528,
       "char" : 14,
       "storageClass" : [
        "enum"
       ],
       "deco" : "b",
-      "init" : "params.length == 1 && MU._implT.hasType!(params[0])"
+      "init" : "params.length == 1 && TypeImplOf!MU.hasType!(params[0])"
      },
      {
       "name" : "tag",
       "kind" : "variable",
-      "line" : 1338,
+      "line" : 1531,
       "char" : 20,
       "storageClass" : [
        "enum"
       ],
       "type" : "TagType",
-      "init" : "MU._impl.getTag!(MU._implT.getTypeIndex!(params[0]))"
+      "init" : "ImplOf!MU.getTag!(TypeImplOf!MU.getTypeIndex!(params[0]))"
      },
      {
       "name" : "index",
       "kind" : "variable",
-      "line" : 1339,
+      "line" : 1532,
       "char" : 20,
       "storageClass" : [
        "enum"
       ],
       "type" : "IndexType",
-      "init" : "MU._implT.getTypeIndex!(params[0])"
+      "init" : "TypeImplOf!MU.getTypeIndex!(params[0])"
      },
      {
       "name" : "RetType",
       "kind" : "alias",
-      "line" : 1354,
+      "line" : 1547,
       "char" : 3,
       "type" : "ReturnType!F"
      },
      {
       "name" : "isMatchFunction",
       "kind" : "variable",
-      "line" : 1376,
+      "line" : 1569,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -19184,20 +19799,20 @@
     ]
    },
    {
-    "name" : "__unittest_L1379_C7",
+    "name" : "__unittest_L1572_C7",
     "kind" : "function",
-    "line" : 1379,
+    "line" : 1572,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1410,
+    "endline" : 1603,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1410,
+    "line" : 1603,
     "char" : 9,
     "name" : "matchFuncInfo",
     "parameters" : [
@@ -19215,42 +19830,42 @@
      {
       "name" : "IndexType",
       "kind" : "alias",
-      "line" : 1413,
+      "line" : 1606,
       "char" : 2,
-      "type" : "ED._impl.IndexType"
+      "type" : "ImplOf!ED.IndexType"
      },
      {
       "name" : "TagType",
       "kind" : "alias",
-      "line" : 1414,
+      "line" : 1607,
       "char" : 2,
-      "type" : "ED._impl.TagType"
+      "type" : "ImplOf!ED.TagType"
      },
      {
       "name" : "notfoundTag",
       "kind" : "alias",
-      "line" : 1415,
+      "line" : 1608,
       "char" : 2,
-      "type" : "ED._impl.notfoundTag"
+      "type" : "ImplOf!ED.notfoundTag"
      },
      {
       "name" : "MemberTypes",
       "kind" : "alias",
-      "line" : 1416,
+      "line" : 1609,
       "char" : 2,
-      "type" : "ED._impl.MemberTypes"
+      "type" : "ImplOf!ED.MemberTypes"
      },
      {
       "name" : "params",
       "kind" : "alias",
-      "line" : 1420,
+      "line" : 1613,
       "char" : 3,
       "type" : "Parameters!F"
      },
      {
       "name" : "isDefault",
       "kind" : "variable",
-      "line" : 1421,
+      "line" : 1614,
       "char" : 13,
       "storageClass" : [
        "enum"
@@ -19261,14 +19876,14 @@
      {
       "name" : "voile.attr",
       "kind" : "import",
-      "line" : 1424,
+      "line" : 1617,
       "char" : 11,
       "protection" : "private"
      },
      {
       "name" : "isCatch",
       "kind" : "variable",
-      "line" : 1425,
+      "line" : 1618,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -19279,7 +19894,7 @@
      {
       "name" : "isCallback",
       "kind" : "variable",
-      "line" : 1426,
+      "line" : 1619,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -19290,7 +19905,7 @@
      {
       "name" : "tag",
       "kind" : "variable",
-      "line" : 1433,
+      "line" : 1626,
       "char" : 19,
       "storageClass" : [
        "enum"
@@ -19301,25 +19916,25 @@
      {
       "name" : "index",
       "kind" : "variable",
-      "line" : 1439,
+      "line" : 1632,
       "char" : 20,
       "storageClass" : [
        "enum"
       ],
       "type" : "IndexType",
-      "init" : "ED._impl.getIndex!tag"
+      "init" : "ImplOf!ED.getIndex!tag"
      },
      {
       "name" : "RetType",
       "kind" : "alias",
-      "line" : 1454,
+      "line" : 1647,
       "char" : 3,
       "type" : "ReturnType!F"
      },
      {
       "name" : "isMatchFunction",
       "kind" : "variable",
-      "line" : 1495,
+      "line" : 1688,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -19330,9 +19945,9 @@
     ]
    },
    {
-    "name" : "__unittest_L1499_C26",
+    "name" : "__unittest_L1692_C26",
     "kind" : "function",
-    "line" : 1499,
+    "line" : 1692,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -19340,13 +19955,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1550,
+    "endline" : 1743,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1550,
+    "line" : 1743,
     "char" : 9,
     "name" : "matchInfo",
     "parameters" : [
@@ -19359,32 +19974,32 @@
       "kind" : "tuple"
      }
     ],
-    "constraint" : "isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)",
+    "constraint" : "isManagedUnion!MU",
     "members" : [
      {
       "name" : "IndexType",
       "kind" : "alias",
-      "line" : 1553,
+      "line" : 1746,
       "char" : 2,
-      "type" : "MU.IndexType"
+      "type" : "ImplOf!MU.IndexType"
      },
      {
       "name" : "TagType",
       "kind" : "alias",
-      "line" : 1554,
+      "line" : 1747,
       "char" : 2,
-      "type" : "MU.TagType"
+      "type" : "ImplOf!MU.TagType"
      },
      {
       "name" : "notfoundTag",
       "kind" : "alias",
-      "line" : 1555,
+      "line" : 1748,
       "char" : 2,
-      "type" : "MU.notfoundTag"
+      "type" : "ImplOf!MU.notfoundTag"
      },
      {
       "kind" : "template",
-      "line" : 1557,
+      "line" : 1750,
       "char" : 12,
       "name" : "isDefault",
       "parameters" : [
@@ -19397,7 +20012,7 @@
        {
         "name" : "isDefault",
         "kind" : "variable",
-        "line" : 1557,
+        "line" : 1750,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -19409,7 +20024,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1558,
+      "line" : 1751,
       "char" : 12,
       "name" : "isCatch",
       "parameters" : [
@@ -19422,7 +20037,7 @@
        {
         "name" : "isCatch",
         "kind" : "variable",
-        "line" : 1558,
+        "line" : 1751,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -19434,7 +20049,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1559,
+      "line" : 1752,
       "char" : 12,
       "name" : "isCallback",
       "parameters" : [
@@ -19447,7 +20062,7 @@
        {
         "name" : "isCallback",
         "kind" : "variable",
-        "line" : 1559,
+        "line" : 1752,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -19459,7 +20074,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1560,
+      "line" : 1753,
       "char" : 12,
       "name" : "isMatchFunc",
       "parameters" : [
@@ -19472,7 +20087,7 @@
        {
         "name" : "isMatchFunc",
         "kind" : "variable",
-        "line" : 1560,
+        "line" : 1753,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -19484,7 +20099,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1561,
+      "line" : 1754,
       "char" : 15,
       "name" : "getTag",
       "parameters" : [
@@ -19497,7 +20112,7 @@
        {
         "name" : "getTag",
         "kind" : "variable",
-        "line" : 1561,
+        "line" : 1754,
         "char" : 15,
         "storageClass" : [
          "enum"
@@ -19509,7 +20124,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1562,
+      "line" : 1755,
       "char" : 17,
       "name" : "getIndex",
       "parameters" : [
@@ -19522,7 +20137,7 @@
        {
         "name" : "getIndex",
         "kind" : "variable",
-        "line" : 1562,
+        "line" : 1755,
         "char" : 17,
         "storageClass" : [
          "enum"
@@ -19534,7 +20149,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1563,
+      "line" : 1756,
       "char" : 2,
       "name" : "getParams",
       "parameters" : [
@@ -19547,7 +20162,7 @@
        {
         "name" : "getParams",
         "kind" : "alias",
-        "line" : 1563,
+        "line" : 1756,
         "char" : 2,
         "type" : "matchFuncInfo!(MU, F).params"
        }
@@ -19555,7 +20170,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1564,
+      "line" : 1757,
       "char" : 2,
       "name" : "getRetType",
       "parameters" : [
@@ -19568,7 +20183,7 @@
        {
         "name" : "getRetType",
         "kind" : "alias",
-        "line" : 1564,
+        "line" : 1757,
         "char" : 2,
         "type" : "matchFuncInfo!(MU, F).RetType"
        }
@@ -19577,14 +20192,14 @@
      {
       "name" : "RetType",
       "kind" : "alias",
-      "line" : 1566,
+      "line" : 1759,
       "char" : 2,
       "type" : "CommonType!(staticMap!(getRetType, Funcs))"
      },
      {
       "name" : "canMatch",
       "kind" : "variable",
-      "line" : 1567,
+      "line" : 1760,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -19595,7 +20210,7 @@
      {
       "name" : "defaultIdx",
       "kind" : "variable",
-      "line" : 1568,
+      "line" : 1761,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -19606,7 +20221,7 @@
      {
       "name" : "hasDefault",
       "kind" : "variable",
-      "line" : 1569,
+      "line" : 1762,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -19617,21 +20232,21 @@
      {
       "name" : "callbacks",
       "kind" : "alias",
-      "line" : 1570,
+      "line" : 1763,
       "char" : 2,
       "type" : "Filter!(isCallback, Funcs)"
      },
      {
       "name" : "catches",
       "kind" : "alias",
-      "line" : 1571,
+      "line" : 1764,
       "char" : 2,
       "type" : "Filter!(isCatch, Funcs)"
      },
      {
       "name" : "hasCatch",
       "kind" : "variable",
-      "line" : 1572,
+      "line" : 1765,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -19642,13 +20257,13 @@
      {
       "name" : "callbackTags",
       "kind" : "alias",
-      "line" : 1574,
+      "line" : 1767,
       "char" : 2,
       "type" : "staticMap!(getTag, callbacks)"
      },
      {
       "kind" : "template",
-      "line" : 1575,
+      "line" : 1768,
       "char" : 12,
       "name" : "isCallbackTag",
       "parameters" : [
@@ -19662,7 +20277,7 @@
        {
         "name" : "isCallbackTag",
         "kind" : "variable",
-        "line" : 1575,
+        "line" : 1768,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -19675,16 +20290,16 @@
      {
       "name" : "defaultTags",
       "kind" : "alias",
-      "line" : 1576,
+      "line" : 1769,
       "char" : 2,
-      "type" : "Filter!(templateNot!isCallbackTag, MU._impl.allTags)"
+      "type" : "Filter!(templateNot!isCallbackTag, ImplOf!MU.allTags)"
      }
     ]
    },
    {
-    "name" : "__unittest_L1591_C26",
+    "name" : "__unittest_L1784_C26",
     "kind" : "function",
-    "line" : 1591,
+    "line" : 1784,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -19692,13 +20307,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1653,
+    "endline" : 1846,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " パターンマッチ\n",
-    "line" : 1653,
+    "line" : 1846,
     "char" : 1,
     "name" : "match",
     "parameters" : [
@@ -19710,7 +20325,7 @@
     "members" : [
      {
       "kind" : "template",
-      "line" : 1655,
+      "line" : 1848,
       "char" : 2,
       "name" : "match",
       "parameters" : [
@@ -19724,14 +20339,14 @@
        {
         "name" : "minfo",
         "kind" : "alias",
-        "line" : 1658,
+        "line" : 1851,
         "char" : 3,
         "type" : "matchInfo!(MU, Funcs)"
        },
        {
         "name" : "matchImpl",
         "kind" : "function",
-        "line" : 1661,
+        "line" : 1854,
         "char" : 27,
         "storageClass" : [
          "auto"
@@ -19747,13 +20362,13 @@
           ]
          }
         ],
-        "endline" : 1688,
+        "endline" : 1881,
         "endchar" : 3
        },
        {
         "name" : "match",
         "kind" : "function",
-        "line" : 1691,
+        "line" : 1884,
         "char" : 27,
         "storageClass" : [
          "auto"
@@ -19769,7 +20384,7 @@
           ]
          }
         ],
-        "endline" : 1712,
+        "endline" : 1905,
         "endchar" : 3
        }
       ]
@@ -19777,10 +20392,10 @@
     ]
    },
    {
-    "name" : "__unittest_L1716_C26",
+    "name" : "__unittest_L1909_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1716,
+    "line" : 1909,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -19788,14 +20403,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1746,
+    "endline" : 1939,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1746_C26",
+    "name" : "__unittest_L1939_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1746,
+    "line" : 1939,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -19803,13 +20418,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1766,
+    "endline" : 1959,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1766_C26",
+    "name" : "__unittest_L1959_C26",
     "kind" : "function",
-    "line" : 1766,
+    "line" : 1959,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -19817,7 +20432,7 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1810,
+    "endline" : 2004,
     "endchar" : 1
    }
   ]
