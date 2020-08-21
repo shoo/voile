@@ -98,8 +98,24 @@ version (unittest) private import std.datetime: Date;
 	u = _unionInit!(U, 1)(1);
 }
 
+
+
+// ユニークなメンバ名を取得する
+private template uniqueMemberName(T, string name = "_uniqueMemberName", uint num = 0)
+{
+	import std.conv;
+	enum string candidate = num == 0 ? name : text(name, num);
+	static if (__traits(hasMember, T, candidate))
+	{
+		enum string uniqueMemberName = uniqueMemberName!(T, name, num+1);
+	}
+	else
+	{
+		enum string uniqueMemberName = candidate;
+	}
+}
+
 private mixin template ManagedUnionImpl(Instance, tags...)
-if (is(Instance == union) && (Fields!Instance.length == tags.length || tags.length == 0))
 {
 	private template GetIndexType(size_t typecnt)
 	{
@@ -149,8 +165,11 @@ if (is(Instance == union) && (Fields!Instance.length == tags.length || tags.leng
 	
 	enum TagType notfoundTag = cast(TagType)(-1);
 	
-	TagType  _tag = notfoundTag;
-	Instance _inst;
+	struct
+	{
+		TagType  _tag = notfoundTag;
+		Instance _inst;
+	}
 	
 	/***************************************************************************
 	 *
@@ -167,26 +186,6 @@ if (is(Instance == union) && (Fields!Instance.length == tags.length || tags.leng
 	{
 		_inst = inst;
 		_tag  = t;
-	}
-	
-	static if (hasDestructor)
-	{
-		// 型のうちいずれかがデストラクタを持つ場合、対処する
-		public ~this()
-		{
-			final switch (_tag)
-			{
-				static foreach (i, T; MemberTypes)
-				{
-				case i:
-					static if (hasElaborateDestructor!T)
-						_inst.tupleof[i]._move();
-					return;
-				}
-				case notfoundTag:
-					return;
-			}
-		}
 	}
 	
 	/***************************************************************************
@@ -256,46 +255,41 @@ if (is(Instance == union) && (Fields!Instance.length == tags.length || tags.leng
 	 */
 	void clear()()
 	{
-		this._move();
-		_tag = notfoundTag;
+		scope (exit)
+			_tag = notfoundTag;
+		static if (hasDestructor)
+		{
+			switch (_tag)
+			{
+				static foreach (i, T; MemberTypes)
+				{
+				case getTag!i:
+					static if (hasElaborateDestructor!T)
+						_inst.tupleof[i]._move();
+					return;
+				}
+				default:
+					return;
+			}
+		}
 	}
 }
 
 /*******************************************************************************
- * タグ付き共用体
+ * 型列挙
  */
-struct ManagedUnion(Types...)
-if (Types.length > 0 && NoDuplicates!Types.length == Types.length)
+private union TypeEnumImpl(Types...)
 {
-private:
-	
-	enum bool isManagedUnion = Types.length == 1 && is(Types[0] == union);
-	
-	static if (isManagedUnion)
+	alias FieldTypes = Types;
+
+	union Instance
 	{
-		alias FieldTypes = Fields!(Types[0]);
-	}
-	else
-	{
-		alias FieldTypes = Types;
-	}
-	
-	
-	static if (isManagedUnion)
-	{
-		alias Instance = Types[0];
-	}
-	else
-	{
-		union Instance
+		mixin template DefineMember(T)
 		{
-			mixin template DefineMember(T)
-			{
-				T _value;
-			}
-			static foreach (T; FieldTypes)
-				mixin DefineMember!T;
+			T _value;
 		}
+		static foreach (T; FieldTypes)
+			mixin DefineMember!T;
 	}
 	mixin ManagedUnionImpl!Instance _impl;
 	
@@ -332,7 +326,7 @@ private:
 		 * 初期化する
 		 */
 		void initialize(T, Args...)(auto ref Args args)
-		if (hasType!T && !isManagedUnion)
+		if (hasType!T)
 		{
 			static if (hasDestructor)
 				clear();
@@ -345,7 +339,7 @@ private:
 		 * データをセットする
 		 */
 		void set(T)(auto ref T val) @property
-		if (isAssignable!T && !isManagedUnion)
+		if (isAssignable!T)
 		{
 			enum idx = getAssignableIndex!T;
 			static if (hasDestructor)
@@ -361,7 +355,7 @@ private:
 		 * データを取得する
 		 */
 		auto ref get(T)() nothrow pure @nogc inout @property
-		if (hasType!T && !isManagedUnion)
+		if (hasType!T)
 		in (getTag!(getAssignableIndex!T) == _tag)
 		{
 			enum idx = getAssignableIndex!T;
@@ -372,38 +366,56 @@ private:
 		 * データがセットされているかチェックする
 		 */
 		bool check(T)() nothrow pure @nogc @safe const
-		if (hasType!T && !isManagedUnion)
+		if (hasType!T)
 		{
 			return _tag == getTag!(getTypeIndex!T);
 		}
 	}
 	mixin WithType _implT;
-public:
-	
+}
+
+
+/*******************************************************************************
+ * 型列挙
+ */
+struct TypeEnum(Types...)
+if (Types.length > 0 && NoDuplicates!Types.length == Types.length)
+{
+	private TypeEnumImpl!Types _inst;
 	/***************************************************************************
 	 * コンストラクタ
 	 */
 	this(T)(auto ref T val)
-	if (isAssignable!T)
+	if (_inst.isAssignable!T)
 	{
-		enum idx = getAssignableIndex!T;
+		enum idx = _inst.getAssignableIndex!T;
 		static if (__traits(isRef, val))
-			_inst.tupleof[idx] = val;
+			_inst._impl._inst.tupleof[idx] = val;
 		else
-			_inst.tupleof[idx] = val._move();
-		_tag = idx;
+			_inst._impl._inst.tupleof[idx] = val._move();
+		_inst._impl._tag = idx;
+	}
+	
+	
+	static if (TypeEnumImpl!Types._impl.hasDestructor)
+	{
+		// 型のうちいずれかがデストラクタを持つ場合、対処する
+		public ~this()
+		{
+			_inst._impl.clear();
+		}
 	}
 	
 	/***************************************************************************
 	 * 代入
 	 */
 	void opAssign(T)(auto ref T val)
-	if (isAssignable!T && !isManagedUnion)
+	if (_inst.isAssignable!T)
 	{
-		static if (hasDestructor)
-			clear();
-		enum idx = getAssignableIndex!T;
-		initialize!idx(val);
+		static if (_inst.hasDestructor)
+			_inst.clear();
+		enum idx = _inst.getAssignableIndex!T;
+		_inst.initialize!idx(val);
 		static if (is(T == struct) && hasElaborateDestructor!T && !__traits(isRef, val))
 			_initialize(val);
 	}
@@ -412,34 +424,16 @@ public:
 	 * キャスト
 	 */
 	inout(T) opCast(T)() inout
-	if (isAssignable!T && !isManagedUnion)
+	if (_inst.isAssignable!T)
 	{
-		return _implT.get!T();
-	}
-	
-	/***************************************************************************
-	 * 名前アクセス
-	 * 
-	 * ManagedUnionの引数に共用体を与えた場合は名前でのアクセスを許可する。
-	 * See_Also: $(D $(LINK2 _voile--_voile.munion.html#.Managed, Managed))
-	 */
-	auto ref opDispatch(string member)()
-	if (isManagedUnion && hasMember!(Instance, member))
-	{
-		return get!(staticIndexOf!(member, FieldNameTuple!(Instance)));
-	}
-	/// ditto
-	void opDispatch(string member)(auto ref MemberTypes[staticIndexOf!(member, FieldNameTuple!(Instance))] val)
-	if (isManagedUnion && hasMember!(Instance, member))
-	{
-		set!(staticIndexOf!(member, FieldNameTuple!(Instance)))(val);
+		return _inst._implT.get!T();
 	}
 }
 
 ///
 @safe pure nothrow @nogc unittest
 {
-	alias U = ManagedUnion!(int, string);
+	alias U = TypeEnum!(int, string);
 	U dat;
 	// assign
 	dat = 1;
@@ -459,10 +453,10 @@ public:
 	// getter/setter
 	assert(dat.tag == 0);
 	assert(dat.get!int == 1);
-	dat.set!int = 5;
+	set!int(dat, 5);
 	assert(dat.get!int == 5);
-	dat.set!1 = "foo";
-	assert(dat.get!1 == "foo");
+//	dat.set!1 = "foo";
+//	assert(dat.get!1 == "foo");
 	
 	// clear
 	dat.clear();
@@ -475,11 +469,13 @@ public:
 		(string str) => str.length) == "foo".length);
 }
 
+
+
 @safe pure @nogc nothrow unittest
 {
 	import std.exception;
 	import std.conv: ConvException;
-	alias U = ManagedUnion!(int, short, long);
+	alias U = TypeEnum!(int, short, long);
 	U dat = 1;
 	assert(dat.check!int);
 	assert(!dat.check!short);
@@ -496,15 +492,66 @@ public:
 	dat.set!0 = 1;
 }
 
+/*******************************************************************************
+ * タグ付き共用体
+ */
+private union TaggedImpl(U)
+{
+	alias FieldTypes = Fields!U;
+	alias Instance = U;
+	mixin ManagedUnionImpl!Instance _impl;
+	alias memberNames = FieldNameTuple!Instance;
+	enum _impl.IndexType getIndex(string member) = cast(_impl.IndexType)staticIndexOf!(member, memberNames);
+	enum _impl.TagType   getTag(string member)   = _impl.getTag!(getIndex!member);
+	alias MemberType(string member)              = _impl.MemberTypes[getIndex!member];
+}
+
 
 /*******************************************************************************
- * 共用体に管理機能を付与する
+ * タグ付き共用体
  */
-template Managed(T)
-if (is(T == union))
+struct Tagged(U)
+if (is(U == union))
 {
-	alias Managed = ManagedUnion!T;
-	static assert(Managed.isManagedUnion);
+	mixin(`private TaggedImpl!U ` ~ uniqueMemberName!U ~ `;`);
+	
+	static if (TaggedImpl!U._impl.hasDestructor)
+	{
+		// 型のうちいずれかがデストラクタを持つ場合、対処する
+		public ~this()
+		{
+			final switch (__traits(getMember, this, uniqueMemberName!U)._impl._tag)
+			{
+				static foreach (i, T; TaggedImpl!U._impl.MemberTypes)
+				{
+				case i:
+					static if (hasElaborateDestructor!T)
+						_inst.tupleof[i]._move();
+					return;
+				}
+				case notfoundTag:
+					return;
+			}
+		}
+	}
+	
+	/***************************************************************************
+	 * 名前アクセス
+	 * 
+	 * Taggedの引数に共用体を与えた場合は名前でのアクセスを許可する。
+	 * See_Also: $(D $(LINK2 _voile--_voile.munion.html#.Managed, Managed))
+	 */
+	auto ref opDispatch(string member)()
+	if (hasMember!(TaggedImpl!U.Instance, member))
+	{
+		return __traits(getMember, this, uniqueMemberName!U).get!(TaggedImpl!U.getTag!member);
+	}
+	/// ditto
+	void opDispatch(string member)(auto ref TaggedImpl!U.MemberType!member val)
+	if (hasMember!(TaggedImpl!U.Instance, member))
+	{
+		__traits(getMember, this, uniqueMemberName!U).set!(TaggedImpl!U.getTag!member)(val);
+	}
 }
 
 ///
@@ -517,7 +564,7 @@ if (is(T == union))
 		string str;
 	}
 	
-	alias MU = ManagedUnion!U;
+	alias MU = Tagged!U;
 	
 	MU dat;
 	
@@ -530,53 +577,48 @@ if (is(T == union))
 	assert(dat.str == "xxx");
 }
 
-
+private union EndataImpl(E)
+{
+	union Instance
+	{
+		static foreach (m; __traits(allMembers, E))
+		{
+			static if (hasData!(__traits(getMember, E, m)))
+				mixin(`DataType!(__traits(getMember, E, m)) ` ~ m ~ `;`);
+		}
+	}
+	alias tags = Filter!(hasData, EnumMembers!E);
+	mixin ManagedUnionImpl!(Instance, tags) _impl;
+	alias memberNames = FieldNameTuple!Instance;
+	enum _impl.IndexType getIndex(string member) = cast(_impl.IndexType)staticIndexOf!(member, memberNames);
+	enum _impl.TagType   getTag(string member)   = _impl.getTag!(getIndex!member);
+	alias MemberType(string member)              = _impl.MemberTypes[getIndex!member];
+}
 
 
 /*******************************************************************************
  * データ付きのenum
  */
 struct Endata(E)
+if (is(E == enum))
 {
-private:
-	mixin template Impl()
-	{
-		union Instance
-		{
-			static foreach (m; __traits(allMembers, E))
-			{
-				static if (hasData!(__traits(getMember, E, m)))
-					mixin(`DataType!(__traits(getMember, E, m)) ` ~ m ~ `;`);
-			}
-		}
-		alias tags = Filter!(hasData, EnumMembers!E);
-		mixin ManagedUnionImpl!(Instance, tags);
-		alias memberNames = FieldNameTuple!Instance;
-		enum TagType getTag(string member) = __traits(getMember, E, member);
-		alias MemberType(string member) = MemberTypes[staticIndexOf!(member, memberNames)];
-	}
-	mixin Impl _impl;
+	mixin(`private EndataImpl!E ` ~ uniqueMemberName!E ~ `;`);
 	
-public:
-	
-	/***********************************************************************
-	 * 
+	/***************************************************************************
+	 * 名前アクセス
 	 */
-	static foreach (m; memberNames)
+	auto ref opDispatch(string member)()
+	if (hasMember!(EndataImpl!E.Instance, member))
 	{
-		mixin(`
-			auto ref `~m~`()() @property
-			{
-				return _impl.get!(_impl.getTag!"`~m~`")();
-			}
-			void `~m~`()(auto ref _impl.MemberType!"`~m~`" val) @property
-			{
-				return _impl.set!(_impl.getTag!"`~m~`")(val);
-			}
-		`);
+		return __traits(getMember, this, uniqueMemberName!E)._impl.get!(EndataImpl!E.getTag!member);
+	}
+	/// ditto
+	void opDispatch(string member)(auto ref EndataImpl!E.MemberType!member val)
+	if (hasMember!(EndataImpl!E.Instance, member))
+	{
+		__traits(getMember, this, uniqueMemberName!E)._impl.set!(EndataImpl!E.getTag!member)(val);
 	}
 }
-
 
 ///
 @safe pure nothrow @nogc unittest
@@ -638,27 +680,108 @@ public:
 	alias EnumData = Endata!E;
 	EnumData dat;
 	
-	static assert(dat._impl.getTag!"number" == number);
-	static assert(is(dat._impl.MemberType!"number" == int));
+	static assert(typeof(dat.getInstance()).getTag!"number" == number);
+	static assert(is(typeof(dat.getInstance()).MemberType!"number" == int));
 	
 	dat.number = 10;
 	assert(dat.tag == number);
 	assert(dat.number == 10);
 }
 
+/*******************************************************************************
+ * 引数によって実装を切り替えるManagedUnion
+ * 
+ * - 引数が1つでunionならTaggedになる
+ * - 引数が1つでenumならEndataになる
+ * - それ以外ならTypeEnumになる
+ */
+template ManagedUnion(Types...)
+if (Types.length > 0)
+{
+	static if (Types.length == 1 && is(Types[0] == union))
+	{
+		alias ManagedUnion = Tagged!Types;
+	}
+	else static if (Types.length == 1 && is(Types[0] == enum))
+	{
+		alias ManagedUnion = Endata!Types;
+	}
+	else
+	{
+		alias ManagedUnion = TypeEnum!Types;
+	}
+}
+
+
+
+/*******************************************************************************
+ * TypeEnumか判定する
+ */
+enum bool isTypeEnum(MU) = isInstanceOf!(TypeEnum, MU);
+
+/*******************************************************************************
+ * Taggedか判定する
+ */
+enum bool isTagged(MU) = isInstanceOf!(Tagged, MU);
+
+/*******************************************************************************
+ * Endataか判定する
+ */
+enum bool isEndata(MU) = isInstanceOf!(Endata, MU);
+
+/*******************************************************************************
+ * ManagedUnionか判定する
+ */
+enum bool isManagedUnion(MU) = isTypeEnum!MU || isTagged!MU || isEndata!MU;
+
+
+
+
+
+private pragma(inline) ref getInstance(MU)(ref MU dat) pure nothrow @nogc @safe
+{
+	static if (isTypeEnum!MU)
+	{
+		return dat._inst;
+	}
+	else
+	{
+		alias A = TemplateArgsOf!MU;
+		return __traits(getMember, dat, uniqueMemberName!A);
+	}
+}
+private template ImplOf(MU)
+{
+	alias A = TemplateArgsOf!MU;
+	static if (isTypeEnum!MU)
+	{
+		alias ImplOf = TypeEnumImpl!A._impl;
+	}
+	else static if (isTagged!MU)
+	{
+		alias ImplOf = TaggedImpl!A._impl;
+	}
+	else static if (isEndata!MU)
+	{
+		alias ImplOf = EndataImpl!A._impl;
+	}
+	else static assert(0);
+}
+
+private alias TypeImplOf(MU) = TypeEnumImpl!(TemplateArgsOf!MU)._implT;
 
 /*******************************************************************************
  * ManagedUnionのタグ型を得る
  */
 template TagType(MU)
-if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
+if (isManagedUnion!MU)
 {
-	alias TagType = MU._impl.TagType;
+	alias TagType = ImplOf!MU.TagType;
 }
 ///
 @safe @nogc nothrow pure unittest
 {
-	static assert(is(TagType!(ManagedUnion!(int, string)) == ubyte));
+	static assert(is(TagType!(TypeEnum!(int, string)) == ubyte));
 }
 ///
 @safe @nogc nothrow pure unittest
@@ -671,11 +794,11 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
  * 有効なタグか確認する
  */
 template isAvailableTag(MU, alias tag)
-if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
+if (isManagedUnion!MU)
 {
 	static if (!isType!tag && isOrderingComparable!(CommonType!(typeof(tag), TagType!MU)))
 	{
-		enum bool isAvailableTag = MU._impl.getIndex!tag < MU._impl.memberCount;
+		enum bool isAvailableTag = ImplOf!MU.getIndex!tag < ImplOf!MU.memberCount;
 	}
 	else
 	{
@@ -685,7 +808,7 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 ///
 @safe @nogc nothrow pure unittest
 {
-	alias MU = ManagedUnion!(int, string);
+	alias MU = TypeEnum!(int, string);
 	static assert( isAvailableTag!(MU, 1));
 	static assert(!isAvailableTag!(MU, 2));
 }
@@ -703,14 +826,14 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
  * 無効なタグを取得する
  */
 template getNotFoundTag(MU)
-if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
+if (isManagedUnion!MU)
 {
-	enum MU._impl.TagType getNotFoundTag = MU._impl.notfoundTag;
+	enum ImplOf!MU.TagType getNotFoundTag = ImplOf!MU.notfoundTag;
 }
 ///
 @safe @nogc nothrow pure unittest
 {
-	alias MU = ManagedUnion!(int, string);
+	alias MU = TypeEnum!(int, string);
 	static assert(getNotFoundTag!MU != 0);
 	static assert(getNotFoundTag!MU != 1);
 }
@@ -727,32 +850,112 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
  * 型を持っているか確認する
  */
 template hasType(MU, T)
-if (isInstanceOf!(ManagedUnion, MU))
+if (isTypeEnum!MU)
 {
-	enum bool hasType = MU._implT.hasType!T;
+	enum bool hasType = TypeImplOf!MU.hasType!T;
 }
 ///
 @safe @nogc nothrow pure unittest
 {
-	alias MU = ManagedUnion!(int, string);
+	alias MU = TypeEnum!(int, string);
 	static assert(hasType!(MU, int));
 	static assert(hasType!(MU, string));
 	static assert(!hasType!(MU, long));
 }
 
 
+
 /*******************************************************************************
- * タグを確認する
+ * 持っている型を列挙する
  */
-TagType!MU tag(MU)(in auto ref MU tu)
-if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
+template EnumMemberTypes(MU)
+if (isManagedUnion!MU)
 {
-	return tu._impl._tag;
+	alias EnumMemberTypes = ImplOf!MU.MemberTypes;
 }
 ///
 @safe @nogc nothrow pure unittest
 {
-	alias MU = ManagedUnion!(int, string);
+	alias MU = TypeEnum!(int, string);
+	alias Types = EnumMemberTypes!MU;
+	static assert(is(Types[0] == int));
+	static assert(is(Types[1] == string));
+}
+
+
+/*******************************************************************************
+ * タグを列挙する
+ */
+template memberTags(MU)
+if (isManagedUnion!MU)
+{
+	enum ImplOf!MU.TagType[] memberTags = (){
+		ImplOf!MU.TagType[] ret;
+		static foreach (i; 0..ImplOf!MU.MemberTypes.length)
+			ret ~= ImplOf!MU.getTag!i;
+		return ret;
+	}();
+}
+
+/// ditto
+template EnumMemberTags(MU)
+if (isManagedUnion!MU)
+{
+	alias EnumMemberTags = aliasSeqOf!(memberTags!MU);
+}
+///
+@safe @nogc nothrow pure unittest
+{
+	alias MU = TypeEnum!(int, string);
+	enum tags = memberTags!MU;
+	static assert(tags.length == 2);
+	static assert(tags[0] == 0);
+	static assert(tags[1] == 1);
+	
+	alias MemberTags = EnumMemberTags!MU;
+	static assert(MemberTags.length == 2);
+	static assert(MemberTags[0] == 0);
+	static assert(MemberTags[1] == 1);
+}
+
+
+/*******************************************************************************
+ * タグから型を得る
+ */
+template TypeFromTag(MU, alias tag)
+if (isManagedUnion!MU)
+{
+	alias TypeFromTag = ImplOf!MU.MemberTypes[ImplOf!MU.getIndex!tag];
+}
+///
+@safe @nogc nothrow pure unittest
+{
+	alias MU1 = TypeEnum!(int, string);
+	static assert(is(TypeFromTag!(MU1, 0) == int));
+}
+
+
+/*******************************************************************************
+ * 型が代入可能か
+ */
+template isTypeAssignable(MU, T)
+if (isTypeEnum!MU)
+{
+	enum bool isTypeAssignable = TypeImplOf!MU.isAssignable!T;
+}
+
+/*******************************************************************************
+ * タグを確認する
+ */
+TagType!MU tag(MU)(in auto ref MU dat)
+if (isManagedUnion!MU)
+{
+	return dat.getInstance()._tag;
+}
+///
+@safe @nogc nothrow pure unittest
+{
+	alias MU = TypeEnum!(int, string);
 	MU tu;
 	assert(tag(tu) == getNotFoundTag!MU);
 	tu = 1;
@@ -783,27 +986,21 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
  * 初期化する
  */
 void initialize(alias tag, MU, Args...)(auto ref MU dat, auto ref Args args)
-if (isInstanceOf!(ManagedUnion, MU) && isAvailableTag!(MU, tag))
+if (isManagedUnion!MU && isAvailableTag!(MU, tag))
 {
-	dat._impl.initialize!tag(args);
+	dat.getInstance()._impl.initialize!tag(args);
 }
 /// ditto
 void initialize(T, MU, Args...)(auto ref MU dat, auto ref Args args)
-if (isInstanceOf!(ManagedUnion, MU) && hasType!(MU, T))
+if (isTypeEnum!MU && hasType!(MU, T))
 {
-	dat._implT.initialize!T(args);
-}
-/// ditto
-void initialize(alias tag, E, Args...)(auto ref Endata!E e, auto ref Args args)
-if (isAvailableTag!(Endata!E, tag))
-{
-	e._impl.initialize!tag(args);
+	dat.getInstance()._implT.initialize!T(args);
 }
 ///
 @safe @nogc nothrow pure unittest
 {
 	struct S { int x; }
-	alias MU = ManagedUnion!(int, S);
+	alias MU = TypeEnum!(int, S);
 	MU dat;
 	initialize!0(dat, 1);
 	assert(get!0(dat) == 1);
@@ -832,36 +1029,34 @@ if (isAvailableTag!(Endata!E, tag))
 /*******************************************************************************
  * データをセットする
  */
-void set(alias tag, MU, T)(ref auto MU dat, auto ref T val)
-if (isInstanceOf!(ManagedUnion, MU) && isAvailableTag!(MU, tag))
+void set(alias tag, MU, T)(ref auto MU dat, auto ref T val) @property
+if (isManagedUnion!MU && isAvailableTag!(MU, tag))
 {
-	dat._impl.set!tag(val);
+	dat.getInstance()._impl.set!tag(val);
+	static if (hasElaborateDestructor!T && !__traits(isRef, val))
+		_initialize(val);
 }
 /// ditto
-void set(T, MU)(ref auto MU dat, auto ref T val)
-if (isInstanceOf!(ManagedUnion, MU) && hasType!(MU, T))
+void set(T, MU)(ref MU dat, auto ref T val) @property
+if (isTypeEnum!MU && hasType!(MU, T))
 {
-	dat._implT.set!T(val);
-}
-/// ditto
-void set(alias tag, E, T)(ref auto Endata!E e, auto ref T val)
-if (isAvailableTag!(Endata!E, tag))
-{
-	e._impl.set!tag(val);
+	dat.getInstance()._implT.set!T(val);
+	static if (hasElaborateDestructor!T && !__traits(isRef, val))
+		_initialize(val);
 }
 ///
 @safe @nogc nothrow pure unittest
 {
 	struct S { int x; }
-	alias MU = ManagedUnion!(int, S);
+	alias MU = TypeEnum!(int, S);
 	MU dat;
-	set!0(dat, 1);
+	dat.set!0 = 1;
 	assert(get!0(dat) == 1);
 	set!1(dat, S(100));
 	assert(get!1(dat) == S(100));
 	// for type
-	set!int(dat, 10);
-	assert(get!0(dat) == 10);
+	dat.set!int = 10;
+	assert(dat.get!0 == 10);
 }
 ///
 @safe @nogc nothrow pure unittest
@@ -871,32 +1066,32 @@ if (isAvailableTag!(Endata!E, tag))
 	alias ED = Endata!E;
 	ED dat;
 	
-	set!x(dat, 1);
-	assert(tag(dat) == x);
+	dat.set!x = 1;
+	assert(dat.tag == x);
 	set!str(dat, "test");
-	assert(tag(dat) == str);
+	assert(dat.tag == str);
 }
 
 /*******************************************************************************
  * データを取得する
  */
 auto ref get(alias tag, MU)(inout auto ref MU dat)
-if ((isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)) && isAvailableTag!(MU, tag))
+if (isManagedUnion!MU && isAvailableTag!(MU, tag))
 {
-	return dat._impl.get!tag();
+	return dat.getInstance()._impl.get!tag();
 }
 /// ditto
 auto ref get(T, MU)(inout auto ref MU dat)
-if (isInstanceOf!(ManagedUnion, MU) && hasType!(MU, T))
+if (isTypeEnum!MU && hasType!(MU, T))
 {
-	return dat._implT.get!T();
+	return dat.getInstance()._implT.get!T();
 }
 ///
 @safe unittest
 {
 	import core.exception: AssertError;
 	import std.exception;
-	alias MU = ManagedUnion!(int, string);
+	alias MU = TypeEnum!(int, string);
 	MU tu;
 	(() @trusted => assertThrown!AssertError(get!0(tu) == 1) )();
 	set!1(tu, "test");
@@ -912,39 +1107,39 @@ if (isInstanceOf!(ManagedUnion, MU) && hasType!(MU, T))
 	alias ED = Endata!E;
 	ED dat;
 	
-	set!x(dat, 1);
+	dat.set!x = 1;
 	assert(.get!x(dat) == 1);
-	set!str(dat, "test");
-	assert(.get!str(dat) == "test");
-	assert(check!str(dat));
+	dat.set!str = "test";
+	assert(dat.get!str == "test");
+	assert(dat.check!str);
 }
 
 /*******************************************************************************
  * データが入っていることを確認する
  */
 bool check(alias tag, MU)(in auto ref MU dat)
-if ((isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU)) && isAvailableTag!(MU, tag))
+if (isManagedUnion!MU && isAvailableTag!(MU, tag))
 {
-	return dat._impl.check!tag();
+	return dat.getInstance()._impl.check!tag();
 }
 /// ditto
 bool check(T, MU)(in auto ref MU dat)
-if (isInstanceOf!(ManagedUnion, MU) && hasType!(MU, T))
+if (isTypeEnum!MU && hasType!(MU, T))
 {
-	return dat._implT.check!T();
+	return dat.getInstance()._implT.check!T();
 }
 ///
 @safe unittest
 {
-	alias MU = ManagedUnion!(int, string);
+	alias MU = TypeEnum!(int, string);
 	MU tu;
-	assert(!check!0(tu));
-	assert(!check!1(tu));
-	set!1(tu, "test");
-	assert(!check!0(tu));
-	assert(check!1(tu));
+	assert(!tu.check!0);
+	assert(!tu.check!1);
+	tu.set!1 = "test";
+	assert(!tu.check!0);
+	assert(tu.check!1);
 	// for type
-	assert(check!string(tu));
+	assert(tu.check!string);
 }
 ///
 @safe @nogc nothrow pure unittest
@@ -954,33 +1149,33 @@ if (isInstanceOf!(ManagedUnion, MU) && hasType!(MU, T))
 	alias ED = Endata!E;
 	ED dat;
 	
-	set!x(dat, 1);
-	assert(check!x(dat));
-	set!str(dat, "test");
-	assert(check!str(dat));
+	dat.set!x = 1;
+	assert(dat.check!x);
+	dat.set!str = "test";
+	assert(dat.check!str);
 }
 
 /*******************************************************************************
  * データをクリアする
  */
 void clear(MU)(auto ref MU dat)
-if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
+if (isManagedUnion!MU)
 {
-	dat._impl.clear();
+	dat.getInstance()._impl.clear();
 }
 ///
 @safe @nogc nothrow pure unittest
 {
-	alias MU = ManagedUnion!(int, string);
+	alias MU = TypeEnum!(int, string);
 	MU tu;
-	assert(!check!0(tu));
-	assert(!check!1(tu));
-	set!1(tu, "test");
-	assert(!check!0(tu));
-	assert(check!1(tu));
-	clear(tu);
-	assert(!check!0(tu));
-	assert(!check!1(tu));
+	assert(!tu.check!0);
+	assert(!tu.check!1);
+	tu.set!1 = "test";
+	assert(!tu.check!0);
+	assert(tu.check!1);
+	tu.clear();
+	assert(!tu.check!0);
+	assert(!tu.check!1);
 }
 ///
 @safe @nogc nothrow pure unittest
@@ -990,9 +1185,9 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 	alias ED = Endata!E;
 	ED dat;
 	
-	set!x(dat, 1);
+	dat.set!x = 1;
 	assert(check!x(dat));
-	set!str(dat, "test");
+	dat.set!str = "test";
 	assert(check!str(dat));
 }
 
@@ -1000,18 +1195,18 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
  * データがクリアされているか確認する
  */
 bool empty(MU)(in auto ref MU dat)
-if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
+if (isManagedUnion!MU)
 {
-	return dat._impl.empty();
+	return dat.getInstance()._impl.empty();
 }
 ///
 @safe @nogc nothrow pure unittest
 {
-	alias MU = ManagedUnion!(int, string);
+	alias MU = TypeEnum!(int, string);
 	MU tu;
-	assert(empty(tu));
-	set!1(tu, "test");
-	assert(!empty(tu));
+	assert(tu.empty);
+	tu.set!1 = "test";
+	assert(!tu.empty);
 }
 ///
 @safe @nogc nothrow pure unittest
@@ -1021,11 +1216,11 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 	alias ED = Endata!E;
 	ED dat;
 	
-	assert(empty(dat));
-	set!x(dat, 1);
-	assert(!empty(dat));
-	set!str(dat, "test");
-	assert(check!str(dat));
+	assert(dat.empty);
+	dat.set!x = 1;
+	assert(!dat.empty);
+	dat.set!str = "test";
+	assert(dat.check!str);
 }
 
 @safe unittest
@@ -1064,7 +1259,7 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 		A a;
 		B b;
 	}
-	alias AB = ManagedUnion!(A, B);
+	alias AB = TypeEnum!(A, B);
 	
 	{
 		U u;
@@ -1110,7 +1305,7 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 				msgRelease ~= "C";
 		}
 	}
-	alias AC = ManagedUnion!(A, C);
+	alias AC = TypeEnum!(A, C);
 	{
 		AC o = A(1);
 		assert(msgDtor == ["A"]);
@@ -1161,7 +1356,7 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 				*msgRelease ~= "E";
 		}
 	}
-	alias DE = ManagedUnion!(D, E);
+	alias DE = TypeEnum!(D, E);
 	{
 		DE o;
 		o.initialize!0(msgRelease);
@@ -1175,7 +1370,6 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 	assert(msgRelease == ["D", "E"]);
 	
 }
-
 
 
 
@@ -1264,7 +1458,6 @@ if (is(T == enum))
 
 
 
-
 private template isCallableWith(alias F, Args...)
 if (__traits(isTemplate, F))
 {
@@ -1318,12 +1511,12 @@ if (__traits(isTemplate, F))
 
 
 private template matchFuncInfo(MU, alias F)
-if (isInstanceOf!(ManagedUnion, MU))
+if (isTypeEnum!MU || isTagged!MU)
 {
-	alias IndexType   = MU._impl.IndexType;
-	alias TagType     = MU._impl.TagType;
-	alias notfoundTag = MU._impl.notfoundTag;
-	alias MemberTypes = MU._impl.MemberTypes;
+	alias IndexType   = ImplOf!MU.IndexType;
+	alias TagType     = ImplOf!MU.TagType;
+	alias notfoundTag = ImplOf!MU.notfoundTag;
+	alias MemberTypes = ImplOf!MU.MemberTypes;
 	
 	static if (isCallable!F)
 	{
@@ -1332,11 +1525,11 @@ if (isInstanceOf!(ManagedUnion, MU))
 		static if (!isDefault)
 		{
 			enum bool isCatch    = params.length == 1 && is(params[0]: Exception);
-			enum bool isCallback = params.length == 1 && MU._implT.hasType!(params[0]);
+			enum bool isCallback = params.length == 1 && TypeImplOf!MU.hasType!(params[0]);
 			static if (isCallback)
 			{
-				enum TagType   tag   = MU._impl.getTag!(MU._implT.getTypeIndex!(params[0]));
-				enum IndexType index = MU._implT.getTypeIndex!(params[0]);
+				enum TagType   tag   = ImplOf!MU.getTag!(TypeImplOf!MU.getTypeIndex!(params[0]));
+				enum IndexType index = TypeImplOf!MU.getTypeIndex!(params[0]);
 			}
 			else
 			{
@@ -1358,7 +1551,7 @@ if (isInstanceOf!(ManagedUnion, MU))
 		// other => ...
 		alias params         = AliasSeq!();
 		enum TagType   tag   = notfoundTag;
-		enum IndexType index = MU._impl.getIndex!tag;
+		enum IndexType index = ImplOf!MU.getIndex!tag;
 		enum bool isDefault  = true;
 		enum bool isCatch    = false;
 		enum bool isCallback = false;
@@ -1378,7 +1571,7 @@ if (isInstanceOf!(ManagedUnion, MU))
 
 @safe unittest
 {
-	alias U = ManagedUnion!(int, short, long);
+	alias U = TypeEnum!(int, short, long);
 	
 	static assert(!matchFuncInfo!(U, (int x) => x + 1).isDefault);
 	static assert(!matchFuncInfo!(U, (Exception x) => 1).isDefault);
@@ -1400,7 +1593,7 @@ if (isInstanceOf!(ManagedUnion, MU))
 	static assert(is(matchFuncInfo!(U, () => 1).RetType == int));
 	static assert(is(matchFuncInfo!(U, 1).RetType == int));
 	
-	static assert(matchFuncInfo!(U, other => 1).tag == U._impl.notfoundTag);
+	static assert(matchFuncInfo!(U, other => 1).tag == ImplOf!U.notfoundTag);
 	static assert( matchFuncInfo!(U, other => 1).isDefault);
 	static assert(!matchFuncInfo!(U, other => 1).isCallback);
 	static assert(!matchFuncInfo!(U, other => 1).isCatch);
@@ -1410,10 +1603,10 @@ if (isInstanceOf!(ManagedUnion, MU))
 private template matchFuncInfo(ED, alias F)
 if (isInstanceOf!(Endata, ED))
 {
-	alias IndexType   = ED._impl.IndexType;
-	alias TagType     = ED._impl.TagType;
-	alias notfoundTag = ED._impl.notfoundTag;
-	alias MemberTypes = ED._impl.MemberTypes;
+	alias IndexType   = ImplOf!ED.IndexType;
+	alias TagType     = ImplOf!ED.TagType;
+	alias notfoundTag = ImplOf!ED.notfoundTag;
+	alias MemberTypes = ImplOf!ED.MemberTypes;
 	
 	static if (isCallable!F)
 	{
@@ -1436,12 +1629,12 @@ if (isInstanceOf!(Endata, ED))
 				{
 					enum TagType tag = notfoundTag;
 				}
-				enum IndexType index = ED._impl.getIndex!tag;
+				enum IndexType index = ImplOf!ED.getIndex!tag;
 			}
 			else
 			{
 				enum TagType   tag   = notfoundTag;
-				enum IndexType index = ED._impl.getIndex!tag;
+				enum IndexType index = ImplOf!ED.getIndex!tag;
 			}
 		}
 		else
@@ -1449,7 +1642,7 @@ if (isInstanceOf!(Endata, ED))
 			enum bool isCatch    = false;
 			enum bool isCallback = false;
 			enum TagType   tag   = notfoundTag;
-			enum IndexType index = ED._impl.getIndex!tag;
+			enum IndexType index = ImplOf!ED.getIndex!tag;
 		}
 		alias RetType = ReturnType!F;
 	}
@@ -1463,7 +1656,7 @@ if (isInstanceOf!(Endata, ED))
 			// other => ...
 			alias params         = AliasSeq!();
 			enum TagType   tag   = notfoundTag;
-			enum IndexType index = ED._impl.getIndex!tag;
+			enum IndexType index = ImplOf!ED.getIndex!tag;
 			enum bool isDefault  = true;
 			enum bool isCatch    = false;
 			enum bool isCallback = false;
@@ -1475,7 +1668,7 @@ if (isInstanceOf!(Endata, ED))
 			// タグがある場合、タグに対応した型を使用して実体化
 			// @tag val => ...
 			enum TagType   tag    = tags[0];
-			enum IndexType index  = ED._impl.getIndex!(tags[0]);
+			enum IndexType index  = ImplOf!ED.getIndex!(tags[0]);
 			alias          params = Parameters!(F!(MemberTypes[index]));
 			static assert(params.length > 0);
 			enum bool isDefault  = false;
@@ -1540,7 +1733,7 @@ if (isInstanceOf!(Endata, ED))
 	static assert(!matchFuncInfo!(U, (@b x) => x ~ "x").isCatch);
 	static assert(is(matchFuncInfo!(U, (@b x) => x ~ "x").RetType == string));
 	
-	static assert(matchFuncInfo!(U, other => "x").tag == U._impl.notfoundTag);
+	static assert(matchFuncInfo!(U, other => "x").tag == ImplOf!U.notfoundTag);
 	static assert( matchFuncInfo!(U, other => "x").isDefault);
 	static assert(!matchFuncInfo!(U, other => "x").isCallback);
 	static assert(!matchFuncInfo!(U, other => "x").isCatch);
@@ -1548,11 +1741,11 @@ if (isInstanceOf!(Endata, ED))
 }
 
 private template matchInfo(MU, Funcs...)
-if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
+if (isManagedUnion!MU)
 {
-	alias IndexType   = MU.IndexType;
-	alias TagType     = MU.TagType;
-	alias notfoundTag = MU.notfoundTag;
+	alias IndexType   = ImplOf!MU.IndexType;
+	alias TagType     = ImplOf!MU.TagType;
+	alias notfoundTag = ImplOf!MU.notfoundTag;
 	
 	enum bool isDefault(alias F)     = matchFuncInfo!(MU, F).isDefault;
 	enum bool isCatch(alias F)       = matchFuncInfo!(MU, F).isCatch;
@@ -1573,15 +1766,15 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 	
 	alias callbackTags                 = staticMap!(getTag, callbacks);
 	enum bool isCallbackTag(TagType t) = staticIndexOf!(t, callbackTags) != -1;
-	alias defaultTags                  = Filter!(templateNot!isCallbackTag, MU._impl.allTags);
+	alias defaultTags                  = Filter!(templateNot!isCallbackTag, ImplOf!MU.allTags);
 	
 	// コールバックはメンバの数以下しかかけない
-	static assert(callbacks.length <= MU._impl.memberCount);
+	static assert(callbacks.length <= ImplOf!MU.memberCount);
 	// コールバックがメンバ全部に対応して書かれている場合はデフォルト不要
-	static if (callbacks.length == MU._impl.memberCount)
+	static if (callbacks.length == ImplOf!MU.memberCount)
 		static assert(!hasDefault);
 	// コールバックがメンバ全部に対応して書かれていない場合はデフォルトが必須
-	static if (callbacks.length < MU._impl.memberCount)
+	static if (callbacks.length < ImplOf!MU.memberCount)
 		static assert(hasDefault);
 	// デフォルト関数は1追加
 	static assert(Filter!(isDefault, Funcs).length <= 1);
@@ -1593,19 +1786,19 @@ if (isInstanceOf!(ManagedUnion, MU) || isInstanceOf!(Endata, MU))
 	import std.exception;
 	import std.conv: ConvException;
 	import voile.misc: nogcEnforce;
-	alias U = ManagedUnion!(int, short, long);
+	alias U = TypeEnum!(int, short, long);
 	U dat;
-	static assert(U._inst.sizeof == long.sizeof);
-	static assert(!U.hasType!char);
-	static assert(U.hasType!short);
-	static assert(U.getTypeIndex!short == 1);
-	static assert(U.getAssignableIndex!short == 1);
-	static assert(U.getAssignableIndex!long  == 2);
-	static assert(U.isAssignable!byte);
-	static assert(U.getAssignableIndex!byte  == 0);
-	static assert(!U.hasType!char);
+	static assert(dat.getInstance()._inst.sizeof == long.sizeof);
+	static assert(!TypeImplOf!U.hasType!char);
+	static assert(TypeImplOf!U.hasType!short);
+	static assert(TypeImplOf!U.getTypeIndex!short == 1);
+	static assert(TypeImplOf!U.getAssignableIndex!short == 1);
+	static assert(TypeImplOf!U.getAssignableIndex!long  == 2);
+	static assert(TypeImplOf!U.isAssignable!byte);
+	static assert(TypeImplOf!U.getAssignableIndex!byte  == 0);
+	static assert(!TypeImplOf!U.hasType!char);
 	
-	static assert(ManagedUnion!(ulong, long, uint, int).sizeof == ManagedUnion!(ubyte, byte, ushort, long).sizeof);
+	static assert(TypeEnum!(ulong, long, uint, int).sizeof == TypeEnum!(ubyte, byte, ushort, long).sizeof);
 	
 	dat = 1;
 	
@@ -1662,27 +1855,27 @@ template match(Funcs...)
 		{
 			static if (minfo.hasDefault)
 			{
-				final switch (dat._impl._tag)
+				final switch (dat.getInstance()._impl._tag)
 				{
 				static foreach (F; minfo.callbacks) case minfo.getTag!F:
 					return F(cast(inout)(ref () @trusted 
-						=> *cast(minfo.getParams!F[0]*)&dat._impl._inst.tupleof[minfo.getIndex!F])());
-				case dat._impl.notfoundTag:
+						=> *cast(minfo.getParams!F[0]*)&dat.getInstance()._impl._inst.tupleof[minfo.getIndex!F])());
+				case dat.getInstance()._impl.notfoundTag:
 				static foreach (tag; minfo.defaultTags) case tag:
 					static if (isCallable!(Funcs[minfo.defaultIdx]))
 						return Funcs[minfo.defaultIdx]();
 					else static if (__traits(isTemplate, Funcs[minfo.defaultIdx]))
-						return Funcs[minfo.defaultIdx](dat._impl._inst.tupleof[dat._impl.getIndex!tag]);
+						return Funcs[minfo.defaultIdx](dat.getInstance()._impl._inst.tupleof[dat.getInstance()._impl.getIndex!tag]);
 					else
 						return Funcs[minfo.defaultIdx];
 				}
 			}
 			else
 			{
-				final switch (dat._impl._tag)
+				final switch (dat.getInstance()._impl._tag)
 				{
 				static foreach (F; minfo.callbacks) case minfo.getTag!F:
-					return F(dat._impl._inst.tupleof[minfo.getIndex!F]);
+					return F(dat.getInstance()._impl._inst.tupleof[minfo.getIndex!F]);
 				}
 			}
 		}
@@ -1718,7 +1911,7 @@ template match(Funcs...)
 	import std.exception;
 	import std.conv: ConvException;
 	import voile.misc: nogcEnforce;
-	alias U = ManagedUnion!(int, short, long);
+	alias U = TypeEnum!(int, short, long);
 	U dat;
 	
 	// マッチ関数を呼び出し
@@ -1768,7 +1961,7 @@ template match(Funcs...)
 	import std.exception;
 	import std.conv: ConvException;
 	import voile.misc: nogcEnforce;
-	alias U = ManagedUnion!(int, short, long);
+	alias U = TypeEnum!(int, short, long);
 	U dat;
 	dat.set!0 = 1;
 	
@@ -1807,3 +2000,4 @@ template match(Funcs...)
 		dat = 5;
 	assert(dat.get!int == 5);
 }
+

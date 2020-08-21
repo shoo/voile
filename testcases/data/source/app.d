@@ -5,7 +5,7 @@ import voile.munion;
 
 void main()
 {
-	alias TU = ManagedUnion!(int, long, string);
+	alias TU = TypeEnum!(int, long, string);
 	
 	TU dat;
 	dat.set!0 = 10;
