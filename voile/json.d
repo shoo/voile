@@ -1,77 +1,20 @@
 ﻿module voile.json;
 
-import voile.misc;
 import std.json, std.traits, std.conv, std.array;
+import std.typecons: Rebindable;
+import voile.misc;
+import voile.munion;
+import voile.attr;
 
 
 /*******************************************************************************
  * JSONValueデータを得る
  */
 JSONValue json(T)(auto const ref T[] x) @property
-	if (isSomeString!(T[]))
+if (isSomeString!(T[]))
 {
 	return JSONValue(to!string(x));
 }
-
-
-/// ditto
-JSONValue json(T)(auto const ref T x) @property
-	if ((isIntegral!T && !is(T == enum))
-	 || isFloatingPoint!T
-	 || is(Unqual!T == bool))
-{
-	return JSONValue(x);
-}
-
-
-/// ditto
-JSONValue json(T)(auto const ref T x) @property
-	if (is(T == enum))
-{
-	return JSONValue(x.to!string());
-}
-
-
-/// ditto
-JSONValue json(T)(auto const ref T[] ary) @property
-	if (!isSomeString!(T[]) && isArray!(T[]))
-{
-	auto app = appender!(JSONValue[])();
-	JSONValue v;
-	foreach (x; ary)
-	{
-		app.put(x.json);
-	}
-	v.array = app.data;
-	return v;
-}
-
-
-/// ditto
-JSONValue json(Value, Key)(auto const ref Value[Key] aa) @property
-	if (isSomeString!Key && is(typeof({auto v = Value.init.json;})))
-{
-	auto ret = JSONValue((JSONValue[string]).init);
-	static if (is(Key: const string))
-	{
-		foreach (key, val; aa)
-			ret.object[key] = val.json;
-	}
-	else
-	{
-		foreach (key, val; aa)
-			v.object[key.to!string] = val.json;
-	}
-	return ret;
-}
-
-/// ditto
-auto ref JSONValue json(JV)(auto const ref JV v) @property
-	if (is(JV: const JSONValue))
-{
-	return cast(JSONValue)v;
-}
-
 ///
 @system unittest
 {
@@ -90,6 +33,24 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 }
 
 
+/// ditto
+JSONValue json(T)(auto const ref T x) @property
+if ((isIntegral!T && !is(T == enum))
+ || isFloatingPoint!T
+ || is(Unqual!T == bool))
+{
+	return JSONValue(x);
+}
+///
+@system unittest
+{
+	bool bt = true;
+	bool bf;
+	auto btjson = bt.json;
+	auto bfjson = bf.json;
+	assert(btjson.type == JSONType.true_);
+	assert(bfjson.type == JSONType.false_);
+}
 ///
 @system unittest
 {
@@ -118,18 +79,12 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	}
 }
 
-
-///
-@system unittest
+/// ditto
+JSONValue json(T)(auto const ref T x) @property
+if (is(T == enum))
 {
-	bool bt = true;
-	bool bf;
-	auto btjson = bt.json;
-	auto bfjson = bf.json;
-	assert(btjson.type == JSONType.true_);
-	assert(bfjson.type == JSONType.false_);
+	return JSONValue(x.to!string());
 }
-
 ///
 @system unittest
 {
@@ -143,7 +98,19 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	assert(ajson.str == "a");
 }
 
-
+/// ditto
+JSONValue json(T)(auto const ref T[] ary) @property
+if (!isSomeString!(T[]) && isArray!(T[]))
+{
+	auto app = appender!(JSONValue[])();
+	JSONValue v;
+	foreach (x; ary)
+	{
+		app.put(x.json);
+	}
+	v.array = app.data;
+	return v;
+}
 ///
 @system unittest
 {
@@ -157,7 +124,6 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	assert(aryjson[1].integer == 2);
 	assert(aryjson[2].integer == 3);
 }
-
 ///
 @system unittest
 {
@@ -199,6 +165,40 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	assert(aryjson[0]["a"].integer == 1);
 	assert(aryjson[1]["a"].integer == 2);
 	assert(aryjson[2]["a"].integer == 3);
+}
+
+/// ditto
+JSONValue json(Value, Key)(auto const ref Value[Key] aa) @property
+if (isSomeString!Key && is(typeof({auto v = Value.init.json;})))
+{
+	auto ret = JSONValue((JSONValue[string]).init);
+	static if (is(Key: const string))
+	{
+		foreach (key, val; aa)
+			ret.object[key] = val.json;
+	}
+	else
+	{
+		foreach (key, val; aa)
+			v.object[key.to!string] = val.json;
+	}
+	return ret;
+}
+///
+@system unittest
+{
+	int[string] val;
+	val["xxx"] = 10;
+	auto jv = val.json;
+	assert(jv["xxx"].integer == 10);
+}
+
+
+/// ditto
+JSONValue json(JV)(auto const ref JV v) @property
+	if (is(JV: const JSONValue))
+{
+	return cast(JSONValue)v;
 }
 
 
@@ -296,7 +296,7 @@ void setValue(T)(ref JSONValue v, string name, T val) pure nothrow @trusted
 
 ///
 bool fromJson(T)(in ref JSONValue src, ref T dst)
-	if (isSomeString!T)
+if (isSomeString!T)
 {
 	if (src.type == JSONType.string)
 	{
@@ -312,21 +312,18 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	}
 	return false;
 }
-
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
-	if (isSomeString!(T))
+///
+@system unittest
 {
-	T tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
+	auto jv = JSONValue("xxx");
+	string dst;
+	auto res = fromJson(jv, dst);
+	assert(res);
+	assert(dst == "xxx");
 }
 
 
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (isIntegral!T && !is(T == enum))
 {
@@ -342,21 +339,17 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	}
 	return false;
 }
-
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
-	if (isIntegral!T && !is(T == enum))
+///
+@system unittest
 {
-	T tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
+	auto jv = JSONValue(10);
+	int dst;
+	auto res = fromJson(jv, dst);
+	assert(res);
+	assert(dst == 10);
 }
 
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (isFloatingPoint!T)
 {
@@ -375,52 +368,95 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 		return false;
 	}
 }
-
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
-	if (isFloatingPoint!T)
+///
+@system unittest
 {
-	T tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
+	import std.math: isClose;
+	auto jv = JSONValue(10.0);
+	double dst;
+	auto res = fromJson(jv, dst);
+	assert(res);
+	assert(dst.isClose(10.0));
 }
 
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
-	if (is(T == struct) && !is(Unqual!T: JSONValue))
+if (is(T == struct)
+ && !is(Unqual!T: JSONValue)
+ && !isManagedUnion!T)
 {
-	if (src.type == JSONType.object)
+	static if (__traits(compiles, { dst.json = src; }))
 	{
 		dst.json = src;
-		return true;
 	}
-	return false;
-}
-
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
-	if (is(T == struct) && !is(Unqual!T: JSONValue))
-{
-	if (auto x = name in v.object)
-	{
-		if (x.type == JSONType.object)
+	else static foreach (memberIdx, member; T.tupleof)
+	{{
+		static if (!hasIgnore!member)
 		{
-			auto ret = T.init;
-			ret.json = *x;
-			return ret;
+			static if (hasName!member)
+			{
+				enum fieldName = getName!member;
+			}
+			else
+			{
+				enum fieldName = __traits(identifier, member);
+			}
+			static if (hasConvBy!member)
+			{
+				static if (hasEssential!member)
+				{
+					dst.tupleof[memberIdx] = convFrom!(member, JSONValue)(src[fieldName]);
+				}
+				else
+				{
+					if (auto pJsonValue = fieldName in src)
+					{
+						try
+							dst.tupleof[memberIdx] = convFrom!(member, JSONValue)(*pJsonValue);
+						catch (Exception e)
+						{
+							/* ignore */
+						}
+					}
+				}
+			}
+			else static if (__traits(compiles, fromJson(src[fieldName], dst.tupleof[memberIdx])))
+			{
+				static if (hasEssential!member)
+				{
+					if (!fromJson(src[fieldName], dst.tupleof[memberIdx]))
+						return false;
+				}
+				else
+				{
+					import std.algorithm: move;
+					auto tmp = src.getValue(fieldName, dst.tupleof[memberIdx]);
+					move(tmp, dst.tupleof[memberIdx]);
+				}
+			}
+			else
+			{
+				return false;
+			}
 		}
-	}
-	return defaultVal;
+	}}
+	return true;
+}
+///
+@system unittest
+{
+	auto jv = JSONValue(["x": 10, "y": 20]);
+	static struct Point{ int x, y; }
+	Point pt;
+	auto res = fromJson(jv, pt);
+	assert(res);
+	assert(pt.x == 10);
+	assert(pt.y == 20);
 }
 
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
-	if (is(T == class))
+if (is(T == class))
 {
 	if (src.type == JSONType.object)
 	{
@@ -432,24 +468,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	return false;
 }
 
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
-	if (is(T == class))
-{
-	if (auto x = name in v.object)
-	{
-		if (x.type == JSONType.object)
-		{
-			auto ret = new T;
-			ret.json = *x;
-			return ret;
-		}
-	}
-	return defaultVal;
-}
-
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(T == enum))
 {
@@ -461,20 +480,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	return false;
 }
 
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
-	if (is(T == enum))
-{
-	T tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
-}
-
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(T == bool))
 {
@@ -491,20 +497,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	return false;
 }
 
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
-	if (is(T == bool))
-{
-	T tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
-}
-
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (!isSomeString!(T) && isDynamicArray!(T))
 {
@@ -522,19 +515,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	return false;
 }
 
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
-	if (!isSomeString!(T) && isDynamicArray!(T))
-{
-	Unqual!(ForeachType!T)[] tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? cast(T)tmp : defaultVal;
-	}
-	return defaultVal;
-}
-
-
-///
+/// ditto
 bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
 	if (isSomeString!Key && is(typeof({ JSONValue val; fromJson(val, dst[Key.init]); })))
 {
@@ -562,19 +543,7 @@ bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
 	return false;
 }
 
-private T _getValue(T: Value[Key], Value, Key)(
-	in ref JSONValue v, string name, lazy scope Value[Key] defaultVal = T.init)
-	if (isSomeString!Key && is(typeof({ JSONValue val; Value[Key] dst; fromJson(val, dst[Key.init]); })))
-{
-	Value[Key] tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
-}
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(Unqual!T == JSONValue))
 {
@@ -582,13 +551,36 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	return true;
 }
 
+
+
 private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
-	if (is(Unqual!T == JSONValue))
 {
-	JSONValue tmp;
 	if (auto x = name in v.object)
 	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
+		static if (is(T == struct)
+		        && !is(Unqual!T: JSONValue)
+		        && __traits(compiles, lvalueOf!T.json(rvalueOf!JSONValue)))
+		{
+			auto ret = T.init;
+			ret.json = *x;
+			return ret;
+		}
+		else static if (is(T == class))
+		{
+			auto ret = new T;
+			ret.json = *x;
+			return ret;
+		}
+		else static if (!isSomeString!(T) && isDynamicArray!(T))
+		{
+			Unqual!(ForeachType!T)[] tmp;
+			return fromJson(*x, tmp) ? cast(T)tmp : defaultVal;
+		}
+		else
+		{
+			T tmp;
+			return fromJson(*x, tmp) ? tmp : defaultVal;
+		}
 	}
 	return defaultVal;
 }
@@ -785,7 +777,6 @@ T getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
 }
 
 
-import std.typecons: Rebindable;
 
 ///
 alias JSONValueArray  = Rebindable!(const(JSONValue[]));
@@ -827,35 +818,12 @@ bool getObject(JSONValue json, string name, ref JSONValueObject object)
 }
 
 ///
-struct AttrName
-{
-	///
-	string name;
-}
-///
-struct AttrEssential
-{
-}
-///
-struct AttrIgnore
-{
-}
-///
 struct AttrConverter(T)
 {
 	///
 	T function(in JSONValue v) from;
 	///
 	JSONValue function(in T v) to;
-}
-
-
-/*******************************************************************************
- * Attribute forcing field name
- */
-AttrName name(string name)
-{
-	return AttrName(name);
 }
 
 /*******************************************************************************
@@ -866,15 +834,7 @@ AttrConverter!T converter(T)(T function(in JSONValue) from, JSONValue function(i
 	return AttrConverter!T(from, to);
 }
 
-/*******************************************************************************
- * Attribute marking essential field
- */
-enum AttrEssential essential = AttrEssential.init;
 
-/*******************************************************************************
- * Attribute marking ignore data
- */
-enum AttrIgnore ignore = AttrIgnore.init;
 
 
 private enum isJSONizableRaw(T) = is(typeof({
@@ -913,19 +873,19 @@ JSONValue serializeToJson(T)(in T data)
 		JSONValue ret;
 		static foreach (memberIdx, member; T.tupleof)
 		{{
-			static if (!hasUDA!(member, AttrIgnore))
+			static if (!hasIgnore!member)
 			{
-				static if (hasUDA!(member, AttrName))
+				static if (hasName!member)
 				{
-					enum fieldName = getUDAs!(member, AttrName)[$-1].name;
+					enum fieldName = getName!member;
 				}
 				else
 				{
 					enum fieldName = __traits(identifier, member);
 				}
-				static if (hasUDA!(member, AttrConverter!(typeof(member))))
+				static if (hasConvBy!member)
 				{
-					ret[fieldName] = getUDAs!(member, AttrConverter!(typeof(member)))[$-1].to(data.tupleof[memberIdx]);
+					ret[fieldName] = convTo!(member, JSONValue)(data.tupleof[memberIdx]);
 				}
 				else static if (isJSONizableRaw!(typeof(member)))
 				{
@@ -1000,28 +960,28 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 	{
 		static foreach (memberIdx, member; T.tupleof)
 		{{
-			static if (!hasUDA!(member, AttrIgnore))
+			static if (!hasIgnore!member)
 			{
-				static if (hasUDA!(member, AttrName))
+				static if (hasName!member)
 				{
-					enum fieldName = getUDAs!(member, AttrName)[$-1].name;
+					enum fieldName = getName!member;
 				}
 				else
 				{
 					enum fieldName = __traits(identifier, member);
 				}
-				static if (hasUDA!(member, AttrConverter!(typeof(member))))
+				static if (hasConvBy!member)
 				{
-					static if (hasUDA!(member, AttrEssential))
+					static if (hasEssential!member)
 					{
-						data.tupleof[memberIdx] = getUDAs!(member, AttrConverter!(typeof(member)))[$-1].from(json[fieldName]);
+						data.tupleof[memberIdx] = convFrom!(member, JSONValue)(json[fieldName]);
 					}
 					else
 					{
 						if (auto pJsonValue = fieldName in json)
 						{
 							try
-								data.tupleof[memberIdx] = getUDAs!(member, AttrConverter!(typeof(member)))[$-1].from(*pJsonValue);
+								data.tupleof[memberIdx] = convFrom!(member, JSONValue)(*pJsonValue);
 							catch (Exception e)
 							{
 								/* ignore */
@@ -1032,7 +992,7 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 				}
 				else static if (isJSONizableRaw!(typeof(member)))
 				{
-					static if (hasUDA!(member, AttrEssential))
+					static if (hasEssential!member)
 					{
 						fromJson(json[fieldName], data.tupleof[memberIdx]);
 					}
@@ -1045,7 +1005,7 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 				}
 				else
 				{
-					static if (hasUDA!(member, AttrEssential))
+					static if (hasEssential!member)
 					{
 						deserializeFromJson(data.tupleof[memberIdx], json[fieldName]);
 					}
@@ -1122,7 +1082,8 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	assert(e1);
 	assert(e1.msg == "Key not found: pt");
 	
-	auto e2 = z.deserializeFromJson(parseJSON(`{"pt": {}}`)).collectException;
+	auto e2json = parseJSON(`{"pt": {}}`);
+	auto e2 = z.deserializeFromJson(e2json).collectException;
 	assert(!e2);
 	assert(z.pt.y == 10);
 	assert(z.time == SysTime.init);
