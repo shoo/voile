@@ -428,6 +428,42 @@ if (Types.length > 0 && NoDuplicates!Types.length == Types.length)
 	{
 		return _inst._implT.get!T();
 	}
+	
+	/***************************************************************************
+	 * 等号演算子オーバーロード
+	 */
+	bool opEquals()(TypeEnum rhs) const
+	{
+		final switch (_inst._impl._tag)
+		{
+			static foreach (i; 0.._inst._impl.MemberTypes.length)
+			{
+			case _inst._impl.getTag!i:
+				return _inst._impl.getTag!i == rhs._inst._impl._tag
+				    && _inst._impl._inst.tupleof[i] == rhs._inst._impl._inst.tupleof[i];
+			}
+		}
+	}
+	
+	/***************************************************************************
+	 * ハッシュ
+	 */
+	size_t toHash()() const
+	{
+		size_t hash;
+		hashOf(_inst._impl._tag, hash);
+		switch (_inst._impl._tag)
+		{
+			static foreach (i; 0.._inst._impl.MemberTypes.length)
+			{
+			case _inst._impl.getTag!i:
+				hashOf(_inst._impl._inst.tupleof[i], hash);
+			}
+			default:
+				break;
+		}
+		return hash;
+	}
 }
 
 ///
@@ -536,6 +572,44 @@ if (is(U == union))
 	}
 	
 	/***************************************************************************
+	 * 等号演算子オーバーロード
+	 */
+	bool opEquals()(Tagged rhs) const
+	{
+		final switch (__traits(getMember, this, uniqueMemberName!U)._impl._tag)
+		{
+			static foreach (i; 0..__traits(getMember, this, uniqueMemberName!U)._impl.MemberTypes.length)
+			{
+			case __traits(getMember, this, uniqueMemberName!U)._impl.getTag!i:
+				return __traits(getMember, this, uniqueMemberName!U)._impl.getTag!i
+				       == __traits(getMember, rhs, uniqueMemberName!U)._impl._tag
+				    && __traits(getMember, this, uniqueMemberName!U)._impl._inst.tupleof[i]
+				       == __traits(getMember, rhs, uniqueMemberName!U)._impl._inst.tupleof[i];
+			}
+		}
+	}
+	
+	/***************************************************************************
+	 * ハッシュ
+	 */
+	size_t toHash()() const
+	{
+		size_t hash;
+		hashOf(__traits(getMember, this, uniqueMemberName!U)._impl._tag, hash);
+		switch (__traits(getMember, this, uniqueMemberName!U)._impl._tag)
+		{
+			static foreach (i; 0..__traits(getMember, this, uniqueMemberName!U)._impl.MemberTypes.length)
+			{
+			case __traits(getMember, this, uniqueMemberName!U)._impl.getTag!i:
+				hashOf(__traits(getMember, this, uniqueMemberName!U)._impl._inst.tupleof[i], hash);
+			}
+			default:
+				break;
+		}
+		return hash;
+	}
+	
+	/***************************************************************************
 	 * 名前アクセス
 	 * 
 	 * Taggedの引数に共用体を与えた場合は名前でのアクセスを許可する。
@@ -603,6 +677,46 @@ struct Endata(E)
 if (is(E == enum))
 {
 	mixin(`private EndataImpl!E ` ~ uniqueMemberName!E ~ `;`);
+	
+	/***************************************************************************
+	 * 等号演算子オーバーロード
+	 */
+	bool opEquals()(Endata rhs) const
+	{
+		switch (__traits(getMember, this, uniqueMemberName!E)._impl._tag)
+		{
+			static foreach (i; 0..__traits(getMember, this, uniqueMemberName!E)._impl.MemberTypes.length)
+			{
+			case __traits(getMember, this, uniqueMemberName!E)._impl.getTag!i:
+				return __traits(getMember, this, uniqueMemberName!E)._impl.getTag!i
+				        == __traits(getMember, rhs, uniqueMemberName!E)._impl._tag
+				    && __traits(getMember, this, uniqueMemberName!E)._impl._inst.tupleof[i]
+				        == __traits(getMember, rhs, uniqueMemberName!E)._impl._inst.tupleof[i];
+			}
+			default:
+				return false;
+		}
+	}
+	
+	/***************************************************************************
+	 * ハッシュ
+	 */
+	size_t toHash()() const
+	{
+		size_t hash;
+		hashOf(__traits(getMember, this, uniqueMemberName!E)._impl._tag, hash);
+		switch (__traits(getMember, this, uniqueMemberName!E)._impl._tag)
+		{
+			static foreach (i; 0..__traits(getMember, this, uniqueMemberName!E)._impl.MemberTypes.length)
+			{
+			case __traits(getMember, this, uniqueMemberName!E)._impl.getTag!i:
+				hashOf(__traits(getMember, this, uniqueMemberName!E)._impl._inst.tupleof[i], hash);
+			}
+			default:
+				break;
+		}
+		return hash;
+	}
 	
 	/***************************************************************************
 	 * 名前アクセス

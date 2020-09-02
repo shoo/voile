@@ -250,38 +250,197 @@ enum bool hasParameterArgUDA(alias Func, size_t i, alias attr) = getParameterArg
 	static assert(!hasParameterArgUDA!(lambda, 3, 30));
 }
 
+
+private enum Ignore {init}
+
+/*******************************************************************************
+ * Attribute marking ignore data
+ */
+enum Ignore ignore = Ignore.init;
+
 ///
-enum bool hasIgnore(alias value) = hasUDA!(value, ignore);
+enum bool hasIgnore(alias value) = hasUDA!(value, Ignore);
 
 ///
 @safe unittest
 {
-	struct A
-	{
-		int test;
-		
-		@ignore
-		int foo;
-	}
-	
-	struct B
-	{
-		int test;
-	}
-	
+	struct A { int test; @ignore int foo; }
+	struct B { int test; }
 	A a;
 	B b;
-	
 	static assert(!hasIgnore!(a.test));
 	static assert(!hasIgnore!(b.test));
 	static assert( hasIgnore!(a.foo));
 }
 
-///
-enum Ignore;
+private enum Essential {init}
+
+/*******************************************************************************
+ * Attribute marking essential field
+ */
+enum Essential essential = Essential.init;
 
 ///
-alias ignore = Ignore;
+enum bool hasEssential(alias value) = hasUDA!(value, Essential);
+
+///
+@safe unittest
+{
+	struct A { int test; @essential int foo; }
+	struct B { int test; }
+	A a;
+	B b;
+	static assert(!hasEssential!(a.test));
+	static assert(!hasEssential!(b.test));
+	static assert( hasEssential!(a.foo));
+}
+
+
+private enum Key {init}
+
+/*******************************************************************************
+ * Attribute marking essential field
+ */
+enum Key key = Key.init;
+
+///
+enum bool hasKey(alias value) = hasUDA!(value, Key);
+
+///
+enum bool isKeyMember(T, string member) = hasKey!(__traits(getMember, T, member));
+
+///
+alias getKeyMemberNames(T) = Filter!(ApplyLeft!(isKeyMember, T), FieldNameTuple!T);
+
+///
+enum bool hasKeyMember(T) = Filter!(ApplyLeft!(isKeyMember, T), FieldNameTuple!T).length != 0;
+
+///
+enum string getKeyMemberName(T) = Filter!(ApplyLeft!(isKeyMember, T), FieldNameTuple!T)[0];
+
+///
+@safe unittest
+{
+	struct A { int test; @key int foo; }
+	struct B { int test; }
+	A a;
+	B b;
+	static assert(!hasKey!(a.test));
+	static assert(!hasKey!(b.test));
+	static assert( hasKey!(a.foo));
+	static assert( hasKeyMember!A);
+	static assert(!hasKeyMember!B);
+	static assert(getKeyMemberNames!A == AliasSeq!("foo"));
+	static assert(getKeyMemberName!A == "foo");
+}
+
+
+
+
+private struct Name
+{
+	string name;
+}
+
+/*******************************************************************************
+ * Attribute forcing field name
+ */
+Name name(string name) pure nothrow @nogc @safe
+{
+	return Name(name);
+}
+/// ditto
+enum Name name(string n) = Name(n);
+
+///
+enum bool hasName(alias value) = hasUDA!(value, Name);
+
+///
+template getName(alias value)
+if (hasName!value)
+{
+	enum string getName = getUDAs!(value, Name)[0].name;
+}
+
+///
+@safe unittest
+{
+	struct A { int test; @name("test") int foo; }
+	struct B { @name!"foo" int test; }
+	A a;
+	B b;
+	static assert(!hasName!(a.test));
+	static assert( hasName!(a.foo));
+	static assert( hasName!(b.test));
+	static assert(getName!(a.foo) == "test");
+	static assert(getName!(b.test) == "foo");
+}
+
+private struct Value(T)
+{
+	T value;
+}
+
+/*******************************************************************************
+ * Attribute forcing field value
+ */
+Value!T value(T)(T val) pure nothrow @nogc @safe
+{
+	return Value!T(val);
+}
+/// ditto
+enum Value!(typeof(v)) value(alias v) = Value!(typeof(v))(v);
+
+///
+template hasValue(args...)
+{
+	static if (args.length == 1)
+	{
+		enum bool hasValue = hasUDA!(args[0], Value);
+	}
+	else static if (args.length == 2 && isType!(args[1]))
+	{
+		enum bool hasValue = hasUDA!(args[0], Value!(args[1]));
+	}
+	else static assert(0);
+}
+
+///
+template getValues(args...)
+{
+	enum getVal(alias v) = v.value;
+	static if (args.length == 1)
+	{
+		alias getValues = staticMap!(getVal, getUDAs!(args[0], Value));
+	}
+	else static if (args.length == 2 && isType!(args[1]))
+	{
+		alias getValues = staticMap!(getVal, getUDAs!(args[0], Value!(args[1])));
+	}
+	else static assert(0);
+}
+
+///
+template getValue(alias value)
+if (hasValue!value)
+{
+	enum getValue = getUDAs!(value, Value)[0].value;
+}
+
+///
+@safe unittest
+{
+	struct A { int test; @value("test") int foo; }
+	struct B { @value!1 int test; }
+	A a;
+	B b;
+	static assert(!hasValue!(a.test));
+	static assert( hasValue!(a.foo));
+	static assert( hasValue!(b.test));
+	static assert( hasValue!(b.test, int));
+	static assert(getValue!(a.foo) == "test");
+	static assert(getValue!(b.test) == 1);
+}
 
 ///
 struct ConvBy(alias T){}
@@ -290,14 +449,37 @@ struct ConvBy(alias T){}
 alias convBy = ConvBy;
 
 ///
-enum bool isConvByAttr(alias Attr) = isInstanceOf!(convBy, Attr);
+template isConvByAttr(alias Attr)
+{
+	static if (isInstanceOf!(convBy, Attr))
+	{
+		enum bool isConvByAttr = true;
+	}
+	else static if (is(typeof(Attr.to)) && is(typeof(Attr.from)))
+	{
+		enum bool isConvByAttr = true;
+	}
+	else
+	{
+		enum bool isConvByAttr = false;
+	}
+}
 
 ///
 template getConvByAttr(alias Attr)
 if (isConvByAttr!Attr)
 {
-	alias getConvByAttr = TemplateArgsOf!(Attr)[0];
+	static if (isInstanceOf!(convBy, Attr))
+	{
+		alias getConvByAttr = TemplateArgsOf!(Attr)[0];
+	}
+	else static if (is(typeof(Attr.to)) && is(typeof(Attr.from)))
+	{
+		alias getConvByAttr = Attr;
+	}
+	else static assert(0);
 }
+
 
 ///
 alias ProxyList(alias value) = staticMap!(getConvByAttr, Filter!(isConvByAttr, __traits(getAttributes, value)));
@@ -421,10 +603,18 @@ if (canConvTo!(value, Dst))
 		{
 			return proxy.to(v);
 		}
+		static Dst convTo()(in auto ref Val v)
+		{
+			return proxy.to(v);
+		}
 	}
 	else static if (convToStyle == ConvStyle.type2)
 	{
 		static Dst convTo()(auto ref Val v)
+		{
+			return proxy.to!Dst(v);
+		}
+		static Dst convTo()(in auto ref Val v)
 		{
 			return proxy.to!Dst(v);
 		}
@@ -435,10 +625,18 @@ if (canConvTo!(value, Dst))
 		{
 			Dst dst = void; proxy.to(v, dst); return dst;
 		}
+		static Dst convTo()(in auto ref Val v)
+		{
+			Dst dst = void; proxy.to(v, dst); return dst;
+		}
 	}
 	else static if (convToStyle == ConvStyle.type4)
 	{
 		static Dst convTo()(auto ref Val v)
+		{
+			return proxy(v);
+		}
+		static Dst convTo()(in auto ref Val v)
 		{
 			return proxy(v);
 		}
@@ -449,10 +647,18 @@ if (canConvTo!(value, Dst))
 		{
 			return proxy!Dst(v);
 		}
+		static Dst convTo()(in auto ref Val v)
+		{
+			return proxy!Dst(v);
+		}
 	}
 	else static if (convToStyle == ConvStyle.type6)
 	{
 		static Dst convTo()(auto ref Val v)
+		{
+			Dst dst = void; proxy(v, dst); return dst;
+		}
+		static Dst convTo()(in auto ref Val v)
 		{
 			Dst dst = void; proxy(v, dst); return dst;
 		}
@@ -526,13 +732,22 @@ if (canConvFrom!(value, Src))
 	enum convFromStyle = getConvFromStyle!(value, Src);
 	static if (convFromStyle == ConvStyle.type1)
 	{
-		static Val convFrom()(auto ref Src v) {
+		static Val convFrom()(auto ref Src v)
+		{
+			return proxy.from(v);
+		}
+		static Val convFrom()(in auto ref Src v)
+		{
 			return proxy.from(v);
 		}
 	}
 	else static if (convFromStyle == ConvStyle.type2)
 	{
 		static Val convFrom()(auto ref Src v)
+		{
+			return proxy.from!Val(v);
+		}
+		static Val convFrom()(in auto ref Src v)
 		{
 			return proxy.from!Val(v);
 		}
@@ -543,10 +758,18 @@ if (canConvFrom!(value, Src))
 		{
 			Val dst = void; proxy.from(v, dst); return dst;
 		}
+		static Val convFrom()(in auto ref Src v)
+		{
+			Val dst = void; proxy.from(v, dst); return dst;
+		}
 	}
 	else static if (convFromStyle == ConvStyle.type4)
 	{
 		static Val convFrom()(auto ref Src v)
+		{
+			return proxy(v);
+		}
+		static Val convFrom()(in auto ref Src v)
 		{
 			return proxy(v);
 		}
@@ -557,10 +780,20 @@ if (canConvFrom!(value, Src))
 		{
 			return proxy!Val(v);
 		}
+		static Val convFrom()(in auto ref Src v)
+		{
+			return proxy!Val(v);
+		}
 	}
 	else static if (convFromStyle == ConvStyle.type6)
 	{
 		static Val convFrom()(auto ref Src v)
+		{
+			Val dst = void;
+			proxy(v, dst);
+			return dst;
+		}
+		static Val convFrom()(in auto ref Src v)
 		{
 			Val dst = void;
 			proxy(v, dst);
@@ -605,6 +838,36 @@ template convertTo(alias value)
 		}
 		else static assert(0);
 	}
+	static void convertTo(Dst)(in auto ref Val src, ref Dst dst)
+	if (canConvTo!(value, Dst))
+	{
+		enum convToStyle = getConvToStyle!(value, Dst);
+		static if (convToStyle == ConvStyle.type1)
+		{
+			dst = proxy.to(src);
+		}
+		else static if (convToStyle == ConvStyle.type2)
+		{
+			dst = proxy.to!Dst(src);
+		}
+		else static if (convToStyle == ConvStyle.type3)
+		{
+			proxy.to(src, dst);
+		}
+		else static if (convToStyle == ConvStyle.type4)
+		{
+			dst = proxy(src);
+		}
+		else static if (convToStyle == ConvStyle.type5)
+		{
+			dst = proxy!Dst(src);
+		}
+		else static if (convToStyle == ConvStyle.type6)
+		{
+			proxy(src, dst);
+		}
+		else static assert(0);
+	}
 }
 
 ///
@@ -613,6 +876,36 @@ template convertFrom(alias value)
 	alias proxy = getConvBy!value;
 	alias Val   = typeof(value);
 	static void convertFrom(Src)(auto ref Src src, ref Val dst)
+	if (canConvFrom!(value, Src))
+	{
+		enum convFromStyle = getConvFromStyle!(value, Src);
+		static if (convFromStyle == ConvStyle.type1)
+		{
+			dst = proxy.from(src);
+		}
+		else static if (convFromStyle == ConvStyle.type2)
+		{
+			dst = proxy.from!Val(src);
+		}
+		else static if (convFromStyle == ConvStyle.type3)
+		{
+			proxy.from(src, dst);
+		}
+		else static if (convFromStyle == ConvStyle.type4)
+		{
+			dst = proxy(src);
+		}
+		else static if (convFromStyle == ConvStyle.type5)
+		{
+			dst = proxy!Val(src);
+		}
+		else static if (convFromStyle == ConvStyle.type6)
+		{
+			proxy(src, dst);
+		}
+		else static assert(0);
+	}
+	static void convertFrom(Src)(in auto ref Src src, ref Val dst)
 	if (canConvFrom!(value, Src))
 	{
 		enum convFromStyle = getConvFromStyle!(value, Src);
@@ -871,4 +1164,30 @@ enum isConvertible(alias value, T) = canConvTo!(value, T) && canConvFrom!(value,
 	assert(foo.f2 == 1666);
 	assert(foo.g2 == 1777);
 	assert(foo.h2 == 1888);
+}
+
+@safe unittest
+{
+	import std.datetime, std.json;
+	///
+	static struct AttrConverter
+	{
+		///
+		JSONValue function(in SysTime v) to;
+		///
+		SysTime function(in JSONValue v) from;
+	}
+	
+	AttrConverter converter(SysTime function(in JSONValue) from, JSONValue function(in SysTime) to)
+	{
+		return AttrConverter(to, from);
+	}
+	static struct A
+	{
+		@converter(jv=>SysTime.fromISOExtString(jv.str), v =>JSONValue(v.toISOExtString()))
+		SysTime time;
+	}
+	static assert(hasConvBy!(A.time));
+	static assert(getConvToStyle!(A.time, JSONValue) == ConvStyle.type1);
+	static assert(getConvFromStyle!(A.time, JSONValue) == ConvStyle.type1);
 }

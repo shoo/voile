@@ -1,77 +1,20 @@
 ﻿module voile.json;
 
+import std.json, std.traits, std.meta, std.conv, std.array;
+import std.typecons: Rebindable;
 import voile.misc;
-import std.json, std.traits, std.conv, std.array;
+import voile.munion;
+import voile.attr;
 
 
 /*******************************************************************************
  * JSONValueデータを得る
  */
 JSONValue json(T)(auto const ref T[] x) @property
-	if (isSomeString!(T[]))
+if (isSomeString!(T[]))
 {
 	return JSONValue(to!string(x));
 }
-
-
-/// ditto
-JSONValue json(T)(auto const ref T x) @property
-	if ((isIntegral!T && !is(T == enum))
-	 || isFloatingPoint!T
-	 || is(Unqual!T == bool))
-{
-	return JSONValue(x);
-}
-
-
-/// ditto
-JSONValue json(T)(auto const ref T x) @property
-	if (is(T == enum))
-{
-	return JSONValue(x.to!string());
-}
-
-
-/// ditto
-JSONValue json(T)(auto const ref T[] ary) @property
-	if (!isSomeString!(T[]) && isArray!(T[]))
-{
-	auto app = appender!(JSONValue[])();
-	JSONValue v;
-	foreach (x; ary)
-	{
-		app.put(x.json);
-	}
-	v.array = app.data;
-	return v;
-}
-
-
-/// ditto
-JSONValue json(Value, Key)(auto const ref Value[Key] aa) @property
-	if (isSomeString!Key && is(typeof({auto v = Value.init.json;})))
-{
-	auto ret = JSONValue((JSONValue[string]).init);
-	static if (is(Key: const string))
-	{
-		foreach (key, val; aa)
-			ret.object[key] = val.json;
-	}
-	else
-	{
-		foreach (key, val; aa)
-			v.object[key.to!string] = val.json;
-	}
-	return ret;
-}
-
-/// ditto
-auto ref JSONValue json(JV)(auto const ref JV v) @property
-	if (is(JV: const JSONValue))
-{
-	return cast(JSONValue)v;
-}
-
 ///
 @system unittest
 {
@@ -90,6 +33,24 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 }
 
 
+/// ditto
+JSONValue json(T)(auto const ref T x) @property
+if ((isIntegral!T && !is(T == enum))
+ || isFloatingPoint!T
+ || is(Unqual!T == bool))
+{
+	return JSONValue(x);
+}
+///
+@system unittest
+{
+	bool bt = true;
+	bool bf;
+	auto btjson = bt.json;
+	auto bfjson = bf.json;
+	assert(btjson.type == JSONType.true_);
+	assert(bfjson.type == JSONType.false_);
+}
 ///
 @system unittest
 {
@@ -118,18 +79,12 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	}
 }
 
-
-///
-@system unittest
+/// ditto
+JSONValue json(T)(auto const ref T x) @property
+if (is(T == enum))
 {
-	bool bt = true;
-	bool bf;
-	auto btjson = bt.json;
-	auto bfjson = bf.json;
-	assert(btjson.type == JSONType.true_);
-	assert(bfjson.type == JSONType.false_);
+	return JSONValue(x.to!string());
 }
-
 ///
 @system unittest
 {
@@ -143,7 +98,19 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	assert(ajson.str == "a");
 }
 
-
+/// ditto
+JSONValue json(T)(auto const ref T[] ary) @property
+if (!isSomeString!(T[]) && isArray!(T[]))
+{
+	auto app = appender!(JSONValue[])();
+	JSONValue v;
+	foreach (x; ary)
+	{
+		app.put(x.json);
+	}
+	v.array = app.data;
+	return v;
+}
 ///
 @system unittest
 {
@@ -157,7 +124,6 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	assert(aryjson[1].integer == 2);
 	assert(aryjson[2].integer == 3);
 }
-
 ///
 @system unittest
 {
@@ -201,6 +167,40 @@ auto ref JSONValue json(JV)(auto const ref JV v) @property
 	assert(aryjson[2]["a"].integer == 3);
 }
 
+/// ditto
+JSONValue json(Value, Key)(auto const ref Value[Key] aa) @property
+if (isSomeString!Key && is(typeof({auto v = Value.init.json;})))
+{
+	auto ret = JSONValue((JSONValue[string]).init);
+	static if (is(Key: const string))
+	{
+		foreach (key, val; aa)
+			ret.object[key] = val.json;
+	}
+	else
+	{
+		foreach (key, val; aa)
+			v.object[key.to!string] = val.json;
+	}
+	return ret;
+}
+///
+@system unittest
+{
+	int[string] val;
+	val["xxx"] = 10;
+	auto jv = val.json;
+	assert(jv["xxx"].integer == 10);
+}
+
+
+/// ditto
+JSONValue json(JV)(auto const ref JV v) @property
+	if (is(JV: const JSONValue))
+{
+	return cast(JSONValue)v;
+}
+
 
 private void _setValue(T)(ref JSONValue v, ref string name, ref T val)
 	if (is(typeof(val.json)))
@@ -216,6 +216,7 @@ private void _setValue(T)(ref JSONValue v, ref string name, ref T val)
 		v = x;
 	}
 }
+
 
 /*******************************************************************************
  * JSONValueデータの操作
@@ -296,7 +297,7 @@ void setValue(T)(ref JSONValue v, string name, T val) pure nothrow @trusted
 
 ///
 bool fromJson(T)(in ref JSONValue src, ref T dst)
-	if (isSomeString!T)
+if (isSomeString!T)
 {
 	if (src.type == JSONType.string)
 	{
@@ -312,21 +313,18 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	}
 	return false;
 }
-
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
-	if (isSomeString!(T))
+///
+@system unittest
 {
-	T tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
+	auto jv = JSONValue("xxx");
+	string dst;
+	auto res = fromJson(jv, dst);
+	assert(res);
+	assert(dst == "xxx");
 }
 
 
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (isIntegral!T && !is(T == enum))
 {
@@ -342,21 +340,17 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	}
 	return false;
 }
-
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
-	if (isIntegral!T && !is(T == enum))
+///
+@system unittest
 {
-	T tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
+	auto jv = JSONValue(10);
+	int dst;
+	auto res = fromJson(jv, dst);
+	assert(res);
+	assert(dst == 10);
 }
 
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (isFloatingPoint!T)
 {
@@ -375,52 +369,95 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 		return false;
 	}
 }
-
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
-	if (isFloatingPoint!T)
+///
+@system unittest
 {
-	T tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
+	import std.math: isClose;
+	auto jv = JSONValue(10.0);
+	double dst;
+	auto res = fromJson(jv, dst);
+	assert(res);
+	assert(dst.isClose(10.0));
 }
 
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
-	if (is(T == struct) && !is(Unqual!T: JSONValue))
+if (is(T == struct)
+ && !is(Unqual!T: JSONValue)
+ && !isManagedUnion!T)
 {
-	if (src.type == JSONType.object)
+	static if (__traits(compiles, { dst.json = src; }))
 	{
 		dst.json = src;
-		return true;
 	}
-	return false;
-}
-
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
-	if (is(T == struct) && !is(Unqual!T: JSONValue))
-{
-	if (auto x = name in v.object)
-	{
-		if (x.type == JSONType.object)
+	else static foreach (memberIdx, member; T.tupleof)
+	{{
+		static if (!hasIgnore!member)
 		{
-			auto ret = T.init;
-			ret.json = *x;
-			return ret;
+			static if (hasName!member)
+			{
+				enum fieldName = getName!member;
+			}
+			else
+			{
+				enum fieldName = __traits(identifier, member);
+			}
+			static if (hasConvBy!member)
+			{
+				static if (hasEssential!member)
+				{
+					dst.tupleof[memberIdx] = convFrom!(member, JSONValue)(src[fieldName]);
+				}
+				else
+				{
+					if (auto pJsonValue = fieldName in src)
+					{
+						try
+							dst.tupleof[memberIdx] = convFrom!(member, JSONValue)(*pJsonValue);
+						catch (Exception e)
+						{
+							/* ignore */
+						}
+					}
+				}
+			}
+			else static if (__traits(compiles, fromJson(src[fieldName], dst.tupleof[memberIdx])))
+			{
+				static if (hasEssential!member)
+				{
+					if (!fromJson(src[fieldName], dst.tupleof[memberIdx]))
+						return false;
+				}
+				else
+				{
+					import std.algorithm: move;
+					auto tmp = src.getValue(fieldName, dst.tupleof[memberIdx]);
+					move(tmp, dst.tupleof[memberIdx]);
+				}
+			}
+			else
+			{
+				return false;
+			}
 		}
-	}
-	return defaultVal;
+	}}
+	return true;
+}
+///
+@system unittest
+{
+	auto jv = JSONValue(["x": 10, "y": 20]);
+	static struct Point{ int x, y; }
+	Point pt;
+	auto res = fromJson(jv, pt);
+	assert(res);
+	assert(pt.x == 10);
+	assert(pt.y == 20);
 }
 
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
-	if (is(T == class))
+if (is(T == class))
 {
 	if (src.type == JSONType.object)
 	{
@@ -432,24 +469,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	return false;
 }
 
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
-	if (is(T == class))
-{
-	if (auto x = name in v.object)
-	{
-		if (x.type == JSONType.object)
-		{
-			auto ret = new T;
-			ret.json = *x;
-			return ret;
-		}
-	}
-	return defaultVal;
-}
-
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(T == enum))
 {
@@ -461,20 +481,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	return false;
 }
 
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
-	if (is(T == enum))
-{
-	T tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
-}
-
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(T == bool))
 {
@@ -491,20 +498,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	return false;
 }
 
-
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal)
-	if (is(T == bool))
-{
-	T tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
-}
-
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (!isSomeString!(T) && isDynamicArray!(T))
 {
@@ -522,19 +516,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	return false;
 }
 
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
-	if (!isSomeString!(T) && isDynamicArray!(T))
-{
-	Unqual!(ForeachType!T)[] tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? cast(T)tmp : defaultVal;
-	}
-	return defaultVal;
-}
-
-
-///
+/// ditto
 bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
 	if (isSomeString!Key && is(typeof({ JSONValue val; fromJson(val, dst[Key.init]); })))
 {
@@ -562,19 +544,7 @@ bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
 	return false;
 }
 
-private T _getValue(T: Value[Key], Value, Key)(
-	in ref JSONValue v, string name, lazy scope Value[Key] defaultVal = T.init)
-	if (isSomeString!Key && is(typeof({ JSONValue val; Value[Key] dst; fromJson(val, dst[Key.init]); })))
-{
-	Value[Key] tmp;
-	if (auto x = name in v.object)
-	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
-	}
-	return defaultVal;
-}
-
-///
+/// ditto
 bool fromJson(T)(in ref JSONValue src, ref T dst)
 	if (is(Unqual!T == JSONValue))
 {
@@ -582,13 +552,35 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 	return true;
 }
 
+
 private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
-	if (is(Unqual!T == JSONValue))
 {
-	JSONValue tmp;
 	if (auto x = name in v.object)
 	{
-		return fromJson(*x, tmp) ? tmp : defaultVal;
+		static if (is(T == struct)
+		        && !is(Unqual!T: JSONValue)
+		        && __traits(compiles, lvalueOf!T.json(rvalueOf!JSONValue)))
+		{
+			auto ret = T.init;
+			ret.json = *x;
+			return ret;
+		}
+		else static if (is(T == class))
+		{
+			auto ret = new T;
+			ret.json = *x;
+			return ret;
+		}
+		else static if (!isSomeString!(T) && isDynamicArray!(T))
+		{
+			Unqual!(ForeachType!T)[] tmp;
+			return fromJson(*x, tmp) ? cast(T)tmp : defaultVal;
+		}
+		else
+		{
+			T tmp;
+			return fromJson(*x, tmp) ? tmp : defaultVal;
+		}
 	}
 	return defaultVal;
 }
@@ -785,7 +777,6 @@ T getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
 }
 
 
-import std.typecons: Rebindable;
 
 ///
 alias JSONValueArray  = Rebindable!(const(JSONValue[]));
@@ -827,35 +818,12 @@ bool getObject(JSONValue json, string name, ref JSONValueObject object)
 }
 
 ///
-struct AttrName
-{
-	///
-	string name;
-}
-///
-struct AttrEssential
-{
-}
-///
-struct AttrIgnore
-{
-}
-///
 struct AttrConverter(T)
 {
 	///
 	T function(in JSONValue v) from;
 	///
 	JSONValue function(in T v) to;
-}
-
-
-/*******************************************************************************
- * Attribute forcing field name
- */
-AttrName name(string name)
-{
-	return AttrName(name);
 }
 
 /*******************************************************************************
@@ -866,15 +834,7 @@ AttrConverter!T converter(T)(T function(in JSONValue) from, JSONValue function(i
 	return AttrConverter!T(from, to);
 }
 
-/*******************************************************************************
- * Attribute marking essential field
- */
-enum AttrEssential essential = AttrEssential.init;
 
-/*******************************************************************************
- * Attribute marking ignore data
- */
-enum AttrIgnore ignore = AttrIgnore.init;
 
 
 private enum isJSONizableRaw(T) = is(typeof({
@@ -882,6 +842,337 @@ private enum isJSONizableRaw(T) = is(typeof({
 	JSONValue jv= val.json;
 	fromJson(jv, val);
 }));
+
+
+//
+private template uniqueKey(MU, string name, uint num = 0)
+if (isManagedUnion!MU)
+{
+	enum string candidate = num == 0 ? name : text(name, num);
+	
+	static if (anySatisfy!(ApplyRight!(hasMember, candidate), EnumMemberTypes!MU))
+	{
+		enum string uniqueKey = uniqueKey!(MU, name, num+1);
+	}
+	else
+	{
+		enum string uniqueKey = candidate;
+	}
+}
+
+@system unittest
+{
+	struct A{ int a; int b; }
+	struct B{ int c; int c1; }
+	static assert(uniqueKey!(TypeEnum!(A, B), "a") == "a1");
+	static assert(uniqueKey!(TypeEnum!(A, B), "b") == "b1");
+	static assert(uniqueKey!(TypeEnum!(A, B), "c") == "c2");
+	static assert(uniqueKey!(TypeEnum!(A, B), "d") == "d");
+}
+
+/+
+// キーの数が同じで、キーの名称が同じで、キーの型が同じならそのキー名を返す
+private template getKeys(Types...)
+{
+	
+	enum string[][] allKeyMembers = ()
+	{
+		string[][] ret;
+		static foreach (T; Types)
+			ret ~= [getKeyMemberNames!T];
+		return ret;
+	}();
+	
+	enum bool isSameNames(string[] rhs, string[] lhs) = rhs == lhs;
+	
+	template getKeyMemberTypes(size_t i, string[] keyMembers)
+	{
+		alias getMemberType(string member) = typeof(__traits(getMember, MemberTypes[i], member));
+		alias getKeyMemberTypes = staticMap!(getMemberType, aliasSeqOf!keyMembers);
+	}
+	
+	static if (allKeyMembers.length == 0)
+	{
+		// キーがない
+		alias getKeys = AliasSeq!();
+	}
+	else static if (Filter!(ApplyLeft!(isSameNames, allKeyMembers[0]),aliasSeqOf!allKeyMembers).length
+	                != allKeyMembers.length)
+	{
+		// キーの数や名称が違う
+		alias getKeys = AliasSeq!();
+	}
+	else static if (
+		!() {
+			// すべてのキーの型が同じか判定する
+			bool ret = true;
+			alias firstKeyMemberTypes = getKeyMemberTypes!(0, allKeyMembers[0]);
+			static foreach (i, keyMembers; allKeyMembers)
+			{{
+				alias keyMemberTypes = getKeyMemberTypes!(i, keyMembers);
+				static foreach (j; 0..keyMemberTypes.length)
+					ret &= is(keyMemberTypes[j] == firstKeyMemberTypes[j]);
+			}}
+			return ret;
+		}())
+	{
+		// キーの型が違う
+		alias getKeys = AliasSeq!();
+	}
+	else
+	{
+		// キーの数も名称も型もすべて同じ
+		alias getKeys = aliasSeqOf!(allKeyMembers[0]);
+	}
+}
+
+@system unittest
+{
+	struct A{ @key int a; int b; }
+	struct B{ @key int a; int c; }
+	struct C{ int a; @key int b; @key int c; }
+	struct D{ int a; @key int b; @key int c; }
+	static assert(getKeys!(A, B) == AliasSeq!("a"));
+	static assert(getKeys!(A, C).length == 0);
+	static assert(getKeys!(C, D) == AliasSeq!("b", "c"));
+}
++/
+
+private struct Kind
+{
+	string key;
+	JSONValue value;
+}
+
+///
+auto kind(T)(string name, T value)
+{
+	import voile.attr: v = value;
+	return v(Kind(name, JSONValue(value)));
+}
+
+/// ditto
+auto kind(T)(T value)
+{
+	import voile.attr: v = value;
+	return v(Kind("kind", JSONValue(value)));
+}
+
+private alias _getKinds(T, string uk, alias tag) = aliasSeqOf!(()
+{
+	Kind[] ret;
+	static if (hasValue!(T, Kind))
+	{
+		ret = [getValues!(T, Kind)];
+	}
+	else static if (getKeyMemberNames!T.length > 0)
+	{
+		static foreach (member; getKeyMemberNames!T)
+		{
+			static foreach (val; getValues!(__traits(getMember, T, member)))
+				ret ~= Kind(member, JSONValue(val));
+		}
+	}
+	else
+	{
+		// UDAがない場合、type, kind, tagをさがす
+		static if (is(typeof(T.type) : string))
+			ret ~= Kind("type", JSONValue(T.stringof));
+		else static if (is(typeof(T.kind) : string))
+			ret ~= Kind("kind", JSONValue(T.stringof));
+		else static if (is(typeof(T.tag) : typeof(tag)))
+			ret ~= Kind("tag", JSONValue(tag));
+	}
+	if (ret.length == 0)
+		ret ~= Kind(uk, JSONValue(tag));
+	return ret;
+}());
+
+// - TypeEnumなら、まず型で 数値/文字列/配列/オブジェクト でそれぞれかぶりがないか検証する
+//   - 数値にかぶりがある→無視して記録する。
+//     デシリアライズの際には一番大きい数値型として復元する。
+//   - 配列にかぶりがある→無視して記録する。
+//     デシリアライズの際には配列要素の最初の型として復元する。
+//     要素がない場合は最初の配列型として復元する。
+//   - オブジェクトにかぶりがある→タグをつける
+//     1. 型に@kind(name, value)をつけるまたは@kind(value)をつける
+//        この場合JSONにnameで指定した名称のキーができる。省略した場合は"kind"のキーができる。
+//        デシリアライズの際にはnameの値がvalueで指定した値かどうかを型の順に走査し、最初にヒットしたものに復元する。
+//     2. すべてのオブジェクトで、メンバに@keyおよび@valueを付ける
+//        すべての@keyで指定されたメンバの値が@valueと一致するかで判別する
+//     3. すべてのオブジェクトで、メンバにsize, type, kind, tagのいずれかがある
+//        - size: 型のサイズが値となって判別する
+//        - type: 型名が値となって判別する
+//        - kind: 型名が値となって判別する
+//        - tag:  番号が値となって判別する
+//     4. キー指定がないなら"_tag"というキー名に番号でタグをつける
+private JSONValue _serializeToJsonImpl(Types...)(in ref TypeEnum!Types dat)
+{
+	alias MU = TypeEnum!Types;
+	alias MemberObjs = Filter!(isAggregateType, EnumMemberTypes!MU);
+	enum bool hasMultiObj = MemberObjs.length > 1;
+	final switch (dat.tag)
+	{
+		static foreach (tag; memberTags!MU)
+		{
+		case tag:
+			auto ret = dat.get!tag.serializeToJson();
+			static if (isAggregateType!(TypeFromTag!(MU, tag)) && hasMultiObj)
+			{
+				static foreach (kind; _getKinds!(TypeFromTag!(MU, tag), uniqueKey!(MU, "_tag"), tag))
+				{{
+					auto jv = kind.value;
+					ret[kind.key] = jv;
+				}}
+			}
+			return ret;
+		}
+	}
+}
+
+///
+@system unittest
+{
+	alias MU = TypeEnum!(int, string);
+	MU dat = 10;
+	auto mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.integer);
+	assert(mujson.integer == 10);
+	
+	dat = "xxx";
+	mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.string);
+	assert(mujson.str == "xxx");
+}
+///
+@system unittest
+{
+	struct A{ @key @value!1 int a; int b; }
+	struct B{ @key @value!2 int a; int c; }
+	struct C{ int a; @key @value!"1" int b; @key @value!"1" int c; }
+	struct D{ int a; @key @value!"1" int b; @key @value!"2" int c; }
+	
+	TypeEnum!(A, B) dat1 = A(0, 10);
+	auto mujson1 = _serializeToJsonImpl(dat1);
+	assert(mujson1.type == JSONType.object);
+	assert(mujson1["a"].type == JSONType.integer);
+	assert(mujson1["a"].integer == 1);
+	assert(mujson1["b"].type == JSONType.integer);
+	assert(mujson1["b"].integer == 10);
+	
+	TypeEnum!(C, D) dat2 = D(0, 10, 100);
+	auto mujson2 = _serializeToJsonImpl(dat2);
+	assert(mujson2.type == JSONType.object);
+	assert(mujson2["a"].type == JSONType.integer);
+	assert(mujson2["a"].integer == 0);
+	assert(mujson2["b"].type == JSONType.string);
+	assert(mujson2["b"].str == "1");
+	assert(mujson2["c"].type == JSONType.string);
+	assert(mujson2["c"].str == "2");
+	
+	@kind("tag", "a") struct E{ int a; int b; int c; }
+	@kind("tag", "b") struct F{ int a; int b; int c; }
+	TypeEnum!(E, F) dat3 = F(0, 10, 100);
+	auto mujson3 = _serializeToJsonImpl(dat3);
+	assert(mujson3.type == JSONType.object);
+	assert(mujson3["tag"].type == JSONType.string);
+	assert(mujson3["tag"].str == "b");
+	assert(mujson3["a"].type == JSONType.integer);
+	assert(mujson3["a"].integer == 0);
+	assert(mujson3["b"].type == JSONType.integer);
+	assert(mujson3["b"].integer == 10);
+	assert(mujson3["c"].type == JSONType.integer);
+	assert(mujson3["c"].integer == 100);
+}
+
+// - Taggedなら、{<タグ>: <データ>}のオブジェクトになる
+private JSONValue _serializeToJsonImpl(U)(in ref Tagged!U dat) @property
+{
+	final switch (dat.tag)
+	{
+		static foreach (tag; memberTags!(Tagged!U))
+		{
+		case tag:
+			return JSONValue([FieldNameTuple!U[tag]: dat.get!tag.serializeToJson()]);
+		}
+	}
+}
+///
+@system unittest
+{
+	union U { int x; string str; }
+	Tagged!U dat;
+	dat.initialize!0(10);
+	auto mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.object);
+	assert(mujson["x"].type == JSONType.integer);
+	assert(mujson["x"].integer == 10);
+	
+	dat.set!1 = "xxx";
+	mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.object);
+	assert(mujson["str"].type == JSONType.string);
+	assert(mujson["str"].str == "xxx");
+}
+///
+@system unittest
+{
+	struct A{ int a; int b; }
+	struct B{ int a; int c; }
+	union U1 { A a; B b; }
+	Tagged!U1 dat1;
+	dat1.initialize!0(100,200);
+	auto mujson1 = _serializeToJsonImpl(dat1);
+	assert(mujson1.type == JSONType.object);
+	assert(mujson1["a"].type == JSONType.object);
+	assert(mujson1["a"]["a"].integer == 100);
+	assert(mujson1["a"]["b"].type == JSONType.integer);
+	assert(mujson1["a"]["b"].integer == 200);
+	
+	struct E{ int a; int b;}
+	struct F{ int a; int b;}
+	union U3 { E a; F b; }
+	Tagged!U3 dat3;
+	dat3.initialize!1(100,200);
+	auto mujson3 = _serializeToJsonImpl(dat3);
+	assert(mujson3.type == JSONType.object);
+	assert(mujson3["b"]["a"].type == JSONType.integer);
+	assert(mujson3["b"]["a"].integer == 100);
+	assert(mujson3["b"]["b"].type == JSONType.integer);
+	assert(mujson3["b"]["b"].integer == 200);
+}
+
+// - Endataなら、{<タグ>: <データ>}のオブジェクトになる
+private auto ref JSONValue _serializeToJsonImpl(E)(in ref Endata!E dat) @property
+{
+	import std.conv;
+	switch (dat.tag)
+	{
+		static foreach (tag; memberTags!(Endata!E))
+		{
+		case tag:
+			return JSONValue([tag.text(): dat.get!tag.serializeToJson()]);
+		}
+		default:
+			return JSONValue((JSONValue[string]).init);
+	}
+}
+///
+@system unittest
+{
+	enum E { @data!int x, @data!string str }
+	mixin EnumMemberAlieses!E;
+	Endata!E dat;
+	dat.initialize!x(10);
+	auto mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.object);
+	assert(mujson["x"].integer == 10);
+	
+	dat.set!str = "xxx";
+	mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.object);
+	assert(mujson["str"].str == "xxx");
+}
 
 /*******************************************************************************
  * serialize data to JSON
@@ -891,6 +1182,10 @@ JSONValue serializeToJson(T)(in T data)
 	static if (isJSONizableRaw!T)
 	{
 		return data.json;
+	}
+	else static if (is(typeof(_serializeToJsonImpl(data)): JSONValue))
+	{
+		return _serializeToJsonImpl(data);
 	}
 	else static if (isArray!T)
 	{
@@ -913,19 +1208,19 @@ JSONValue serializeToJson(T)(in T data)
 		JSONValue ret;
 		static foreach (memberIdx, member; T.tupleof)
 		{{
-			static if (!hasUDA!(member, AttrIgnore))
+			static if (!hasIgnore!member)
 			{
-				static if (hasUDA!(member, AttrName))
+				static if (hasName!member)
 				{
-					enum fieldName = getUDAs!(member, AttrName)[$-1].name;
+					enum fieldName = getName!member;
 				}
 				else
 				{
 					enum fieldName = __traits(identifier, member);
 				}
-				static if (hasUDA!(member, AttrConverter!(typeof(member))))
+				static if (hasConvBy!member)
 				{
-					ret[fieldName] = getUDAs!(member, AttrConverter!(typeof(member)))[$-1].to(data.tupleof[memberIdx]);
+					ret[fieldName] = convTo!(member, JSONValue)(data.tupleof[memberIdx]);
 				}
 				else static if (isJSONizableRaw!(typeof(member)))
 				{
@@ -955,6 +1250,223 @@ void serializeToJsonFile(T)(in T data, string jsonfile, JSONOptions options = JS
 	std.file.write(jsonfile, contents);
 }
 
+
+
+// - TypeEnumなら、まず型で 数値/文字列/配列/オブジェクト でそれぞれかぶりがないか検証する
+//   - 数値→一番大きい数値型として復元する。
+//   - 配列→デシリアライズの際には配列要素の最初の型として復元する。
+//     要素がない場合は最初の配列型として復元する。
+//   - オブジェクト→タグ
+//     1. 型に@kind(name, value)をつけるまたは@kind(value)をつける
+//        この場合JSONにnameで指定した名称のキーができる。省略した場合は"kind"のキーができる。
+//        デシリアライズの際にはnameの値がvalueで指定した値かどうかを型の順に走査し、最初にヒットしたものに復元する。
+//     2. すべてのオブジェクトで、メンバに@keyおよび@valueを付ける
+//        すべての@keyで指定されたメンバの値が@valueと一致するかで判別する
+//     3. すべてのオブジェクトで、メンバにsize, type, kind, tagのいずれかがある
+//        - type: 型名が値となって判別する
+//        - kind: 型名が値となって判別する
+//        - tag:  番号が値となって判別する
+//     4. キー指定がないなら"_tag"というキー名に番号でタグをつける
+private void _deserializeFromJsonImpl(Types...)(ref TypeEnum!Types dat, in ref JSONValue json)
+{
+	alias MU = TypeEnum!Types;
+	final switch (json.type)
+	{
+	case JSONType.null_:
+		dat.clear();
+		break;
+	case JSONType.string:
+		static if (hasType!(MU, string))
+			dat.initialize(json.str);
+		break;
+	case JSONType.integer:
+		static if (hasType!(MU, long))
+			dat.initialize!long(json.integer);
+		else static if (hasType!(MU, int))
+			dat.initialize!int(json.integer);
+		else static if (hasType!(MU, short))
+			dat.initialize!short(json.integer);
+		else static if (hasType!(MU, byte))
+			dat.initialize!byte(json.integer);
+		break;
+	case JSONType.uinteger:
+		static if (hasType!(MU, ulong))
+			dat.initialize!ulong(json.uinteger);
+		else static if (hasType!(MU, uint))
+			dat.initialize!uint(json.uinteger);
+		else static if (hasType!(MU, ushort))
+			dat.initialize!ushort(json.uinteger);
+		else static if (hasType!(MU, ubyte))
+			dat.initialize!ubyte(json.uinteger);
+		break;
+	case JSONType.float_:
+		static if (hasType!(MU, real))
+			dat.initialize!real(json.floating);
+		else static if (hasType!(MU, double))
+			dat.initialize!double(json.floating);
+		else static if (hasType!(MU, float))
+			dat.initialize!float(json.floating);
+		break;
+	case JSONType.array:
+		// 配列型の候補を選択
+		alias AryTypes = Filter!(isArray, Types);
+		static if (AryTypes.length == 0)
+		{
+			// 配列型がないなら無視
+			return;
+		}
+		else static if (AryTypes.length == 1)
+		{
+			// 配列型が1つならそれを最優先で選択
+			AryTypes[0] tmp;
+			deserializeFromJson(tmp, json);
+			dst.initialize!(AryTypes[0])(tmp);
+			return;
+		}
+		else
+		{
+			// 配列型が複数ある場合は1つ目のデータの要素で決定
+			if (json.array.length == 0)
+				dst.clear();
+			import std.meta;
+			TypeEnum!(staticMap!(ForeachType, AryTypes)) datElm;
+			datElm.deserializeFromJson(srcDat.array[0]);
+			final switch (datElm.tag)
+			{
+				static foreach (tag; memberTags!MU)
+				{
+				case tag:
+					AryTypes[tag] ary;
+					ary.deserializeFromJson(dat);
+					dat.initialize!(AryTypes[tag])(ary);
+					return;
+				}
+			}
+		}
+		assert(0);
+	case JSONType.object:
+		// オブジェクト型の候補を選択
+		enum bool isObjType(T) = isAggregateType!T || isAssociativeArray!T;
+		alias ObjTypes = Filter!(isObjType, Types);
+		static if (ObjTypes.length == 0)
+		{
+			// オブジェクト型がないなら無視
+		}
+		else static if (ObjTypes.length == 1)
+		{
+			// オブジェクト型が1つならそれを最優先で選択
+			ObjTypes[0] tmp;
+			deserializeFromJson(tmp, json);
+			dst.initialize!(ObjTypes[0])(tmp);
+		}
+		else
+		{
+			// オブジェクト型が複数ある場合はキーデータの要素で決定
+			static foreach (tag; memberTags!MU)
+			{
+				static foreach (kind; _getKinds!(TypeFromTag!(MU, tag), uniqueKey!(MU, "_tag"), tag))
+				{
+					if (auto v = kind.key in json)
+					{
+						if (*v == kind.value)
+						{
+							TypeFromTag!(MU, tag) tmp;
+							deserializeFromJson(tmp, json);
+							dat.initialize!tag(tmp);
+							return;
+						}
+					}
+				}
+			}
+		}
+		break;
+	case JSONType.true_:
+	case JSONType.false_:
+		static if (hasType!(TypeEnum!Types, bool))
+			dat.initialize!bool(src.boolean);
+		break;
+	}
+}
+
+///
+@system unittest
+{
+	struct A{ @key @value!1 int a; int b; }
+	struct B{ @key @value!2 int a; int c; }
+	struct C{ int a; @key @value!1 int b; @key @value!1 int c; }
+	struct D{ int a; @key @value!1 int b; @key @value!2 int c; }
+	
+	TypeEnum!(A, B) dat1;
+	auto mujson1 = JSONValue(["a": JSONValue(1), "b": JSONValue(10)]);
+	_deserializeFromJsonImpl(dat1, mujson1);
+	assert(dat1.tag == 0);
+	assert(dat1.get!A.a == 1);
+	assert(dat1.get!A.b == 10);
+}
+
+// Tagged
+private void _deserializeFromJsonImpl(U)(ref Tagged!U dst, in ref JSONValue src)
+{
+	foreach (k, v; src.object)
+	{
+		switch (k)
+		{
+			static foreach (tag, memberName; FieldNameTuple!U)
+			{
+			case memberName:
+				typeof(__traits(getMember, U, memberName)) dat;
+				dat.deserializeFromJson(v);
+				dst.initialize!tag(dat);
+				return;
+			}
+			default:
+				break;
+		}
+	}
+}
+///
+@system unittest
+{
+	union U { int x; string str; }
+	Tagged!U dat;
+	auto jv = JSONValue(["x": JSONValue(10)]);
+	_deserializeFromJsonImpl(dat, jv);
+	assert(dat.x == 10);
+}
+
+/// Endata
+void _deserializeFromJsonImpl(E)(ref Endata!E dst, in ref JSONValue src)
+{
+	foreach (k, v; src.object)
+	{
+		auto e = to!E(k);
+		switch (e)
+		{
+			static foreach (tag; memberTags!(Endata!E))
+			{
+			case tag:
+				TypeFromTag!(Endata!E, tag) dat;
+				dat.deserializeFromJson(v);
+				dst.initialize!tag(dat);
+				return;
+			}
+			default:
+				break;
+		}
+	}
+}
+
+@system unittest
+{
+	enum E { @data!int x, @data!string str }
+	mixin EnumMemberAlieses!E;
+	Endata!E dat;
+	auto jv = JSONValue(["x": JSONValue(10)]);
+	_deserializeFromJsonImpl(dat, jv);
+	assert(dat.x == 10);
+}
+
+
 /*******************************************************************************
  * deserialize data from JSON
  */
@@ -963,6 +1475,10 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 	static if (isJSONizableRaw!T)
 	{
 		fromJson(json, data);
+	}
+	else static if (__traits(compiles, _deserializeFromJsonImpl(data, json)))
+	{
+		_deserializeFromJsonImpl(data, json);
 	}
 	else static if (isArray!T)
 	{
@@ -1000,28 +1516,28 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 	{
 		static foreach (memberIdx, member; T.tupleof)
 		{{
-			static if (!hasUDA!(member, AttrIgnore))
+			static if (!hasIgnore!member)
 			{
-				static if (hasUDA!(member, AttrName))
+				static if (hasName!member)
 				{
-					enum fieldName = getUDAs!(member, AttrName)[$-1].name;
+					enum fieldName = getName!member;
 				}
 				else
 				{
 					enum fieldName = __traits(identifier, member);
 				}
-				static if (hasUDA!(member, AttrConverter!(typeof(member))))
+				static if (hasConvBy!member)
 				{
-					static if (hasUDA!(member, AttrEssential))
+					static if (hasEssential!member)
 					{
-						data.tupleof[memberIdx] = getUDAs!(member, AttrConverter!(typeof(member)))[$-1].from(json[fieldName]);
+						data.tupleof[memberIdx] = convFrom!(member, JSONValue)(json[fieldName]);
 					}
 					else
 					{
 						if (auto pJsonValue = fieldName in json)
 						{
 							try
-								data.tupleof[memberIdx] = getUDAs!(member, AttrConverter!(typeof(member)))[$-1].from(*pJsonValue);
+								data.tupleof[memberIdx] = convFrom!(member, JSONValue)(*pJsonValue);
 							catch (Exception e)
 							{
 								/* ignore */
@@ -1032,7 +1548,7 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 				}
 				else static if (isJSONizableRaw!(typeof(member)))
 				{
-					static if (hasUDA!(member, AttrEssential))
+					static if (hasEssential!member)
 					{
 						fromJson(json[fieldName], data.tupleof[memberIdx]);
 					}
@@ -1045,7 +1561,7 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 				}
 				else
 				{
-					static if (hasUDA!(member, AttrEssential))
+					static if (hasEssential!member)
 					{
 						deserializeFromJson(data.tupleof[memberIdx], json[fieldName]);
 					}
@@ -1077,6 +1593,12 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 @system unittest
 {
 	import std.exception, std.datetime.systime;
+	struct UnionDataA{ @key @value!1 int a; @name("hogeB") int b; }
+	struct UnionDataB{ @key @value!2 int a; int c; }
+	alias TE = TypeEnum!(UnionDataA, UnionDataB);
+	enum EnumDataA { @data!int x, @data!string str }
+	alias ED = Endata!EnumDataA;
+	
 	static struct Point
 	{
 		@name("xValue")
@@ -1092,6 +1614,8 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 		@essential Point  pt;
 		Point[] points;
 		Point[string] pointMap;
+		TE te;
+		ED ed;
 		
 		@converter!SysTime(jv=>SysTime.fromISOExtString(jv.str),
 		                   v =>JSONValue(v.toISOExtString()))
@@ -1103,9 +1627,11 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	x.pt.x = 300;
 	x.pt.y = 400;
 	x.testval = 100;
-	y.testval = 200;
+	x.te = UnionDataA(1, 2);
+	x.ed.initialize!(EnumDataA.str)("test");
 	auto tim = Clock.currTime();
 	x.time = tim;
+	y.testval = 200;
 	JSONValue jv1     = serializeToJson(x);
 	string    jsonStr = jv1.toPrettyString();
 	JSONValue jv2     = parseJSON(jsonStr);
@@ -1116,13 +1642,16 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	assert(jv1["pt"]["xValue"].integer == 300);
 	assert(jv1["pt"]["yValue"].integer == 400);
 	assert(jv1["time"].str == tim.toISOExtString());
+	assert(jv1["te"]["hogeB"].integer == 2);
+	assert(jv1["ed"]["str"].str == "test");
 	
 	auto e1 = z.deserializeFromJson(parseJSON(`{}`)).collectException;
 	import std.stdio;
 	assert(e1);
 	assert(e1.msg == "Key not found: pt");
 	
-	auto e2 = z.deserializeFromJson(parseJSON(`{"pt": {}}`)).collectException;
+	auto e2json = parseJSON(`{"pt": {}}`);
+	auto e2 = z.deserializeFromJson(e2json).collectException;
 	assert(!e2);
 	assert(z.pt.y == 10);
 	assert(z.time == SysTime.init);
@@ -1142,8 +1671,11 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	
 	Data[] datAry1, datAry2;
 	Data[string] datMap1, datMap2;
-	datAry1 = [Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)], tim)];
-	datMap1 = ["Data": Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)], tim)];
+	auto teInitDat = TE(UnionDataA(1,7));
+	ED edInitDat;
+	edInitDat.initialize!(EnumDataA.str)("test");
+	datAry1 = [Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)], teInitDat, edInitDat, tim)];
+	datMap1 = ["Data": Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)], teInitDat, edInitDat, tim)];
 	datAry1.serializeToJsonFile("test.json");
 	datAry2.deserializeFromJsonFile("test.json");
 	datMap1.serializeToJsonFile("test.json");
