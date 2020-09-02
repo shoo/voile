@@ -1,6 +1,6 @@
 ﻿module voile.json;
 
-import std.json, std.traits, std.conv, std.array;
+import std.json, std.traits, std.meta, std.conv, std.array;
 import std.typecons: Rebindable;
 import voile.misc;
 import voile.munion;
@@ -216,6 +216,7 @@ private void _setValue(T)(ref JSONValue v, ref string name, ref T val)
 		v = x;
 	}
 }
+
 
 /*******************************************************************************
  * JSONValueデータの操作
@@ -552,7 +553,6 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 }
 
 
-
 private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
 {
 	if (auto x = name in v.object)
@@ -843,6 +843,337 @@ private enum isJSONizableRaw(T) = is(typeof({
 	fromJson(jv, val);
 }));
 
+
+//
+private template uniqueKey(MU, string name, uint num = 0)
+if (isManagedUnion!MU)
+{
+	enum string candidate = num == 0 ? name : text(name, num);
+	
+	static if (anySatisfy!(ApplyRight!(hasMember, candidate), EnumMemberTypes!MU))
+	{
+		enum string uniqueKey = uniqueKey!(MU, name, num+1);
+	}
+	else
+	{
+		enum string uniqueKey = candidate;
+	}
+}
+
+@system unittest
+{
+	struct A{ int a; int b; }
+	struct B{ int c; int c1; }
+	static assert(uniqueKey!(TypeEnum!(A, B), "a") == "a1");
+	static assert(uniqueKey!(TypeEnum!(A, B), "b") == "b1");
+	static assert(uniqueKey!(TypeEnum!(A, B), "c") == "c2");
+	static assert(uniqueKey!(TypeEnum!(A, B), "d") == "d");
+}
+
+/+
+// キーの数が同じで、キーの名称が同じで、キーの型が同じならそのキー名を返す
+private template getKeys(Types...)
+{
+	
+	enum string[][] allKeyMembers = ()
+	{
+		string[][] ret;
+		static foreach (T; Types)
+			ret ~= [getKeyMemberNames!T];
+		return ret;
+	}();
+	
+	enum bool isSameNames(string[] rhs, string[] lhs) = rhs == lhs;
+	
+	template getKeyMemberTypes(size_t i, string[] keyMembers)
+	{
+		alias getMemberType(string member) = typeof(__traits(getMember, MemberTypes[i], member));
+		alias getKeyMemberTypes = staticMap!(getMemberType, aliasSeqOf!keyMembers);
+	}
+	
+	static if (allKeyMembers.length == 0)
+	{
+		// キーがない
+		alias getKeys = AliasSeq!();
+	}
+	else static if (Filter!(ApplyLeft!(isSameNames, allKeyMembers[0]),aliasSeqOf!allKeyMembers).length
+	                != allKeyMembers.length)
+	{
+		// キーの数や名称が違う
+		alias getKeys = AliasSeq!();
+	}
+	else static if (
+		!() {
+			// すべてのキーの型が同じか判定する
+			bool ret = true;
+			alias firstKeyMemberTypes = getKeyMemberTypes!(0, allKeyMembers[0]);
+			static foreach (i, keyMembers; allKeyMembers)
+			{{
+				alias keyMemberTypes = getKeyMemberTypes!(i, keyMembers);
+				static foreach (j; 0..keyMemberTypes.length)
+					ret &= is(keyMemberTypes[j] == firstKeyMemberTypes[j]);
+			}}
+			return ret;
+		}())
+	{
+		// キーの型が違う
+		alias getKeys = AliasSeq!();
+	}
+	else
+	{
+		// キーの数も名称も型もすべて同じ
+		alias getKeys = aliasSeqOf!(allKeyMembers[0]);
+	}
+}
+
+@system unittest
+{
+	struct A{ @key int a; int b; }
+	struct B{ @key int a; int c; }
+	struct C{ int a; @key int b; @key int c; }
+	struct D{ int a; @key int b; @key int c; }
+	static assert(getKeys!(A, B) == AliasSeq!("a"));
+	static assert(getKeys!(A, C).length == 0);
+	static assert(getKeys!(C, D) == AliasSeq!("b", "c"));
+}
++/
+
+private struct Kind
+{
+	string key;
+	JSONValue value;
+}
+
+///
+auto kind(T)(string name, T value)
+{
+	import voile.attr: v = value;
+	return v(Kind(name, JSONValue(value)));
+}
+
+/// ditto
+auto kind(T)(T value)
+{
+	import voile.attr: v = value;
+	return v(Kind("kind", JSONValue(value)));
+}
+
+private alias _getKinds(T, string uk, alias tag) = aliasSeqOf!(()
+{
+	Kind[] ret;
+	static if (hasValue!(T, Kind))
+	{
+		ret = [getValues!(T, Kind)];
+	}
+	else static if (getKeyMemberNames!T.length > 0)
+	{
+		static foreach (member; getKeyMemberNames!T)
+		{
+			static foreach (val; getValues!(__traits(getMember, T, member)))
+				ret ~= Kind(member, JSONValue(val));
+		}
+	}
+	else
+	{
+		// UDAがない場合、type, kind, tagをさがす
+		static if (is(typeof(T.type) : string))
+			ret ~= Kind("type", JSONValue(T.stringof));
+		else static if (is(typeof(T.kind) : string))
+			ret ~= Kind("kind", JSONValue(T.stringof));
+		else static if (is(typeof(T.tag) : typeof(tag)))
+			ret ~= Kind("tag", JSONValue(tag));
+	}
+	if (ret.length == 0)
+		ret ~= Kind(uk, JSONValue(tag));
+	return ret;
+}());
+
+// - TypeEnumなら、まず型で 数値/文字列/配列/オブジェクト でそれぞれかぶりがないか検証する
+//   - 数値にかぶりがある→無視して記録する。
+//     デシリアライズの際には一番大きい数値型として復元する。
+//   - 配列にかぶりがある→無視して記録する。
+//     デシリアライズの際には配列要素の最初の型として復元する。
+//     要素がない場合は最初の配列型として復元する。
+//   - オブジェクトにかぶりがある→タグをつける
+//     1. 型に@kind(name, value)をつけるまたは@kind(value)をつける
+//        この場合JSONにnameで指定した名称のキーができる。省略した場合は"kind"のキーができる。
+//        デシリアライズの際にはnameの値がvalueで指定した値かどうかを型の順に走査し、最初にヒットしたものに復元する。
+//     2. すべてのオブジェクトで、メンバに@keyおよび@valueを付ける
+//        すべての@keyで指定されたメンバの値が@valueと一致するかで判別する
+//     3. すべてのオブジェクトで、メンバにsize, type, kind, tagのいずれかがある
+//        - size: 型のサイズが値となって判別する
+//        - type: 型名が値となって判別する
+//        - kind: 型名が値となって判別する
+//        - tag:  番号が値となって判別する
+//     4. キー指定がないなら"_tag"というキー名に番号でタグをつける
+private JSONValue _serializeToJsonImpl(Types...)(in ref TypeEnum!Types dat)
+{
+	alias MU = TypeEnum!Types;
+	alias MemberObjs = Filter!(isAggregateType, EnumMemberTypes!MU);
+	enum bool hasMultiObj = MemberObjs.length > 1;
+	final switch (dat.tag)
+	{
+		static foreach (tag; memberTags!MU)
+		{
+		case tag:
+			auto ret = dat.get!tag.serializeToJson();
+			static if (isAggregateType!(TypeFromTag!(MU, tag)) && hasMultiObj)
+			{
+				static foreach (kind; _getKinds!(TypeFromTag!(MU, tag), uniqueKey!(MU, "_tag"), tag))
+				{{
+					auto jv = kind.value;
+					ret[kind.key] = jv;
+				}}
+			}
+			return ret;
+		}
+	}
+}
+
+///
+@system unittest
+{
+	alias MU = TypeEnum!(int, string);
+	MU dat = 10;
+	auto mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.integer);
+	assert(mujson.integer == 10);
+	
+	dat = "xxx";
+	mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.string);
+	assert(mujson.str == "xxx");
+}
+///
+@system unittest
+{
+	struct A{ @key @value!1 int a; int b; }
+	struct B{ @key @value!2 int a; int c; }
+	struct C{ int a; @key @value!"1" int b; @key @value!"1" int c; }
+	struct D{ int a; @key @value!"1" int b; @key @value!"2" int c; }
+	
+	TypeEnum!(A, B) dat1 = A(0, 10);
+	auto mujson1 = _serializeToJsonImpl(dat1);
+	assert(mujson1.type == JSONType.object);
+	assert(mujson1["a"].type == JSONType.integer);
+	assert(mujson1["a"].integer == 1);
+	assert(mujson1["b"].type == JSONType.integer);
+	assert(mujson1["b"].integer == 10);
+	
+	TypeEnum!(C, D) dat2 = D(0, 10, 100);
+	auto mujson2 = _serializeToJsonImpl(dat2);
+	assert(mujson2.type == JSONType.object);
+	assert(mujson2["a"].type == JSONType.integer);
+	assert(mujson2["a"].integer == 0);
+	assert(mujson2["b"].type == JSONType.string);
+	assert(mujson2["b"].str == "1");
+	assert(mujson2["c"].type == JSONType.string);
+	assert(mujson2["c"].str == "2");
+	
+	@kind("tag", "a") struct E{ int a; int b; int c; }
+	@kind("tag", "b") struct F{ int a; int b; int c; }
+	TypeEnum!(E, F) dat3 = F(0, 10, 100);
+	auto mujson3 = _serializeToJsonImpl(dat3);
+	assert(mujson3.type == JSONType.object);
+	assert(mujson3["tag"].type == JSONType.string);
+	assert(mujson3["tag"].str == "b");
+	assert(mujson3["a"].type == JSONType.integer);
+	assert(mujson3["a"].integer == 0);
+	assert(mujson3["b"].type == JSONType.integer);
+	assert(mujson3["b"].integer == 10);
+	assert(mujson3["c"].type == JSONType.integer);
+	assert(mujson3["c"].integer == 100);
+}
+
+// - Taggedなら、{<タグ>: <データ>}のオブジェクトになる
+private JSONValue _serializeToJsonImpl(U)(in ref Tagged!U dat) @property
+{
+	final switch (dat.tag)
+	{
+		static foreach (tag; memberTags!(Tagged!U))
+		{
+		case tag:
+			return JSONValue([FieldNameTuple!U[tag]: dat.get!tag.serializeToJson()]);
+		}
+	}
+}
+///
+@system unittest
+{
+	union U { int x; string str; }
+	Tagged!U dat;
+	dat.initialize!0(10);
+	auto mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.object);
+	assert(mujson["x"].type == JSONType.integer);
+	assert(mujson["x"].integer == 10);
+	
+	dat.set!1 = "xxx";
+	mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.object);
+	assert(mujson["str"].type == JSONType.string);
+	assert(mujson["str"].str == "xxx");
+}
+///
+@system unittest
+{
+	struct A{ int a; int b; }
+	struct B{ int a; int c; }
+	union U1 { A a; B b; }
+	Tagged!U1 dat1;
+	dat1.initialize!0(100,200);
+	auto mujson1 = _serializeToJsonImpl(dat1);
+	assert(mujson1.type == JSONType.object);
+	assert(mujson1["a"].type == JSONType.object);
+	assert(mujson1["a"]["a"].integer == 100);
+	assert(mujson1["a"]["b"].type == JSONType.integer);
+	assert(mujson1["a"]["b"].integer == 200);
+	
+	struct E{ int a; int b;}
+	struct F{ int a; int b;}
+	union U3 { E a; F b; }
+	Tagged!U3 dat3;
+	dat3.initialize!1(100,200);
+	auto mujson3 = _serializeToJsonImpl(dat3);
+	assert(mujson3.type == JSONType.object);
+	assert(mujson3["b"]["a"].type == JSONType.integer);
+	assert(mujson3["b"]["a"].integer == 100);
+	assert(mujson3["b"]["b"].type == JSONType.integer);
+	assert(mujson3["b"]["b"].integer == 200);
+}
+
+// - Endataなら、{<タグ>: <データ>}のオブジェクトになる
+private auto ref JSONValue _serializeToJsonImpl(E)(in ref Endata!E dat) @property
+{
+	import std.conv;
+	switch (dat.tag)
+	{
+		static foreach (tag; memberTags!(Endata!E))
+		{
+		case tag:
+			return JSONValue([tag.text(): dat.get!tag.serializeToJson()]);
+		}
+		default:
+			return JSONValue((JSONValue[string]).init);
+	}
+}
+///
+@system unittest
+{
+	enum E { @data!int x, @data!string str }
+	mixin EnumMemberAlieses!E;
+	Endata!E dat;
+	dat.initialize!x(10);
+	auto mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.object);
+	assert(mujson["x"].integer == 10);
+	
+	dat.set!str = "xxx";
+	mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.object);
+	assert(mujson["str"].str == "xxx");
+}
+
 /*******************************************************************************
  * serialize data to JSON
  */
@@ -851,6 +1182,10 @@ JSONValue serializeToJson(T)(in T data)
 	static if (isJSONizableRaw!T)
 	{
 		return data.json;
+	}
+	else static if (is(typeof(_serializeToJsonImpl(data)): JSONValue))
+	{
+		return _serializeToJsonImpl(data);
 	}
 	else static if (isArray!T)
 	{
@@ -915,6 +1250,223 @@ void serializeToJsonFile(T)(in T data, string jsonfile, JSONOptions options = JS
 	std.file.write(jsonfile, contents);
 }
 
+
+
+// - TypeEnumなら、まず型で 数値/文字列/配列/オブジェクト でそれぞれかぶりがないか検証する
+//   - 数値→一番大きい数値型として復元する。
+//   - 配列→デシリアライズの際には配列要素の最初の型として復元する。
+//     要素がない場合は最初の配列型として復元する。
+//   - オブジェクト→タグ
+//     1. 型に@kind(name, value)をつけるまたは@kind(value)をつける
+//        この場合JSONにnameで指定した名称のキーができる。省略した場合は"kind"のキーができる。
+//        デシリアライズの際にはnameの値がvalueで指定した値かどうかを型の順に走査し、最初にヒットしたものに復元する。
+//     2. すべてのオブジェクトで、メンバに@keyおよび@valueを付ける
+//        すべての@keyで指定されたメンバの値が@valueと一致するかで判別する
+//     3. すべてのオブジェクトで、メンバにsize, type, kind, tagのいずれかがある
+//        - type: 型名が値となって判別する
+//        - kind: 型名が値となって判別する
+//        - tag:  番号が値となって判別する
+//     4. キー指定がないなら"_tag"というキー名に番号でタグをつける
+private void _deserializeFromJsonImpl(Types...)(ref TypeEnum!Types dat, in ref JSONValue json)
+{
+	alias MU = TypeEnum!Types;
+	final switch (json.type)
+	{
+	case JSONType.null_:
+		dat.clear();
+		break;
+	case JSONType.string:
+		static if (hasType!(MU, string))
+			dat.initialize(json.str);
+		break;
+	case JSONType.integer:
+		static if (hasType!(MU, long))
+			dat.initialize!long(json.integer);
+		else static if (hasType!(MU, int))
+			dat.initialize!int(json.integer);
+		else static if (hasType!(MU, short))
+			dat.initialize!short(json.integer);
+		else static if (hasType!(MU, byte))
+			dat.initialize!byte(json.integer);
+		break;
+	case JSONType.uinteger:
+		static if (hasType!(MU, ulong))
+			dat.initialize!ulong(json.uinteger);
+		else static if (hasType!(MU, uint))
+			dat.initialize!uint(json.uinteger);
+		else static if (hasType!(MU, ushort))
+			dat.initialize!ushort(json.uinteger);
+		else static if (hasType!(MU, ubyte))
+			dat.initialize!ubyte(json.uinteger);
+		break;
+	case JSONType.float_:
+		static if (hasType!(MU, real))
+			dat.initialize!real(json.floating);
+		else static if (hasType!(MU, double))
+			dat.initialize!double(json.floating);
+		else static if (hasType!(MU, float))
+			dat.initialize!float(json.floating);
+		break;
+	case JSONType.array:
+		// 配列型の候補を選択
+		alias AryTypes = Filter!(isArray, Types);
+		static if (AryTypes.length == 0)
+		{
+			// 配列型がないなら無視
+			return;
+		}
+		else static if (AryTypes.length == 1)
+		{
+			// 配列型が1つならそれを最優先で選択
+			AryTypes[0] tmp;
+			deserializeFromJson(tmp, json);
+			dst.initialize!(AryTypes[0])(tmp);
+			return;
+		}
+		else
+		{
+			// 配列型が複数ある場合は1つ目のデータの要素で決定
+			if (json.array.length == 0)
+				dst.clear();
+			import std.meta;
+			TypeEnum!(staticMap!(ForeachType, AryTypes)) datElm;
+			datElm.deserializeFromJson(srcDat.array[0]);
+			final switch (datElm.tag)
+			{
+				static foreach (tag; memberTags!MU)
+				{
+				case tag:
+					AryTypes[tag] ary;
+					ary.deserializeFromJson(dat);
+					dat.initialize!(AryTypes[tag])(ary);
+					return;
+				}
+			}
+		}
+		assert(0);
+	case JSONType.object:
+		// オブジェクト型の候補を選択
+		enum bool isObjType(T) = isAggregateType!T || isAssociativeArray!T;
+		alias ObjTypes = Filter!(isObjType, Types);
+		static if (ObjTypes.length == 0)
+		{
+			// オブジェクト型がないなら無視
+		}
+		else static if (ObjTypes.length == 1)
+		{
+			// オブジェクト型が1つならそれを最優先で選択
+			ObjTypes[0] tmp;
+			deserializeFromJson(tmp, json);
+			dst.initialize!(ObjTypes[0])(tmp);
+		}
+		else
+		{
+			// オブジェクト型が複数ある場合はキーデータの要素で決定
+			static foreach (tag; memberTags!MU)
+			{
+				static foreach (kind; _getKinds!(TypeFromTag!(MU, tag), uniqueKey!(MU, "_tag"), tag))
+				{
+					if (auto v = kind.key in json)
+					{
+						if (*v == kind.value)
+						{
+							TypeFromTag!(MU, tag) tmp;
+							deserializeFromJson(tmp, json);
+							dat.initialize!tag(tmp);
+							return;
+						}
+					}
+				}
+			}
+		}
+		break;
+	case JSONType.true_:
+	case JSONType.false_:
+		static if (hasType!(TypeEnum!Types, bool))
+			dat.initialize!bool(src.boolean);
+		break;
+	}
+}
+
+///
+@system unittest
+{
+	struct A{ @key @value!1 int a; int b; }
+	struct B{ @key @value!2 int a; int c; }
+	struct C{ int a; @key @value!1 int b; @key @value!1 int c; }
+	struct D{ int a; @key @value!1 int b; @key @value!2 int c; }
+	
+	TypeEnum!(A, B) dat1;
+	auto mujson1 = JSONValue(["a": JSONValue(1), "b": JSONValue(10)]);
+	_deserializeFromJsonImpl(dat1, mujson1);
+	assert(dat1.tag == 0);
+	assert(dat1.get!A.a == 1);
+	assert(dat1.get!A.b == 10);
+}
+
+// Tagged
+private void _deserializeFromJsonImpl(U)(ref Tagged!U dst, in ref JSONValue src)
+{
+	foreach (k, v; src.object)
+	{
+		switch (k)
+		{
+			static foreach (tag, memberName; FieldNameTuple!U)
+			{
+			case memberName:
+				typeof(__traits(getMember, U, memberName)) dat;
+				dat.deserializeFromJson(v);
+				dst.initialize!tag(dat);
+				return;
+			}
+			default:
+				break;
+		}
+	}
+}
+///
+@system unittest
+{
+	union U { int x; string str; }
+	Tagged!U dat;
+	auto jv = JSONValue(["x": JSONValue(10)]);
+	_deserializeFromJsonImpl(dat, jv);
+	assert(dat.x == 10);
+}
+
+/// Endata
+void _deserializeFromJsonImpl(E)(ref Endata!E dst, in ref JSONValue src)
+{
+	foreach (k, v; src.object)
+	{
+		auto e = to!E(k);
+		switch (e)
+		{
+			static foreach (tag; memberTags!(Endata!E))
+			{
+			case tag:
+				TypeFromTag!(Endata!E, tag) dat;
+				dat.deserializeFromJson(v);
+				dst.initialize!tag(dat);
+				return;
+			}
+			default:
+				break;
+		}
+	}
+}
+
+@system unittest
+{
+	enum E { @data!int x, @data!string str }
+	mixin EnumMemberAlieses!E;
+	Endata!E dat;
+	auto jv = JSONValue(["x": JSONValue(10)]);
+	_deserializeFromJsonImpl(dat, jv);
+	assert(dat.x == 10);
+}
+
+
 /*******************************************************************************
  * deserialize data from JSON
  */
@@ -923,6 +1475,10 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 	static if (isJSONizableRaw!T)
 	{
 		fromJson(json, data);
+	}
+	else static if (__traits(compiles, _deserializeFromJsonImpl(data, json)))
+	{
+		_deserializeFromJsonImpl(data, json);
 	}
 	else static if (isArray!T)
 	{
@@ -1037,6 +1593,12 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 @system unittest
 {
 	import std.exception, std.datetime.systime;
+	struct UnionDataA{ @key @value!1 int a; @name("hogeB") int b; }
+	struct UnionDataB{ @key @value!2 int a; int c; }
+	alias TE = TypeEnum!(UnionDataA, UnionDataB);
+	enum EnumDataA { @data!int x, @data!string str }
+	alias ED = Endata!EnumDataA;
+	
 	static struct Point
 	{
 		@name("xValue")
@@ -1052,6 +1614,8 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 		@essential Point  pt;
 		Point[] points;
 		Point[string] pointMap;
+		TE te;
+		ED ed;
 		
 		@converter!SysTime(jv=>SysTime.fromISOExtString(jv.str),
 		                   v =>JSONValue(v.toISOExtString()))
@@ -1063,9 +1627,11 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	x.pt.x = 300;
 	x.pt.y = 400;
 	x.testval = 100;
-	y.testval = 200;
+	x.te = UnionDataA(1, 2);
+	x.ed.initialize!(EnumDataA.str)("test");
 	auto tim = Clock.currTime();
 	x.time = tim;
+	y.testval = 200;
 	JSONValue jv1     = serializeToJson(x);
 	string    jsonStr = jv1.toPrettyString();
 	JSONValue jv2     = parseJSON(jsonStr);
@@ -1076,6 +1642,8 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	assert(jv1["pt"]["xValue"].integer == 300);
 	assert(jv1["pt"]["yValue"].integer == 400);
 	assert(jv1["time"].str == tim.toISOExtString());
+	assert(jv1["te"]["hogeB"].integer == 2);
+	assert(jv1["ed"]["str"].str == "test");
 	
 	auto e1 = z.deserializeFromJson(parseJSON(`{}`)).collectException;
 	import std.stdio;
@@ -1103,8 +1671,11 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	
 	Data[] datAry1, datAry2;
 	Data[string] datMap1, datMap2;
-	datAry1 = [Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)], tim)];
-	datMap1 = ["Data": Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)], tim)];
+	auto teInitDat = TE(UnionDataA(1,7));
+	ED edInitDat;
+	edInitDat.initialize!(EnumDataA.str)("test");
+	datAry1 = [Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)], teInitDat, edInitDat, tim)];
+	datMap1 = ["Data": Data("x", 10, 0, Point(1,2), [Point(3,4)], ["PT": Point(5,6)], teInitDat, edInitDat, tim)];
 	datAry1.serializeToJsonFile("test.json");
 	datAry2.deserializeFromJsonFile("test.json");
 	datMap1.serializeToJsonFile("test.json");

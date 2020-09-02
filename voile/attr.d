@@ -264,22 +264,10 @@ enum bool hasIgnore(alias value) = hasUDA!(value, Ignore);
 ///
 @safe unittest
 {
-	struct A
-	{
-		int test;
-		
-		@ignore
-		int foo;
-	}
-	
-	struct B
-	{
-		int test;
-	}
-	
+	struct A { int test; @ignore int foo; }
+	struct B { int test; }
 	A a;
 	B b;
-	
 	static assert(!hasIgnore!(a.test));
 	static assert(!hasIgnore!(b.test));
 	static assert( hasIgnore!(a.foo));
@@ -295,6 +283,60 @@ enum Essential essential = Essential.init;
 ///
 enum bool hasEssential(alias value) = hasUDA!(value, Essential);
 
+///
+@safe unittest
+{
+	struct A { int test; @essential int foo; }
+	struct B { int test; }
+	A a;
+	B b;
+	static assert(!hasEssential!(a.test));
+	static assert(!hasEssential!(b.test));
+	static assert( hasEssential!(a.foo));
+}
+
+
+private enum Key {init}
+
+/*******************************************************************************
+ * Attribute marking essential field
+ */
+enum Key key = Key.init;
+
+///
+enum bool hasKey(alias value) = hasUDA!(value, Key);
+
+///
+enum bool isKeyMember(T, string member) = hasKey!(__traits(getMember, T, member));
+
+///
+alias getKeyMemberNames(T) = Filter!(ApplyLeft!(isKeyMember, T), FieldNameTuple!T);
+
+///
+enum bool hasKeyMember(T) = Filter!(ApplyLeft!(isKeyMember, T), FieldNameTuple!T).length != 0;
+
+///
+enum string getKeyMemberName(T) = Filter!(ApplyLeft!(isKeyMember, T), FieldNameTuple!T)[0];
+
+///
+@safe unittest
+{
+	struct A { int test; @key int foo; }
+	struct B { int test; }
+	A a;
+	B b;
+	static assert(!hasKey!(a.test));
+	static assert(!hasKey!(b.test));
+	static assert( hasKey!(a.foo));
+	static assert( hasKeyMember!A);
+	static assert(!hasKeyMember!B);
+	static assert(getKeyMemberNames!A == AliasSeq!("foo"));
+	static assert(getKeyMemberName!A == "foo");
+}
+
+
+
+
 private struct Name
 {
 	string name;
@@ -303,15 +345,12 @@ private struct Name
 /*******************************************************************************
  * Attribute forcing field name
  */
-Name name(string name)
+Name name(string name) pure nothrow @nogc @safe
 {
 	return Name(name);
 }
 /// ditto
-Name name(string name)()
-{
-	return Name(name);
-}
+enum Name name(string n) = Name(n);
 
 ///
 enum bool hasName(alias value) = hasUDA!(value, Name);
@@ -321,6 +360,86 @@ template getName(alias value)
 if (hasName!value)
 {
 	enum string getName = getUDAs!(value, Name)[0].name;
+}
+
+///
+@safe unittest
+{
+	struct A { int test; @name("test") int foo; }
+	struct B { @name!"foo" int test; }
+	A a;
+	B b;
+	static assert(!hasName!(a.test));
+	static assert( hasName!(a.foo));
+	static assert( hasName!(b.test));
+	static assert(getName!(a.foo) == "test");
+	static assert(getName!(b.test) == "foo");
+}
+
+private struct Value(T)
+{
+	T value;
+}
+
+/*******************************************************************************
+ * Attribute forcing field value
+ */
+Value!T value(T)(T val) pure nothrow @nogc @safe
+{
+	return Value!T(val);
+}
+/// ditto
+enum Value!(typeof(v)) value(alias v) = Value!(typeof(v))(v);
+
+///
+template hasValue(args...)
+{
+	static if (args.length == 1)
+	{
+		enum bool hasValue = hasUDA!(args[0], Value);
+	}
+	else static if (args.length == 2 && isType!(args[1]))
+	{
+		enum bool hasValue = hasUDA!(args[0], Value!(args[1]));
+	}
+	else static assert(0);
+}
+
+///
+template getValues(args...)
+{
+	enum getVal(alias v) = v.value;
+	static if (args.length == 1)
+	{
+		alias getValues = staticMap!(getVal, getUDAs!(args[0], Value));
+	}
+	else static if (args.length == 2 && isType!(args[1]))
+	{
+		alias getValues = staticMap!(getVal, getUDAs!(args[0], Value!(args[1])));
+	}
+	else static assert(0);
+}
+
+///
+template getValue(alias value)
+if (hasValue!value)
+{
+	enum getValue = getUDAs!(value, Value)[0].value;
+}
+
+///
+@safe unittest
+{
+	struct A { int test; @value("test") int foo; }
+	struct B { @value!1 int test; }
+	A a;
+	B b;
+	static assert(!hasValue!(a.test));
+	static assert( hasValue!(a.foo));
+	static assert( hasValue!(b.test));
+	static assert( hasValue!(b.test, int));
+	static assert(getValue!(a.foo) == "test");
+	static assert(getValue!(b.test) == 1);
 }
 
 ///
