@@ -110,6 +110,12 @@ set!<span class="d_keyword">int</span>(dat, 5);
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".TypeEnum.opCast"></span><div class="quickindex" id="quickindex.TypeEnum.opCast"></div>inout inout<span class="ddoc_template_param_list" title="Template parameter list">(T)</span> <code class="ddoc_psymbol">opCast</code>(T)()<br><span class="ddoc_constraint">if(_inst.isAssignable!T)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">キャスト</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TypeEnum.opEquals"></span><div class="quickindex" id="quickindex.TypeEnum.opEquals"></div>const bool <code class="ddoc_psymbol">opEquals</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(TypeEnum <span class="ddoc_param">rhs</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">等号演算子オーバーロード</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TypeEnum.toHash"></span><div class="quickindex" id="quickindex.TypeEnum.toHash"></div>const size_t <code class="ddoc_psymbol">toHash</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ハッシュ</div></dd>
 </div></dl>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Tagged"></span><div class="quickindex" id="quickindex.Tagged"></div>struct <code class="ddoc_psymbol">Tagged</code>(U) if (is(U == union));
@@ -135,7 +141,13 @@ dat.str = <span class="d_string">"xxx"</span>;
 <span class="d_keyword">assert</span>(dat.str == <span class="d_string">"xxx"</span>);
 </pre>
 </div>
-<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Tagged.opDispatch"></span><div class="quickindex" id="quickindex.Tagged.opDispatch"></div>ref auto <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_param_list" title="Template parameter list">(string member)</span>()<br><span class="ddoc_constraint">if(hasMember!(TaggedImpl!U.Instance, member))</span>;
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Tagged.opEquals"></span><div class="quickindex" id="quickindex.Tagged.opEquals"></div>const bool <code class="ddoc_psymbol">opEquals</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Tagged <span class="ddoc_param">rhs</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">等号演算子オーバーロード</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Tagged.toHash"></span><div class="quickindex" id="quickindex.Tagged.toHash"></div>const size_t <code class="ddoc_psymbol">toHash</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ハッシュ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Tagged.opDispatch"></span><div class="quickindex" id="quickindex.Tagged.opDispatch"></div>ref auto <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_param_list" title="Template parameter list">(string member)</span>()<br><span class="ddoc_constraint">if(hasMember!(TaggedImpl!U.Instance, member))</span>;
 <br>
 void <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_param_list" title="Template parameter list">(string member)</span>(auto ref TaggedImpl!U.MemberType!member <span class="ddoc_param">val</span>)<br><span class="ddoc_constraint">if(hasMember!(TaggedImpl!U.Instance, member))</span>;
 <br></div></dt>
@@ -186,7 +198,13 @@ dat.set!id = 5;
 </span><span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_keyword">__traits</span>(compiles, dat.set!ignore(0)));
 </pre>
 </div>
-<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata.opDispatch"></span><div class="quickindex" id="quickindex.Endata.opDispatch"></div>ref auto <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_param_list" title="Template parameter list">(string member)</span>()<br><span class="ddoc_constraint">if(hasMember!(EndataImpl!E.Instance, member))</span>;
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata.opEquals"></span><div class="quickindex" id="quickindex.Endata.opEquals"></div>const bool <code class="ddoc_psymbol">opEquals</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Endata <span class="ddoc_param">rhs</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">等号演算子オーバーロード</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata.toHash"></span><div class="quickindex" id="quickindex.Endata.toHash"></div>const size_t <code class="ddoc_psymbol">toHash</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ハッシュ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata.opDispatch"></span><div class="quickindex" id="quickindex.Endata.opDispatch"></div>ref auto <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_param_list" title="Template parameter list">(string member)</span>()<br><span class="ddoc_constraint">if(hasMember!(EndataImpl!E.Instance, member))</span>;
 <br>
 void <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_param_list" title="Template parameter list">(string member)</span>(auto ref EndataImpl!E.MemberType!member <span class="ddoc_param">val</span>)<br><span class="ddoc_constraint">if(hasMember!(EndataImpl!E.Instance, member))</span>;
 <br></div></dt>

@@ -252,38 +252,121 @@ template <code class="ddoc_psymbol">getParameterArgUDAs</code>(alias Func, size_
 </pre>
 </div>
 </dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ignore"></span><div class="quickindex" id="quickindex.ignore"></div>enum Ignore <code class="ddoc_psymbol">ignore</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Attribute marking <code class="ddoc_psymbol">ignore</code> data</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasIgnore"></span><div class="quickindex" id="quickindex.hasIgnore"></div>enum bool <code class="ddoc_psymbol">hasIgnore</code>(alias value);
 <br></div></dt>
 <dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
- <pre class="d_code notranslate"><span class="d_keyword">struct</span> A
-{
-	<span class="d_keyword">int</span> test;
-	
-	@ignore
-	<span class="d_keyword">int</span> foo;
-}
-
-<span class="d_keyword">struct</span> B
-{
-	<span class="d_keyword">int</span> test;
-}
-
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> A { <span class="d_keyword">int</span> test; @ignore <span class="d_keyword">int</span> foo; }
+<span class="d_keyword">struct</span> B { <span class="d_keyword">int</span> test; }
 A a;
 B b;
-
 <span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasIgnore</span>!(a.test));
 <span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasIgnore</span>!(b.test));
 <span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasIgnore</span>!(a.foo));
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Ignore"></span><div class="quickindex" id="quickindex.Ignore"></div>enum <code class="ddoc_psymbol">Ignore</code>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".essential"></span><div class="quickindex" id="quickindex.essential"></div>enum Essential <code class="ddoc_psymbol">essential</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Attribute marking <code class="ddoc_psymbol">essential</code> field</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasEssential"></span><div class="quickindex" id="quickindex.hasEssential"></div>enum bool <code class="ddoc_psymbol">hasEssential</code>(alias value);
+<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> A { <span class="d_keyword">int</span> test; @essential <span class="d_keyword">int</span> foo; }
+<span class="d_keyword">struct</span> B { <span class="d_keyword">int</span> test; }
+A a;
+B b;
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasEssential</span>!(a.test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">hasEssential</span>!(b.test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( <span class="d_psymbol">hasEssential</span>!(a.foo));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".key"></span><div class="quickindex" id="quickindex.key"></div>enum Key <code class="ddoc_psymbol">key</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Attribute marking essential field</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasKey"></span><div class="quickindex" id="quickindex.hasKey"></div>enum bool <code class="ddoc_psymbol">hasKey</code>(alias value);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ignore"></span><div class="quickindex" id="quickindex.ignore"></div>alias <code class="ddoc_psymbol">ignore</code> = Ignore;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isKeyMember"></span><div class="quickindex" id="quickindex.isKeyMember"></div>enum bool <code class="ddoc_psymbol">isKeyMember</code>(T, string member);
 <br></div></dt>
 <dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getKeyMemberNames"></span><div class="quickindex" id="quickindex.getKeyMemberNames"></div>template <code class="ddoc_psymbol">getKeyMemberNames</code>(T)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasKeyMember"></span><div class="quickindex" id="quickindex.hasKeyMember"></div>enum bool <code class="ddoc_psymbol">hasKeyMember</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getKeyMemberName"></span><div class="quickindex" id="quickindex.getKeyMemberName"></div>enum string <code class="ddoc_psymbol">getKeyMemberName</code>(T);
+<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> A { <span class="d_keyword">int</span> test; @key <span class="d_keyword">int</span> foo; }
+<span class="d_keyword">struct</span> B { <span class="d_keyword">int</span> test; }
+A a;
+B b;
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!hasKey!(a.test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!hasKey!(b.test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( hasKey!(a.foo));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( hasKeyMember!A);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!hasKeyMember!B);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(getKeyMemberNames!A == AliasSeq!(<span class="d_string">"foo"</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getKeyMemberName</span>!A == <span class="d_string">"foo"</span>);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".name"></span><div class="quickindex" id="quickindex.name"></div>pure nothrow @nogc @safe Name <code class="ddoc_psymbol">name</code>(string <code class="ddoc_psymbol">name</code>);
+<br>
+enum Name <code class="ddoc_psymbol">name</code>(string n);
+<br></div></dt>
+<dd><div class="ddoc_summary">Attribute forcing field <code class="ddoc_psymbol">name</code></div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasName"></span><div class="quickindex" id="quickindex.hasName"></div>enum bool <code class="ddoc_psymbol">hasName</code>(alias value);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getName"></span><div class="quickindex" id="quickindex.getName"></div>template <code class="ddoc_psymbol">getName</code>(alias value) if (hasName!value)<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> A { <span class="d_keyword">int</span> test; @name(<span class="d_string">"test"</span>) <span class="d_keyword">int</span> foo; }
+<span class="d_keyword">struct</span> B { @name!<span class="d_string">"foo"</span> <span class="d_keyword">int</span> test; }
+A a;
+B b;
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!hasName!(a.test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( hasName!(a.foo));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( hasName!(b.test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getName</span>!(a.foo) == <span class="d_string">"test"</span>);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getName</span>!(b.test) == <span class="d_string">"foo"</span>);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".value"></span><div class="quickindex" id="quickindex.value"></div>pure nothrow @nogc @safe Value!T <code class="ddoc_psymbol">value</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">val</span>);
+<br>
+enum Value!(typeof(v)) <code class="ddoc_psymbol">value</code>(alias v);
+<br></div></dt>
+<dd><div class="ddoc_summary">Attribute forcing field <code class="ddoc_psymbol">value</code></div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasValue"></span><div class="quickindex" id="quickindex.hasValue"></div>template <code class="ddoc_psymbol">hasValue</code>(args...)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getValues"></span><div class="quickindex" id="quickindex.getValues"></div>template <code class="ddoc_psymbol">getValues</code>(args...)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getValue"></span><div class="quickindex" id="quickindex.getValue"></div>template <code class="ddoc_psymbol">getValue</code>(alias value) if (hasValue!value)<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">struct</span> A { <span class="d_keyword">int</span> test; @value(<span class="d_string">"test"</span>) <span class="d_keyword">int</span> foo; }
+<span class="d_keyword">struct</span> B { @value!1 <span class="d_keyword">int</span> test; }
+A a;
+B b;
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!hasValue!(a.test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( hasValue!(a.foo));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( hasValue!(b.test));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>( hasValue!(b.test, <span class="d_keyword">int</span>));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getValue</span>!(a.foo) == <span class="d_string">"test"</span>);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_psymbol">getValue</span>!(b.test) == 1);
+</pre>
+</div>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".ConvBy"></span><div class="quickindex" id="quickindex.ConvBy"></div>struct <code class="ddoc_psymbol">ConvBy</code>(alias T);
 <br></div></dt>
@@ -293,8 +376,7 @@ B b;
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isConvByAttr"></span><div class="quickindex" id="quickindex.isConvByAttr"></div>enum bool <code class="ddoc_psymbol">isConvByAttr</code>(alias Attr);
-<br></div></dt>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isConvByAttr"></span><div class="quickindex" id="quickindex.isConvByAttr"></div>template <code class="ddoc_psymbol">isConvByAttr</code>(alias Attr)<br></div></dt>
 <dd>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".getConvByAttr"></span><div class="quickindex" id="quickindex.getConvByAttr"></div>template <code class="ddoc_psymbol">getConvByAttr</code>(alias Attr) if (isConvByAttr!Attr)<br></div></dt>
