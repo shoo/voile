@@ -1340,10 +1340,16 @@ struct FileSystem
 		import std.algorithm, std.array;
 		if (!dstDir.exists)
 			return copyFiles(srcDir, dstDir);
+		
 		auto srcAbsPaths = dirEntries(srcDir, SpanMode.breadth).map!(a => a.name).array;
 		auto dstAbsPaths = dirEntries(dstDir, SpanMode.breadth).map!(a => a.name).array;
+		
+		srcAbsPaths.sort!((a,b) => filenameCmp(a, b) < 0);
+		dstAbsPaths.sort!((a,b) => filenameCmp(a, b) < 0);
+		
 		auto srcRelPaths = srcAbsPaths.map!(a => a.relativePath(srcDir)).array;
 		auto dstRelPaths = dstAbsPaths.map!(a => a.relativePath(dstDir)).array;
+		
 		import std.stdio;
 		size_t indexBefore, indexAfter;
 		auto levPath = levenshteinDistanceAndPath(srcRelPaths, dstRelPaths)[1];
