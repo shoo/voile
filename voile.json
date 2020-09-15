@@ -6236,7 +6236,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1407,
+        "endline" : 1413,
         "endchar" : 2
        }
       ]
@@ -6245,7 +6245,7 @@
       "name" : "mirrorFiles",
       "kind" : "function",
       "comment" : " ファイルをミラーリングする\n",
-      "line" : 1412,
+      "line" : 1418,
       "char" : 7,
       "deco" : "FAyaQdbkZb",
       "originalType" : "bool(string srcDir, string dstDir, bool force = true, uint retrycnt = 5)",
@@ -6269,13 +6269,13 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1415,
+      "endline" : 1421,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1421,
+      "line" : 1427,
       "char" : 15,
       "name" : "moveFilesImpl",
       "parameters" : [
@@ -6289,7 +6289,7 @@
        {
         "name" : "moveFilesImpl",
         "kind" : "function",
-        "line" : 1421,
+        "line" : 1427,
         "char" : 15,
         "type" : "bool(string src, string dst, bool force, bool retrycnt)",
         "parameters" : [
@@ -6310,7 +6310,7 @@
           "deco" : "b"
          }
         ],
-        "endline" : 1427,
+        "endline" : 1433,
         "endchar" : 2
        }
       ]
@@ -6318,7 +6318,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1429,
+      "line" : 1435,
       "char" : 15,
       "name" : "moveFilesImpl",
       "parameters" : [
@@ -6333,7 +6333,7 @@
        {
         "name" : "moveFilesImpl",
         "kind" : "function",
-        "line" : 1429,
+        "line" : 1435,
         "char" : 15,
         "type" : "bool(string src, string dst, bool force, bool retrycnt)",
         "parameters" : [
@@ -6354,7 +6354,7 @@
           "deco" : "b"
          }
         ],
-        "endline" : 1494,
+        "endline" : 1500,
         "endchar" : 2
        }
       ]
@@ -6363,7 +6363,7 @@
       "name" : "moveFiles",
       "kind" : "function",
       "comment" : " ファイルを移動する\n",
-      "line" : 1499,
+      "line" : 1505,
       "char" : 7,
       "deco" : "FAyaQdbbZb",
       "parameters" : [
@@ -6386,13 +6386,13 @@
         "default" : "true"
        }
       ],
-      "endline" : 1502,
+      "endline" : 1508,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1507,
+      "line" : 1513,
       "char" : 15,
       "name" : "setTimeStampImpl",
       "parameters" : [
@@ -6406,7 +6406,7 @@
        {
         "name" : "setTimeStampImpl",
         "kind" : "function",
-        "line" : 1507,
+        "line" : 1513,
         "char" : 15,
         "type" : "void(string target, SysTime accessTime, SysTime modificationTime)",
         "parameters" : [
@@ -6423,7 +6423,7 @@
           "type" : "SysTime"
          }
         ],
-        "endline" : 1510,
+        "endline" : 1516,
         "endchar" : 2
        }
       ]
@@ -6431,7 +6431,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1512,
+      "line" : 1518,
       "char" : 15,
       "name" : "setTimeStampImpl",
       "parameters" : [
@@ -6446,7 +6446,7 @@
        {
         "name" : "setTimeStampImpl",
         "kind" : "function",
-        "line" : 1512,
+        "line" : 1518,
         "char" : 15,
         "type" : "void(string target, SysTime accessTime, SysTime modificationTime)",
         "parameters" : [
@@ -6463,7 +6463,7 @@
           "type" : "SysTime"
          }
         ],
-        "endline" : 1515,
+        "endline" : 1521,
         "endchar" : 2
        }
       ]
@@ -6471,7 +6471,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1517,
+      "line" : 1523,
       "char" : 15,
       "name" : "getTimeStampImpl",
       "parameters" : [
@@ -6485,53 +6485,7 @@
        {
         "name" : "getTimeStampImpl",
         "kind" : "function",
-        "line" : 1517,
-        "char" : 15,
-        "type" : "void(string target, out SysTime accessTime, out SysTime modificationTime)",
-        "parameters" : [
-         {
-          "name" : "target",
-          "type" : "string"
-         },
-         {
-          "name" : "accessTime",
-          "type" : "SysTime",
-          "storageClass" : [
-           "out"
-          ]
-         },
-         {
-          "name" : "modificationTime",
-          "type" : "SysTime",
-          "storageClass" : [
-           "out"
-          ]
-         }
-        ],
-        "endline" : 1520,
-        "endchar" : 2
-       }
-      ]
-     },
-     {
-      "kind" : "template",
-      "protection" : "private",
-      "line" : 1522,
-      "char" : 15,
-      "name" : "getTimeStampImpl",
-      "parameters" : [
-       {
-        "name" : "absConvert",
-        "kind" : "value",
-        "deco" : "b",
-        "specValue" : "false"
-       }
-      ],
-      "members" : [
-       {
-        "name" : "getTimeStampImpl",
-        "kind" : "function",
-        "line" : 1522,
+        "line" : 1523,
         "char" : 15,
         "type" : "void(string target, out SysTime accessTime, out SysTime modificationTime)",
         "parameters" : [
@@ -6560,10 +6514,56 @@
       ]
      },
      {
+      "kind" : "template",
+      "protection" : "private",
+      "line" : 1528,
+      "char" : 15,
+      "name" : "getTimeStampImpl",
+      "parameters" : [
+       {
+        "name" : "absConvert",
+        "kind" : "value",
+        "deco" : "b",
+        "specValue" : "false"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "getTimeStampImpl",
+        "kind" : "function",
+        "line" : 1528,
+        "char" : 15,
+        "type" : "void(string target, out SysTime accessTime, out SysTime modificationTime)",
+        "parameters" : [
+         {
+          "name" : "target",
+          "type" : "string"
+         },
+         {
+          "name" : "accessTime",
+          "type" : "SysTime",
+          "storageClass" : [
+           "out"
+          ]
+         },
+         {
+          "name" : "modificationTime",
+          "type" : "SysTime",
+          "storageClass" : [
+           "out"
+          ]
+         }
+        ],
+        "endline" : 1532,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
       "name" : "setTimeStamp",
       "kind" : "function",
       "comment" : " タイムスタンプを変更/取得する\n",
-      "line" : 1532,
+      "line" : 1538,
       "char" : 7,
       "deco" : "FAyaS3std8datetime7systime7SysTimeQBeZv",
       "parameters" : [
@@ -6580,14 +6580,14 @@
         "deco" : "S3std8datetime7systime7SysTime"
        }
       ],
-      "endline" : 1535,
+      "endline" : 1541,
       "endchar" : 2
      },
      {
       "name" : "setTimeStamp",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1537,
+      "line" : 1543,
       "char" : 7,
       "deco" : "FAyaS3std8datetime7systime7SysTimeZv",
       "parameters" : [
@@ -6600,14 +6600,14 @@
         "deco" : "S3std8datetime7systime7SysTime"
        }
       ],
-      "endline" : 1540,
+      "endline" : 1546,
       "endchar" : 2
      },
      {
       "name" : "setTimeStamp",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1542,
+      "line" : 1548,
       "char" : 7,
       "deco" : "FAyaS3std8datetime4date8DateTimeQBcZv",
       "parameters" : [
@@ -6624,14 +6624,14 @@
         "deco" : "S3std8datetime4date8DateTime"
        }
       ],
-      "endline" : 1545,
+      "endline" : 1551,
       "endchar" : 2
      },
      {
       "name" : "setTimeStamp",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1547,
+      "line" : 1553,
       "char" : 7,
       "deco" : "FAyaS3std8datetime4date8DateTimeZv",
       "parameters" : [
@@ -6644,14 +6644,14 @@
         "deco" : "S3std8datetime4date8DateTime"
        }
       ],
-      "endline" : 1550,
+      "endline" : 1556,
       "endchar" : 2
      },
      {
       "name" : "getTimeStamp",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1552,
+      "line" : 1558,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime7systime7SysTimeJQBfZv",
       "parameters" : [
@@ -6674,14 +6674,14 @@
         ]
        }
       ],
-      "endline" : 1555,
+      "endline" : 1561,
       "endchar" : 2
      },
      {
       "name" : "getTimeStamp",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1557,
+      "line" : 1563,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime7systime7SysTimeZv",
       "parameters" : [
@@ -6697,14 +6697,14 @@
         ]
        }
       ],
-      "endline" : 1561,
+      "endline" : 1567,
       "endchar" : 2
      },
      {
       "name" : "getTimeStamp",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1563,
+      "line" : 1569,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime4date8DateTimeJQBdZv",
       "parameters" : [
@@ -6727,14 +6727,14 @@
         ]
        }
       ],
-      "endline" : 1569,
+      "endline" : 1575,
       "endchar" : 2
      },
      {
       "name" : "getTimeStamp",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1571,
+      "line" : 1577,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime4date8DateTimeZv",
       "parameters" : [
@@ -6750,14 +6750,14 @@
         ]
        }
       ],
-      "endline" : 1576,
+      "endline" : 1582,
       "endchar" : 2
      },
      {
       "name" : "getTimeStamp",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1578,
+      "line" : 1584,
       "char" : 10,
       "deco" : "FAyaZS3std8datetime7systime7SysTime",
       "parameters" : [
@@ -6766,25 +6766,25 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 1583,
+      "endline" : 1589,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1585_C10",
+      "name" : "__unittest_L1591_C10",
       "kind" : "function",
-      "line" : 1585,
+      "line" : 1591,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1639,
+      "endline" : 1645,
       "endchar" : 2
      },
      {
       "name" : "searchPath",
       "kind" : "function",
       "comment" : " パスを検索する\n",
-      "line" : 1639,
+      "line" : 1645,
       "char" : 9,
       "deco" : "xFNexAaxAAyaZAya",
       "originalType" : "const @trusted string(in char[] executable, in string[] additional = null)",
@@ -6799,14 +6799,14 @@
         "default" : "null"
        }
       ],
-      "endline" : 1679,
+      "endline" : 1685,
       "endchar" : 2
      },
      {
       "name" : "spawnProcess",
       "kind" : "function",
       "comment" : " プロセスを実行する\n",
-      "line" : 1684,
+      "line" : 1690,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -6829,14 +6829,14 @@
         "default" : "cast(Config)0"
        }
       ],
-      "endline" : 1690,
+      "endline" : 1696,
       "endchar" : 2
      },
      {
       "name" : "spawnProcess",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1693,
+      "line" : 1699,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -6871,14 +6871,14 @@
         "default" : "cast(Config)16"
        }
       ],
-      "endline" : 1703,
+      "endline" : 1709,
       "endchar" : 2
      },
      {
       "name" : "spawnProcess",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1706,
+      "line" : 1712,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -6913,14 +6913,14 @@
         "default" : "cast(Config)16"
        }
       ],
-      "endline" : 1716,
+      "endline" : 1722,
       "endchar" : 2
      },
      {
       "name" : "pipeProcess",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1719,
+      "line" : 1725,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -6943,14 +6943,14 @@
         "default" : "cast(Config)16"
        }
       ],
-      "endline" : 1725,
+      "endline" : 1731,
       "endchar" : 2
      },
      {
       "name" : "execute",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 1728,
+      "line" : 1734,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -6973,55 +6973,55 @@
         "default" : "cast(Config)16"
        }
       ],
-      "endline" : 1734,
+      "endline" : 1740,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1737_C10",
+      "name" : "__unittest_L1743_C10",
       "kind" : "function",
       "comment" : "\n",
-      "line" : 1737,
+      "line" : 1743,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1757,
+      "endline" : 1763,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1757_C10",
+      "name" : "__unittest_L1763_C10",
       "kind" : "function",
       "comment" : "\n",
-      "line" : 1757,
+      "line" : 1763,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1777,
+      "endline" : 1783,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1777_C10",
+      "name" : "__unittest_L1783_C10",
       "kind" : "function",
       "comment" : "\n",
-      "line" : 1777,
+      "line" : 1783,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1798,
+      "endline" : 1804,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1798_C10",
+      "name" : "__unittest_L1804_C10",
       "kind" : "function",
       "comment" : "\n",
-      "line" : 1798,
+      "line" : 1804,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1813,
+      "endline" : 1819,
       "endchar" : 1
      },
      {
@@ -7063,22 +7063,22 @@
     ]
    },
    {
-    "name" : "__unittest_L1815_C9",
+    "name" : "__unittest_L1821_C9",
     "kind" : "function",
     "comment" : "コピー禁止とムーブ、インスタンス削除の例\n",
-    "line" : 1815,
+    "line" : 1821,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1833,
+    "endline" : 1839,
     "endchar" : 1
    },
    {
     "name" : "createTempDir",
     "kind" : "function",
     "comment" : " 一時ディレクトリを作成し、作成したディレクトリのFileSystemを返す\n",
-    "line" : 1833,
+    "line" : 1839,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -7099,14 +7099,14 @@
       "default" : "5u"
      }
     ],
-    "endline" : 1858,
+    "endline" : 1864,
     "endchar" : 1
    },
    {
     "name" : "createDisposableDir",
     "kind" : "function",
     "comment" : " 使い捨ての一時ディレクトリを作成\n\n 作成したディレクトリのFileSystemを返す。返されたFileSystemは、インスタンスの破棄時に削除される。\n",
-    "line" : 1865,
+    "line" : 1871,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -7127,19 +7127,19 @@
       "default" : "5u"
      }
     ],
-    "endline" : 1875,
+    "endline" : 1881,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1878_C7",
+    "name" : "__unittest_L1884_C7",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1878,
+    "line" : 1884,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1887,
+    "endline" : 1893,
     "endchar" : 1
    }
   ]
