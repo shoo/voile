@@ -1551,7 +1551,7 @@
         "kind" : "function",
         "line" : 606,
         "char" : 14,
-        "type" : "Dst(auto ref Val v)",
+        "type" : "Dst(auto in ref Val v)",
         "parameters" : [
          {
           "name" : "v",
@@ -1726,7 +1726,7 @@
         "kind" : "function",
         "line" : 739,
         "char" : 14,
-        "type" : "Val(auto ref Src v)",
+        "type" : "Val(auto in ref Src v)",
         "parameters" : [
          {
           "name" : "v",
@@ -1831,7 +1831,7 @@
         "kind" : "function",
         "line" : 841,
         "char" : 14,
-        "type" : "void(auto ref Val src, ref Dst dst)",
+        "type" : "void(auto in ref Val src, ref Dst dst)",
         "parameters" : [
          {
           "name" : "src",
@@ -1943,7 +1943,7 @@
         "kind" : "function",
         "line" : 908,
         "char" : 14,
-        "type" : "void(auto ref Src src, ref Val dst)",
+        "type" : "void(auto in ref Src src, ref Val dst)",
         "parameters" : [
          {
           "name" : "src",
@@ -4974,8 +4974,7 @@
       "comment" : " テキストファイルを書き出す\n",
       "line" : 769,
       "char" : 7,
-      "deco" : "FAyaxAaZv",
-      "originalType" : "void(string filename, in char[] text)",
+      "deco" : "FAyaIAaZv",
       "parameters" : [
        {
         "name" : "filename",
@@ -4983,7 +4982,10 @@
        },
        {
         "name" : "text",
-        "deco" : "xAa"
+        "deco" : "xAa",
+        "storageClass" : [
+         "in"
+        ]
        }
       ],
       "endline" : 772,
@@ -5175,8 +5177,7 @@
       "comment" : " バイナリファイルを書き出す\n",
       "line" : 828,
       "char" : 7,
-      "deco" : "FAyaxAhZv",
-      "originalType" : "void(string filename, in ubyte[] binary)",
+      "deco" : "FAyaIAhZv",
       "parameters" : [
        {
         "name" : "filename",
@@ -5184,7 +5185,10 @@
        },
        {
         "name" : "binary",
-        "deco" : "xAh"
+        "deco" : "xAh",
+        "storageClass" : [
+         "in"
+        ]
        }
       ],
       "endline" : 831,
@@ -6786,16 +6790,21 @@
       "comment" : " パスを検索する\n",
       "line" : 1645,
       "char" : 9,
-      "deco" : "xFNexAaxAAyaZAya",
-      "originalType" : "const @trusted string(in char[] executable, in string[] additional = null)",
+      "deco" : "xFNeIAaIAAyaZAya",
       "parameters" : [
        {
         "name" : "executable",
-        "deco" : "xAa"
+        "deco" : "xAa",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "additional",
         "deco" : "xAAya",
+        "storageClass" : [
+         "in"
+        ],
         "default" : "null"
        }
       ],
@@ -10554,7 +10563,7 @@
       "kind" : "function",
       "line" : 299,
       "char" : 6,
-      "type" : "bool(ref JSONValue src, ref T dst)",
+      "type" : "bool(in ref JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
@@ -10608,7 +10617,7 @@
       "kind" : "function",
       "line" : 328,
       "char" : 6,
-      "type" : "bool(ref JSONValue src, ref T dst)",
+      "type" : "bool(in ref JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
@@ -10662,7 +10671,7 @@
       "kind" : "function",
       "line" : 354,
       "char" : 6,
-      "type" : "bool(ref JSONValue src, ref T dst)",
+      "type" : "bool(in ref JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
@@ -10716,7 +10725,7 @@
       "kind" : "function",
       "line" : 384,
       "char" : 6,
-      "type" : "bool(ref JSONValue src, ref T dst)",
+      "type" : "bool(in ref JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
@@ -10770,7 +10779,7 @@
       "kind" : "function",
       "line" : 459,
       "char" : 6,
-      "type" : "bool(ref JSONValue src, ref T dst)",
+      "type" : "bool(in ref JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
@@ -10812,7 +10821,7 @@
       "kind" : "function",
       "line" : 473,
       "char" : 6,
-      "type" : "bool(ref JSONValue src, ref T dst)",
+      "type" : "bool(in ref JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
@@ -10854,7 +10863,7 @@
       "kind" : "function",
       "line" : 485,
       "char" : 6,
-      "type" : "bool(ref JSONValue src, ref T dst)",
+      "type" : "bool(in ref JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
@@ -10896,7 +10905,7 @@
       "kind" : "function",
       "line" : 502,
       "char" : 6,
-      "type" : "bool(ref JSONValue src, ref T dst)",
+      "type" : "bool(in ref JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
@@ -10942,7 +10951,7 @@
       "kind" : "function",
       "line" : 520,
       "char" : 6,
-      "type" : "bool(ref JSONValue src, ref Value[Key] dst)",
+      "type" : "bool(in ref JSONValue src, ref Value[Key] dst)",
       "parameters" : [
        {
         "name" : "src",
@@ -10984,7 +10993,7 @@
       "kind" : "function",
       "line" : 548,
       "char" : 6,
-      "type" : "bool(ref JSONValue src, ref T dst)",
+      "type" : "bool(in ref JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
@@ -11025,7 +11034,7 @@
       "kind" : "function",
       "line" : 556,
       "char" : 11,
-      "type" : "T(ref JSONValue v, string name, lazy scope T defaultVal = T.init)",
+      "type" : "T(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)",
       "parameters" : [
        {
         "name" : "v",
@@ -11072,7 +11081,7 @@
       "kind" : "function",
       "line" : 589,
       "char" : 3,
-      "type" : "pure nothrow @trusted T(ref JSONValue v, string name, lazy scope T defaultVal = T.init)",
+      "type" : "pure nothrow @trusted T(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)",
       "parameters" : [
        {
         "name" : "v",
@@ -11572,7 +11581,7 @@
       "kind" : "function",
       "line" : 1009,
       "char" : 19,
-      "type" : "JSONValue(ref TypeEnum!Types dat)",
+      "type" : "JSONValue(in ref TypeEnum!Types dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -11630,7 +11639,7 @@
       "kind" : "function",
       "line" : 1089,
       "char" : 19,
-      "type" : "@property JSONValue(ref Tagged!U dat)",
+      "type" : "@property JSONValue(in ref Tagged!U dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -11691,7 +11700,7 @@
       "storageClass" : [
        "auto"
       ],
-      "type" : "@property ref JSONValue(ref Endata!E dat)",
+      "type" : "@property ref JSONValue(in ref Endata!E dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -11850,7 +11859,7 @@
       "kind" : "function",
       "line" : 1270,
       "char" : 14,
-      "type" : "void(ref TypeEnum!Types dat, ref JSONValue json)",
+      "type" : "void(ref TypeEnum!Types dat, in ref JSONValue json)",
       "parameters" : [
        {
         "name" : "dat",
@@ -11903,7 +11912,7 @@
       "kind" : "function",
       "line" : 1408,
       "char" : 14,
-      "type" : "void(ref Tagged!U dst, ref JSONValue src)",
+      "type" : "void(ref Tagged!U dst, in ref JSONValue src)",
       "parameters" : [
        {
         "name" : "dst",
@@ -11956,7 +11965,7 @@
       "kind" : "function",
       "line" : 1438,
       "char" : 6,
-      "type" : "void(ref Endata!E dst, ref JSONValue src)",
+      "type" : "void(ref Endata!E dst, in ref JSONValue src)",
       "parameters" : [
        {
         "name" : "dst",
@@ -12144,12 +12153,14 @@
     "comment" : "\n",
     "line" : 1731,
     "char" : 11,
-    "deco" : "FNdxS3std4json9JSONValueZSQvQtQq",
-    "originalType" : "@property JSONValue(in JSONValue v)",
+    "deco" : "FNdIS3std4json9JSONValueZSQvQtQq",
     "parameters" : [
      {
       "name" : "v",
-      "deco" : "xS3std4json9JSONValue"
+      "deco" : "xS3std4json9JSONValue",
+      "storageClass" : [
+       "in"
+      ]
      }
     ],
     "endline" : 1754,
@@ -13446,12 +13457,15 @@
       "comment" : "\n",
       "line" : 370,
       "char" : 2,
-      "deco" : "FNfxAyaxE3std12experimental6logger4core8LogLevelZC5voile3log14TextFileLogger",
+      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelZC5voile3log14TextFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
         "name" : "fn",
-        "deco" : "xAya"
+        "deco" : "xAya",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "lv",
@@ -13468,12 +13482,15 @@
       "comment" : "ditto\n",
       "line" : 375,
       "char" : 2,
-      "deco" : "FNfxAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log14TextFileLogger",
+      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log14TextFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv, CreateFolder createFileNameFolder)",
       "parameters" : [
        {
         "name" : "fn",
-        "deco" : "xAya"
+        "deco" : "xAya",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "lv",
@@ -13684,12 +13701,15 @@
       "comment" : "\n",
       "line" : 430,
       "char" : 2,
-      "deco" : "FNfxAyaxE3std12experimental6logger4core8LogLevelZC5voile3log14JsonFileLogger",
+      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelZC5voile3log14JsonFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
         "name" : "fn",
-        "deco" : "xAya"
+        "deco" : "xAya",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "lv",
@@ -13706,12 +13726,15 @@
       "comment" : "ditto\n",
       "line" : 435,
       "char" : 2,
-      "deco" : "FNexAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log14JsonFileLogger",
+      "deco" : "FNeIAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log14JsonFileLogger",
       "originalType" : "@trusted (in string fn, const LogLevel lv, CreateFolder createFileNameFolder)",
       "parameters" : [
        {
         "name" : "fn",
-        "deco" : "xAya"
+        "deco" : "xAya",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "lv",
@@ -13898,12 +13921,15 @@
       "comment" : "\n",
       "line" : 621,
       "char" : 2,
-      "deco" : "FNfxAyaxE3std12experimental6logger4core8LogLevelZC5voile3log13XmlFileLogger",
+      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelZC5voile3log13XmlFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
         "name" : "fn",
-        "deco" : "xAya"
+        "deco" : "xAya",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "lv",
@@ -13920,12 +13946,15 @@
       "comment" : "ditto\n",
       "line" : 626,
       "char" : 2,
-      "deco" : "FNexAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13XmlFileLogger",
+      "deco" : "FNeIAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13XmlFileLogger",
       "originalType" : "@trusted (in string fn, const LogLevel lv, CreateFolder createFileNameFolder)",
       "parameters" : [
        {
         "name" : "fn",
-        "deco" : "xAya"
+        "deco" : "xAya",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "lv",
@@ -14082,12 +14111,15 @@
       "comment" : "\n",
       "line" : 727,
       "char" : 2,
-      "deco" : "FNfxAyaxE3std12experimental6logger4core8LogLevelZC5voile3log13CsvFileLogger",
+      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelZC5voile3log13CsvFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
         "name" : "fn",
-        "deco" : "xAya"
+        "deco" : "xAya",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "lv",
@@ -14104,12 +14136,15 @@
       "comment" : "ditto\n",
       "line" : 732,
       "char" : 2,
-      "deco" : "FNexAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13CsvFileLogger",
+      "deco" : "FNeIAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13CsvFileLogger",
       "originalType" : "@trusted (in string fn, const LogLevel lv, CreateFolder createFileNameFolder)",
       "parameters" : [
        {
         "name" : "fn",
-        "deco" : "xAya"
+        "deco" : "xAya",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "lv",
@@ -14266,12 +14301,15 @@
       "comment" : "\n",
       "line" : 808,
       "char" : 2,
-      "deco" : "FNfxAyaxE3std12experimental6logger4core8LogLevelZC5voile3log13TsvFileLogger",
+      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelZC5voile3log13TsvFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
         "name" : "fn",
-        "deco" : "xAya"
+        "deco" : "xAya",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "lv",
@@ -14288,12 +14326,15 @@
       "comment" : "ditto\n",
       "line" : 813,
       "char" : 2,
-      "deco" : "FNexAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13TsvFileLogger",
+      "deco" : "FNeIAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13TsvFileLogger",
       "originalType" : "@trusted (in string fn, const LogLevel lv, CreateFolder createFileNameFolder)",
       "parameters" : [
        {
         "name" : "fn",
-        "deco" : "xAya"
+        "deco" : "xAya",
+        "storageClass" : [
+         "in"
+        ]
        },
        {
         "name" : "lv",
@@ -14433,7 +14474,7 @@
       "line" : 878,
       "char" : 1,
       "deco" : "FNfZC5voile3log11NamedLogger",
-      "originalType" : "@safe ()"
+      "originalType" : "()"
      }
     ]
    },
@@ -14961,7 +15002,7 @@
       "line" : 908,
       "char" : 1,
       "deco" : "FNfZC5voile3log14DispatchLogger",
-      "originalType" : "@safe ()"
+      "originalType" : "()"
      }
     ]
    },
@@ -16499,12 +16540,15 @@
     "comment" : " MBS(ZeroNIL)文字列からUTF8に変換\n",
     "line" : 950,
     "char" : 8,
-    "deco" : "FxAhkZAya",
+    "deco" : "FIAhkZAya",
     "originalType" : "string(in ubyte[] data, uint codePage = 0)",
     "parameters" : [
      {
       "name" : "data",
-      "deco" : "xAh"
+      "deco" : "xAh",
+      "storageClass" : [
+       "in"
+      ]
      },
      {
       "name" : "codePage",
@@ -16521,12 +16565,14 @@
     "comment" : " UTF16(ZeroNIL)文字列からUTF8に変換\n",
     "line" : 969,
     "char" : 8,
-    "deco" : "FxPuZAya",
-    "originalType" : "string(in wchar* data)",
+    "deco" : "FIPuZAya",
     "parameters" : [
      {
       "name" : "data",
-      "deco" : "xPu"
+      "deco" : "xPu",
+      "storageClass" : [
+       "in"
+      ]
      }
     ],
     "endline" : 976,
@@ -16538,12 +16584,15 @@
     "comment" : " UTF8からMBS(ZeroNIL)文字列に変換\n",
     "line" : 983,
     "char" : 15,
-    "deco" : "FxAakZAxa",
+    "deco" : "FIAakZAxa",
     "originalType" : "const(char)[](in char[] data, uint codePage = 0)",
     "parameters" : [
      {
       "name" : "data",
-      "deco" : "xAa"
+      "deco" : "xAa",
+      "storageClass" : [
+       "in"
+      ]
      },
      {
       "name" : "codePage",
@@ -19672,7 +19721,7 @@
       "kind" : "function",
       "line" : 1064,
       "char" : 12,
-      "type" : "TagType!MU(auto ref MU dat)",
+      "type" : "TagType!MU(auto in ref MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -20111,7 +20160,7 @@
       "kind" : "function",
       "line" : 1234,
       "char" : 6,
-      "type" : "bool(auto ref MU dat)",
+      "type" : "bool(auto in ref MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -20151,7 +20200,7 @@
       "kind" : "function",
       "line" : 1240,
       "char" : 6,
-      "type" : "bool(auto ref MU dat)",
+      "type" : "bool(auto in ref MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -20279,7 +20328,7 @@
       "kind" : "function",
       "line" : 1311,
       "char" : 6,
-      "type" : "bool(auto ref MU dat)",
+      "type" : "bool(auto in ref MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -22567,8 +22616,7 @@
     "protection" : "private",
     "line" : 852,
     "char" : 19,
-    "deco" : "FNaNfAAyaKxS5voile8parseopt10TypeOptionKxASQBfQBc9OptPrefixZASQByQBv7ArgData",
-    "originalType" : "pure @safe ArgData[](string[] args, ref TypeOption typeOpt, ref OptPrefix[] optPrefices)",
+    "deco" : "FNaNfAAyaIKS5voile8parseopt10TypeOptionIKASQBfQBc9OptPrefixZASQByQBv7ArgData",
     "parameters" : [
      {
       "name" : "args",
@@ -22578,6 +22626,7 @@
       "name" : "typeOpt",
       "deco" : "xS5voile8parseopt10TypeOption",
       "storageClass" : [
+       "in",
        "ref"
       ]
      },
@@ -22585,6 +22634,7 @@
       "name" : "optPrefices",
       "deco" : "xAS5voile8parseopt9OptPrefix",
       "storageClass" : [
+       "in",
        "ref"
       ]
      }
@@ -23495,7 +23545,7 @@
       "kind" : "function",
       "line" : 559,
       "char" : 6,
-      "type" : "bool(ref RefCounted!T dat)",
+      "type" : "bool(in ref RefCounted!T dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -23529,7 +23579,7 @@
       "kind" : "function",
       "line" : 579,
       "char" : 6,
-      "type" : "bool(ref RefCounted!T dat)",
+      "type" : "bool(in ref RefCounted!T dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -24202,7 +24252,7 @@
       "kind" : "function",
       "line" : 884,
       "char" : 5,
-      "type" : "pure nothrow @nogc @property @safe int(ref RefCounted!T rc)",
+      "type" : "pure nothrow @nogc @property @safe int(in ref RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",

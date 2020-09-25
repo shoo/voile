@@ -279,7 +279,7 @@ void <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_para
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".isTypeAssignable"></span><div class="quickindex" id="quickindex.isTypeAssignable"></div>template <code class="ddoc_psymbol">isTypeAssignable</code>(MU, T) if (isTypeEnum!MU)<br></div></dt>
 <dd><div class="ddoc_summary">型が代入可能か</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".tag"></span><div class="quickindex" id="quickindex.tag"></div>TagType!MU <code class="ddoc_psymbol">tag</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU)</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".tag"></span><div class="quickindex" id="quickindex.tag"></div>TagType!MU <code class="ddoc_psymbol">tag</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto in ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">タグを確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = TypeEnum!(<span class="d_keyword">int</span>, string);
@@ -400,9 +400,9 @@ ED <span class="d_param">dat</span>;
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".check"></span><div class="quickindex" id="quickindex.check"></div>bool <code class="ddoc_psymbol">check</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU)</span>(auto ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU &amp;&amp; isAvailableTag!(MU, tag))</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".check"></span><div class="quickindex" id="quickindex.check"></div>bool <code class="ddoc_psymbol">check</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU)</span>(auto in ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU &amp;&amp; isAvailableTag!(MU, tag))</span>;
 <br>
-bool <code class="ddoc_psymbol">check</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU)</span>(auto ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isTypeEnum!MU &amp;&amp; hasType!(MU, T))</span>;
+bool <code class="ddoc_psymbol">check</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU)</span>(auto in ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isTypeEnum!MU &amp;&amp; hasType!(MU, T))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">データが入っていることを確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = TypeEnum!(<span class="d_keyword">int</span>, string);
@@ -457,7 +457,7 @@ ED <span class="d_param">dat</span>;
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".empty"></span><div class="quickindex" id="quickindex.empty"></div>bool <code class="ddoc_psymbol">empty</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU)</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".empty"></span><div class="quickindex" id="quickindex.empty"></div>bool <code class="ddoc_psymbol">empty</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto in ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">データがクリアされているか確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = TypeEnum!(<span class="d_keyword">int</span>, string);
