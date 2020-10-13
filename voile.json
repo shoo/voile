@@ -26631,7 +26631,7 @@
         "storageClass" : [
          "auto"
         ],
-        "type" : "@property ()",
+        "type" : "@property @safe ()",
         "endline" : 1672,
         "endchar" : 2
        },
@@ -26644,7 +26644,7 @@
         "storageClass" : [
          "auto"
         ],
-        "type" : "shared inout @property ()",
+        "type" : "shared inout @property @trusted ()",
         "endline" : 1677,
         "endchar" : 2
        },
@@ -26654,7 +26654,7 @@
         "comment" : " ロックを試行する。\n\n Returns:\n     すでにロックしているならtrue\n     ロックされていなければロックしてtrue\n     別のスレッドにロックされていてロックできなければfalse\n",
         "line" : 1688,
         "char" : 7,
-        "type" : "bool()",
+        "type" : "@safe bool()",
         "endline" : 1695,
         "endchar" : 2
        },
@@ -26664,7 +26664,7 @@
         "comment" : "ditto\n",
         "line" : 1697,
         "char" : 7,
-        "type" : "shared bool()",
+        "type" : "shared @trusted bool()",
         "endline" : 1700,
         "endchar" : 2
        },
@@ -26674,7 +26674,7 @@
         "comment" : " ロックする。\n",
         "line" : 1706,
         "char" : 7,
-        "type" : "void()",
+        "type" : "@safe void()",
         "endline" : 1710,
         "endchar" : 2
        },
@@ -26684,7 +26684,7 @@
         "comment" : "ditto\n",
         "line" : 1712,
         "char" : 7,
-        "type" : "shared void()",
+        "type" : "shared @trusted void()",
         "endline" : 1715,
         "endchar" : 2
        },
@@ -26694,7 +26694,7 @@
         "comment" : " ロック解除する。\n",
         "line" : 1721,
         "char" : 7,
-        "type" : "void()",
+        "type" : "@safe void()",
         "endline" : 1725,
         "endchar" : 2
        },
@@ -26704,7 +26704,7 @@
         "comment" : "ditto\n",
         "line" : 1727,
         "char" : 7,
-        "type" : "shared void()",
+        "type" : "shared @trusted void()",
         "endline" : 1730,
         "endchar" : 2
        },
@@ -26805,36 +26805,94 @@
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1870,
+    "endline" : 1873,
     "endchar" : 1
    },
    {
     "name" : "TaskData",
     "kind" : "class",
-    "comment" : "\n",
-    "line" : 1870,
+    "comment" : " マルチタスクキューによって管理されるタスクデータ\n",
+    "line" : 1873,
     "char" : 1,
     "members" : [
      {
       "name" : "std.datetime",
       "kind" : "import",
-      "line" : 1872,
+      "line" : 1875,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.uuid",
       "kind" : "import",
-      "line" : 1873,
+      "line" : 1876,
       "char" : 9,
       "protection" : "private"
+     },
+     {
+      "name" : "State",
+      "kind" : "enum",
+      "comment" : "状態\n",
+      "line" : 1878,
+      "char" : 2,
+      "baseDeco" : "i",
+      "members" : [
+       {
+        "name" : "waiting",
+        "kind" : "enum member",
+        "value" : "0",
+        "comment" : "初期状態で、タスクプールに追加される前\n",
+        "line" : 1881,
+        "char" : 3
+       },
+       {
+        "name" : "ready",
+        "kind" : "enum member",
+        "value" : "1",
+        "comment" : "タスクプールに追加された状態\n",
+        "line" : 1883,
+        "char" : 3
+       },
+       {
+        "name" : "running",
+        "kind" : "enum member",
+        "value" : "2",
+        "comment" : "実行中の状態\n",
+        "line" : 1885,
+        "char" : 3
+       },
+       {
+        "name" : "finished",
+        "kind" : "enum member",
+        "value" : "3",
+        "comment" : "実行が終了した状態\n",
+        "line" : 1887,
+        "char" : 3
+       },
+       {
+        "name" : "failed",
+        "kind" : "enum member",
+        "value" : "4",
+        "comment" : "実行の結果、異常終了した状態\n",
+        "line" : 1889,
+        "char" : 3
+       },
+       {
+        "name" : "dropped",
+        "kind" : "enum member",
+        "value" : "5",
+        "comment" : "実行されずにドロップされた状態\n",
+        "line" : 1891,
+        "char" : 3
+       }
+      ]
      },
      {
       "name" : "type",
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "タスクの種類\n",
-      "line" : 1876,
+      "line" : 1895,
       "char" : 35,
       "storageClass" : [
        "immutable"
@@ -26848,7 +26906,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "タスクの本体\n",
-      "line" : 1878,
+      "line" : 1897,
       "char" : 35,
       "storageClass" : [
        "immutable"
@@ -26862,7 +26920,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "Queueに追加された時刻\n",
-      "line" : 1880,
+      "line" : 1899,
       "char" : 35,
       "storageClass" : [
        "shared"
@@ -26876,7 +26934,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "Poolに追加された時刻\n",
-      "line" : 1882,
+      "line" : 1901,
       "char" : 35,
       "storageClass" : [
        "shared"
@@ -26891,7 +26949,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "実行開始した時刻\n",
-      "line" : 1884,
+      "line" : 1903,
       "char" : 35,
       "storageClass" : [
        "shared"
@@ -26906,7 +26964,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "実行終了した時刻\n",
-      "line" : 1886,
+      "line" : 1905,
       "char" : 35,
       "storageClass" : [
        "shared"
@@ -26921,7 +26979,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "一意なID\n",
-      "line" : 1888,
+      "line" : 1907,
       "char" : 35,
       "storageClass" : [
        "immutable"
@@ -26931,70 +26989,11 @@
       "offset" : 112
      },
      {
-      "name" : "State",
-      "kind" : "enum",
-      "protection" : "protected",
-      "comment" : "状態\n",
-      "line" : 1890,
-      "char" : 2,
-      "baseDeco" : "i",
-      "members" : [
-       {
-        "name" : "waiting",
-        "kind" : "enum member",
-        "value" : "0",
-        "comment" : "初期状態で、タスクプールに追加される前\n",
-        "line" : 1893,
-        "char" : 3
-       },
-       {
-        "name" : "ready",
-        "kind" : "enum member",
-        "value" : "1",
-        "comment" : "タスクプールに追加された状態\n",
-        "line" : 1895,
-        "char" : 3
-       },
-       {
-        "name" : "running",
-        "kind" : "enum member",
-        "value" : "2",
-        "comment" : "実行中の状態\n",
-        "line" : 1897,
-        "char" : 3
-       },
-       {
-        "name" : "finished",
-        "kind" : "enum member",
-        "value" : "3",
-        "comment" : "実行が終了した状態\n",
-        "line" : 1899,
-        "char" : 3
-       },
-       {
-        "name" : "failed",
-        "kind" : "enum member",
-        "value" : "4",
-        "comment" : "実行の結果、異常終了した状態\n",
-        "line" : 1901,
-        "char" : 3
-       },
-       {
-        "name" : "dropped",
-        "kind" : "enum member",
-        "value" : "5",
-        "comment" : "実行されずにドロップされた状態\n",
-        "line" : 1903,
-        "char" : 3
-       }
-      ]
-     },
-     {
       "name" : "state",
       "kind" : "variable",
       "protection" : "protected",
-      "comment" : "\n",
-      "line" : 1906,
+      "comment" : "状態\n",
+      "line" : 1909,
       "char" : 8,
       "deco" : "E5voile4sync8TaskData5State",
       "init" : "cast(State)0",
@@ -27003,17 +27002,8 @@
      {
       "name" : "onReady",
       "kind" : "function",
+      "protection" : "protected",
       "comment" : "Poolに追加されたタイミングでコールバック\n",
-      "line" : 1909,
-      "char" : 7,
-      "deco" : "OFZv",
-      "endline" : 1909,
-      "endchar" : 27
-     },
-     {
-      "name" : "onStart",
-      "kind" : "function",
-      "comment" : "実行開始したタイミングでコールバック\n",
       "line" : 1911,
       "char" : 7,
       "deco" : "OFZv",
@@ -27021,20 +27011,33 @@
       "endchar" : 27
      },
      {
-      "name" : "onEnd",
+      "name" : "onStart",
       "kind" : "function",
-      "comment" : "実行終了したタイミングでコールバック\n",
+      "protection" : "protected",
+      "comment" : "実行開始したタイミングでコールバック\n",
       "line" : 1913,
       "char" : 7,
       "deco" : "OFZv",
       "endline" : 1913,
+      "endchar" : 27
+     },
+     {
+      "name" : "onEnd",
+      "kind" : "function",
+      "protection" : "protected",
+      "comment" : "実行終了したタイミングでコールバック\n",
+      "line" : 1915,
+      "char" : 7,
+      "deco" : "OFZv",
+      "endline" : 1915,
       "endchar" : 25
      },
      {
       "name" : "onFailed",
       "kind" : "function",
+      "protection" : "protected",
       "comment" : "実行失敗したタイミングでコールバック\n",
-      "line" : 1915,
+      "line" : 1917,
       "char" : 7,
       "deco" : "OFC6object9ThrowableZv",
       "originalType" : "shared void(Throwable)",
@@ -27044,24 +27047,25 @@
         "deco" : "C6object9Throwable"
        }
       ],
-      "endline" : 1915,
+      "endline" : 1917,
       "endchar" : 37
      },
      {
       "name" : "onDropped",
       "kind" : "function",
+      "protection" : "protected",
       "comment" : "実行されずにドロップしたタイミングでコールバック\n",
-      "line" : 1917,
+      "line" : 1919,
       "char" : 7,
       "deco" : "OFZv",
-      "endline" : 1917,
+      "endline" : 1919,
       "endchar" : 29
      },
      {
       "name" : "this",
       "kind" : "constructor",
       "comment" : "\n",
-      "line" : 1920,
+      "line" : 1923,
       "char" : 2,
       "deco" : "FAyaDOFZvS3std4uuid4UUIDZC5voile4sync8TaskData",
       "originalType" : "(string ty, void delegate() shared callback, UUID id = randomUUID())",
@@ -27080,7 +27084,7 @@
         "default" : "randomUUID()"
        }
       ],
-      "endline" : 1926,
+      "endline" : 1929,
       "endchar" : 2
      }
     ]
@@ -27088,56 +27092,56 @@
    {
     "name" : "MultiTaskQueue",
     "kind" : "class",
-    "comment" : "\n",
-    "line" : 1932,
+    "comment" : " マルチタスクキュー\n\n タスクの待ち行列を作成する。\n 同じ種類のタスクは待ち行列によって順次実行し、違う種類のタスクはタスクプールで並列実行する。\n コンストラクタでタスクプールの設定を行い、$(D invoke)関数によってタスクの種類と実行内容を指定する。\n $(D invoke)により指定されるタスクは、$(D TaskData)クラスを継承することで細かく内容を調整することができる。\n $(D invoke)によって待ち行列に追加された未だ実行されていないタスクを、$(D drop)によって実行取り消しすることができる。\n $(D informations)関数により、各タスクの実行状況を調べることができる。\n\n 以下のようなことが可能\n\n <img src=\"img/voile.sync.MultiTaskQueue-testcase.drawio.svg\" />\n",
+    "line" : 1946,
     "char" : 1,
     "members" : [
      {
       "name" : "core.atomic",
       "kind" : "import",
-      "line" : 1935,
+      "line" : 1949,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "core.sync.mutex",
       "kind" : "import",
-      "line" : 1936,
+      "line" : 1950,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "core.thread",
       "kind" : "import",
-      "line" : 1937,
+      "line" : 1951,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.concurrency",
       "kind" : "import",
-      "line" : 1938,
+      "line" : 1952,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.parallelism",
       "kind" : "import",
-      "line" : 1939,
+      "line" : 1953,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.uuid",
       "kind" : "import",
-      "line" : 1940,
+      "line" : 1954,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.datetime",
       "kind" : "import",
-      "line" : 1941,
+      "line" : 1955,
       "char" : 9,
       "protection" : "private"
      },
@@ -27145,7 +27149,7 @@
       "name" : "_pool",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 1943,
+      "line" : 1957,
       "char" : 11,
       "deco" : "C3std11parallelism8TaskPool",
       "originalType" : "TaskPool",
@@ -27155,7 +27159,7 @@
       "name" : "_finishPool",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 1944,
+      "line" : 1958,
       "char" : 18,
       "deco" : "DFZv",
       "offset" : 24
@@ -27164,14 +27168,14 @@
       "name" : "TaskQueue",
       "kind" : "struct",
       "protection" : "private",
-      "line" : 1946,
+      "line" : 1960,
       "char" : 2,
       "members" : [
        {
         "name" : "_tasks",
         "kind" : "variable",
         "protection" : "private",
-        "line" : 1949,
+        "line" : 1963,
         "char" : 22,
         "deco" : "HAyaAC5voile4sync8TaskData",
         "offset" : 0
@@ -27180,7 +27184,7 @@
         "name" : "State",
         "kind" : "enum",
         "protection" : "private",
-        "line" : 1950,
+        "line" : 1964,
         "char" : 3,
         "baseDeco" : "i",
         "members" : [
@@ -27188,14 +27192,14 @@
           "name" : "ready",
           "kind" : "enum member",
           "value" : "0",
-          "line" : 1952,
+          "line" : 1966,
           "char" : 4
          },
          {
           "name" : "finish",
           "kind" : "enum member",
           "value" : "1",
-          "line" : 1952,
+          "line" : 1966,
           "char" : 11
          }
         ]
@@ -27204,7 +27208,7 @@
         "name" : "_state",
         "kind" : "variable",
         "protection" : "private",
-        "line" : 1954,
+        "line" : 1968,
         "char" : 9,
         "deco" : "E5voile4sync14MultiTaskQueue9TaskQueue5State",
         "init" : "cast(State)0",
@@ -27214,7 +27218,7 @@
         "name" : "pushBack",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 1957,
+        "line" : 1971,
         "char" : 8,
         "deco" : "FC5voile4sync8TaskDataDFZvZv",
         "originalType" : "void(TaskData task, void delegate() onCreated = null)",
@@ -27229,14 +27233,14 @@
           "default" : "cast(void delegate())null"
          }
         ],
-        "endline" : 1972,
+        "endline" : 1986,
         "endchar" : 3
        },
        {
         "name" : "removeAt",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 1974,
+        "line" : 1988,
         "char" : 12,
         "deco" : "FAyaS3std4uuid4UUIDZC5voile4sync8TaskData",
         "parameters" : [
@@ -27249,14 +27253,14 @@
           "deco" : "S3std4uuid4UUID"
          }
         ],
-        "endline" : 1997,
+        "endline" : 2011,
         "endchar" : 3
        },
        {
         "name" : "removeFront",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 1999,
+        "line" : 2013,
         "char" : 12,
         "deco" : "FAyaZC5voile4sync8TaskData",
         "parameters" : [
@@ -27265,14 +27269,14 @@
           "deco" : "Aya"
          }
         ],
-        "endline" : 2016,
+        "endline" : 2030,
         "endchar" : 3
        },
        {
         "name" : "removeFrontAndGetNext",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 2018,
+        "line" : 2032,
         "char" : 12,
         "deco" : "FAyaJC5voile4sync8TaskDataZQw",
         "parameters" : [
@@ -27288,14 +27292,14 @@
           ]
          }
         ],
-        "endline" : 2037,
+        "endline" : 2051,
         "endchar" : 3
        },
        {
         "name" : "refFront",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 2039,
+        "line" : 2053,
         "char" : 12,
         "deco" : "FAyaZC5voile4sync8TaskData",
         "parameters" : [
@@ -27304,14 +27308,14 @@
           "deco" : "Aya"
          }
         ],
-        "endline" : 2043,
+        "endline" : 2057,
         "endchar" : 3
        },
        {
         "name" : "getFront",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 2045,
+        "line" : 2059,
         "char" : 12,
         "deco" : "FAyaZC5voile4sync8TaskData",
         "parameters" : [
@@ -27320,14 +27324,14 @@
           "deco" : "Aya"
          }
         ],
-        "endline" : 2051,
+        "endline" : 2065,
         "endchar" : 3
        },
        {
         "name" : "getAt",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 2053,
+        "line" : 2067,
         "char" : 12,
         "deco" : "FAyaS3std4uuid4UUIDZC5voile4sync8TaskData",
         "parameters" : [
@@ -27340,14 +27344,14 @@
           "deco" : "S3std4uuid4UUID"
          }
         ],
-        "endline" : 2063,
+        "endline" : 2077,
         "endchar" : 3
        },
        {
         "name" : "getNext",
         "kind" : "function",
         "comment" : "現在実行中の次のタスクを得る\n",
-        "line" : 2065,
+        "line" : 2079,
         "char" : 12,
         "deco" : "FAyaZC5voile4sync8TaskData",
         "parameters" : [
@@ -27356,14 +27360,14 @@
           "deco" : "Aya"
          }
         ],
-        "endline" : 2071,
+        "endline" : 2085,
         "endchar" : 3
        },
        {
         "name" : "dropNext",
         "kind" : "function",
         "comment" : "現在実行中のタスクの次のタスクを破棄する。破棄されたタスクを返す。\n",
-        "line" : 2073,
+        "line" : 2087,
         "char" : 12,
         "deco" : "FAyaZC5voile4sync8TaskData",
         "parameters" : [
@@ -27372,17 +27376,17 @@
           "deco" : "Aya"
          }
         ],
-        "endline" : 2086,
+        "endline" : 2100,
         "endchar" : 3
        },
        {
         "name" : "types",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 2088,
+        "line" : 2102,
         "char" : 12,
         "deco" : "FZAAya",
-        "endline" : 2091,
+        "endline" : 2105,
         "endchar" : 3
        }
       ]
@@ -27391,7 +27395,7 @@
       "name" : "_taskQueue",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 2093,
+      "line" : 2107,
       "char" : 33,
       "storageClass" : [
        "shared"
@@ -27404,7 +27408,7 @@
       "name" : "_startTask",
       "kind" : "function",
       "protection" : "private",
-      "line" : 2095,
+      "line" : 2109,
       "char" : 7,
       "deco" : "OFAyaZv",
       "parameters" : [
@@ -27413,14 +27417,14 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 2152,
+      "endline" : 2166,
       "endchar" : 2
      },
      {
       "name" : "_initialize",
       "kind" : "function",
       "protection" : "private",
-      "line" : 2154,
+      "line" : 2168,
       "char" : 7,
       "deco" : "FC3std11parallelism8TaskPoolDFZvZv",
       "parameters" : [
@@ -27433,14 +27437,14 @@
         "deco" : "DFZv"
        }
       ],
-      "endline" : 2159,
+      "endline" : 2173,
       "endchar" : 2
      },
      {
       "name" : "this",
       "kind" : "constructor",
-      "comment" : "\n",
-      "line" : 2166,
+      "comment" : " コンストラクタ\n\n Params:\n      pool = 使用するタスクプールを指定できる\n      callbackFinishPool = タスクキューを破棄した際に全てのタスクが終了した際に呼ばれる。タスクプールを終了するために使用できる。\n      worker = ワーカースレッド数を指定して作成できる\n",
+      "line" : 2185,
       "char" : 2,
       "deco" : "FC3std11parallelism8TaskPoolDFZvZC5voile4sync14MultiTaskQueue",
       "originalType" : "(TaskPool pool, void delegate() callbackFinishPool = null)",
@@ -27455,14 +27459,14 @@
         "default" : "cast(void delegate())null"
        }
       ],
-      "endline" : 2169,
+      "endline" : 2188,
       "endchar" : 2
      },
      {
       "name" : "this",
       "kind" : "constructor",
       "comment" : "ditto\n",
-      "line" : 2172,
+      "line" : 2191,
       "char" : 2,
       "deco" : "OFC3std11parallelism8TaskPoolDFZvZOC5voile4sync14MultiTaskQueue",
       "originalType" : "shared (TaskPool pool, void delegate() callbackFinishPool = null)",
@@ -27477,60 +27481,70 @@
         "default" : "cast(void delegate())null"
        }
       ],
-      "endline" : 2177,
+      "endline" : 2196,
       "endchar" : 2
      },
      {
       "name" : "this",
       "kind" : "constructor",
       "comment" : "ditto\n",
-      "line" : 2179,
+      "line" : 2198,
       "char" : 2,
-      "deco" : "FmZC5voile4sync14MultiTaskQueue",
-      "originalType" : "(size_t worker = 8)",
+      "deco" : "FmbZC5voile4sync14MultiTaskQueue",
+      "originalType" : "(size_t worker = 8, bool daemon = false)",
       "parameters" : [
        {
         "name" : "worker",
         "deco" : "m",
         "default" : "8LU"
+       },
+       {
+        "name" : "daemon",
+        "deco" : "b",
+        "default" : "false"
        }
       ],
-      "endline" : 2182,
+      "endline" : 2201,
       "endchar" : 2
      },
      {
       "name" : "this",
       "kind" : "constructor",
       "comment" : "ditto\n",
-      "line" : 2184,
+      "line" : 2203,
       "char" : 2,
-      "deco" : "OFmZOC5voile4sync14MultiTaskQueue",
-      "originalType" : "shared (size_t worker = 8)",
+      "deco" : "OFmbZOC5voile4sync14MultiTaskQueue",
+      "originalType" : "shared (size_t worker = 8, bool daemon = false)",
       "parameters" : [
        {
         "name" : "worker",
         "deco" : "m",
         "default" : "8LU"
+       },
+       {
+        "name" : "daemon",
+        "deco" : "b",
+        "default" : "false"
        }
       ],
-      "endline" : 2187,
+      "endline" : 2206,
       "endchar" : 2
      },
      {
       "name" : "dispose",
       "kind" : "function",
       "comment" : " インスタンスを破棄する。\n",
-      "line" : 2192,
+      "line" : 2211,
       "char" : 7,
       "deco" : "FZv",
-      "endline" : 2210,
+      "endline" : 2229,
       "endchar" : 2
      },
      {
       "name" : "invoke",
       "kind" : "function",
-      "comment" : "\n",
-      "line" : 2216,
+      "comment" : " タスクを実行予約する\n\n タスクを待ち行列に追加する。待ち行列に追加されると、順次実行される。\n 待ち行列は$(D type)毎にあり、どの待ち行列に追加されるかはタスクの$(D type)により決まる。\n 同じ$(D type)では、追加された順に順次実行される。\n 異なる$(D type)の場合は並行して実行される。並行数はコンストラクタで指定したタスクプールに依存する。\n\n Params:\n      tsk = タスクデータを指定する\n      type = タスク種別を指定する\n      dg = タスクの処理内容のデリゲートを指定する\n      id = タスクの識別用IDを指定する\n Returns:\n      タスクを追加することができたらtrueを、追加できなかったらfalseを返す。\n",
+      "line" : 2247,
       "char" : 7,
       "deco" : "FC5voile4sync8TaskDataZb",
       "parameters" : [
@@ -27539,14 +27553,14 @@
         "deco" : "C5voile4sync8TaskData"
        }
       ],
-      "endline" : 2230,
+      "endline" : 2261,
       "endchar" : 2
      },
      {
       "name" : "invoke",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 2232,
+      "line" : 2263,
       "char" : 7,
       "deco" : "OFC5voile4sync8TaskDataZb",
       "parameters" : [
@@ -27555,14 +27569,14 @@
         "deco" : "C5voile4sync8TaskData"
        }
       ],
-      "endline" : 2236,
+      "endline" : 2267,
       "endchar" : 2
      },
      {
       "name" : "invoke",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 2238,
+      "line" : 2269,
       "char" : 7,
       "deco" : "FAyaDOFZvS3std4uuid4UUIDZb",
       "parameters" : [
@@ -27580,14 +27594,14 @@
         "default" : "randomUUID()"
        }
       ],
-      "endline" : 2241,
+      "endline" : 2272,
       "endchar" : 2
      },
      {
       "name" : "invoke",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 2243,
+      "line" : 2274,
       "char" : 7,
       "deco" : "OFAyaDOFZvS3std4uuid4UUIDZb",
       "parameters" : [
@@ -27605,14 +27619,14 @@
         "default" : "randomUUID()"
        }
       ],
-      "endline" : 2246,
+      "endline" : 2277,
       "endchar" : 2
      },
      {
       "name" : "drop",
       "kind" : "function",
-      "comment" : "\n",
-      "line" : 2249,
+      "comment" : " タスク実行を取りやめる\n\n タスクがまだ実行されていない場合は、実行を取りやめる。\n",
+      "line" : 2284,
       "char" : 7,
       "deco" : "FAyaS3std4uuid4UUIDZv",
       "parameters" : [
@@ -27625,20 +27639,125 @@
         "deco" : "S3std4uuid4UUID"
        }
       ],
-      "endline" : 2256,
+      "endline" : 2291,
+      "endchar" : 2
+     },
+     {
+      "name" : "TaskInfo",
+      "kind" : "struct",
+      "comment" : " タスクの情報\n",
+      "line" : 2296,
+      "char" : 2,
+      "members" : [
+       {
+        "name" : "type",
+        "kind" : "variable",
+        "comment" : "タスクの種類\n",
+        "line" : 2299,
+        "char" : 18,
+        "deco" : "Aya",
+        "offset" : 0
+       },
+       {
+        "name" : "timCreate",
+        "kind" : "variable",
+        "comment" : "Queueに追加された時刻\n",
+        "line" : 2301,
+        "char" : 18,
+        "deco" : "S3std8datetime7systime7SysTime",
+        "offset" : 16
+       },
+       {
+        "name" : "timReady",
+        "kind" : "variable",
+        "comment" : "Poolに追加された時刻\n",
+        "line" : 2303,
+        "char" : 18,
+        "deco" : "S3std8datetime7systime7SysTime",
+        "offset" : 32
+       },
+       {
+        "name" : "timStart",
+        "kind" : "variable",
+        "comment" : "実行開始した時刻\n",
+        "line" : 2305,
+        "char" : 18,
+        "deco" : "S3std8datetime7systime7SysTime",
+        "offset" : 48
+       },
+       {
+        "name" : "timEnd",
+        "kind" : "variable",
+        "comment" : "実行終了した時刻\n",
+        "line" : 2307,
+        "char" : 18,
+        "deco" : "S3std8datetime7systime7SysTime",
+        "offset" : 64
+       },
+       {
+        "name" : "uuid",
+        "kind" : "variable",
+        "comment" : "一意なID\n",
+        "line" : 2309,
+        "char" : 18,
+        "deco" : "S3std4uuid4UUID",
+        "offset" : 80
+       },
+       {
+        "name" : "State",
+        "kind" : "alias",
+        "comment" : "タスクの状態\n",
+        "line" : 2311,
+        "char" : 3,
+        "deco" : "E5voile4sync8TaskData5State",
+        "originalType" : "TaskData.State"
+       },
+       {
+        "name" : "state",
+        "kind" : "variable",
+        "comment" : "ditto\n",
+        "line" : 2313,
+        "char" : 9,
+        "deco" : "E5voile4sync8TaskData5State",
+        "offset" : 96
+       },
+       {
+        "name" : "opAssign",
+        "kind" : "generated function",
+        "line" : 2296,
+        "char" : 2,
+        "deco" : "FNaNbNcNiNjNfS5voile4sync14MultiTaskQueue8TaskInfoZQBm",
+        "originalType" : "pure nothrow ref @safe TaskInfo(TaskInfo p) return",
+        "parameters" : [
+         {
+          "name" : "p",
+          "deco" : "S5voile4sync14MultiTaskQueue8TaskInfo"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "name" : "informations",
+      "kind" : "function",
+      "comment" : " 情報取得\n\n タスクの実行状況を調べる。\n\n Returns:\n      タスクの情報を$(D TaskInfo)の配列で返す。\n",
+      "line" : 2324,
+      "char" : 13,
+      "deco" : "xFNdNfZAS5voile4sync14MultiTaskQueue8TaskInfo",
+      "endline" : 2336,
       "endchar" : 2
      }
     ]
    },
    {
-    "name" : "__unittest_L2259_C9",
+    "name" : "__unittest_L2340_C9",
     "kind" : "function",
-    "line" : 2259,
+    "line" : 2340,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2433,
+    "endline" : 2524,
     "endchar" : 1
    }
   ]

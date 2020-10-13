@@ -524,17 +524,17 @@ shared pure @trusted this();
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.locked"></span><div class="quickindex" id="quickindex.ManagedShared.locked"></div>@property auto <code class="ddoc_psymbol">locked</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.locked"></span><div class="quickindex" id="quickindex.ManagedShared.locked"></div>@property @safe auto <code class="ddoc_psymbol">locked</code>();
 <br>
-shared inout @property auto <code class="ddoc_psymbol">locked</code>();
+shared inout @property @trusted auto <code class="ddoc_psymbol">locked</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">ロックされたデータを得る
 </div><div class="ddoc_description">この戻り値が破棄されるときにRAIIで自動的にロックが解除される。
  また、戻り値はロックされた共有資源へ、非共有資源としてアクセス可能な参照として使用できる。</div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.tryLock"></span><div class="quickindex" id="quickindex.ManagedShared.tryLock"></div>bool <code class="ddoc_psymbol">tryLock</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.tryLock"></span><div class="quickindex" id="quickindex.ManagedShared.tryLock"></div>@safe bool <code class="ddoc_psymbol">tryLock</code>();
 <br>
-shared bool <code class="ddoc_psymbol">tryLock</code>();
+shared @trusted bool <code class="ddoc_psymbol">tryLock</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">ロックを試行する。
 </div><div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
@@ -542,14 +542,14 @@ shared bool <code class="ddoc_psymbol">tryLock</code>();
      ロックされていなければロックしてtrue
      別のスレッドにロックされていてロックできなければfalse</div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.lock"></span><div class="quickindex" id="quickindex.ManagedShared.lock"></div>void <code class="ddoc_psymbol">lock</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.lock"></span><div class="quickindex" id="quickindex.ManagedShared.lock"></div>@safe void <code class="ddoc_psymbol">lock</code>();
 <br>
-shared void <code class="ddoc_psymbol">lock</code>();
+shared @trusted void <code class="ddoc_psymbol">lock</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">ロックする。</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.unlock"></span><div class="quickindex" id="quickindex.ManagedShared.unlock"></div>void <code class="ddoc_psymbol">unlock</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.unlock"></span><div class="quickindex" id="quickindex.ManagedShared.unlock"></div>@safe void <code class="ddoc_psymbol">unlock</code>();
 <br>
-shared void <code class="ddoc_psymbol">unlock</code>();
+shared @trusted void <code class="ddoc_psymbol">unlock</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">ロック解除する。</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedShared.asUnshared"></span><div class="quickindex" id="quickindex.ManagedShared.asUnshared"></div>inout @property ref T <code class="ddoc_psymbol">asUnshared</code>();
@@ -570,8 +570,23 @@ shared inout @property ref shared(T) <code class="ddoc_psymbol">asShared</code>(
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData"></span><div class="quickindex" id="quickindex.TaskData"></div>class <code class="ddoc_psymbol">TaskData</code>;
 <br></div></dt>
-<dd>
-<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.type"></span><div class="quickindex" id="quickindex.TaskData.type"></div>protected immutable string <code class="ddoc_psymbol">type</code>;
+<dd><div class="ddoc_summary">マルチタスクキューによって管理されるタスクデータ</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State"></span><div class="quickindex" id="quickindex.TaskData.State"></div>enum <code class="ddoc_psymbol">State</code>: <span class="ddoc_enum_basetype">int</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">状態</div><dl class="ddoc_members"><div class="ddoc_enum_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.waiting"></span><div class="quickindex" id="quickindex.TaskData.State.waiting"></div><code class="ddoc_psymbol">waiting</code><br></div></dt>
+<dd><div class="ddoc_summary">初期状態で、タスクプールに追加される前</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.ready"></span><div class="quickindex" id="quickindex.TaskData.State.ready"></div><code class="ddoc_psymbol">ready</code><br></div></dt>
+<dd><div class="ddoc_summary">タスクプールに追加された状態</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.running"></span><div class="quickindex" id="quickindex.TaskData.State.running"></div><code class="ddoc_psymbol">running</code><br></div></dt>
+<dd><div class="ddoc_summary">実行中の状態</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.finished"></span><div class="quickindex" id="quickindex.TaskData.State.finished"></div><code class="ddoc_psymbol">finished</code><br></div></dt>
+<dd><div class="ddoc_summary">実行が終了した状態</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.failed"></span><div class="quickindex" id="quickindex.TaskData.State.failed"></div><code class="ddoc_psymbol">failed</code><br></div></dt>
+<dd><div class="ddoc_summary">実行の結果、異常終了した状態</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.dropped"></span><div class="quickindex" id="quickindex.TaskData.State.dropped"></div><code class="ddoc_psymbol">dropped</code><br></div></dt>
+<dd><div class="ddoc_summary">実行されずにドロップされた状態</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.type"></span><div class="quickindex" id="quickindex.TaskData.type"></div>protected immutable string <code class="ddoc_psymbol">type</code>;
 <br></div></dt>
 <dd><div class="ddoc_summary">タスクの種類</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onCall"></span><div class="quickindex" id="quickindex.TaskData.onCall"></div>protected immutable void delegate() shared <code class="ddoc_psymbol">onCall</code>;
@@ -592,39 +607,22 @@ shared inout @property ref shared(T) <code class="ddoc_psymbol">asShared</code>(
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.uuid"></span><div class="quickindex" id="quickindex.TaskData.uuid"></div>protected immutable UUID <code class="ddoc_psymbol">uuid</code>;
 <br></div></dt>
 <dd><div class="ddoc_summary">一意なID</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State"></span><div class="quickindex" id="quickindex.TaskData.State"></div>enum <code class="ddoc_psymbol">State</code>: <span class="ddoc_enum_basetype">int</span>;
-<br></div></dt>
-<dd><div class="ddoc_summary">状態</div><dl class="ddoc_members"><div class="ddoc_enum_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.waiting"></span><div class="quickindex" id="quickindex.TaskData.State.waiting"></div><code class="ddoc_psymbol">waiting</code><br></div></dt>
-<dd><div class="ddoc_summary">初期状態で、タスクプールに追加される前</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.ready"></span><div class="quickindex" id="quickindex.TaskData.State.ready"></div><code class="ddoc_psymbol">ready</code><br></div></dt>
-<dd><div class="ddoc_summary">タスクプールに追加された状態</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.running"></span><div class="quickindex" id="quickindex.TaskData.State.running"></div><code class="ddoc_psymbol">running</code><br></div></dt>
-<dd><div class="ddoc_summary">実行中の状態</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.finished"></span><div class="quickindex" id="quickindex.TaskData.State.finished"></div><code class="ddoc_psymbol">finished</code><br></div></dt>
-<dd><div class="ddoc_summary">実行が終了した状態</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.failed"></span><div class="quickindex" id="quickindex.TaskData.State.failed"></div><code class="ddoc_psymbol">failed</code><br></div></dt>
-<dd><div class="ddoc_summary">実行の結果、異常終了した状態</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.State.dropped"></span><div class="quickindex" id="quickindex.TaskData.State.dropped"></div><code class="ddoc_psymbol">dropped</code><br></div></dt>
-<dd><div class="ddoc_summary">実行されずにドロップされた状態</div></dd>
-</div></dl>
-</dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.state"></span><div class="quickindex" id="quickindex.TaskData.state"></div>protected State <code class="ddoc_psymbol">state</code>;
 <br></div></dt>
-<dd>
-</dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onReady"></span><div class="quickindex" id="quickindex.TaskData.onReady"></div>shared void <code class="ddoc_psymbol">onReady</code>();
+<dd><div class="ddoc_summary">状態</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onReady"></span><div class="quickindex" id="quickindex.TaskData.onReady"></div>protected shared void <code class="ddoc_psymbol">onReady</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">Poolに追加されたタイミングでコールバック</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onStart"></span><div class="quickindex" id="quickindex.TaskData.onStart"></div>shared void <code class="ddoc_psymbol">onStart</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onStart"></span><div class="quickindex" id="quickindex.TaskData.onStart"></div>protected shared void <code class="ddoc_psymbol">onStart</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">実行開始したタイミングでコールバック</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onEnd"></span><div class="quickindex" id="quickindex.TaskData.onEnd"></div>shared void <code class="ddoc_psymbol">onEnd</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onEnd"></span><div class="quickindex" id="quickindex.TaskData.onEnd"></div>protected shared void <code class="ddoc_psymbol">onEnd</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">実行終了したタイミングでコールバック</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onFailed"></span><div class="quickindex" id="quickindex.TaskData.onFailed"></div>shared void <code class="ddoc_psymbol">onFailed</code>(Throwable);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onFailed"></span><div class="quickindex" id="quickindex.TaskData.onFailed"></div>protected shared void <code class="ddoc_psymbol">onFailed</code>(Throwable);
 <br></div></dt>
 <dd><div class="ddoc_summary">実行失敗したタイミングでコールバック</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onDropped"></span><div class="quickindex" id="quickindex.TaskData.onDropped"></div>shared void <code class="ddoc_psymbol">onDropped</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.onDropped"></span><div class="quickindex" id="quickindex.TaskData.onDropped"></div>protected shared void <code class="ddoc_psymbol">onDropped</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">実行されずにドロップしたタイミングでコールバック</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".TaskData.this"></span><div class="quickindex" id="quickindex.TaskData.this"></div>this(string <span class="ddoc_param">ty</span>, void delegate() shared <span class="ddoc_param">callback</span>, UUID <span class="ddoc_param">id</span> = randomUUID());
@@ -635,16 +633,37 @@ shared inout @property ref shared(T) <code class="ddoc_psymbol">asShared</code>(
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue"></span><div class="quickindex" id="quickindex.MultiTaskQueue"></div>class <code class="ddoc_psymbol">MultiTaskQueue</code>;
 <br></div></dt>
-<dd>
+<dd><div class="ddoc_summary">マルチタスクキュー
+</div><div class="ddoc_description">タスクの待ち行列を作成する。
+ 同じ種類のタスクは待ち行列によって順次実行し、違う種類のタスクはタスクプールで並列実行する。
+ コンストラクタでタスクプールの設定を行い、<code class="d_inlinecode donthyphenate notranslate">invoke</code>関数によってタスクの種類と実行内容を指定する。
+ <code class="d_inlinecode donthyphenate notranslate">invoke</code>により指定されるタスクは、<code class="d_inlinecode donthyphenate notranslate">TaskData</code>クラスを継承することで細かく内容を調整することができる。
+ <code class="d_inlinecode donthyphenate notranslate">invoke</code>によって待ち行列に追加された未だ実行されていないタスクを、<code class="d_inlinecode donthyphenate notranslate">drop</code>によって実行取り消しすることができる。
+ <code class="d_inlinecode donthyphenate notranslate">informations</code>関数により、各タスクの実行状況を調べることができる。
+<div class="ddoc_blankline"></div>
+
+ 以下のようなことが可能
+<div class="ddoc_blankline"></div>
+
+ <img src="img/voile.sync.MultiTaskQueue-testcase.drawio.svg" /></div>
 <dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.this"></span><div class="quickindex" id="quickindex.MultiTaskQueue.this"></div>this(TaskPool <span class="ddoc_param">pool</span>, void delegate() <span class="ddoc_param">callbackFinishPool</span> = null);
 <br>
 shared this(TaskPool <span class="ddoc_param">pool</span>, void delegate() <span class="ddoc_param">callbackFinishPool</span> = null);
 <br>
-this(size_t <span class="ddoc_param">worker</span> = 8);
+this(size_t <span class="ddoc_param">worker</span> = 8, bool <span class="ddoc_param">daemon</span> = false);
 <br>
-shared this(size_t <span class="ddoc_param">worker</span> = 8);
+shared this(size_t <span class="ddoc_param">worker</span> = 8, bool <span class="ddoc_param">daemon</span> = false);
 <br></div></dt>
-<dd>
+<dd><div class="ddoc_summary">コンストラクタ
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">TaskPool <span class="ddoc_param">pool</span></td>
+<td class="ddoc_param_desc">使用するタスクプールを指定できる</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">void delegate() <span class="ddoc_param">callbackFinishPool</span></td>
+<td class="ddoc_param_desc">タスクキューを破棄した際に全てのタスクが終了した際に呼ばれる。タスクプールを終了するために使用できる。</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">size_t <span class="ddoc_param">worker</span></td>
+<td class="ddoc_param_desc">ワーカースレッド数を指定して作成できる</td></tr>
+</table></div>
+
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.dispose"></span><div class="quickindex" id="quickindex.MultiTaskQueue.dispose"></div>void <code class="ddoc_psymbol">dispose</code>();
 <br></div></dt>
@@ -657,11 +676,67 @@ bool <code class="ddoc_psymbol">invoke</code>(string <span class="ddoc_param">ty
 <br>
 shared bool <code class="ddoc_psymbol">invoke</code>(string <span class="ddoc_param">type</span>, void delegate() shared <span class="ddoc_param">dg</span>, UUID <span class="ddoc_param">id</span> = randomUUID());
 <br></div></dt>
-<dd>
+<dd><div class="ddoc_summary">タスクを実行予約する
+</div><div class="ddoc_description">タスクを待ち行列に追加する。待ち行列に追加されると、順次実行される。
+ 待ち行列は<code class="d_inlinecode donthyphenate notranslate"><span class="ddoc_param">type</span></code>毎にあり、どの待ち行列に追加されるかはタスクの<code class="d_inlinecode donthyphenate notranslate"><span class="ddoc_param">type</span></code>により決まる。
+ 同じ<code class="d_inlinecode donthyphenate notranslate"><span class="ddoc_param">type</span></code>では、追加された順に順次実行される。
+ 異なる<code class="d_inlinecode donthyphenate notranslate"><span class="ddoc_param">type</span></code>の場合は並行して実行される。並行数はコンストラクタで指定したタスクプールに依存する。
+
+</div>
+<div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">TaskData <span class="ddoc_param">tsk</span></td>
+<td class="ddoc_param_desc">タスクデータを指定する</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">type</span></td>
+<td class="ddoc_param_desc">タスク種別を指定する</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">void delegate() shared <span class="ddoc_param">dg</span></td>
+<td class="ddoc_param_desc">タスクの処理内容のデリゲートを指定する</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">UUID <span class="ddoc_param">id</span></td>
+<td class="ddoc_param_desc">タスクの識別用IDを指定する</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ タスクを追加することができたらtrueを、追加できなかったらfalseを返す。</div>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.drop"></span><div class="quickindex" id="quickindex.MultiTaskQueue.drop"></div>void <code class="ddoc_psymbol">drop</code>(string <span class="ddoc_param">type</span>, UUID <span class="ddoc_param">id</span>);
 <br></div></dt>
-<dd>
+<dd><div class="ddoc_summary">タスク実行を取りやめる
+</div><div class="ddoc_description">タスクがまだ実行されていない場合は、実行を取りやめる。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.TaskInfo"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo"></div>struct <code class="ddoc_psymbol">TaskInfo</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">タスクの情報</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.TaskInfo.type"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo.type"></div>string <code class="ddoc_psymbol">type</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">タスクの種類</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.TaskInfo.timCreate"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo.timCreate"></div>SysTime <code class="ddoc_psymbol">timCreate</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Queueに追加された時刻</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.TaskInfo.timReady"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo.timReady"></div>SysTime <code class="ddoc_psymbol">timReady</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Poolに追加された時刻</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.TaskInfo.timStart"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo.timStart"></div>SysTime <code class="ddoc_psymbol">timStart</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">実行開始した時刻</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.TaskInfo.timEnd"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo.timEnd"></div>SysTime <code class="ddoc_psymbol">timEnd</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">実行終了した時刻</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.TaskInfo.uuid"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo.uuid"></div>UUID <code class="ddoc_psymbol">uuid</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">一意なID</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.TaskInfo.State"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo.State"></div>alias <code class="ddoc_psymbol">State</code> = .TaskData.<code class="ddoc_psymbol">State</code>;
+<br>
+<span class="def-anchor" id=".MultiTaskQueue.TaskInfo.state"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo.state"></div>State <code class="ddoc_psymbol">state</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">タスクの状態</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.informations"></span><div class="quickindex" id="quickindex.MultiTaskQueue.informations"></div>const @property @safe TaskInfo[] <code class="ddoc_psymbol">informations</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">情報取得
+</div><div class="ddoc_description">タスクの実行状況を調べる。
+
+</div>
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ タスクの情報を<code class="d_inlinecode donthyphenate notranslate">TaskInfo</code>の配列で返す。</div>
 </dd>
 </div></dl>
 </dd>
