@@ -1650,7 +1650,7 @@ public:
 	 * この戻り値が破棄されるときにRAIIで自動的にロックが解除される。
 	 * また、戻り値はロックされた共有資源へ、非共有資源としてアクセス可能な参照として使用できる。
 	 */
-	auto locked() @property // @suppress(dscanner.confusing.function_attributes)
+	auto locked() @safe @property // @suppress(dscanner.confusing.function_attributes)
 	{
 		lock();
 		static struct LockedData
@@ -1661,7 +1661,7 @@ public:
 		public:
 			ref inout(T) dataRef() inout @property { return *_data; }
 			@disable this(this);
-			~this()
+			~this() @trusted
 			{
 				if (_unlock)
 					_unlock();
@@ -1671,7 +1671,7 @@ public:
 		return LockedData(&_data, &unlock);
 	}
 	/// ditto
-	auto locked() shared inout @property
+	auto locked() @trusted shared inout @property
 	{
 		return (cast()this).locked();
 	}
@@ -1685,16 +1685,16 @@ public:
 	 *     ロックされていなければロックしてtrue
 	 *     別のスレッドにロックされていてロックできなければfalse
 	 */
-	bool tryLock()
+	bool tryLock() @safe
 	{
-		auto tmp = _mutex.tryLock();
+		auto tmp = (() @trusted => _mutex.tryLock())();
 		// ロックされていなければ _locked を操作することは許されない
 		if (tmp)
 			_locked++;
 		return tmp;
 	}
 	/// ditto
-	bool tryLock() shared
+	bool tryLock() @trusted shared
 	{
 		return (cast()this).tryLock();
 	}
@@ -1703,13 +1703,13 @@ public:
 	/***************************************************************************
 	 * ロックする。
 	 */
-	void lock()
+	void lock() @safe
 	{
 		_mutex.lock();
 		_locked++;
 	}
 	/// ditto
-	void lock() shared
+	void lock() @trusted shared
 	{
 		(cast()this).lock();
 	}
@@ -1718,13 +1718,13 @@ public:
 	/***************************************************************************
 	 * ロック解除する。
 	 */
-	void unlock()
+	void unlock() @safe
 	{
 		_locked--;
 		_mutex.unlock();
 	}
 	/// ditto
-	void unlock() shared
+	void unlock() @trusted shared
 	{
 		(cast()this).unlock();
 	}
@@ -1866,26 +1866,14 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 
 
 
-///
+
+/*******************************************************************************
+ * マルチタスクキューによって管理されるタスクデータ
+ */
 class TaskData
 {
 	import std.datetime;
 	import std.uuid;
-protected:
-	/// タスクの種類
-	immutable string                 type;
-	/// タスクの本体
-	immutable void delegate() shared onCall;
-	/// Queueに追加された時刻
-	shared SysTime                   timCreate;
-	/// Poolに追加された時刻
-	shared SysTime                   timReady = SysTime.init;
-	/// 実行開始した時刻
-	shared SysTime                   timStart = SysTime.init;
-	/// 実行終了した時刻
-	shared SysTime                   timEnd = SysTime.init;
-	/// 一意なID
-	immutable UUID                   uuid;
 	/// 状態
 	enum State
 	{
@@ -1902,9 +1890,23 @@ protected:
 		/// 実行されずにドロップされた状態
 		dropped,
 	}
-	///
+protected:
+	/// タスクの種類
+	immutable string                 type;
+	/// タスクの本体
+	immutable void delegate() shared onCall;
+	/// Queueに追加された時刻
+	shared SysTime                   timCreate;
+	/// Poolに追加された時刻
+	shared SysTime                   timReady = SysTime.init;
+	/// 実行開始した時刻
+	shared SysTime                   timStart = SysTime.init;
+	/// 実行終了した時刻
+	shared SysTime                   timEnd = SysTime.init;
+	/// 一意なID
+	immutable UUID                   uuid;
+	/// 状態
 	State state = State.waiting;
-public:
 	/// Poolに追加されたタイミングでコールバック
 	void onReady() shared {  }
 	/// 実行開始したタイミングでコールバック
@@ -1916,6 +1918,7 @@ public:
 	/// 実行されずにドロップしたタイミングでコールバック
 	void onDropped() shared {  }
 	
+public:
 	///
 	this(string ty, void delegate() shared callback, UUID id = randomUUID())
 	{
@@ -1927,7 +1930,18 @@ public:
 }
 
 /*******************************************************************************
+ * マルチタスクキュー
  * 
+ * タスクの待ち行列を作成する。
+ * 同じ種類のタスクは待ち行列によって順次実行し、違う種類のタスクはタスクプールで並列実行する。
+ * コンストラクタでタスクプールの設定を行い、$(D invoke)関数によってタスクの種類と実行内容を指定する。
+ * $(D invoke)により指定されるタスクは、$(D TaskData)クラスを継承することで細かく内容を調整することができる。
+ * $(D invoke)によって待ち行列に追加された未だ実行されていないタスクを、$(D drop)によって実行取り消しすることができる。
+ * $(D informations)関数により、各タスクの実行状況を調べることができる。
+ * 
+ * 以下のようなことが可能
+ * 
+ * <img src="img/voile.sync.MultiTaskQueue-testcase.drawio.svg" />
  */
 class MultiTaskQueue
 {
@@ -2161,7 +2175,12 @@ private:
 public:
 	
 	/***************************************************************************
+	 * コンストラクタ
 	 * 
+	 * Params:
+	 *      pool = 使用するタスクプールを指定できる
+	 *      callbackFinishPool = タスクキューを破棄した際に全てのタスクが終了した際に呼ばれる。タスクプールを終了するために使用できる。
+	 *      worker = ワーカースレッド数を指定して作成できる
 	 */
 	this(TaskPool pool, void delegate() callbackFinishPool = null)
 	{
@@ -2176,12 +2195,12 @@ public:
 		(cast()this)._initialize(pool, callbackFinishPool);
 	}
 	/// ditto
-	this(size_t worker = 8)
+	this(size_t worker = 8, bool daemon = false)
 	{
 		this(new TaskPool(worker), () => _pool.finish(true));
 	}
 	/// ditto
-	this(size_t worker = 8) shared
+	this(size_t worker = 8, bool daemon = false) shared
 	{
 		this(new TaskPool(worker), () => _pool.assumeUnshared.finish(true));
 	}
@@ -2209,9 +2228,21 @@ public:
 			_finishPool();
 	}
 	
-
 	/***************************************************************************
+	 * タスクを実行予約する
 	 * 
+	 * タスクを待ち行列に追加する。待ち行列に追加されると、順次実行される。
+	 * 待ち行列は$(D type)毎にあり、どの待ち行列に追加されるかはタスクの$(D type)により決まる。
+	 * 同じ$(D type)では、追加された順に順次実行される。
+	 * 異なる$(D type)の場合は並行して実行される。並行数はコンストラクタで指定したタスクプールに依存する。
+	 * 
+	 * Params:
+	 *      tsk = タスクデータを指定する
+	 *      type = タスク種別を指定する
+	 *      dg = タスクの処理内容のデリゲートを指定する
+	 *      id = タスクの識別用IDを指定する
+	 * Returns:
+	 *      タスクを追加することができたらtrueを、追加できなかったらfalseを返す。
 	 */
 	bool invoke(TaskData tsk)
 	{
@@ -2245,7 +2276,11 @@ public:
 		return invoke(new TaskData(type, dg, id));
 	}
 	
-	///
+	/***************************************************************************
+	 * タスク実行を取りやめる
+	 * 
+	 * タスクがまだ実行されていない場合は、実行を取りやめる。
+	 */
 	void drop(string type, UUID id)
 	{
 		with (_taskQueue.locked)
@@ -2254,8 +2289,54 @@ public:
 				removeAt(type, id);
 		}
 	}
+	
+	/***************************************************************************
+	 * タスクの情報
+	 */
+	struct TaskInfo
+	{
+		/// タスクの種類
+		string         type;
+		/// Queueに追加された時刻
+		SysTime        timCreate;
+		/// Poolに追加された時刻
+		SysTime        timReady;
+		/// 実行開始した時刻
+		SysTime        timStart;
+		/// 実行終了した時刻
+		SysTime        timEnd;
+		/// 一意なID
+		UUID           uuid;
+		/// タスクの状態
+		alias State = TaskData.State;
+		/// ditto
+		State state;
+	}
+	
+	/***************************************************************************
+	 * 情報取得
+	 * 
+	 * タスクの実行状況を調べる。
+	 * 
+	 * Returns:
+	 *      タスクの情報を$(D TaskInfo)の配列で返す。
+	 */
+	TaskInfo[] informations() const @safe @property
+	{
+		TaskInfo[] ret;
+		with (_taskQueue.locked)
+		{
+			foreach (k, tasks; _tasks)
+			{
+				foreach (t; tasks)
+					ret ~= TaskInfo(t.type, t.timCreate, t.timReady, t.timStart, t.timEnd, t.uuid, t.state);
+			}
+		}
+		return ret;
+	}
 }
 
+// <img src="img/voile.sync.MultiTaskQueue-testcase.drawio.svg" />
 @system unittest
 {
 	import std;
@@ -2357,6 +2438,16 @@ public:
 		assert(getFront("2").state == TaskData.State.running);
 		assert(getFront("3").state == TaskData.State.ready);
 	}
+	
+	auto infos = mtq.informations;
+	infos.sort!((a,b) => icmp(a.type, b.type) < 0, SwapStrategy.stable);
+	assert(infos.length == 3);
+	assert(infos[0].type == "1");
+	assert(infos[1].type == "2");
+	assert(infos[2].type == "3");
+	assert(infos[0].state == TaskData.State.running);
+	assert(infos[1].state == TaskData.State.running);
+	assert(infos[2].state == TaskData.State.ready);
 	
 	end(1);
 	wait(3);
