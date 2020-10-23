@@ -1247,7 +1247,7 @@ struct FileSystem
 		auto absWork      = absolutePath();
 		auto absSrcDir    = .absolutePath(srcDir,    absWork).buildNormalizedPath();
 		auto absTargetDir = .absolutePath(targetDir, absWork).buildNormalizedPath();
-		return copyFilesImpl!false(absSrcDir, absTargetDir, force, retrycnt);
+		return copyFilesImpl!false(absSrcDir, blobFilter, absTargetDir, force, retrycnt);
 	}
 	
 	private bool copyFilesImpl(bool absConvert: false)(
