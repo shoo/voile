@@ -2181,6 +2181,7 @@ public:
 	 *      pool = 使用するタスクプールを指定できる
 	 *      callbackFinishPool = タスクキューを破棄した際に全てのタスクが終了した際に呼ばれる。タスクプールを終了するために使用できる。
 	 *      worker = ワーカースレッド数を指定して作成できる
+	 *      daemon = スレッドのデーモン化をする場合はtrue。disposeしない場合がある場合にtrueを指定する。
 	 */
 	this(TaskPool pool, void delegate() callbackFinishPool = null)
 	{
@@ -2198,11 +2199,15 @@ public:
 	this(size_t worker = 8, bool daemon = false)
 	{
 		this(new TaskPool(worker), () => _pool.finish(true));
+		if (daemon)
+			_pool.isDaemon = true;
 	}
 	/// ditto
 	this(size_t worker = 8, bool daemon = false) shared
 	{
 		this(new TaskPool(worker), () => _pool.assumeUnshared.finish(true));
+		if (daemon)
+			_pool.assumeUnshared.isDaemon = true;
 	}
 	
 	/***************************************************************************
@@ -2289,6 +2294,16 @@ public:
 				removeAt(type, id);
 		}
 	}
+	
+	/***************************************************************************
+	 * タスクを取り出す
+	 */
+	shared(TaskData) peek(string type, UUID id)
+	{
+		with (_taskQueue.locked)
+			return cast(shared)getAt(type, id);
+	}
+	
 	
 	/***************************************************************************
 	 * タスクの情報
