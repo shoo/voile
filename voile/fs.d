@@ -1320,7 +1320,7 @@ struct FileSystem
 		assert(!fs.isFile("a/b/c.txt"));
 		assert(!fs.isFile("a/b/d.dat"));
 		fs.writeText("a/b/c.txt", "aaaaa");
-		fs.writeBinary("a/b/c.txt", [1,2,3]);
+		fs.writeBinary("a/b/d.dat", [1,2,3]);
 		fs.copyFiles("a/b", "*.txt", "a/c");
 		assert(fs.isFile("a/c/c.txt"));
 		assert(!fs.isFile("a/c/d.dat"));
