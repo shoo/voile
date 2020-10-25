@@ -662,6 +662,8 @@ shared this(size_t <span class="ddoc_param">worker</span> = 8, bool <span class=
 <td class="ddoc_param_desc">タスクキューを破棄した際に全てのタスクが終了した際に呼ばれる。タスクプールを終了するために使用できる。</td></tr>
 <tr class="ddoc_param_row"><td class="ddoc_param_id">size_t <span class="ddoc_param">worker</span></td>
 <td class="ddoc_param_desc">ワーカースレッド数を指定して作成できる</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">bool <span class="ddoc_param">daemon</span></td>
+<td class="ddoc_param_desc">スレッドのデーモン化をする場合はtrue。disposeしない場合がある場合にtrueを指定する。</td></tr>
 </table></div>
 
 </dd>
@@ -702,6 +704,9 @@ shared bool <code class="ddoc_psymbol">invoke</code>(string <span class="ddoc_pa
 <dd><div class="ddoc_summary">タスク実行を取りやめる
 </div><div class="ddoc_description">タスクがまだ実行されていない場合は、実行を取りやめる。</div>
 </dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.peek"></span><div class="quickindex" id="quickindex.MultiTaskQueue.peek"></div>shared(TaskData) <code class="ddoc_psymbol">peek</code>(string <span class="ddoc_param">type</span>, UUID <span class="ddoc_param">id</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">タスクを取り出す</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.TaskInfo"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo"></div>struct <code class="ddoc_psymbol">TaskInfo</code>;
 <br></div></dt>
 <dd><div class="ddoc_summary">タスクの情報</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.TaskInfo.type"></span><div class="quickindex" id="quickindex.MultiTaskQueue.TaskInfo.type"></div>string <code class="ddoc_psymbol">type</code>;

@@ -511,7 +511,7 @@ fs.<span class="d_psymbol">copyFiles</span>(<span class="d_string">"a/b"</span>,
 <span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/b/c.txt"</span>));
 <span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/b/d.dat"</span>));
 fs.writeText(<span class="d_string">"a/b/c.txt"</span>, <span class="d_string">"aaaaa"</span>);
-fs.writeBinary(<span class="d_string">"a/b/c.txt"</span>, [1,2,3]);
+fs.writeBinary(<span class="d_string">"a/b/d.dat"</span>, [1,2,3]);
 fs.<span class="d_psymbol">copyFiles</span>(<span class="d_string">"a/b"</span>, <span class="d_string">"*.txt"</span>, <span class="d_string">"a/c"</span>);
 <span class="d_keyword">assert</span>(fs.isFile(<span class="d_string">"a/c/c.txt"</span>));
 <span class="d_keyword">assert</span>(!fs.isFile(<span class="d_string">"a/c/d.dat"</span>));
