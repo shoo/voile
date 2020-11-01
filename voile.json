@@ -2441,23 +2441,1649 @@
   "comment" : " Binary data serializer/deserializer\n",
   "members" : [
    {
-    "name" : "BigEndian",
-    "kind" : "enum",
-    "comment" : "\n",
-    "line" : 12,
-    "char" : 1
+    "name" : "std.range",
+    "kind" : "import",
+    "line" : 6,
+    "char" : 8,
+    "protection" : "private"
    },
    {
-    "name" : "LittleEndian",
-    "kind" : "enum",
-    "line" : 13,
-    "char" : 1
+    "name" : "std.traits",
+    "kind" : "import",
+    "line" : 6,
+    "char" : 19,
+    "protection" : "private"
    },
    {
-    "name" : "Ignore",
+    "name" : "voile.munion",
+    "kind" : "import",
+    "line" : 7,
+    "char" : 8,
+    "protection" : "private"
+   },
+   {
+    "name" : "voile.attr",
+    "kind" : "import",
+    "line" : 8,
+    "char" : 15
+   },
+   {
+    "name" : "Endian",
     "kind" : "enum",
-    "line" : 14,
-    "char" : 1
+    "protection" : "private",
+    "line" : 10,
+    "char" : 9,
+    "baseDeco" : "i",
+    "members" : [
+     {
+      "name" : "little",
+      "kind" : "enum member",
+      "value" : "0",
+      "line" : 12,
+      "char" : 2
+     },
+     {
+      "name" : "big",
+      "kind" : "enum member",
+      "value" : "1",
+      "line" : 12,
+      "char" : 10
+     }
+    ]
+   },
+   {
+    "name" : "littleEndian",
+    "kind" : "variable",
+    "comment" : " リトルエンディアンのデータに付与するUDA\n",
+    "line" : 18,
+    "char" : 6,
+    "storageClass" : [
+     "enum"
+    ],
+    "deco" : "E5voile6bindat6Endian",
+    "init" : "cast(Endian)0"
+   },
+   {
+    "name" : "bigEndian",
+    "kind" : "variable",
+    "comment" : " ビッグエンディアンのデータに付与するUDA\n",
+    "line" : 23,
+    "char" : 6,
+    "storageClass" : [
+     "enum"
+    ],
+    "deco" : "E5voile6bindat6Endian",
+    "init" : "cast(Endian)1"
+   },
+   {
+    "name" : "systemEndian",
+    "kind" : "variable",
+    "comment" : " システムのエンディアンがリトルかビッグかで切り替えが行われるUDA\n",
+    "line" : 30,
+    "char" : 7,
+    "storageClass" : [
+     "enum"
+    ],
+    "deco" : "E5voile6bindat6Endian",
+    "init" : "cast(Endian)0"
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 41,
+    "char" : 9,
+    "name" : "getEndian",
+    "parameters" : [
+     {
+      "name" : "val",
+      "kind" : "alias"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "getEndian",
+      "kind" : "variable",
+      "line" : 45,
+      "char" : 8,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "getUDAs!(val, Endian)[__dollar - 1]"
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L53_C7",
+    "kind" : "function",
+    "line" : 53,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 66,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 66,
+    "char" : 14,
+    "name" : "isSystemEndian",
+    "parameters" : [
+     {
+      "name" : "val",
+      "kind" : "alias"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isSystemEndian",
+      "kind" : "variable",
+      "line" : 66,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "getEndian!val == systemEndian"
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L68_C7",
+    "kind" : "function",
+    "line" : 68,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 95,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "comment" : " バイトの並びを逆順にする\n\n LittleEndianをBigEndianに、あるいはその逆を行うことができる\n",
+    "line" : 95,
+    "char" : 14,
+    "name" : "swapBytes",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "swapBytes",
+      "kind" : "function",
+      "line" : 95,
+      "char" : 14,
+      "type" : "@trusted void(in T src, out T dst)",
+      "parameters" : [
+       {
+        "name" : "src",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       },
+       {
+        "name" : "dst",
+        "type" : "T",
+        "storageClass" : [
+         "out"
+        ]
+       }
+      ],
+      "endline" : 123,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "comment" : "ditto\n",
+    "line" : 125,
+    "char" : 11,
+    "name" : "swapBytes",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "swapBytes",
+      "kind" : "function",
+      "line" : 125,
+      "char" : 11,
+      "type" : "T(in T src)",
+      "parameters" : [
+       {
+        "name" : "src",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 130,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 132,
+    "char" : 9,
+    "name" : "PreLength",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "PreLength",
+      "kind" : "struct",
+      "line" : 132,
+      "char" : 9,
+      "members" : [
+       {
+        "name" : "LengthType",
+        "kind" : "alias",
+        "line" : 134,
+        "char" : 2,
+        "type" : "T"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " 配列の長さがバイナリの前方に現れる場合のUDA\n",
+    "line" : 140,
+    "char" : 1,
+    "name" : "preLength",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "preLength",
+      "kind" : "alias",
+      "line" : 142,
+      "char" : 2,
+      "type" : "PreLength!T"
+     }
+    ]
+   },
+   {
+    "name" : "ArrayLength",
+    "kind" : "struct",
+    "protection" : "private",
+    "line" : 145,
+    "char" : 9,
+    "members" : [
+     {
+      "name" : "predication",
+      "kind" : "variable",
+      "line" : 147,
+      "char" : 9,
+      "deco" : "Aya",
+      "offset" : 0
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " 配列の長さを計算によって行うUDA\n",
+    "line" : 153,
+    "char" : 1,
+    "name" : "arrayLength",
+    "parameters" : [
+     {
+      "name" : "pred",
+      "kind" : "value",
+      "deco" : "Aya"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "arrayLength",
+      "kind" : "variable",
+      "line" : 155,
+      "char" : 7,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "ArrayLength(pred)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 158,
+    "char" : 13,
+    "name" : "arrayLength",
+    "parameters" : [],
+    "members" : [
+     {
+      "name" : "arrayLength",
+      "kind" : "function",
+      "line" : 158,
+      "char" : 13,
+      "type" : "ArrayLength(string pred)",
+      "parameters" : [
+       {
+        "name" : "pred",
+        "type" : "string"
+       }
+      ],
+      "endline" : 161,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 163,
+    "char" : 14,
+    "name" : "hasPreLength",
+    "parameters" : [
+     {
+      "name" : "val",
+      "kind" : "alias"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "hasPreLength",
+      "kind" : "variable",
+      "line" : 163,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "hasUDA!(val, PreLength)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 164,
+    "char" : 14,
+    "name" : "hasArrayLength",
+    "parameters" : [
+     {
+      "name" : "val",
+      "kind" : "alias"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "hasArrayLength",
+      "kind" : "variable",
+      "line" : 164,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "hasUDA!(val, ArrayLength)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 165,
+    "char" : 14,
+    "name" : "getArrayLengthPred",
+    "parameters" : [
+     {
+      "name" : "val",
+      "kind" : "alias"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "getArrayLengthPred",
+      "kind" : "variable",
+      "line" : 165,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "getUDAs!(val, ArrayLength)[0].predication"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 166,
+    "char" : 9,
+    "name" : "getLengthType",
+    "parameters" : [
+     {
+      "name" : "val",
+      "kind" : "alias"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "getLengthType",
+      "kind" : "alias",
+      "line" : 170,
+      "char" : 3,
+      "type" : "TemplateArgsOf!(getUDAs!(val, PreLength))[0]"
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L184_C7",
+    "kind" : "function",
+    "line" : 184,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 209,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "comment" : " 入力対象のバイナリデータ型\n",
+    "line" : 209,
+    "char" : 11,
+    "name" : "isInputBinary",
+    "parameters" : [
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isInputBinary",
+      "kind" : "variable",
+      "line" : 209,
+      "char" : 11,
+      "storageClass" : [
+       "enum"
+      ],
+      "deco" : "b",
+      "init" : "isInputRange!InputRange && is(Unqual!(ForeachType!InputRange) == ubyte)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " 出力対象のバイナリデータ型\n",
+    "line" : 214,
+    "char" : 11,
+    "name" : "isOutputBinary",
+    "parameters" : [
+     {
+      "name" : "OutputRange",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isOutputBinary",
+      "kind" : "variable",
+      "line" : 214,
+      "char" : 11,
+      "storageClass" : [
+       "enum"
+      ],
+      "deco" : "b",
+      "init" : "isOutputRange!(OutputRange, ubyte)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " 基本型要素をもつ配列\n",
+    "line" : 219,
+    "char" : 1,
+    "name" : "isBasicArray",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isBasicArray",
+      "kind" : "variable",
+      "line" : 222,
+      "char" : 13,
+      "storageClass" : [
+       "enum"
+      ],
+      "deco" : "b",
+      "init" : "isBasicType!(ForeachType!T)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " Proxy\n\n 1. 以下の関数を持つ\n    - `void writeBinary(InputRange)(ref InputRange) const;`\n    - `void readBinary(OutputRange)(ref OutputRange);`\n 2. 【未実装】以下の関数を持つ\n    - `size_t binaryLength() const @property;`\n    - `immutable(ubyte)[] toBinary() const;`\n    - `void fromBinary(in byte[]);`\n 3. 【未実装】型の宣言に以下のUDAを持つ\n    - `@convBy!Proxy`\n      - Proxy: `void to(OutputRange)(ref T src, ref OutputRange);`\n      - Proxy: `void from(InputRange)(ref InputRange, ref T dst);`\n 4. 【未実装】メンバの宣言に以下のUDAを持つ\n    - `@convBy!Proxy`\n      - Proxy type6: `void to(OutputRange)(ref T src, ref OutputRange);`\n      - Proxy type6: `void from(InputRange)(ref InputRange, ref T dst);`\n 5. 【未実装】メンバの宣言に以下のUDAを持つ\n    - `@preLength!Size`\n    - `@convBy!Proxy` : `immutable(ubyte)[]`\n 6. 【未実装】メンバの宣言に以下のUDAを持つ\n    - `@arrayLength!\"...\"`\n    - `@convBy!Proxy` : `immutable(ubyte)[]`\n",
+    "line" : 252,
+    "char" : 1,
+    "name" : "hasBinaryConvertionProxy",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "InputRange",
+      "kind" : "alias",
+      "line" : 254,
+      "char" : 2,
+      "type" : "InputRangeObject!(ubyte[])"
+     },
+     {
+      "name" : "OutputRange",
+      "kind" : "alias",
+      "line" : 255,
+      "char" : 2,
+      "type" : "OutputRangeObject!(ubyte[], ubyte)"
+     },
+     {
+      "name" : "hasBinaryConvertionProxy",
+      "kind" : "variable",
+      "line" : 261,
+      "char" : 13,
+      "storageClass" : [
+       "enum"
+      ],
+      "deco" : "b",
+      "init" : "true"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " バイナリのシリアライズ\n",
+    "line" : 272,
+    "char" : 6,
+    "name" : "serializeToBinDat",
+    "parameters" : [
+     {
+      "name" : "endian",
+      "kind" : "value",
+      "deco" : "E5voile6bindat6Endian"
+     },
+     {
+      "name" : "OutputRange",
+      "kind" : "type"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isOutputBinary!OutputRange && isBasicType!T",
+    "members" : [
+     {
+      "name" : "serializeToBinDat",
+      "kind" : "function",
+      "line" : 272,
+      "char" : 6,
+      "type" : "@trusted void(ref OutputRange r, in T data)",
+      "parameters" : [
+       {
+        "name" : "r",
+        "type" : "OutputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 284,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 286,
+    "char" : 6,
+    "name" : "serializeToBinDat",
+    "parameters" : [
+     {
+      "name" : "endian",
+      "kind" : "value",
+      "deco" : "E5voile6bindat6Endian"
+     },
+     {
+      "name" : "OutputRange",
+      "kind" : "type"
+     },
+     {
+      "name" : "T",
+      "kind" : "type",
+      "deco" : "h"
+     }
+    ],
+    "constraint" : "isOutputBinary!OutputRange && isBasicType!T",
+    "members" : [
+     {
+      "name" : "serializeToBinDat",
+      "kind" : "function",
+      "line" : 286,
+      "char" : 6,
+      "type" : "void(ref OutputRange r, in T data)",
+      "parameters" : [
+       {
+        "name" : "r",
+        "type" : "OutputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 290,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 292,
+    "char" : 6,
+    "name" : "serializeToBinDat",
+    "parameters" : [
+     {
+      "name" : "OutputRange",
+      "kind" : "type"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isOutputBinary!OutputRange && isBasicType!T",
+    "members" : [
+     {
+      "name" : "serializeToBinDat",
+      "kind" : "function",
+      "line" : 292,
+      "char" : 6,
+      "type" : "@trusted void(ref OutputRange r, in T data)",
+      "parameters" : [
+       {
+        "name" : "r",
+        "type" : "OutputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 296,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 298,
+    "char" : 6,
+    "name" : "serializeToBinDat",
+    "parameters" : [
+     {
+      "name" : "OutputRange",
+      "kind" : "type"
+     },
+     {
+      "name" : "T",
+      "kind" : "type",
+      "deco" : "h"
+     }
+    ],
+    "constraint" : "isOutputBinary!OutputRange && isBasicType!T",
+    "members" : [
+     {
+      "name" : "serializeToBinDat",
+      "kind" : "function",
+      "line" : 298,
+      "char" : 6,
+      "type" : "void(ref OutputRange r, in T data)",
+      "parameters" : [
+       {
+        "name" : "r",
+        "type" : "OutputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 302,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 304,
+    "char" : 6,
+    "name" : "serializeToBinDat",
+    "parameters" : [
+     {
+      "name" : "endian",
+      "kind" : "value",
+      "deco" : "E5voile6bindat6Endian"
+     },
+     {
+      "name" : "OutputRange",
+      "kind" : "type"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isOutputBinary!OutputRange && isBasicArray!T",
+    "members" : [
+     {
+      "name" : "serializeToBinDat",
+      "kind" : "function",
+      "line" : 304,
+      "char" : 6,
+      "type" : "void(ref OutputRange r, in T data)",
+      "parameters" : [
+       {
+        "name" : "r",
+        "type" : "OutputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 316,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 318,
+    "char" : 6,
+    "name" : "serializeToBinDat",
+    "parameters" : [
+     {
+      "name" : "OutputRange",
+      "kind" : "type"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isOutputBinary!OutputRange && isArray!T",
+    "members" : [
+     {
+      "name" : "serializeToBinDat",
+      "kind" : "function",
+      "line" : 318,
+      "char" : 6,
+      "type" : "void(ref OutputRange r, in T data)",
+      "parameters" : [
+       {
+        "name" : "r",
+        "type" : "OutputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 330,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 332,
+    "char" : 6,
+    "name" : "serializeToBinDat",
+    "parameters" : [
+     {
+      "name" : "OutputRange",
+      "kind" : "type"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isOutputBinary!OutputRange && is(T == struct)",
+    "members" : [
+     {
+      "name" : "serializeToBinDat",
+      "kind" : "function",
+      "line" : 332,
+      "char" : 6,
+      "type" : "void(ref OutputRange r, in T data)",
+      "parameters" : [
+       {
+        "name" : "r",
+        "type" : "OutputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 393,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 395,
+    "char" : 6,
+    "name" : "serializeToBinDat",
+    "parameters" : [
+     {
+      "name" : "OutputRange",
+      "kind" : "type"
+     },
+     {
+      "name" : "T",
+      "kind" : "type",
+      "type" : "Endata!U"
+     },
+     {
+      "name" : "U",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isOutputBinary!OutputRange && is(T == struct)",
+    "members" : [
+     {
+      "name" : "serializeToBinDat",
+      "kind" : "function",
+      "line" : 395,
+      "char" : 6,
+      "type" : "void(ref OutputRange r, in T data)",
+      "parameters" : [
+       {
+        "name" : "r",
+        "type" : "OutputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 434,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 436,
+    "char" : 20,
+    "name" : "serializeToBinDat",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "serializeToBinDat",
+      "kind" : "function",
+      "line" : 436,
+      "char" : 20,
+      "type" : "@trusted immutable(ubyte)[](in T data)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 442,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 444,
+    "char" : 20,
+    "name" : "serializeToBinDat",
+    "parameters" : [
+     {
+      "name" : "endian",
+      "kind" : "value",
+      "deco" : "E5voile6bindat6Endian"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isBasicType!T || isArray!T",
+    "members" : [
+     {
+      "name" : "serializeToBinDat",
+      "kind" : "function",
+      "line" : 444,
+      "char" : 20,
+      "type" : "@trusted immutable(ubyte)[](in T data)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 451,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L454_C7",
+    "kind" : "function",
+    "comment" : "基本型と列挙値\n",
+    "line" : 454,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 474,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L474_C7",
+    "kind" : "function",
+    "comment" : "配列\n",
+    "line" : 474,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 490,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L490_C7",
+    "kind" : "function",
+    "comment" : "エンディアン変換\n",
+    "line" : 490,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 501,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L501_C7",
+    "kind" : "function",
+    "comment" : "構造体\n",
+    "line" : 501,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 531,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L531_C7",
+    "kind" : "function",
+    "comment" : "Endata\n",
+    "line" : 531,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 546,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L546_C7",
+    "kind" : "function",
+    "comment" : "Proxy\n",
+    "line" : 546,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 571,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "comment" : " 入力レンジから所定のバイト数を消費\n",
+    "line" : 571,
+    "char" : 14,
+    "name" : "consume",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputBinary!InputRange",
+    "members" : [
+     {
+      "name" : "consume",
+      "kind" : "function",
+      "line" : 571,
+      "char" : 14,
+      "type" : "@trusted void(ref T dst, ref InputRange r)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "r",
+        "type" : "InputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 590,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : " バイナリのデシリアライズ\n",
+    "line" : 595,
+    "char" : 6,
+    "name" : "deserializeFromBinDat",
+    "parameters" : [
+     {
+      "name" : "endian",
+      "kind" : "value",
+      "deco" : "E5voile6bindat6Endian"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputBinary!InputRange && isBasicType!T",
+    "members" : [
+     {
+      "name" : "deserializeFromBinDat",
+      "kind" : "function",
+      "line" : 595,
+      "char" : 6,
+      "type" : "void(ref T dst, ref InputRange r)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "r",
+        "type" : "InputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 601,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 603,
+    "char" : 6,
+    "name" : "deserializeFromBinDat",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputBinary!InputRange && isBasicType!T",
+    "members" : [
+     {
+      "name" : "deserializeFromBinDat",
+      "kind" : "function",
+      "line" : 603,
+      "char" : 6,
+      "type" : "void(ref T dst, ref InputRange r)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "r",
+        "type" : "InputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 607,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 609,
+    "char" : 6,
+    "name" : "deserializeFromBinDat",
+    "parameters" : [
+     {
+      "name" : "endian",
+      "kind" : "value",
+      "deco" : "E5voile6bindat6Endian"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputBinary!InputRange && isBasicArray!T",
+    "members" : [
+     {
+      "name" : "deserializeFromBinDat",
+      "kind" : "function",
+      "line" : 609,
+      "char" : 6,
+      "type" : "void(ref T dst, ref InputRange r)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "r",
+        "type" : "InputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 618,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 620,
+    "char" : 6,
+    "name" : "deserializeFromBinDat",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputBinary!InputRange && isArray!T",
+    "members" : [
+     {
+      "name" : "deserializeFromBinDat",
+      "kind" : "function",
+      "line" : 620,
+      "char" : 6,
+      "type" : "void(ref T dst, ref InputRange r)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "r",
+        "type" : "InputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 632,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 634,
+    "char" : 6,
+    "name" : "deserializeFromBinDat",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputBinary!InputRange && is(T == struct)",
+    "members" : [
+     {
+      "name" : "deserializeFromBinDat",
+      "kind" : "function",
+      "line" : 634,
+      "char" : 6,
+      "type" : "void(ref T dst, ref InputRange r)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "r",
+        "type" : "InputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 704,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 706,
+    "char" : 6,
+    "name" : "deserializeFromBinDat",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type",
+      "type" : "Endata!U"
+     },
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     },
+     {
+      "name" : "U",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputBinary!InputRange && is(T == struct)",
+    "members" : [
+     {
+      "name" : "deserializeFromBinDat",
+      "kind" : "function",
+      "line" : 706,
+      "char" : 6,
+      "type" : "void(ref T dst, ref InputRange r)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "r",
+        "type" : "InputRange",
+        "storageClass" : [
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 746,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 748,
+    "char" : 6,
+    "name" : "deserializeFromBinDat",
+    "parameters" : [
+     {
+      "name" : "endian",
+      "kind" : "value",
+      "deco" : "E5voile6bindat6Endian"
+     },
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputBinary!InputRange",
+    "members" : [
+     {
+      "name" : "deserializeFromBinDat",
+      "kind" : "function",
+      "line" : 748,
+      "char" : 6,
+      "type" : "void(ref T dst, InputRange r)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "r",
+        "type" : "InputRange"
+       }
+      ],
+      "endline" : 752,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 754,
+    "char" : 6,
+    "name" : "deserializeFromBinDat",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputBinary!InputRange",
+    "members" : [
+     {
+      "name" : "deserializeFromBinDat",
+      "kind" : "function",
+      "line" : 754,
+      "char" : 6,
+      "type" : "void(ref T dst, InputRange r)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "r",
+        "type" : "InputRange"
+       }
+      ],
+      "endline" : 758,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 760,
+    "char" : 3,
+    "name" : "deserializeFromBinDat",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "InputRange",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputBinary!InputRange",
+    "members" : [
+     {
+      "name" : "deserializeFromBinDat",
+      "kind" : "function",
+      "line" : 760,
+      "char" : 3,
+      "type" : "T(InputRange r)",
+      "parameters" : [
+       {
+        "name" : "r",
+        "type" : "InputRange"
+       }
+      ],
+      "endline" : 766,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L769_C7",
+    "kind" : "function",
+    "comment" : "基本型と列挙値\n",
+    "line" : 769,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 797,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L797_C7",
+    "kind" : "function",
+    "comment" : "配列\n",
+    "line" : 797,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 819,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L819_C7",
+    "kind" : "function",
+    "comment" : "エンディアン変換\n",
+    "line" : 819,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 833,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L833_C7",
+    "kind" : "function",
+    "comment" : "構造体\n",
+    "line" : 833,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 868,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L868_C7",
+    "kind" : "function",
+    "comment" : "Endata\n",
+    "line" : 868,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 888,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L888_C7",
+    "kind" : "function",
+    "comment" : "Proxy\n",
+    "line" : 888,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 930,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L930_C7",
+    "kind" : "function",
+    "comment" : " バイナリの解析\n\n - [0-2] タグタイプ\n   - if [0-2]が 0x0001\n     - [2-4] 長さ\n     - [4-X] ペイロード\n   - if [0-2]が 0x0002\n     - [2] コマンド種別\n       - if [2] が 0x01\n         - [3-5] 付与データ\n       - if [2] が 0x02\n         - (なし)\n       - if [2] が 0x03\n         - [3.0]     フラグ1\n         - [3.1-3.3] フラグ2\n         - [3.3-3.6] reserved\n         - [3.7]     フラグ8\n",
+    "line" : 930,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 987,
+    "endchar" : 1
    }
   ]
  },

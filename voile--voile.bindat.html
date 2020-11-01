@@ -62,9 +62,434 @@
                 
                 <div class="quickindex" id="quickindex"></div>
                 
-                <div class="ddoc_summary">Binary data serializer/deserializer</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".BigEndian"></span><div class="quickindex" id="quickindex.BigEndian"></div>enum <code class="ddoc_psymbol">BigEndian</code>;
+                <div class="ddoc_summary">Binary data serializer/deserializer</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".littleEndian"></span><div class="quickindex" id="quickindex.littleEndian"></div>enum Endian <code class="ddoc_psymbol">littleEndian</code>;
 <br></div></dt>
-<dd>
+<dd><div class="ddoc_summary">リトルエンディアンのデータに付与するUDA</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".bigEndian"></span><div class="quickindex" id="quickindex.bigEndian"></div>enum Endian <code class="ddoc_psymbol">bigEndian</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">ビッグエンディアンのデータに付与するUDA</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".systemEndian"></span><div class="quickindex" id="quickindex.systemEndian"></div>enum Endian <code class="ddoc_psymbol">systemEndian</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">システムのエンディアンがリトルかビッグかで切り替えが行われるUDA</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".preLength"></span><div class="quickindex" id="quickindex.preLength"></div>template <code class="ddoc_psymbol">preLength</code>(T)<br></div></dt>
+<dd><div class="ddoc_summary">配列の長さがバイナリの前方に現れる場合のUDA</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".arrayLength"></span><div class="quickindex" id="quickindex.arrayLength"></div>enum auto <code class="ddoc_psymbol">arrayLength</code>(string pred);
+<br>
+ArrayLength <code class="ddoc_psymbol">arrayLength</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(string <span class="ddoc_param">pred</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">配列の長さを計算によって行うUDA</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isInputBinary"></span><div class="quickindex" id="quickindex.isInputBinary"></div>enum bool <code class="ddoc_psymbol">isInputBinary</code>(InputRange);
+<br></div></dt>
+<dd><div class="ddoc_summary">入力対象のバイナリデータ型</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOutputBinary"></span><div class="quickindex" id="quickindex.isOutputBinary"></div>enum bool <code class="ddoc_psymbol">isOutputBinary</code>(OutputRange);
+<br></div></dt>
+<dd><div class="ddoc_summary">出力対象のバイナリデータ型</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isBasicArray"></span><div class="quickindex" id="quickindex.isBasicArray"></div>template <code class="ddoc_psymbol">isBasicArray</code>(T)<br></div></dt>
+<dd><div class="ddoc_summary">基本型要素をもつ配列</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasBinaryConvertionProxy"></span><div class="quickindex" id="quickindex.hasBinaryConvertionProxy"></div>template <code class="ddoc_psymbol">hasBinaryConvertionProxy</code>(T)<br></div></dt>
+<dd><div class="ddoc_summary">Proxy
+</div><div class="ddoc_description"><ol><li>以下の関数を持つ
+<ul><li><code class="d_inlinecode donthyphenate notranslate">void writeBinary(InputRange)(ref InputRange) const;</code></li>
+<li><code class="d_inlinecode donthyphenate notranslate">void readBinary(OutputRange)(ref OutputRange);</code></li>
+</ul></li>
+<li>【未実装】以下の関数を持つ
+<ul><li><code class="d_inlinecode donthyphenate notranslate">size_t binaryLength() const @property;</code></li>
+<li><code class="d_inlinecode donthyphenate notranslate">immutable(ubyte)[] toBinary() const;</code></li>
+<li><code class="d_inlinecode donthyphenate notranslate">void fromBinary(in byte[]);</code></li>
+</ul></li>
+<li>【未実装】型の宣言に以下のUDAを持つ
+<ul><li><code class="d_inlinecode donthyphenate notranslate">@convBy!Proxy</code>
+<ul><li>Proxy: <code class="d_inlinecode donthyphenate notranslate">void to(OutputRange)(ref T src, ref OutputRange);</code></li>
+<li>Proxy: <code class="d_inlinecode donthyphenate notranslate">void from(InputRange)(ref InputRange, ref T dst);</code></li>
+</ul></li>
+</ul></li>
+<li>【未実装】メンバの宣言に以下のUDAを持つ
+<ul><li><code class="d_inlinecode donthyphenate notranslate">@convBy!Proxy</code>
+<ul><li>Proxy type6: <code class="d_inlinecode donthyphenate notranslate">void to(OutputRange)(ref T src, ref OutputRange);</code></li>
+<li>Proxy type6: <code class="d_inlinecode donthyphenate notranslate">void from(InputRange)(ref InputRange, ref T dst);</code></li>
+</ul></li>
+</ul></li>
+<li>【未実装】メンバの宣言に以下のUDAを持つ
+<ul><li><code class="d_inlinecode donthyphenate notranslate">@preLength!Size</code></li>
+<li><code class="d_inlinecode donthyphenate notranslate">@convBy!Proxy</code> : <code class="d_inlinecode donthyphenate notranslate">immutable(ubyte)[]</code></li>
+</ul></li>
+<li>【未実装】メンバの宣言に以下のUDAを持つ
+<ul><li><code class="d_inlinecode donthyphenate notranslate">@arrayLength!"..."</code></li>
+<li><code class="d_inlinecode donthyphenate notranslate">@convBy!Proxy</code> : <code class="d_inlinecode donthyphenate notranslate">immutable(ubyte)[]</code></li>
+</ul></li>
+</ol></div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".serializeToBinDat"></span><div class="quickindex" id="quickindex.serializeToBinDat"></div>@trusted void <code class="ddoc_psymbol">serializeToBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(Endian endian, OutputRange, T)</span>(ref OutputRange <span class="ddoc_param">r</span>, in T <span class="ddoc_param">data</span>)<br><span class="ddoc_constraint">if(isOutputBinary!OutputRange &amp;&amp; isBasicType!T)</span>;
+<br>
+void <code class="ddoc_psymbol">serializeToBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(Endian endian, OutputRange, T : ubyte)</span>(ref OutputRange <span class="ddoc_param">r</span>, in T <span class="ddoc_param">data</span>)<br><span class="ddoc_constraint">if(isOutputBinary!OutputRange &amp;&amp; isBasicType!T)</span>;
+<br>
+@trusted void <code class="ddoc_psymbol">serializeToBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange, T)</span>(ref OutputRange <span class="ddoc_param">r</span>, in T <span class="ddoc_param">data</span>)<br><span class="ddoc_constraint">if(isOutputBinary!OutputRange &amp;&amp; isBasicType!T)</span>;
+<br>
+void <code class="ddoc_psymbol">serializeToBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange, T : ubyte)</span>(ref OutputRange <span class="ddoc_param">r</span>, in T <span class="ddoc_param">data</span>)<br><span class="ddoc_constraint">if(isOutputBinary!OutputRange &amp;&amp; isBasicType!T)</span>;
+<br>
+void <code class="ddoc_psymbol">serializeToBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(Endian endian, OutputRange, T)</span>(ref OutputRange <span class="ddoc_param">r</span>, in T <span class="ddoc_param">data</span>)<br><span class="ddoc_constraint">if(isOutputBinary!OutputRange &amp;&amp; isBasicArray!T)</span>;
+<br>
+void <code class="ddoc_psymbol">serializeToBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange, T)</span>(ref OutputRange <span class="ddoc_param">r</span>, in T <span class="ddoc_param">data</span>)<br><span class="ddoc_constraint">if(isOutputBinary!OutputRange &amp;&amp; isArray!T)</span>;
+<br>
+void <code class="ddoc_psymbol">serializeToBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange, T)</span>(ref OutputRange <span class="ddoc_param">r</span>, in T <span class="ddoc_param">data</span>)<br><span class="ddoc_constraint">if(isOutputBinary!OutputRange &amp;&amp; is(T == struct))</span>;
+<br>
+void <code class="ddoc_psymbol">serializeToBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange, T : Endata!U, U)</span>(ref OutputRange <span class="ddoc_param">r</span>, in T <span class="ddoc_param">data</span>)<br><span class="ddoc_constraint">if(isOutputBinary!OutputRange &amp;&amp; is(T == struct))</span>;
+<br>
+@trusted immutable(ubyte)[] <code class="ddoc_psymbol">serializeToBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>);
+<br>
+@trusted immutable(ubyte)[] <code class="ddoc_psymbol">serializeToBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(Endian endian, T)</span>(in T <span class="ddoc_param">data</span>)<br><span class="ddoc_constraint">if(isBasicType!T || isArray!T)</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">バイナリのシリアライズ</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ 基本型と列挙値
+<pre class="d_code notranslate"><span class="d_keyword">ubyte</span> a = 10;
+<span class="d_keyword">assert</span>(a.<span class="d_psymbol">serializeToBinDat</span>!littleEndian() == [10]);
+<span class="d_keyword">uint</span> b = 10;
+<span class="d_keyword">assert</span>(b.<span class="d_psymbol">serializeToBinDat</span>!bigEndian() == [0, 0, 0, 10]);
+
+<span class="d_keyword">version</span> (LittleEndian)
+	<span class="d_keyword">assert</span>(b.<span class="d_psymbol">serializeToBinDat</span>() == [10, 0, 0, 0]);
+<span class="d_keyword">version</span> (BigEndian)
+	<span class="d_keyword">assert</span>(b.<span class="d_psymbol">serializeToBinDat</span>() == [0, 0, 0, 10]);
+
+<span class="d_keyword">enum</span> E { a, b }
+E e = E.a;
+<span class="d_keyword">assert</span>(e.<span class="d_psymbol">serializeToBinDat</span>!littleEndian() == [0, 0, 0, 0]);
+e = E.b;
+<span class="d_keyword">assert</span>(e.<span class="d_psymbol">serializeToBinDat</span>!littleEndian() == [1, 0, 0, 0]);
+<span class="d_keyword">assert</span>(e.<span class="d_psymbol">serializeToBinDat</span>!bigEndian()    == [0, 0, 0, 1]);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ 配列
+<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] a = [10, 20];
+<span class="d_keyword">assert</span>(a.<span class="d_psymbol">serializeToBinDat</span>!littleEndian() == [10, 20]);
+<span class="d_keyword">uint</span>[] b = [10, 20];
+<span class="d_keyword">assert</span>(b.<span class="d_psymbol">serializeToBinDat</span>!bigEndian() == [0, 0, 0, 10, 0, 0, 0, 20]);
+
+<span class="d_keyword">version</span> (LittleEndian)
+	<span class="d_keyword">assert</span>(b.<span class="d_psymbol">serializeToBinDat</span>() == [10, 0, 0, 0, 20, 0, 0, 0]);
+<span class="d_keyword">version</span> (BigEndian)
+	<span class="d_keyword">assert</span>(b.<span class="d_psymbol">serializeToBinDat</span>() == [0, 0, 0, 10, 0, 0, 0, 20]);
+
+<span class="d_keyword">uint</span>[2] c = [1,2];
+<span class="d_keyword">assert</span>(c.<span class="d_psymbol">serializeToBinDat</span>!littleEndian() == [1, 0, 0, 0, 2, 0, 0, 0]);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ エンディアン変換
+<pre class="d_code notranslate"><span class="d_keyword">struct</span> A
+{
+	@bigEndian <span class="d_keyword">ushort</span> a;
+	@littleEndian <span class="d_keyword">ushort</span> b;
+}
+<span class="d_keyword">auto</span> a = A(10, 20);
+<span class="d_keyword">assert</span>(a.<span class="d_psymbol">serializeToBinDat</span>() == [0, 10, 20, 0]);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ 構造体
+<pre class="d_code notranslate"><span class="d_keyword">struct</span> A
+{
+	@preLength!<span class="d_keyword">ushort</span> @bigEndian <span class="d_keyword">ubyte</span>[] <span class="d_param">data</span>;
+}
+<span class="d_keyword">auto</span> a = A([10, 20]);
+<span class="d_keyword">assert</span>(a.<span class="d_psymbol">serializeToBinDat</span>() == [0, 2, 10, 20]);
+
+<span class="d_keyword">struct</span> B
+{
+	@bigEndian <span class="d_keyword">uint</span> length;
+	@arrayLength!<span class="d_string">"length"</span> @littleEndian <span class="d_keyword">ushort</span>[] <span class="d_param">data</span>;
+}
+<span class="d_keyword">auto</span> b = B(2, [10, 20]);
+<span class="d_keyword">assert</span>(b.<span class="d_psymbol">serializeToBinDat</span>() == [0, 0, 0, 2, 10, 0, 20, 0]);
+
+<span class="d_keyword">struct</span> C
+{
+	A a;
+	@bigEndian <span class="d_keyword">ushort</span>[4] x;
+	B b;
+}
+<span class="d_keyword">auto</span> c = C(A([10, 20]), [1,2,3,4], B(2, [10, 20]));
+<span class="d_keyword">assert</span>(c.<span class="d_psymbol">serializeToBinDat</span>() == [
+	0, 2, 10, 20,
+	0,1, 0,2, 0,3, 0,4,
+	0, 0, 0, 2, 10, 0, 20, 0]);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ Endata
+<pre class="d_code notranslate">@littleEndian <span class="d_keyword">enum</span> A: <span class="d_keyword">short</span>
+{
+	@bigEndian    @<span class="d_param">data</span>!<span class="d_keyword">int</span> a,
+	@littleEndian @<span class="d_param">data</span>!<span class="d_keyword">short</span> b
+}
+Endata!A a;
+a.a = 10;
+<span class="d_keyword">assert</span>(a.<span class="d_psymbol">serializeToBinDat</span>() == [0x00, 0x00, 0x00, 0x00, 0x00, 0x0a]);
+a.b = 11;
+<span class="d_keyword">assert</span>(a.<span class="d_psymbol">serializeToBinDat</span>() == [0x01, 0x00, 0x0b, 0x00]);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ Proxy
+<pre class="d_code notranslate"><span class="d_keyword">struct</span> A
+{
+	<span class="d_keyword">int</span> a;
+	<span class="d_keyword">void</span> writeBinary(OutputRange)(<span class="d_keyword">ref</span> OutputRange <span class="d_param">r</span>) <span class="d_keyword">const</span>
+	<span class="d_keyword">if</span> (isOutputBinary!OutputRange)
+	{
+		<span class="d_param">r</span>.put(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)(a + 100));
+	}
+	<span class="d_keyword">void</span> readBinary(InputRange)(<span class="d_keyword">ref</span> InputRange <span class="d_param">r</span>)
+	<span class="d_keyword">if</span> (isInputBinary!InputRange)
+	{
+		a = <span class="d_param">r</span>.front - 100;
+		<span class="d_param">r</span>.popFront();
+	}
+}
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(hasBinaryConvertionProxy!A);
+A a = A(-10);
+<span class="d_keyword">assert</span>(a.<span class="d_psymbol">serializeToBinDat</span>() == [90]);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".deserializeFromBinDat"></span><div class="quickindex" id="quickindex.deserializeFromBinDat"></div>void <code class="ddoc_psymbol">deserializeFromBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(Endian endian, T, InputRange)</span>(ref T <span class="ddoc_param">dst</span>, ref InputRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputBinary!InputRange &amp;&amp; isBasicType!T)</span>;
+<br>
+void <code class="ddoc_psymbol">deserializeFromBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(T, InputRange)</span>(ref T <span class="ddoc_param">dst</span>, ref InputRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputBinary!InputRange &amp;&amp; isBasicType!T)</span>;
+<br>
+void <code class="ddoc_psymbol">deserializeFromBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(Endian endian, T, InputRange)</span>(ref T <span class="ddoc_param">dst</span>, ref InputRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputBinary!InputRange &amp;&amp; isBasicArray!T)</span>;
+<br>
+void <code class="ddoc_psymbol">deserializeFromBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(T, InputRange)</span>(ref T <span class="ddoc_param">dst</span>, ref InputRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputBinary!InputRange &amp;&amp; isArray!T)</span>;
+<br>
+void <code class="ddoc_psymbol">deserializeFromBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(T, InputRange)</span>(ref T <span class="ddoc_param">dst</span>, ref InputRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputBinary!InputRange &amp;&amp; is(T == struct))</span>;
+<br>
+void <code class="ddoc_psymbol">deserializeFromBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(T : Endata!U, InputRange, U)</span>(ref T <span class="ddoc_param">dst</span>, ref InputRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputBinary!InputRange &amp;&amp; is(T == struct))</span>;
+<br>
+void <code class="ddoc_psymbol">deserializeFromBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(Endian endian, T, InputRange)</span>(ref T <span class="ddoc_param">dst</span>, InputRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputBinary!InputRange)</span>;
+<br>
+void <code class="ddoc_psymbol">deserializeFromBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(T, InputRange)</span>(ref T <span class="ddoc_param">dst</span>, InputRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputBinary!InputRange)</span>;
+<br>
+T <code class="ddoc_psymbol">deserializeFromBinDat</code><span class="ddoc_template_param_list" title="Template parameter list">(T, InputRange)</span>(InputRange <span class="ddoc_param">r</span>)<br><span class="ddoc_constraint">if(isInputBinary!InputRange)</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">バイナリのデシリアライズ</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ 基本型と列挙値
+<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<span class="d_keyword">ubyte</span> a;
+a.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(10));
+<span class="d_keyword">assert</span>(a == 10);
+
+<span class="d_keyword">uint</span> b;
+b.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(bin(0, 0, 0, 10));
+<span class="d_keyword">assert</span>(b == 10);
+
+<span class="d_keyword">version</span> (LittleEndian)
+	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(10, 0, 0, 0));
+<span class="d_keyword">version</span> (BigEndian)
+	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 0, 0, 10));
+<span class="d_keyword">assert</span>(b == 10);
+
+<span class="d_keyword">enum</span> E { a, b }
+E e;
+e.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(0, 0, 0, 0));
+<span class="d_keyword">assert</span>(e == E.a);
+e.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(1, 0, 0, 0));
+<span class="d_keyword">assert</span>(e == E.b);
+e.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(bin(0, 0, 0, 1));
+<span class="d_keyword">assert</span>(e == E.b);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ 配列
+<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<span class="d_keyword">ubyte</span>[] a = <span class="d_keyword">new</span> <span class="d_keyword">ubyte</span>[2];
+a.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(10, 20));
+<span class="d_keyword">assert</span>(a == [10, 20]);
+<span class="d_keyword">uint</span>[] b = <span class="d_keyword">new</span> <span class="d_keyword">uint</span>[2];
+b.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(bin(0, 0, 0, 10, 0, 0, 0, 20));
+<span class="d_keyword">assert</span>(b == [10, 20]);
+
+<span class="d_keyword">version</span> (LittleEndian)
+	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(10, 0, 0, 0, 20, 0, 0, 0));
+<span class="d_keyword">version</span> (BigEndian)
+	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 0, 0, 10, 0, 0, 0, 20));
+<span class="d_keyword">assert</span>(b == [10, 20]);
+
+<span class="d_keyword">uint</span>[2] c;
+c.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(1, 0, 0, 0, 2, 0, 0, 0));
+<span class="d_keyword">assert</span>(c == [1, 2]);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ エンディアン変換
+<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<span class="d_keyword">struct</span> A
+{
+	@bigEndian <span class="d_keyword">ushort</span> a;
+	@littleEndian <span class="d_keyword">ushort</span> b;
+}
+A a;
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 10, 20, 0));
+<span class="d_keyword">assert</span>(a == A(10, 20));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ 構造体
+<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<span class="d_keyword">struct</span> A
+{
+	@preLength!<span class="d_keyword">ushort</span> @bigEndian <span class="d_keyword">ubyte</span>[] data;
+}
+A a;
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 2, 10, 20));
+<span class="d_keyword">assert</span> (a == A([10, 20]));
+
+<span class="d_keyword">struct</span> B
+{
+	@bigEndian <span class="d_keyword">uint</span> length;
+	@arrayLength!<span class="d_string">"length"</span> @littleEndian <span class="d_keyword">ushort</span>[] data;
+}
+B b;
+b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 0, 0, 2, 10, 0, 20, 0));
+<span class="d_keyword">assert</span>(b == B(2, [10, 20]));
+
+<span class="d_keyword">struct</span> C
+{
+	A a;
+	@bigEndian <span class="d_keyword">ushort</span>[4] x;
+	B b;
+}
+C c;
+c.<span class="d_psymbol">deserializeFromBinDat</span>(bin(
+	0, 2, 10, 20,
+	0,1, 0,2, 0,3, 0,4,
+	0, 0, 0, 2, 10, 0, 20, 0));
+<span class="d_keyword">assert</span>(c == C(A([10, 20]), [1,2,3,4], B(2, [10, 20])));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ Endata
+<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+@littleEndian <span class="d_keyword">enum</span> A: <span class="d_keyword">short</span>
+{
+	@bigEndian    @data!<span class="d_keyword">int</span> a,
+	@littleEndian @data!<span class="d_keyword">short</span> b
+}
+Endata!A a;
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0x00, 0x00, 0x00, 0x00, 0x00, 0x0a));
+Endata!A tmp;
+tmp.a = 10;
+<span class="d_keyword">assert</span>(a == tmp);
+
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0x01, 0x00, 0x0b, 0x00));
+tmp.b = 11;
+<span class="d_keyword">assert</span>(a == tmp);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ Proxy
+<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<span class="d_keyword">struct</span> A
+{
+	<span class="d_keyword">int</span> a;
+	<span class="d_keyword">void</span> writeBinary(OutputRange)(<span class="d_keyword">ref</span> OutputRange <span class="d_param">r</span>) <span class="d_keyword">const</span>
+	<span class="d_keyword">if</span> (isOutputBinary!OutputRange)
+	{
+		<span class="d_param">r</span>.put(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)(a + 100));
+	}
+	<span class="d_keyword">void</span> readBinary(InputRange)(<span class="d_keyword">ref</span> InputRange <span class="d_param">r</span>)
+	<span class="d_keyword">if</span> (isInputBinary!InputRange)
+	{
+		a = <span class="d_param">r</span>.front - 100;
+		<span class="d_param">r</span>.popFront();
+	}
+}
+A a;
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(90));
+<span class="d_keyword">assert</span>(a == A(-10));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ バイナリの解析
+
+<ul><li>[0-2] タグタイプ
+<ul><li>if [0-2]が 0x0001
+<ul><li>[2-4] 長さ</li>
+<li>[4-X] ペイロード</li>
+</ul></li>
+<li>if [0-2]が 0x0002
+<ul><li>[2] コマンド種別
+<ul><li>if [2] が 0x01
+<ul><li>[3-5] 付与データ</li>
+</ul></li>
+<li>if [2] が 0x02
+<ul><li>(なし)</li>
+</ul></li>
+<li>if [2] が 0x03
+<ul><li>[3.0]     フラグ1</li>
+<li>[3.1-3.3] フラグ2</li>
+<li>[3.3-3.6] reserved</li>
+<li>[3.7]     フラグ8</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+<pre class="d_code notranslate"><span class="d_keyword">import</span> voile.munion;
+<span class="d_keyword">struct</span> TypeAPayload
+{
+	@bigEndian @preLength!<span class="d_keyword">ushort</span> <span class="d_keyword">ubyte</span>[] payload;
+}
+<span class="d_keyword">struct</span> TypeBPayload
+{
+	<span class="d_keyword">struct</span> CommandAPayload
+	{
+		@bigEndian <span class="d_keyword">ushort</span> payload;
+	}
+	<span class="d_keyword">struct</span> CommandCPayload
+	{
+		<span class="d_keyword">ubyte</span> flag1;
+		<span class="d_keyword">ubyte</span> flag2;
+		<span class="d_keyword">ubyte</span> flag7;
+	}
+	<span class="d_keyword">enum</span> CommandType: <span class="d_keyword">ubyte</span>
+	{
+		@data!CommandAPayload
+		a = 0x0001,
+		b = 0x0002,
+		@data!CommandCPayload
+		c = 0x0003,
+	}
+	@bigEndian Endata!CommandType commandType;
+}
+@bigEndian <span class="d_keyword">enum</span> TagType: <span class="d_keyword">ushort</span>
+{
+	@data!TypeAPayload
+	a = 0x0001,
+	@data!TypeBPayload
+	b = 0x0002,
+}
+Endata!TagType bindat;
+
+<span class="d_keyword">static</span> <span class="d_keyword">immutable</span> <span class="d_keyword">ubyte</span>[] binary1 = [
+	0x00, 0x01, <span class="d_comment">// [0-2] タグタイプ
+</span>	0x00, 0x04, <span class="d_comment">// [2-4] 長さ
+</span>	0x00, 0x01, 0x02, 0x03 <span class="d_comment">// [4-X] ペイロード
+</span>];
+bindat.<span class="d_psymbol">deserializeFromBinDat</span>(binary1[]);
+<span class="d_keyword">assert</span>(bindat.tag == TagType.a);
+<span class="d_keyword">assert</span>(bindat.a.payload == [0x00, 0x01, 0x02, 0x03]);
+
+<span class="d_keyword">static</span> <span class="d_keyword">immutable</span> <span class="d_keyword">ubyte</span>[] binary2 = [
+	0x00, 0x02, <span class="d_comment">// [0-2] タグタイプ
+</span>	0x01, <span class="d_comment">// [2] コマンド種別
+</span>	0x00, 0x01 <span class="d_comment">// [3-5] 付与データ
+</span>];
+bindat.<span class="d_psymbol">deserializeFromBinDat</span>(binary2[]);
+<span class="d_keyword">assert</span>(bindat.tag == TagType.b);
+<span class="d_keyword">assert</span>(bindat.b.commandType.tag == TypeBPayload.CommandType.a);
+<span class="d_keyword">assert</span>(bindat.b.commandType.a.payload == 0x0001);
+</pre>
+</div>
 </dd>
 </div></dl>
 
