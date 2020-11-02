@@ -306,7 +306,7 @@ if (isOutputBinary!OutputRange && isBasicArray!T)
 {
 	static if (is(Unqual!T: const(ubyte)[]))
 	{
-		r.put(data);
+		r.put(data[]);
 	}
 	else
 	{
@@ -485,6 +485,9 @@ if (isBasicType!T || isArray!T)
 	
 	uint[2] c = [1,2];
 	assert(c.serializeToBinDat!littleEndian() == [1, 0, 0, 0, 2, 0, 0, 0]);
+	
+	ubyte[8] d = [1,2,3,4,5,6,7,8];
+	assert(d.serializeToBinDat() == [1,2,3,4,5,6,7,8]);
 }
 /// エンディアン変換
 @safe unittest
@@ -813,6 +816,10 @@ if (isInputBinary!InputRange)
 	uint[2] c;
 	c.deserializeFromBinDat!littleEndian(bin(1, 0, 0, 0, 2, 0, 0, 0));
 	assert(c == [1, 2]);
+	
+	ubyte[8] d;
+	d.deserializeFromBinDat(bin(1, 0, 0, 0, 2, 0, 0, 0));
+	assert(d == [1, 0, 0, 0, 2, 0, 0, 0]);
 }
 
 /// エンディアン変換
