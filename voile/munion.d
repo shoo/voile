@@ -651,6 +651,44 @@ if (is(U == union))
 	assert(dat.str == "xxx");
 }
 
+/*******************************************************************************
+ * Taggedの構築
+ */
+Tagged!U tagged(U, size_t memberIndex, Args...)(auto ref Args args)
+{
+	alias TU = Tagged!U;
+	enum tag = TaggedImpl!TU._impl.getTag!memberIndex;
+	TU dat;
+	dat.initialize!tag(args);
+	return dat;
+}
+/// ditto
+Tagged!U tagged(U, string memberName, Args...)(auto ref Args args)
+{
+	alias TU = Tagged!U;
+	enum tag = TaggedImpl!U.getTag!memberName;
+	TU dat;
+	dat.getInstance()._impl.initialize!tag(args);
+	return dat;
+}
+///
+@safe pure nothrow @nogc unittest
+{
+	union U
+	{
+		uint   x;
+		uint   y;
+	}
+	
+	auto dat = tagged!(U, 0)(10);
+	assert(dat.tag == 0);
+	assert(dat.x == 10);
+	
+	dat = tagged!(U, "y")(20);
+	assert(dat.tag == 1);
+	assert(dat.y == 20);
+}
+
 private union EndataImpl(E)
 {
 	union Instance
@@ -800,6 +838,31 @@ if (is(E == enum))
 	dat.number = 10;
 	assert(dat.tag == number);
 	assert(dat.number == 10);
+}
+
+/*******************************************************************************
+ * Endataの構築
+ */
+Endata!(typeof(tag)) endata(alias tag, Args...)(auto ref Args payload)
+{
+	Endata!(typeof(tag)) dat;
+	dat.initialize!tag(payload);
+	return dat;
+}
+
+///
+@safe pure nothrow @nogc unittest
+{
+	enum E
+	{
+		@data!int id,
+		@data!int number,
+	}
+	mixin EnumMemberAlieses!E;
+	
+	auto dat = endata!id(10);
+	assert(dat.tag == id);
+	assert(dat.id == 10);
 }
 
 /*******************************************************************************
