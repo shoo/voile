@@ -173,6 +173,9 @@ e = E.b;
 
 <span class="d_keyword">uint</span>[2] c = [1,2];
 <span class="d_keyword">assert</span>(c.<span class="d_psymbol">serializeToBinDat</span>!littleEndian() == [1, 0, 0, 0, 2, 0, 0, 0]);
+
+<span class="d_keyword">ubyte</span>[8] d = [1,2,3,4,5,6,7,8];
+<span class="d_keyword">assert</span>(d.<span class="d_psymbol">serializeToBinDat</span>() == [1,2,3,4,5,6,7,8]);
 </pre>
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
@@ -317,6 +320,10 @@ b.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(bin(0, 0, 0, 10
 <span class="d_keyword">uint</span>[2] c;
 c.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(1, 0, 0, 0, 2, 0, 0, 0));
 <span class="d_keyword">assert</span>(c == [1, 2]);
+
+<span class="d_keyword">ubyte</span>[8] d;
+d.<span class="d_psymbol">deserializeFromBinDat</span>(bin(1, 0, 0, 0, 2, 0, 0, 0));
+<span class="d_keyword">assert</span>(d == [1, 0, 0, 0, 2, 0, 0, 0]);
 </pre>
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>

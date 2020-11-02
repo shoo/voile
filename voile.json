@@ -3495,62 +3495,62 @@
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 490,
+    "endline" : 493,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L490_C7",
+    "name" : "__unittest_L493_C7",
     "kind" : "function",
     "comment" : "エンディアン変換\n",
-    "line" : 490,
+    "line" : 493,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 501,
+    "endline" : 504,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L501_C7",
+    "name" : "__unittest_L504_C7",
     "kind" : "function",
     "comment" : "構造体\n",
-    "line" : 501,
+    "line" : 504,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 531,
+    "endline" : 534,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L531_C7",
+    "name" : "__unittest_L534_C7",
     "kind" : "function",
     "comment" : "Endata\n",
-    "line" : 531,
+    "line" : 534,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 546,
+    "endline" : 549,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L546_C7",
+    "name" : "__unittest_L549_C7",
     "kind" : "function",
     "comment" : "Proxy\n",
-    "line" : 546,
+    "line" : 549,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 571,
+    "endline" : 574,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
     "comment" : " 入力レンジから所定のバイト数を消費\n",
-    "line" : 571,
+    "line" : 574,
     "char" : 14,
     "name" : "consume",
     "parameters" : [
@@ -3568,7 +3568,7 @@
      {
       "name" : "consume",
       "kind" : "function",
-      "line" : 571,
+      "line" : 574,
       "char" : 14,
       "type" : "@trusted void(ref T dst, ref InputRange r)",
       "parameters" : [
@@ -3587,7 +3587,7 @@
         ]
        }
       ],
-      "endline" : 590,
+      "endline" : 593,
       "endchar" : 1
      }
     ]
@@ -3595,7 +3595,7 @@
    {
     "kind" : "template",
     "comment" : " バイナリのデシリアライズ\n",
-    "line" : 595,
+    "line" : 598,
     "char" : 6,
     "name" : "deserializeFromBinDat",
     "parameters" : [
@@ -3618,7 +3618,7 @@
      {
       "name" : "deserializeFromBinDat",
       "kind" : "function",
-      "line" : 595,
+      "line" : 598,
       "char" : 6,
       "type" : "void(ref T dst, ref InputRange r)",
       "parameters" : [
@@ -3637,7 +3637,7 @@
         ]
        }
       ],
-      "endline" : 601,
+      "endline" : 604,
       "endchar" : 1
      }
     ]
@@ -3645,7 +3645,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 603,
+    "line" : 606,
     "char" : 6,
     "name" : "deserializeFromBinDat",
     "parameters" : [
@@ -3663,7 +3663,7 @@
      {
       "name" : "deserializeFromBinDat",
       "kind" : "function",
-      "line" : 603,
+      "line" : 606,
       "char" : 6,
       "type" : "void(ref T dst, ref InputRange r)",
       "parameters" : [
@@ -3682,7 +3682,7 @@
         ]
        }
       ],
-      "endline" : 607,
+      "endline" : 610,
       "endchar" : 1
      }
     ]
@@ -3690,7 +3690,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 609,
+    "line" : 612,
     "char" : 6,
     "name" : "deserializeFromBinDat",
     "parameters" : [
@@ -3713,7 +3713,7 @@
      {
       "name" : "deserializeFromBinDat",
       "kind" : "function",
-      "line" : 609,
+      "line" : 612,
       "char" : 6,
       "type" : "void(ref T dst, ref InputRange r)",
       "parameters" : [
@@ -3732,7 +3732,7 @@
         ]
        }
       ],
-      "endline" : 618,
+      "endline" : 621,
       "endchar" : 1
      }
     ]
@@ -3740,7 +3740,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 620,
+    "line" : 623,
     "char" : 6,
     "name" : "deserializeFromBinDat",
     "parameters" : [
@@ -3758,7 +3758,7 @@
      {
       "name" : "deserializeFromBinDat",
       "kind" : "function",
-      "line" : 620,
+      "line" : 623,
       "char" : 6,
       "type" : "void(ref T dst, ref InputRange r)",
       "parameters" : [
@@ -3777,7 +3777,7 @@
         ]
        }
       ],
-      "endline" : 632,
+      "endline" : 635,
       "endchar" : 1
      }
     ]
@@ -3785,7 +3785,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 634,
+    "line" : 637,
     "char" : 6,
     "name" : "deserializeFromBinDat",
     "parameters" : [
@@ -3803,7 +3803,7 @@
      {
       "name" : "deserializeFromBinDat",
       "kind" : "function",
-      "line" : 634,
+      "line" : 637,
       "char" : 6,
       "type" : "void(ref T dst, ref InputRange r)",
       "parameters" : [
@@ -3822,7 +3822,7 @@
         ]
        }
       ],
-      "endline" : 704,
+      "endline" : 707,
       "endchar" : 1
      }
     ]
@@ -3830,7 +3830,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 706,
+    "line" : 709,
     "char" : 6,
     "name" : "deserializeFromBinDat",
     "parameters" : [
@@ -3853,7 +3853,7 @@
      {
       "name" : "deserializeFromBinDat",
       "kind" : "function",
-      "line" : 706,
+      "line" : 709,
       "char" : 6,
       "type" : "void(ref T dst, ref InputRange r)",
       "parameters" : [
@@ -3872,7 +3872,7 @@
         ]
        }
       ],
-      "endline" : 746,
+      "endline" : 749,
       "endchar" : 1
      }
     ]
@@ -3880,7 +3880,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 748,
+    "line" : 751,
     "char" : 6,
     "name" : "deserializeFromBinDat",
     "parameters" : [
@@ -3903,7 +3903,7 @@
      {
       "name" : "deserializeFromBinDat",
       "kind" : "function",
-      "line" : 748,
+      "line" : 751,
       "char" : 6,
       "type" : "void(ref T dst, InputRange r)",
       "parameters" : [
@@ -3919,7 +3919,7 @@
         "type" : "InputRange"
        }
       ],
-      "endline" : 752,
+      "endline" : 755,
       "endchar" : 1
      }
     ]
@@ -3927,7 +3927,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 754,
+    "line" : 757,
     "char" : 6,
     "name" : "deserializeFromBinDat",
     "parameters" : [
@@ -3945,7 +3945,7 @@
      {
       "name" : "deserializeFromBinDat",
       "kind" : "function",
-      "line" : 754,
+      "line" : 757,
       "char" : 6,
       "type" : "void(ref T dst, InputRange r)",
       "parameters" : [
@@ -3961,7 +3961,7 @@
         "type" : "InputRange"
        }
       ],
-      "endline" : 758,
+      "endline" : 761,
       "endchar" : 1
      }
     ]
@@ -3969,7 +3969,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 760,
+    "line" : 763,
     "char" : 3,
     "name" : "deserializeFromBinDat",
     "parameters" : [
@@ -3987,7 +3987,7 @@
      {
       "name" : "deserializeFromBinDat",
       "kind" : "function",
-      "line" : 760,
+      "line" : 763,
       "char" : 3,
       "type" : "T(InputRange r)",
       "parameters" : [
@@ -3996,93 +3996,93 @@
         "type" : "InputRange"
        }
       ],
-      "endline" : 766,
+      "endline" : 769,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L769_C7",
+    "name" : "__unittest_L772_C7",
     "kind" : "function",
     "comment" : "基本型と列挙値\n",
-    "line" : 769,
+    "line" : 772,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 797,
+    "endline" : 800,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L797_C7",
+    "name" : "__unittest_L800_C7",
     "kind" : "function",
     "comment" : "配列\n",
-    "line" : 797,
+    "line" : 800,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 819,
+    "endline" : 826,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L819_C7",
+    "name" : "__unittest_L826_C7",
     "kind" : "function",
     "comment" : "エンディアン変換\n",
-    "line" : 819,
+    "line" : 826,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 833,
+    "endline" : 840,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L833_C7",
+    "name" : "__unittest_L840_C7",
     "kind" : "function",
     "comment" : "構造体\n",
-    "line" : 833,
+    "line" : 840,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 868,
+    "endline" : 875,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L868_C7",
+    "name" : "__unittest_L875_C7",
     "kind" : "function",
     "comment" : "Endata\n",
-    "line" : 868,
+    "line" : 875,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 888,
+    "endline" : 895,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L888_C7",
+    "name" : "__unittest_L895_C7",
     "kind" : "function",
     "comment" : "Proxy\n",
-    "line" : 888,
+    "line" : 895,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 930,
+    "endline" : 937,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L930_C7",
+    "name" : "__unittest_L937_C7",
     "kind" : "function",
     "comment" : " バイナリの解析\n\n - [0-2] タグタイプ\n   - if [0-2]が 0x0001\n     - [2-4] 長さ\n     - [4-X] ペイロード\n   - if [0-2]が 0x0002\n     - [2] コマンド種別\n       - if [2] が 0x01\n         - [3-5] 付与データ\n       - if [2] が 0x02\n         - (なし)\n       - if [2] が 0x03\n         - [3.0]     フラグ1\n         - [3.1-3.3] フラグ2\n         - [3.3-3.6] reserved\n         - [3.7]     フラグ8\n",
-    "line" : 930,
+    "line" : 937,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 987,
+    "endline" : 994,
     "endchar" : 1
    }
   ]
