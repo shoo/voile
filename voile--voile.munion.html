@@ -159,6 +159,27 @@ void <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_para
 </dd>
 </div></dl>
 </dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".tagged"></span><div class="quickindex" id="quickindex.tagged"></div>Tagged!U <code class="ddoc_psymbol">tagged</code>(U, size_t memberIndex, Args...)(auto ref Args <span class="ddoc_param">args</span>);
+<br>
+Tagged!U <code class="ddoc_psymbol">tagged</code><span class="ddoc_template_param_list" title="Template parameter list">(U, string memberName, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Taggedの構築</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">union</span> U
+{
+	<span class="d_keyword">uint</span>   x;
+	<span class="d_keyword">uint</span>   y;
+}
+
+<span class="d_keyword">auto</span> dat = <span class="d_psymbol">tagged</span>!(U, 0)(10);
+<span class="d_keyword">assert</span>(dat.tag == 0);
+<span class="d_keyword">assert</span>(dat.x == 10);
+
+dat = <span class="d_psymbol">tagged</span>!(U, <span class="d_string">"y"</span>)(20);
+<span class="d_keyword">assert</span>(dat.tag == 1);
+<span class="d_keyword">assert</span>(dat.y == 20);
+</pre>
+</div>
+</dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata"></span><div class="quickindex" id="quickindex.Endata"></div>struct <code class="ddoc_psymbol">Endata</code>(E) if (is(E == enum));
 <br></div></dt>
 <dd><div class="ddoc_summary">データ付きのenum</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
@@ -210,6 +231,22 @@ void <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_para
 <br></div></dt>
 <dd><div class="ddoc_summary">名前アクセス</div></dd>
 </div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".endata"></span><div class="quickindex" id="quickindex.endata"></div>Endata!(typeof(tag)) <code class="ddoc_psymbol">endata</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, Args...)</span>(auto ref Args <span class="ddoc_param">payload</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Endataの構築</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">enum</span> E
+{
+	@data!<span class="d_keyword">int</span> id,
+	@data!<span class="d_keyword">int</span> number,
+}
+<span class="d_keyword">mixin</span> EnumMemberAlieses!E;
+
+<span class="d_keyword">auto</span> dat = <span class="d_psymbol">endata</span>!id(10);
+<span class="d_keyword">assert</span>(dat.tag == id);
+<span class="d_keyword">assert</span>(dat.id == 10);
+</pre>
+</div>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".ManagedUnion"></span><div class="quickindex" id="quickindex.ManagedUnion"></div>template <code class="ddoc_psymbol">ManagedUnion</code>(Types...) if (Types.length &gt; 0)<br></div></dt>
 <dd><div class="ddoc_summary">引数によって実装を切り替えるManagedUnion

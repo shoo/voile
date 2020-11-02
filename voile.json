@@ -20436,13 +20436,114 @@
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 654,
+    "endline" : 657,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "comment" : " Taggedの構築\n",
+    "line" : 657,
+    "char" : 10,
+    "name" : "tagged",
+    "parameters" : [
+     {
+      "name" : "U",
+      "kind" : "type"
+     },
+     {
+      "name" : "memberIndex",
+      "kind" : "value",
+      "deco" : "m"
+     },
+     {
+      "name" : "Args",
+      "kind" : "tuple"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "tagged",
+      "kind" : "function",
+      "line" : 657,
+      "char" : 10,
+      "type" : "Tagged!U(auto ref Args args)",
+      "parameters" : [
+       {
+        "name" : "args",
+        "type" : "Args",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 664,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "comment" : "ditto\n",
+    "line" : 666,
+    "char" : 10,
+    "name" : "tagged",
+    "parameters" : [
+     {
+      "name" : "U",
+      "kind" : "type"
+     },
+     {
+      "name" : "memberName",
+      "kind" : "value",
+      "deco" : "Aya"
+     },
+     {
+      "name" : "Args",
+      "kind" : "tuple"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "tagged",
+      "kind" : "function",
+      "line" : 666,
+      "char" : 10,
+      "type" : "Tagged!U(auto ref Args args)",
+      "parameters" : [
+       {
+        "name" : "args",
+        "type" : "Args",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 673,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L675_C26",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 675,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 692,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 654,
+    "line" : 692,
     "char" : 9,
     "name" : "EndataImpl",
     "parameters" : [
@@ -20455,39 +20556,39 @@
      {
       "name" : "EndataImpl",
       "kind" : "union",
-      "line" : 654,
+      "line" : 692,
       "char" : 9,
       "members" : [
        {
         "name" : "Instance",
         "kind" : "union",
-        "line" : 656,
+        "line" : 694,
         "char" : 2,
         "members" : []
        },
        {
         "name" : "tags",
         "kind" : "alias",
-        "line" : 664,
+        "line" : 702,
         "char" : 2,
         "type" : "Filter!(hasData, EnumMembers!E)"
        },
        {
         "name" : "ManagedUnionImpl!(Instance, tags)",
         "kind" : "mixin",
-        "line" : 665,
+        "line" : 703,
         "char" : 2
        },
        {
         "name" : "memberNames",
         "kind" : "alias",
-        "line" : 666,
+        "line" : 704,
         "char" : 2,
         "type" : "FieldNameTuple!Instance"
        },
        {
         "kind" : "template",
-        "line" : 667,
+        "line" : 705,
         "char" : 23,
         "name" : "getIndex",
         "parameters" : [
@@ -20501,7 +20602,7 @@
          {
           "name" : "getIndex",
           "kind" : "variable",
-          "line" : 667,
+          "line" : 705,
           "char" : 23,
           "storageClass" : [
            "enum"
@@ -20513,7 +20614,7 @@
        },
        {
         "kind" : "template",
-        "line" : 668,
+        "line" : 706,
         "char" : 23,
         "name" : "getTag",
         "parameters" : [
@@ -20527,7 +20628,7 @@
          {
           "name" : "getTag",
           "kind" : "variable",
-          "line" : 668,
+          "line" : 706,
           "char" : 23,
           "storageClass" : [
            "enum"
@@ -20539,7 +20640,7 @@
        },
        {
         "kind" : "template",
-        "line" : 669,
+        "line" : 707,
         "char" : 2,
         "name" : "MemberType",
         "parameters" : [
@@ -20553,7 +20654,7 @@
          {
           "name" : "MemberType",
           "kind" : "alias",
-          "line" : 669,
+          "line" : 707,
           "char" : 2,
           "type" : "_impl.MemberTypes[getIndex!member]"
          }
@@ -20566,7 +20667,7 @@
    {
     "kind" : "template",
     "comment" : " データ付きのenum\n",
-    "line" : 676,
+    "line" : 714,
     "char" : 1,
     "name" : "Endata",
     "parameters" : [
@@ -20580,13 +20681,13 @@
      {
       "name" : "Endata",
       "kind" : "struct",
-      "line" : 676,
+      "line" : 714,
       "char" : 1,
       "members" : [
        {
         "kind" : "template",
         "comment" : " 等号演算子オーバーロード\n",
-        "line" : 684,
+        "line" : 722,
         "char" : 7,
         "name" : "opEquals",
         "parameters" : [],
@@ -20594,7 +20695,7 @@
          {
           "name" : "opEquals",
           "kind" : "function",
-          "line" : 684,
+          "line" : 722,
           "char" : 7,
           "type" : "const bool(Endata rhs)",
           "parameters" : [
@@ -20603,7 +20704,7 @@
             "type" : "Endata"
            }
           ],
-          "endline" : 699,
+          "endline" : 737,
           "endchar" : 2
          }
         ]
@@ -20611,7 +20712,7 @@
        {
         "kind" : "template",
         "comment" : " ハッシュ\n",
-        "line" : 704,
+        "line" : 742,
         "char" : 9,
         "name" : "toHash",
         "parameters" : [],
@@ -20619,10 +20720,10 @@
          {
           "name" : "toHash",
           "kind" : "function",
-          "line" : 704,
+          "line" : 742,
           "char" : 9,
           "type" : "const size_t()",
-          "endline" : 719,
+          "endline" : 757,
           "endchar" : 2
          }
         ]
@@ -20630,7 +20731,7 @@
        {
         "kind" : "template",
         "comment" : " 名前アクセス\n",
-        "line" : 724,
+        "line" : 762,
         "char" : 11,
         "name" : "opDispatch",
         "parameters" : [
@@ -20645,13 +20746,13 @@
          {
           "name" : "opDispatch",
           "kind" : "function",
-          "line" : 724,
+          "line" : 762,
           "char" : 11,
           "storageClass" : [
            "auto"
           ],
           "type" : "ref ()",
-          "endline" : 728,
+          "endline" : 766,
           "endchar" : 2
          }
         ]
@@ -20659,7 +20760,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 730,
+        "line" : 768,
         "char" : 7,
         "name" : "opDispatch",
         "parameters" : [
@@ -20674,7 +20775,7 @@
          {
           "name" : "opDispatch",
           "kind" : "function",
-          "line" : 730,
+          "line" : 768,
           "char" : 7,
           "type" : "void(auto ref EndataImpl!E.MemberType!member val)",
           "parameters" : [
@@ -20687,7 +20788,7 @@
             ]
            }
           ],
-          "endline" : 734,
+          "endline" : 772,
           "endchar" : 2
          }
         ]
@@ -20697,10 +20798,10 @@
     ]
    },
    {
-    "name" : "__unittest_L738_C26",
+    "name" : "__unittest_L776_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 738,
+    "line" : 776,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -20708,26 +20809,79 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 776,
+    "endline" : 814,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L776_C20",
+    "name" : "__unittest_L814_C20",
     "kind" : "function",
-    "line" : 776,
+    "line" : 814,
     "char" : 20,
     "storageClass" : [
      "nothrow",
      "pure",
      "@safe"
     ],
-    "endline" : 812,
+    "endline" : 846,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "comment" : " Endataの構築\n",
+    "line" : 846,
+    "char" : 22,
+    "name" : "endata",
+    "parameters" : [
+     {
+      "name" : "tag",
+      "kind" : "alias"
+     },
+     {
+      "name" : "Args",
+      "kind" : "tuple"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "endata",
+      "kind" : "function",
+      "line" : 846,
+      "char" : 22,
+      "type" : "Endata!(typeof(tag))(auto ref Args payload)",
+      "parameters" : [
+       {
+        "name" : "payload",
+        "type" : "Args",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 851,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L854_C26",
+    "kind" : "function",
+    "comment" : "\n",
+    "line" : 854,
+    "char" : 26,
+    "storageClass" : [
+     "nothrow",
+     "pure",
+     "@nogc",
+     "@safe"
+    ],
+    "endline" : 875,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " 引数によって実装を切り替えるManagedUnion\n\n - 引数が1つでunionならTaggedになる\n - 引数が1つでenumならEndataになる\n - それ以外ならTypeEnumになる\n",
-    "line" : 812,
+    "line" : 875,
     "char" : 1,
     "name" : "ManagedUnion",
     "parameters" : [
@@ -20741,7 +20895,7 @@
      {
       "name" : "ManagedUnion",
       "kind" : "alias",
-      "line" : 817,
+      "line" : 880,
       "char" : 3,
       "type" : "Tagged!Types"
      }
@@ -20750,7 +20904,7 @@
    {
     "kind" : "template",
     "comment" : " TypeEnumか判定する\n",
-    "line" : 834,
+    "line" : 897,
     "char" : 11,
     "name" : "isTypeEnum",
     "parameters" : [
@@ -20763,7 +20917,7 @@
      {
       "name" : "isTypeEnum",
       "kind" : "variable",
-      "line" : 834,
+      "line" : 897,
       "char" : 11,
       "storageClass" : [
        "enum"
@@ -20776,7 +20930,7 @@
    {
     "kind" : "template",
     "comment" : " Taggedか判定する\n",
-    "line" : 839,
+    "line" : 902,
     "char" : 11,
     "name" : "isTagged",
     "parameters" : [
@@ -20789,7 +20943,7 @@
      {
       "name" : "isTagged",
       "kind" : "variable",
-      "line" : 839,
+      "line" : 902,
       "char" : 11,
       "storageClass" : [
        "enum"
@@ -20802,7 +20956,7 @@
    {
     "kind" : "template",
     "comment" : " Endataか判定する\n",
-    "line" : 844,
+    "line" : 907,
     "char" : 11,
     "name" : "isEndata",
     "parameters" : [
@@ -20815,7 +20969,7 @@
      {
       "name" : "isEndata",
       "kind" : "variable",
-      "line" : 844,
+      "line" : 907,
       "char" : 11,
       "storageClass" : [
        "enum"
@@ -20828,7 +20982,7 @@
    {
     "kind" : "template",
     "comment" : " ManagedUnionか判定する\n",
-    "line" : 849,
+    "line" : 912,
     "char" : 11,
     "name" : "isManagedUnion",
     "parameters" : [
@@ -20841,7 +20995,7 @@
      {
       "name" : "isManagedUnion",
       "kind" : "variable",
-      "line" : 849,
+      "line" : 912,
       "char" : 11,
       "storageClass" : [
        "enum"
@@ -20854,7 +21008,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 855,
+    "line" : 918,
     "char" : 28,
     "name" : "getInstance",
     "parameters" : [
@@ -20867,7 +21021,7 @@
      {
       "name" : "getInstance",
       "kind" : "function",
-      "line" : 855,
+      "line" : 918,
       "char" : 28,
       "type" : "pure nothrow @nogc ref @safe (ref MU dat)",
       "parameters" : [
@@ -20879,7 +21033,7 @@
         ]
        }
       ],
-      "endline" : 866,
+      "endline" : 929,
       "endchar" : 1
      }
     ]
@@ -20887,7 +21041,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 867,
+    "line" : 930,
     "char" : 9,
     "name" : "ImplOf",
     "parameters" : [
@@ -20900,14 +21054,14 @@
      {
       "name" : "A",
       "kind" : "alias",
-      "line" : 869,
+      "line" : 932,
       "char" : 2,
       "type" : "TemplateArgsOf!MU"
      },
      {
       "name" : "ImplOf",
       "kind" : "alias",
-      "line" : 872,
+      "line" : 935,
       "char" : 3,
       "type" : "TypeEnumImpl!A._impl"
      }
@@ -20916,7 +21070,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 885,
+    "line" : 948,
     "char" : 9,
     "name" : "TypeImplOf",
     "parameters" : [
@@ -20929,7 +21083,7 @@
      {
       "name" : "TypeImplOf",
       "kind" : "alias",
-      "line" : 885,
+      "line" : 948,
       "char" : 9,
       "type" : "TypeEnumImpl!(TemplateArgsOf!MU)._implT"
      }
@@ -20938,7 +21092,7 @@
    {
     "kind" : "template",
     "comment" : " ManagedUnionのタグ型を得る\n",
-    "line" : 890,
+    "line" : 953,
     "char" : 1,
     "name" : "TagType",
     "parameters" : [
@@ -20952,17 +21106,17 @@
      {
       "name" : "TagType",
       "kind" : "alias",
-      "line" : 893,
+      "line" : 956,
       "char" : 2,
       "type" : "ImplOf!MU.TagType"
      }
     ]
    },
    {
-    "name" : "__unittest_L896_C26",
+    "name" : "__unittest_L959_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 896,
+    "line" : 959,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -20970,14 +21124,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 901,
+    "endline" : 964,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L901_C26",
+    "name" : "__unittest_L964_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 901,
+    "line" : 964,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -20985,13 +21139,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 910,
+    "endline" : 973,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " 有効なタグか確認する\n",
-    "line" : 910,
+    "line" : 973,
     "char" : 1,
     "name" : "isAvailableTag",
     "parameters" : [
@@ -21009,7 +21163,7 @@
      {
       "name" : "isAvailableTag",
       "kind" : "variable",
-      "line" : 915,
+      "line" : 978,
       "char" : 13,
       "storageClass" : [
        "enum"
@@ -21020,10 +21174,10 @@
     ]
    },
    {
-    "name" : "__unittest_L923_C26",
+    "name" : "__unittest_L986_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 923,
+    "line" : 986,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21031,14 +21185,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 930,
+    "endline" : 993,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L930_C26",
+    "name" : "__unittest_L993_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 930,
+    "line" : 993,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21046,13 +21200,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 942,
+    "endline" : 1005,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " 無効なタグを取得する\n",
-    "line" : 942,
+    "line" : 1005,
     "char" : 1,
     "name" : "getNotFoundTag",
     "parameters" : [
@@ -21066,7 +21220,7 @@
      {
       "name" : "getNotFoundTag",
       "kind" : "variable",
-      "line" : 945,
+      "line" : 1008,
       "char" : 25,
       "storageClass" : [
        "enum"
@@ -21077,10 +21231,10 @@
     ]
    },
    {
-    "name" : "__unittest_L948_C26",
+    "name" : "__unittest_L1011_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 948,
+    "line" : 1011,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21088,14 +21242,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 955,
+    "endline" : 1018,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L955_C26",
+    "name" : "__unittest_L1018_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 955,
+    "line" : 1018,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21103,13 +21257,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 966,
+    "endline" : 1029,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " 型を持っているか確認する\n",
-    "line" : 966,
+    "line" : 1029,
     "char" : 1,
     "name" : "hasType",
     "parameters" : [
@@ -21127,7 +21281,7 @@
      {
       "name" : "hasType",
       "kind" : "variable",
-      "line" : 969,
+      "line" : 1032,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -21138,10 +21292,10 @@
     ]
    },
    {
-    "name" : "__unittest_L972_C26",
+    "name" : "__unittest_L1035_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 972,
+    "line" : 1035,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21149,13 +21303,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 985,
+    "endline" : 1048,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " 持っている型を列挙する\n",
-    "line" : 985,
+    "line" : 1048,
     "char" : 1,
     "name" : "EnumMemberTypes",
     "parameters" : [
@@ -21169,17 +21323,17 @@
      {
       "name" : "EnumMemberTypes",
       "kind" : "alias",
-      "line" : 988,
+      "line" : 1051,
       "char" : 2,
       "type" : "ImplOf!MU.MemberTypes"
      }
     ]
    },
    {
-    "name" : "__unittest_L991_C26",
+    "name" : "__unittest_L1054_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 991,
+    "line" : 1054,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21187,13 +21341,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1003,
+    "endline" : 1066,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " タグを列挙する\n",
-    "line" : 1003,
+    "line" : 1066,
     "char" : 1,
     "name" : "memberTags",
     "parameters" : [
@@ -21207,7 +21361,7 @@
      {
       "name" : "memberTags",
       "kind" : "variable",
-      "line" : 1006,
+      "line" : 1069,
       "char" : 27,
       "storageClass" : [
        "enum"
@@ -21220,7 +21374,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 1015,
+    "line" : 1078,
     "char" : 1,
     "name" : "EnumMemberTags",
     "parameters" : [
@@ -21234,17 +21388,17 @@
      {
       "name" : "EnumMemberTags",
       "kind" : "alias",
-      "line" : 1018,
+      "line" : 1081,
       "char" : 2,
       "type" : "aliasSeqOf!(memberTags!MU)"
      }
     ]
    },
    {
-    "name" : "__unittest_L1021_C26",
+    "name" : "__unittest_L1084_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1021,
+    "line" : 1084,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21252,13 +21406,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1039,
+    "endline" : 1102,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " タグから型を得る\n",
-    "line" : 1039,
+    "line" : 1102,
     "char" : 1,
     "name" : "TypeFromTag",
     "parameters" : [
@@ -21276,17 +21430,17 @@
      {
       "name" : "TypeFromTag",
       "kind" : "alias",
-      "line" : 1042,
+      "line" : 1105,
       "char" : 2,
       "type" : "ImplOf!MU.MemberTypes[ImplOf!MU.getIndex!tag]"
      }
     ]
    },
    {
-    "name" : "__unittest_L1045_C26",
+    "name" : "__unittest_L1108_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1045,
+    "line" : 1108,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21294,13 +21448,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1055,
+    "endline" : 1118,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " 型が代入可能か\n",
-    "line" : 1055,
+    "line" : 1118,
     "char" : 1,
     "name" : "isTypeAssignable",
     "parameters" : [
@@ -21318,7 +21472,7 @@
      {
       "name" : "isTypeAssignable",
       "kind" : "variable",
-      "line" : 1058,
+      "line" : 1121,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -21331,7 +21485,7 @@
    {
     "kind" : "template",
     "comment" : " タグを確認する\n",
-    "line" : 1064,
+    "line" : 1127,
     "char" : 12,
     "name" : "tag",
     "parameters" : [
@@ -21345,7 +21499,7 @@
      {
       "name" : "tag",
       "kind" : "function",
-      "line" : 1064,
+      "line" : 1127,
       "char" : 12,
       "type" : "TagType!MU(auto in ref MU dat)",
       "parameters" : [
@@ -21359,16 +21513,16 @@
         ]
        }
       ],
-      "endline" : 1068,
+      "endline" : 1131,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1070_C26",
+    "name" : "__unittest_L1133_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1070,
+    "line" : 1133,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21376,14 +21530,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1083,
+    "endline" : 1146,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1083_C26",
+    "name" : "__unittest_L1146_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1083,
+    "line" : 1146,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21391,13 +21545,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1102,
+    "endline" : 1165,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " 初期化する\n",
-    "line" : 1102,
+    "line" : 1165,
     "char" : 6,
     "name" : "initialize",
     "parameters" : [
@@ -21419,7 +21573,7 @@
      {
       "name" : "initialize",
       "kind" : "function",
-      "line" : 1102,
+      "line" : 1165,
       "char" : 6,
       "type" : "void(auto ref MU dat, auto ref Args args)",
       "parameters" : [
@@ -21440,7 +21594,7 @@
         ]
        }
       ],
-      "endline" : 1106,
+      "endline" : 1169,
       "endchar" : 1
      }
     ]
@@ -21448,7 +21602,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 1108,
+    "line" : 1171,
     "char" : 6,
     "name" : "initialize",
     "parameters" : [
@@ -21470,7 +21624,7 @@
      {
       "name" : "initialize",
       "kind" : "function",
-      "line" : 1108,
+      "line" : 1171,
       "char" : 6,
       "type" : "void(auto ref MU dat, auto ref Args args)",
       "parameters" : [
@@ -21491,16 +21645,16 @@
         ]
        }
       ],
-      "endline" : 1112,
+      "endline" : 1175,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1114_C26",
+    "name" : "__unittest_L1177_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1114,
+    "line" : 1177,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21508,25 +21662,25 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1128,
+    "endline" : 1191,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1128_C7",
+    "name" : "__unittest_L1191_C7",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1128,
+    "line" : 1191,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1146,
+    "endline" : 1209,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " データをセットする\n",
-    "line" : 1146,
+    "line" : 1209,
     "char" : 6,
     "name" : "set",
     "parameters" : [
@@ -21548,7 +21702,7 @@
      {
       "name" : "set",
       "kind" : "function",
-      "line" : 1146,
+      "line" : 1209,
       "char" : 6,
       "type" : "@property void(auto ref MU dat, auto ref T val)",
       "parameters" : [
@@ -21569,7 +21723,7 @@
         ]
        }
       ],
-      "endline" : 1152,
+      "endline" : 1215,
       "endchar" : 1
      }
     ]
@@ -21577,7 +21731,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 1154,
+    "line" : 1217,
     "char" : 6,
     "name" : "set",
     "parameters" : [
@@ -21595,7 +21749,7 @@
      {
       "name" : "set",
       "kind" : "function",
-      "line" : 1154,
+      "line" : 1217,
       "char" : 6,
       "type" : "@property void(ref MU dat, auto ref T val)",
       "parameters" : [
@@ -21615,16 +21769,16 @@
         ]
        }
       ],
-      "endline" : 1160,
+      "endline" : 1223,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1162_C26",
+    "name" : "__unittest_L1225_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1162,
+    "line" : 1225,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21632,14 +21786,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1176,
+    "endline" : 1239,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1176_C26",
+    "name" : "__unittest_L1239_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1176,
+    "line" : 1239,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21647,13 +21801,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1192,
+    "endline" : 1255,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " データを取得する\n",
-    "line" : 1192,
+    "line" : 1255,
     "char" : 10,
     "name" : "get",
     "parameters" : [
@@ -21671,7 +21825,7 @@
      {
       "name" : "get",
       "kind" : "function",
-      "line" : 1192,
+      "line" : 1255,
       "char" : 10,
       "storageClass" : [
        "auto"
@@ -21688,7 +21842,7 @@
         ]
        }
       ],
-      "endline" : 1196,
+      "endline" : 1259,
       "endchar" : 1
      }
     ]
@@ -21696,7 +21850,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 1198,
+    "line" : 1261,
     "char" : 10,
     "name" : "get",
     "parameters" : [
@@ -21714,7 +21868,7 @@
      {
       "name" : "get",
       "kind" : "function",
-      "line" : 1198,
+      "line" : 1261,
       "char" : 10,
       "storageClass" : [
        "auto"
@@ -21731,28 +21885,28 @@
         ]
        }
       ],
-      "endline" : 1202,
+      "endline" : 1265,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1204_C7",
+    "name" : "__unittest_L1267_C7",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1204,
+    "line" : 1267,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1217,
+    "endline" : 1280,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1217_C26",
+    "name" : "__unittest_L1280_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1217,
+    "line" : 1280,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21760,13 +21914,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1234,
+    "endline" : 1297,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " データが入っていることを確認する\n",
-    "line" : 1234,
+    "line" : 1297,
     "char" : 6,
     "name" : "check",
     "parameters" : [
@@ -21784,7 +21938,7 @@
      {
       "name" : "check",
       "kind" : "function",
-      "line" : 1234,
+      "line" : 1297,
       "char" : 6,
       "type" : "bool(auto in ref MU dat)",
       "parameters" : [
@@ -21798,7 +21952,7 @@
         ]
        }
       ],
-      "endline" : 1238,
+      "endline" : 1301,
       "endchar" : 1
      }
     ]
@@ -21806,7 +21960,7 @@
    {
     "kind" : "template",
     "comment" : "ditto\n",
-    "line" : 1240,
+    "line" : 1303,
     "char" : 6,
     "name" : "check",
     "parameters" : [
@@ -21824,7 +21978,7 @@
      {
       "name" : "check",
       "kind" : "function",
-      "line" : 1240,
+      "line" : 1303,
       "char" : 6,
       "type" : "bool(auto in ref MU dat)",
       "parameters" : [
@@ -21838,28 +21992,28 @@
         ]
        }
       ],
-      "endline" : 1244,
+      "endline" : 1307,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1246_C7",
+    "name" : "__unittest_L1309_C7",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1246,
+    "line" : 1309,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1259,
+    "endline" : 1322,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1259_C26",
+    "name" : "__unittest_L1322_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1259,
+    "line" : 1322,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21867,13 +22021,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1275,
+    "endline" : 1338,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " データをクリアする\n",
-    "line" : 1275,
+    "line" : 1338,
     "char" : 6,
     "name" : "clear",
     "parameters" : [
@@ -21887,7 +22041,7 @@
      {
       "name" : "clear",
       "kind" : "function",
-      "line" : 1275,
+      "line" : 1338,
       "char" : 6,
       "type" : "void(auto ref MU dat)",
       "parameters" : [
@@ -21900,16 +22054,16 @@
         ]
        }
       ],
-      "endline" : 1279,
+      "endline" : 1342,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1281_C26",
+    "name" : "__unittest_L1344_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1281,
+    "line" : 1344,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21917,14 +22071,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1295,
+    "endline" : 1358,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1295_C26",
+    "name" : "__unittest_L1358_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1295,
+    "line" : 1358,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21932,13 +22086,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1311,
+    "endline" : 1374,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " データがクリアされているか確認する\n",
-    "line" : 1311,
+    "line" : 1374,
     "char" : 6,
     "name" : "empty",
     "parameters" : [
@@ -21952,7 +22106,7 @@
      {
       "name" : "empty",
       "kind" : "function",
-      "line" : 1311,
+      "line" : 1374,
       "char" : 6,
       "type" : "bool(auto in ref MU dat)",
       "parameters" : [
@@ -21966,16 +22120,16 @@
         ]
        }
       ],
-      "endline" : 1315,
+      "endline" : 1378,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1317_C26",
+    "name" : "__unittest_L1380_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1317,
+    "line" : 1380,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21983,14 +22137,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1326,
+    "endline" : 1389,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1326_C26",
+    "name" : "__unittest_L1389_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 1326,
+    "line" : 1389,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -21998,24 +22152,24 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1340,
+    "endline" : 1403,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1340_C7",
+    "name" : "__unittest_L1403_C7",
     "kind" : "function",
-    "line" : 1340,
+    "line" : 1403,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1491,
+    "endline" : 1554,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1491,
+    "line" : 1554,
     "char" : 9,
     "name" : "AttrData",
     "parameters" : [
@@ -22028,7 +22182,7 @@
      {
       "name" : "AttrData",
       "kind" : "struct",
-      "line" : 1491,
+      "line" : 1554,
       "char" : 9,
       "members" : []
      }
@@ -22038,14 +22192,14 @@
     "name" : "data",
     "kind" : "alias",
     "comment" : "\n",
-    "line" : 1496,
+    "line" : 1559,
     "char" : 1,
     "originalType" : "AttrData"
    },
    {
     "kind" : "template",
     "comment" : "\n",
-    "line" : 1502,
+    "line" : 1565,
     "char" : 1,
     "name" : "hasData",
     "parameters" : [
@@ -22058,7 +22212,7 @@
      {
       "name" : "hasData",
       "kind" : "variable",
-      "line" : 1506,
+      "line" : 1569,
       "char" : 13,
       "storageClass" : [
        "enum"
@@ -22071,7 +22225,7 @@
    {
     "kind" : "template",
     "comment" : "\n",
-    "line" : 1521,
+    "line" : 1584,
     "char" : 1,
     "name" : "getDatas",
     "parameters" : [
@@ -22085,7 +22239,7 @@
      {
       "name" : "getDatas",
       "kind" : "alias",
-      "line" : 1524,
+      "line" : 1587,
       "char" : 2,
       "type" : "staticMap!(TemplateArgsOf, getUDAs!(value, AttrData))"
      }
@@ -22094,7 +22248,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1527,
+    "line" : 1590,
     "char" : 9,
     "name" : "DataType",
     "parameters" : [
@@ -22108,14 +22262,14 @@
      {
       "name" : "std.typecons",
       "kind" : "import",
-      "line" : 1530,
+      "line" : 1593,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "DataType",
       "kind" : "alias",
-      "line" : 1533,
+      "line" : 1596,
       "char" : 3,
       "type" : "getDatas!e[0]"
      }
@@ -22124,7 +22278,7 @@
    {
     "kind" : "template",
     "comment" : "\n",
-    "line" : 1544,
+    "line" : 1607,
     "char" : 1,
     "name" : "Data",
     "parameters" : [
@@ -22138,12 +22292,12 @@
      {
       "name" : "Data",
       "kind" : "union",
-      "line" : 1547,
+      "line" : 1610,
       "char" : 5,
       "members" : [
        {
         "kind" : "template",
-        "line" : 1549,
+        "line" : 1612,
         "char" : 3,
         "name" : "Value",
         "parameters" : [],
@@ -22151,7 +22305,7 @@
          {
           "name" : "_instance_of_value_",
           "kind" : "variable",
-          "line" : 1551,
+          "line" : 1614,
           "char" : 15,
           "type" : "DataType!e"
          }
@@ -22160,7 +22314,7 @@
        {
         "name" : "Value!()",
         "kind" : "mixin",
-        "line" : 1553,
+        "line" : 1616,
         "char" : 3
        }
       ]
@@ -22170,7 +22324,7 @@
    {
     "kind" : "template",
     "comment" : "\n",
-    "line" : 1562,
+    "line" : 1625,
     "char" : 7,
     "name" : "EnumMemberAlieses",
     "parameters" : [
@@ -22185,7 +22339,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1575,
+    "line" : 1638,
     "char" : 9,
     "name" : "isCallableWith",
     "parameters" : [
@@ -22203,7 +22357,7 @@
      {
       "name" : "isCallableWith",
       "kind" : "variable",
-      "line" : 1578,
+      "line" : 1641,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -22216,7 +22370,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1581,
+    "line" : 1644,
     "char" : 9,
     "name" : "getTempFuncParamUDAs",
     "parameters" : [
@@ -22243,7 +22397,7 @@
      {
       "name" : "std.typecons",
       "kind" : "import",
-      "line" : 1584,
+      "line" : 1647,
       "char" : 9,
       "protection" : "private",
       "selective" : [
@@ -22253,7 +22407,7 @@
      {
       "name" : "voile.attr",
       "kind" : "import",
-      "line" : 1585,
+      "line" : 1648,
       "char" : 9,
       "protection" : "private",
       "selective" : [
@@ -22263,27 +22417,27 @@
      {
       "name" : "getTempFuncParamUDAs",
       "kind" : "alias",
-      "line" : 1588,
+      "line" : 1651,
       "char" : 3,
       "type" : "AliasSeq!()"
      }
     ]
    },
    {
-    "name" : "__unittest_L1614_C7",
+    "name" : "__unittest_L1677_C7",
     "kind" : "function",
-    "line" : 1614,
+    "line" : 1677,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1627,
+    "endline" : 1690,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1627,
+    "line" : 1690,
     "char" : 9,
     "name" : "matchFuncInfo",
     "parameters" : [
@@ -22301,42 +22455,42 @@
      {
       "name" : "IndexType",
       "kind" : "alias",
-      "line" : 1630,
+      "line" : 1693,
       "char" : 2,
       "type" : "ImplOf!MU.IndexType"
      },
      {
       "name" : "TagType",
       "kind" : "alias",
-      "line" : 1631,
+      "line" : 1694,
       "char" : 2,
       "type" : "ImplOf!MU.TagType"
      },
      {
       "name" : "notfoundTag",
       "kind" : "alias",
-      "line" : 1632,
+      "line" : 1695,
       "char" : 2,
       "type" : "ImplOf!MU.notfoundTag"
      },
      {
       "name" : "MemberTypes",
       "kind" : "alias",
-      "line" : 1633,
+      "line" : 1696,
       "char" : 2,
       "type" : "ImplOf!MU.MemberTypes"
      },
      {
       "name" : "params",
       "kind" : "alias",
-      "line" : 1637,
+      "line" : 1700,
       "char" : 3,
       "type" : "Parameters!F"
      },
      {
       "name" : "isDefault",
       "kind" : "variable",
-      "line" : 1638,
+      "line" : 1701,
       "char" : 13,
       "storageClass" : [
        "enum"
@@ -22347,7 +22501,7 @@
      {
       "name" : "isCatch",
       "kind" : "variable",
-      "line" : 1641,
+      "line" : 1704,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -22358,7 +22512,7 @@
      {
       "name" : "isCallback",
       "kind" : "variable",
-      "line" : 1642,
+      "line" : 1705,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -22369,7 +22523,7 @@
      {
       "name" : "tag",
       "kind" : "variable",
-      "line" : 1645,
+      "line" : 1708,
       "char" : 20,
       "storageClass" : [
        "enum"
@@ -22380,7 +22534,7 @@
      {
       "name" : "index",
       "kind" : "variable",
-      "line" : 1646,
+      "line" : 1709,
       "char" : 20,
       "storageClass" : [
        "enum"
@@ -22391,14 +22545,14 @@
      {
       "name" : "RetType",
       "kind" : "alias",
-      "line" : 1661,
+      "line" : 1724,
       "char" : 3,
       "type" : "ReturnType!F"
      },
      {
       "name" : "isMatchFunction",
       "kind" : "variable",
-      "line" : 1683,
+      "line" : 1746,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -22409,20 +22563,20 @@
     ]
    },
    {
-    "name" : "__unittest_L1686_C7",
+    "name" : "__unittest_L1749_C7",
     "kind" : "function",
-    "line" : 1686,
+    "line" : 1749,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1717,
+    "endline" : 1780,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1717,
+    "line" : 1780,
     "char" : 9,
     "name" : "matchFuncInfo",
     "parameters" : [
@@ -22440,42 +22594,42 @@
      {
       "name" : "IndexType",
       "kind" : "alias",
-      "line" : 1720,
+      "line" : 1783,
       "char" : 2,
       "type" : "ImplOf!ED.IndexType"
      },
      {
       "name" : "TagType",
       "kind" : "alias",
-      "line" : 1721,
+      "line" : 1784,
       "char" : 2,
       "type" : "ImplOf!ED.TagType"
      },
      {
       "name" : "notfoundTag",
       "kind" : "alias",
-      "line" : 1722,
+      "line" : 1785,
       "char" : 2,
       "type" : "ImplOf!ED.notfoundTag"
      },
      {
       "name" : "MemberTypes",
       "kind" : "alias",
-      "line" : 1723,
+      "line" : 1786,
       "char" : 2,
       "type" : "ImplOf!ED.MemberTypes"
      },
      {
       "name" : "params",
       "kind" : "alias",
-      "line" : 1727,
+      "line" : 1790,
       "char" : 3,
       "type" : "Parameters!F"
      },
      {
       "name" : "isDefault",
       "kind" : "variable",
-      "line" : 1728,
+      "line" : 1791,
       "char" : 13,
       "storageClass" : [
        "enum"
@@ -22486,14 +22640,14 @@
      {
       "name" : "voile.attr",
       "kind" : "import",
-      "line" : 1731,
+      "line" : 1794,
       "char" : 11,
       "protection" : "private"
      },
      {
       "name" : "isCatch",
       "kind" : "variable",
-      "line" : 1732,
+      "line" : 1795,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -22504,7 +22658,7 @@
      {
       "name" : "isCallback",
       "kind" : "variable",
-      "line" : 1733,
+      "line" : 1796,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -22515,7 +22669,7 @@
      {
       "name" : "tag",
       "kind" : "variable",
-      "line" : 1740,
+      "line" : 1803,
       "char" : 19,
       "storageClass" : [
        "enum"
@@ -22526,7 +22680,7 @@
      {
       "name" : "index",
       "kind" : "variable",
-      "line" : 1746,
+      "line" : 1809,
       "char" : 20,
       "storageClass" : [
        "enum"
@@ -22537,14 +22691,14 @@
      {
       "name" : "RetType",
       "kind" : "alias",
-      "line" : 1761,
+      "line" : 1824,
       "char" : 3,
       "type" : "ReturnType!F"
      },
      {
       "name" : "isMatchFunction",
       "kind" : "variable",
-      "line" : 1802,
+      "line" : 1865,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -22555,9 +22709,9 @@
     ]
    },
    {
-    "name" : "__unittest_L1806_C26",
+    "name" : "__unittest_L1869_C26",
     "kind" : "function",
-    "line" : 1806,
+    "line" : 1869,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -22565,13 +22719,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1857,
+    "endline" : 1920,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1857,
+    "line" : 1920,
     "char" : 9,
     "name" : "matchInfo",
     "parameters" : [
@@ -22589,27 +22743,27 @@
      {
       "name" : "IndexType",
       "kind" : "alias",
-      "line" : 1860,
+      "line" : 1923,
       "char" : 2,
       "type" : "ImplOf!MU.IndexType"
      },
      {
       "name" : "TagType",
       "kind" : "alias",
-      "line" : 1861,
+      "line" : 1924,
       "char" : 2,
       "type" : "ImplOf!MU.TagType"
      },
      {
       "name" : "notfoundTag",
       "kind" : "alias",
-      "line" : 1862,
+      "line" : 1925,
       "char" : 2,
       "type" : "ImplOf!MU.notfoundTag"
      },
      {
       "kind" : "template",
-      "line" : 1864,
+      "line" : 1927,
       "char" : 12,
       "name" : "isDefault",
       "parameters" : [
@@ -22622,7 +22776,7 @@
        {
         "name" : "isDefault",
         "kind" : "variable",
-        "line" : 1864,
+        "line" : 1927,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -22634,7 +22788,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1865,
+      "line" : 1928,
       "char" : 12,
       "name" : "isCatch",
       "parameters" : [
@@ -22647,7 +22801,7 @@
        {
         "name" : "isCatch",
         "kind" : "variable",
-        "line" : 1865,
+        "line" : 1928,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -22659,7 +22813,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1866,
+      "line" : 1929,
       "char" : 12,
       "name" : "isCallback",
       "parameters" : [
@@ -22672,7 +22826,7 @@
        {
         "name" : "isCallback",
         "kind" : "variable",
-        "line" : 1866,
+        "line" : 1929,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -22684,7 +22838,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1867,
+      "line" : 1930,
       "char" : 12,
       "name" : "isMatchFunc",
       "parameters" : [
@@ -22697,7 +22851,7 @@
        {
         "name" : "isMatchFunc",
         "kind" : "variable",
-        "line" : 1867,
+        "line" : 1930,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -22709,7 +22863,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1868,
+      "line" : 1931,
       "char" : 15,
       "name" : "getTag",
       "parameters" : [
@@ -22722,7 +22876,7 @@
        {
         "name" : "getTag",
         "kind" : "variable",
-        "line" : 1868,
+        "line" : 1931,
         "char" : 15,
         "storageClass" : [
          "enum"
@@ -22734,7 +22888,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1869,
+      "line" : 1932,
       "char" : 17,
       "name" : "getIndex",
       "parameters" : [
@@ -22747,7 +22901,7 @@
        {
         "name" : "getIndex",
         "kind" : "variable",
-        "line" : 1869,
+        "line" : 1932,
         "char" : 17,
         "storageClass" : [
          "enum"
@@ -22759,7 +22913,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1870,
+      "line" : 1933,
       "char" : 2,
       "name" : "getParams",
       "parameters" : [
@@ -22772,7 +22926,7 @@
        {
         "name" : "getParams",
         "kind" : "alias",
-        "line" : 1870,
+        "line" : 1933,
         "char" : 2,
         "type" : "matchFuncInfo!(MU, F).params"
        }
@@ -22780,7 +22934,7 @@
      },
      {
       "kind" : "template",
-      "line" : 1871,
+      "line" : 1934,
       "char" : 2,
       "name" : "getRetType",
       "parameters" : [
@@ -22793,7 +22947,7 @@
        {
         "name" : "getRetType",
         "kind" : "alias",
-        "line" : 1871,
+        "line" : 1934,
         "char" : 2,
         "type" : "matchFuncInfo!(MU, F).RetType"
        }
@@ -22802,14 +22956,14 @@
      {
       "name" : "RetType",
       "kind" : "alias",
-      "line" : 1873,
+      "line" : 1936,
       "char" : 2,
       "type" : "CommonType!(staticMap!(getRetType, Funcs))"
      },
      {
       "name" : "canMatch",
       "kind" : "variable",
-      "line" : 1874,
+      "line" : 1937,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -22820,7 +22974,7 @@
      {
       "name" : "defaultIdx",
       "kind" : "variable",
-      "line" : 1875,
+      "line" : 1938,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -22831,7 +22985,7 @@
      {
       "name" : "hasDefault",
       "kind" : "variable",
-      "line" : 1876,
+      "line" : 1939,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -22842,21 +22996,21 @@
      {
       "name" : "callbacks",
       "kind" : "alias",
-      "line" : 1877,
+      "line" : 1940,
       "char" : 2,
       "type" : "Filter!(isCallback, Funcs)"
      },
      {
       "name" : "catches",
       "kind" : "alias",
-      "line" : 1878,
+      "line" : 1941,
       "char" : 2,
       "type" : "Filter!(isCatch, Funcs)"
      },
      {
       "name" : "hasCatch",
       "kind" : "variable",
-      "line" : 1879,
+      "line" : 1942,
       "char" : 12,
       "storageClass" : [
        "enum"
@@ -22867,13 +23021,13 @@
      {
       "name" : "callbackTags",
       "kind" : "alias",
-      "line" : 1881,
+      "line" : 1944,
       "char" : 2,
       "type" : "staticMap!(getTag, callbacks)"
      },
      {
       "kind" : "template",
-      "line" : 1882,
+      "line" : 1945,
       "char" : 12,
       "name" : "isCallbackTag",
       "parameters" : [
@@ -22887,7 +23041,7 @@
        {
         "name" : "isCallbackTag",
         "kind" : "variable",
-        "line" : 1882,
+        "line" : 1945,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -22900,16 +23054,16 @@
      {
       "name" : "defaultTags",
       "kind" : "alias",
-      "line" : 1883,
+      "line" : 1946,
       "char" : 2,
       "type" : "Filter!(templateNot!isCallbackTag, ImplOf!MU.allTags)"
      }
     ]
    },
    {
-    "name" : "__unittest_L1898_C26",
+    "name" : "__unittest_L1961_C26",
     "kind" : "function",
-    "line" : 1898,
+    "line" : 1961,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -22917,13 +23071,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 1960,
+    "endline" : 2023,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "comment" : " パターンマッチ\n",
-    "line" : 1960,
+    "line" : 2023,
     "char" : 1,
     "name" : "match",
     "parameters" : [
@@ -22935,7 +23089,7 @@
     "members" : [
      {
       "kind" : "template",
-      "line" : 1962,
+      "line" : 2025,
       "char" : 2,
       "name" : "match",
       "parameters" : [
@@ -22949,14 +23103,14 @@
        {
         "name" : "minfo",
         "kind" : "alias",
-        "line" : 1965,
+        "line" : 2028,
         "char" : 3,
         "type" : "matchInfo!(MU, Funcs)"
        },
        {
         "name" : "matchImpl",
         "kind" : "function",
-        "line" : 1968,
+        "line" : 2031,
         "char" : 27,
         "storageClass" : [
          "auto"
@@ -22972,13 +23126,13 @@
           ]
          }
         ],
-        "endline" : 1995,
+        "endline" : 2058,
         "endchar" : 3
        },
        {
         "name" : "match",
         "kind" : "function",
-        "line" : 1998,
+        "line" : 2061,
         "char" : 27,
         "storageClass" : [
          "auto"
@@ -22994,7 +23148,7 @@
           ]
          }
         ],
-        "endline" : 2019,
+        "endline" : 2082,
         "endchar" : 3
        }
       ]
@@ -23002,10 +23156,10 @@
     ]
    },
    {
-    "name" : "__unittest_L2023_C26",
+    "name" : "__unittest_L2086_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 2023,
+    "line" : 2086,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -23013,14 +23167,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 2053,
+    "endline" : 2116,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L2053_C26",
+    "name" : "__unittest_L2116_C26",
     "kind" : "function",
     "comment" : "\n",
-    "line" : 2053,
+    "line" : 2116,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -23028,13 +23182,13 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 2073,
+    "endline" : 2136,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L2073_C26",
+    "name" : "__unittest_L2136_C26",
     "kind" : "function",
-    "line" : 2073,
+    "line" : 2136,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -23042,7 +23196,7 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 2118,
+    "endline" : 2181,
     "endchar" : 1
    }
   ]
