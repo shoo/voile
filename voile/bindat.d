@@ -236,12 +236,12 @@ template isBasicArray(T)
  *    - `void fromBinary(in byte[]);`
  * 3. 【未実装】型の宣言に以下のUDAを持つ
  *    - `@convBy!Proxy`
- *      - Proxy: `void to(OutputRange)(ref T src, ref OutputRange);`
- *      - Proxy: `void from(InputRange)(ref InputRange, ref T dst);`
- * 4. 【未実装】メンバの宣言に以下のUDAを持つ
+ *      - Proxy: `void to(OutputRange)(in T src, ref OutputRange r);`
+ *      - Proxy: `void from(InputRange)(ref InputRange r, ref T dst);`
+ * 4. メンバの宣言に以下のUDAを持つ
  *    - `@convBy!Proxy`
- *      - Proxy type6: `void to(OutputRange)(ref T src, ref OutputRange);`
- *      - Proxy type6: `void from(InputRange)(ref InputRange, ref T dst);`
+ *      - Proxy type3: `void to(OutputRange)(in T src, ref OutputRange);`
+ *      - Proxy type3: `void from(InputRange)(ref InputRange, ref T dst);`
  * 5. 【未実装】メンバの宣言に以下のUDAを持つ
  *    - `@preLength!Size`
  *    - `@convBy!Proxy` : `immutable(ubyte)[]`
@@ -265,6 +265,28 @@ template hasBinaryConvertionProxy(T)
 		enum bool hasBinaryConvertionProxy = false;
 	}
 }
+/// ditto
+template hasBinaryConvertionProxy(T, string memberName)
+{
+	alias InputRange = std.range.interfaces.InputRange!ubyte;
+	alias OutputRange = std.range.interfaces.OutputRange!ubyte;
+	alias value = __traits(getMember, T, memberName);
+	static if (hasConvBy!value)
+	{
+		static if (canConvFrom!(value, InputRange) && canConvTo!(value, OutputRange))
+		{
+			enum bool hasBinaryConvertionProxy = true;
+		}
+		else
+		{
+			enum bool hasBinaryConvertionProxy = false;
+		}
+	}
+	else
+	{
+		enum bool hasBinaryConvertionProxy = false;
+	}
+}
 
 /*******************************************************************************
  * バイナリのシリアライズ
@@ -274,19 +296,19 @@ if (isOutputBinary!OutputRange && isBasicType!T)
 {
 	static if (endian == systemEndian)
 	{
-		r.put((cast(ubyte*)&data)[0..T.sizeof]);
+		put(r, (cast(ubyte*)&data)[0..T.sizeof]);
 	}
 	else
 	{
 		auto tmp = swapBytes(data);
-		r.put((cast(ubyte*)&tmp)[0..T.sizeof]);
+		put(r, (cast(ubyte*)&tmp)[0..T.sizeof]);
 	}
 }
 /// ditto
 void serializeToBinDat(Endian endian, OutputRange, T: ubyte)(ref OutputRange r, in T data)
 if (isOutputBinary!OutputRange && isBasicType!T)
 {
-	r.put(data);
+	put(r, data);
 }
 /// ditto
 void serializeToBinDat(OutputRange, T)(ref OutputRange r, in T data) @trusted
@@ -298,7 +320,7 @@ if (isOutputBinary!OutputRange && isBasicType!T)
 void serializeToBinDat(OutputRange, T: ubyte)(ref OutputRange r, in T data)
 if (isOutputBinary!OutputRange && isBasicType!T)
 {
-	r.put(data);
+	put(r, data);
 }
 /// ditto
 void serializeToBinDat(Endian endian, OutputRange, T)(ref OutputRange r, in T data)
@@ -306,7 +328,7 @@ if (isOutputBinary!OutputRange && isBasicArray!T)
 {
 	static if (is(Unqual!T: const(ubyte)[]))
 	{
-		r.put(data[]);
+		put(r, data[]);
 	}
 	else
 	{
@@ -343,7 +365,11 @@ if (isOutputBinary!OutputRange && is(T == struct))
 	{{
 		alias memberValue = __traits(getMember, data, memberName);
 		alias memberType  = typeof(memberValue);
-		static if (isBasicType!memberType)
+		static if (hasBinaryConvertionProxy!(T, memberName) && canConvTo!(memberValue, OutputRange))
+		{
+			convertTo!memberValue(__traits(getMember, data, memberName), r);
+		}
+		else static if (isBasicType!memberType)
 		{
 			//----------------------------------
 			// 基本型
@@ -554,7 +580,7 @@ if (isBasicType!T || isArray!T)
 		void writeBinary(OutputRange)(ref OutputRange r) const
 		if (isOutputBinary!OutputRange)
 		{
-			r.put(cast(ubyte)(a + 100));
+			put(r, cast(ubyte)(a + 100));
 		}
 		void readBinary(InputRange)(ref InputRange r)
 		if (isInputBinary!InputRange)
@@ -566,6 +592,42 @@ if (isBasicType!T || isArray!T)
 	static assert(hasBinaryConvertionProxy!A);
 	A a = A(-10);
 	assert(a.serializeToBinDat() == [90]);
+	
+	import std.datetime;
+	struct B
+	{
+		static struct Proxy
+		{
+			static void to(OutputRange)(in DateTime d, ref OutputRange r) @trusted
+			{
+				r.serializeToBinDat!bigEndian(cast(ushort)d.year);
+				r.serializeToBinDat!bigEndian(cast(ubyte)d.month);
+				r.serializeToBinDat!bigEndian(cast(ubyte)d.day);
+				r.serializeToBinDat!bigEndian(cast(ubyte)d.hour);
+				r.serializeToBinDat!bigEndian(cast(ubyte)d.minute);
+				r.serializeToBinDat!bigEndian(cast(ubyte)d.second);
+			}
+			static void from(InputRange)(ref InputRange r, ref DateTime d) @trusted
+			{
+				ushort year;
+				ubyte  month;
+				ubyte  day;
+				ubyte  hour;
+				ubyte  minute;
+				ubyte  second;
+				year.deserializeFromBinDat!bigEndian(r);
+				month.deserializeFromBinDat!bigEndian(r);
+				day.deserializeFromBinDat!bigEndian(r);
+				hour.deserializeFromBinDat!bigEndian(r);
+				minute.deserializeFromBinDat!bigEndian(r);
+				second.deserializeFromBinDat!bigEndian(r);
+				d = DateTime(year, month, day, hour, minute, second);
+			}
+		}
+		@convBy!Proxy DateTime dt;
+	}
+	B b = B(DateTime(2020, 12, 25));
+	assert(b.serializeToBinDat() == [0x07, 0xE4, 12, 25, 0, 0, 0]);
 }
 
 /*******************************************************************************
@@ -648,7 +710,14 @@ if (isInputBinary!InputRange && is(T == struct))
 	{{
 		alias memberValue = __traits(getMember, dst, memberName);
 		alias memberType  = typeof(memberValue);
-		static if (isBasicType!memberType)
+		static if (hasBinaryConvertionProxy!(T, memberName) && canConvFrom!(memberValue, InputRange))
+		{
+			//----------------------------------
+			// Proxy
+			//----------------------------------
+			convertFrom!memberValue(r, __traits(getMember, dst, memberName));
+		}
+		else static if (isBasicType!memberType)
 		{
 			//----------------------------------
 			// 基本型
@@ -901,7 +970,7 @@ if (isInputBinary!InputRange)
 		void writeBinary(OutputRange)(ref OutputRange r) const
 		if (isOutputBinary!OutputRange)
 		{
-			r.put(cast(ubyte)(a + 100));
+			put(r, cast(ubyte)(a + 100));
 		}
 		void readBinary(InputRange)(ref InputRange r)
 		if (isInputBinary!InputRange)
@@ -913,6 +982,43 @@ if (isInputBinary!InputRange)
 	A a;
 	a.deserializeFromBinDat(bin(90));
 	assert(a == A(-10));
+	
+	import std.datetime;
+	struct B
+	{
+		static struct Proxy
+		{
+			static void to(OutputRange)(in DateTime d, ref OutputRange r) @trusted
+			{
+				r.serializeToBinDat!bigEndian(cast(ushort)d.year);
+				r.serializeToBinDat!bigEndian(cast(ubyte)d.month);
+				r.serializeToBinDat!bigEndian(cast(ubyte)d.day);
+				r.serializeToBinDat!bigEndian(cast(ubyte)d.hour);
+				r.serializeToBinDat!bigEndian(cast(ubyte)d.minute);
+				r.serializeToBinDat!bigEndian(cast(ubyte)d.second);
+			}
+			static void from(InputRange)(ref InputRange r, ref DateTime d) @trusted
+			{
+				ushort year;
+				ubyte  month;
+				ubyte  day;
+				ubyte  hour;
+				ubyte  minute;
+				ubyte  second;
+				year.deserializeFromBinDat!bigEndian(r);
+				month.deserializeFromBinDat!bigEndian(r);
+				day.deserializeFromBinDat!bigEndian(r);
+				hour.deserializeFromBinDat!bigEndian(r);
+				minute.deserializeFromBinDat!bigEndian(r);
+				second.deserializeFromBinDat!bigEndian(r);
+				d = DateTime(year, month, day, hour, minute, second);
+			}
+		}
+		@convBy!Proxy DateTime dt;
+	}
+	B b;
+	b.deserializeFromBinDat(bin([0x07, 0xE4, 12, 25, 0, 0, 0]));
+	assert(b == B(DateTime(2020, 12, 25)));
 }
 
 /*******************************************************************************
