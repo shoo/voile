@@ -86,7 +86,8 @@ ArrayLength <code class="ddoc_psymbol">arrayLength</code><span class="ddoc_templ
 <dd><div class="ddoc_summary">出力対象のバイナリデータ型</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".isBasicArray"></span><div class="quickindex" id="quickindex.isBasicArray"></div>template <code class="ddoc_psymbol">isBasicArray</code>(T)<br></div></dt>
 <dd><div class="ddoc_summary">基本型要素をもつ配列</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasBinaryConvertionProxy"></span><div class="quickindex" id="quickindex.hasBinaryConvertionProxy"></div>template <code class="ddoc_psymbol">hasBinaryConvertionProxy</code>(T)<br></div></dt>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".hasBinaryConvertionProxy"></span><div class="quickindex" id="quickindex.hasBinaryConvertionProxy"></div>template <code class="ddoc_psymbol">hasBinaryConvertionProxy</code>(T)<br>
+template <code class="ddoc_psymbol">hasBinaryConvertionProxy</code>(T, string memberName)<br></div></dt>
 <dd><div class="ddoc_summary">Proxy
 </div><div class="ddoc_description"><ol><li>以下の関数を持つ
 <ul><li><code class="d_inlinecode donthyphenate notranslate">void writeBinary(InputRange)(ref InputRange) const;</code></li>
@@ -99,14 +100,14 @@ ArrayLength <code class="ddoc_psymbol">arrayLength</code><span class="ddoc_templ
 </ul></li>
 <li>【未実装】型の宣言に以下のUDAを持つ
 <ul><li><code class="d_inlinecode donthyphenate notranslate">@convBy!Proxy</code>
-<ul><li>Proxy: <code class="d_inlinecode donthyphenate notranslate">void to(OutputRange)(ref T src, ref OutputRange);</code></li>
-<li>Proxy: <code class="d_inlinecode donthyphenate notranslate">void from(InputRange)(ref InputRange, ref T dst);</code></li>
+<ul><li>Proxy: <code class="d_inlinecode donthyphenate notranslate">void to(OutputRange)(in T src, ref OutputRange r);</code></li>
+<li>Proxy: <code class="d_inlinecode donthyphenate notranslate">void from(InputRange)(ref InputRange r, ref T dst);</code></li>
 </ul></li>
 </ul></li>
-<li>【未実装】メンバの宣言に以下のUDAを持つ
+<li>メンバの宣言に以下のUDAを持つ
 <ul><li><code class="d_inlinecode donthyphenate notranslate">@convBy!Proxy</code>
-<ul><li>Proxy type6: <code class="d_inlinecode donthyphenate notranslate">void to(OutputRange)(ref T src, ref OutputRange);</code></li>
-<li>Proxy type6: <code class="d_inlinecode donthyphenate notranslate">void from(InputRange)(ref InputRange, ref T dst);</code></li>
+<ul><li>Proxy type3: <code class="d_inlinecode donthyphenate notranslate">void to(OutputRange)(in T src, ref OutputRange);</code></li>
+<li>Proxy type3: <code class="d_inlinecode donthyphenate notranslate">void from(InputRange)(ref InputRange, ref T dst);</code></li>
 </ul></li>
 </ul></li>
 <li>【未実装】メンバの宣言に以下のUDAを持つ
@@ -241,7 +242,7 @@ a.b = 11;
 	<span class="d_keyword">void</span> writeBinary(OutputRange)(<span class="d_keyword">ref</span> OutputRange <span class="d_param">r</span>) <span class="d_keyword">const</span>
 	<span class="d_keyword">if</span> (isOutputBinary!OutputRange)
 	{
-		<span class="d_param">r</span>.put(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)(a + 100));
+		put(<span class="d_param">r</span>, <span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)(a + 100));
 	}
 	<span class="d_keyword">void</span> readBinary(InputRange)(<span class="d_keyword">ref</span> InputRange <span class="d_param">r</span>)
 	<span class="d_keyword">if</span> (isInputBinary!InputRange)
@@ -253,6 +254,42 @@ a.b = 11;
 <span class="d_keyword">static</span> <span class="d_keyword">assert</span>(hasBinaryConvertionProxy!A);
 A a = A(-10);
 <span class="d_keyword">assert</span>(a.<span class="d_psymbol">serializeToBinDat</span>() == [90]);
+
+<span class="d_keyword">import</span> std.datetime;
+<span class="d_keyword">struct</span> B
+{
+	<span class="d_keyword">static</span> <span class="d_keyword">struct</span> Proxy
+	{
+		<span class="d_keyword">static</span> <span class="d_keyword">void</span> to(OutputRange)(<span class="d_keyword">in</span> DateTime d, <span class="d_keyword">ref</span> OutputRange <span class="d_param">r</span>) @trusted
+		{
+			<span class="d_param">r</span>.<span class="d_psymbol">serializeToBinDat</span>!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ushort</span>)d.year);
+			<span class="d_param">r</span>.<span class="d_psymbol">serializeToBinDat</span>!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)d.month);
+			<span class="d_param">r</span>.<span class="d_psymbol">serializeToBinDat</span>!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)d.day);
+			<span class="d_param">r</span>.<span class="d_psymbol">serializeToBinDat</span>!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)d.hour);
+			<span class="d_param">r</span>.<span class="d_psymbol">serializeToBinDat</span>!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)d.minute);
+			<span class="d_param">r</span>.<span class="d_psymbol">serializeToBinDat</span>!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)d.second);
+		}
+		<span class="d_keyword">static</span> <span class="d_keyword">void</span> from(InputRange)(<span class="d_keyword">ref</span> InputRange <span class="d_param">r</span>, <span class="d_keyword">ref</span> DateTime d) @trusted
+		{
+			<span class="d_keyword">ushort</span> year;
+			<span class="d_keyword">ubyte</span>  month;
+			<span class="d_keyword">ubyte</span>  day;
+			<span class="d_keyword">ubyte</span>  hour;
+			<span class="d_keyword">ubyte</span>  minute;
+			<span class="d_keyword">ubyte</span>  second;
+			year.deserializeFromBinDat!bigEndian(<span class="d_param">r</span>);
+			month.deserializeFromBinDat!bigEndian(<span class="d_param">r</span>);
+			day.deserializeFromBinDat!bigEndian(<span class="d_param">r</span>);
+			hour.deserializeFromBinDat!bigEndian(<span class="d_param">r</span>);
+			minute.deserializeFromBinDat!bigEndian(<span class="d_param">r</span>);
+			second.deserializeFromBinDat!bigEndian(<span class="d_param">r</span>);
+			d = DateTime(year, month, day, hour, minute, second);
+		}
+	}
+	@convBy!Proxy DateTime dt;
+}
+B b = B(DateTime(2020, 12, 25));
+<span class="d_keyword">assert</span>(b.<span class="d_psymbol">serializeToBinDat</span>() == [0x07, 0xE4, 12, 25, 0, 0, 0]);
 </pre>
 </div>
 </dd>
@@ -401,7 +438,7 @@ tmp.b = 11;
 	<span class="d_keyword">void</span> writeBinary(OutputRange)(<span class="d_keyword">ref</span> OutputRange <span class="d_param">r</span>) <span class="d_keyword">const</span>
 	<span class="d_keyword">if</span> (isOutputBinary!OutputRange)
 	{
-		<span class="d_param">r</span>.put(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)(a + 100));
+		put(<span class="d_param">r</span>, <span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)(a + 100));
 	}
 	<span class="d_keyword">void</span> readBinary(InputRange)(<span class="d_keyword">ref</span> InputRange <span class="d_param">r</span>)
 	<span class="d_keyword">if</span> (isInputBinary!InputRange)
@@ -413,6 +450,43 @@ tmp.b = 11;
 A a;
 a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(90));
 <span class="d_keyword">assert</span>(a == A(-10));
+
+<span class="d_keyword">import</span> std.datetime;
+<span class="d_keyword">struct</span> B
+{
+	<span class="d_keyword">static</span> <span class="d_keyword">struct</span> Proxy
+	{
+		<span class="d_keyword">static</span> <span class="d_keyword">void</span> to(OutputRange)(<span class="d_keyword">in</span> DateTime d, <span class="d_keyword">ref</span> OutputRange <span class="d_param">r</span>) @trusted
+		{
+			<span class="d_param">r</span>.serializeToBinDat!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ushort</span>)d.year);
+			<span class="d_param">r</span>.serializeToBinDat!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)d.month);
+			<span class="d_param">r</span>.serializeToBinDat!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)d.day);
+			<span class="d_param">r</span>.serializeToBinDat!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)d.hour);
+			<span class="d_param">r</span>.serializeToBinDat!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)d.minute);
+			<span class="d_param">r</span>.serializeToBinDat!bigEndian(<span class="d_keyword">cast</span>(<span class="d_keyword">ubyte</span>)d.second);
+		}
+		<span class="d_keyword">static</span> <span class="d_keyword">void</span> from(InputRange)(<span class="d_keyword">ref</span> InputRange <span class="d_param">r</span>, <span class="d_keyword">ref</span> DateTime d) @trusted
+		{
+			<span class="d_keyword">ushort</span> year;
+			<span class="d_keyword">ubyte</span>  month;
+			<span class="d_keyword">ubyte</span>  day;
+			<span class="d_keyword">ubyte</span>  hour;
+			<span class="d_keyword">ubyte</span>  minute;
+			<span class="d_keyword">ubyte</span>  second;
+			year.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(<span class="d_param">r</span>);
+			month.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(<span class="d_param">r</span>);
+			day.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(<span class="d_param">r</span>);
+			hour.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(<span class="d_param">r</span>);
+			minute.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(<span class="d_param">r</span>);
+			second.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(<span class="d_param">r</span>);
+			d = DateTime(year, month, day, hour, minute, second);
+		}
+	}
+	@convBy!Proxy DateTime dt;
+}
+B b;
+b.<span class="d_psymbol">deserializeFromBinDat</span>(bin([0x07, 0xE4, 12, 25, 0, 0, 0]));
+<span class="d_keyword">assert</span>(b == B(DateTime(2020, 12, 25)));
 </pre>
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
