@@ -29457,10 +29457,10 @@
      {
       "name" : "drop",
       "kind" : "function",
-      "comment" : " タスク実行を取りやめる\n\n タスクがまだ実行されていない場合は、実行を取りやめる。\n",
-      "line" : 2289,
+      "comment" : " タスク実行を取りやめる\n\n タスクがまだ実行されていない場合は、実行を取りやめる。\n\n Params:\n      type = タスク種別を指定する\n      id = タスクの識別用IDを指定する\n Returns:\n      正常にドロップされた場合はtrueが返り、さもなくばfalseが返る。\n",
+      "line" : 2295,
       "char" : 7,
-      "deco" : "FAyaS3std4uuid4UUIDZv",
+      "deco" : "FAyaS3std4uuid4UUIDZb",
       "parameters" : [
        {
         "name" : "type",
@@ -29471,14 +29471,14 @@
         "deco" : "S3std4uuid4UUID"
        }
       ],
-      "endline" : 2296,
+      "endline" : 2309,
       "endchar" : 2
      },
      {
       "name" : "peek",
       "kind" : "function",
       "comment" : " タスクを取り出す\n",
-      "line" : 2301,
+      "line" : 2314,
       "char" : 19,
       "deco" : "FAyaS3std4uuid4UUIDZOC5voile4sync8TaskData",
       "parameters" : [
@@ -29491,21 +29491,21 @@
         "deco" : "S3std4uuid4UUID"
        }
       ],
-      "endline" : 2305,
+      "endline" : 2318,
       "endchar" : 2
      },
      {
       "name" : "TaskInfo",
       "kind" : "struct",
       "comment" : " タスクの情報\n",
-      "line" : 2311,
+      "line" : 2324,
       "char" : 2,
       "members" : [
        {
         "name" : "type",
         "kind" : "variable",
         "comment" : "タスクの種類\n",
-        "line" : 2314,
+        "line" : 2327,
         "char" : 18,
         "deco" : "Aya",
         "offset" : 0
@@ -29514,7 +29514,7 @@
         "name" : "timCreate",
         "kind" : "variable",
         "comment" : "Queueに追加された時刻\n",
-        "line" : 2316,
+        "line" : 2329,
         "char" : 18,
         "deco" : "S3std8datetime7systime7SysTime",
         "offset" : 16
@@ -29523,7 +29523,7 @@
         "name" : "timReady",
         "kind" : "variable",
         "comment" : "Poolに追加された時刻\n",
-        "line" : 2318,
+        "line" : 2331,
         "char" : 18,
         "deco" : "S3std8datetime7systime7SysTime",
         "offset" : 32
@@ -29532,7 +29532,7 @@
         "name" : "timStart",
         "kind" : "variable",
         "comment" : "実行開始した時刻\n",
-        "line" : 2320,
+        "line" : 2333,
         "char" : 18,
         "deco" : "S3std8datetime7systime7SysTime",
         "offset" : 48
@@ -29541,7 +29541,7 @@
         "name" : "timEnd",
         "kind" : "variable",
         "comment" : "実行終了した時刻\n",
-        "line" : 2322,
+        "line" : 2335,
         "char" : 18,
         "deco" : "S3std8datetime7systime7SysTime",
         "offset" : 64
@@ -29550,7 +29550,7 @@
         "name" : "uuid",
         "kind" : "variable",
         "comment" : "一意なID\n",
-        "line" : 2324,
+        "line" : 2337,
         "char" : 18,
         "deco" : "S3std4uuid4UUID",
         "offset" : 80
@@ -29559,7 +29559,7 @@
         "name" : "State",
         "kind" : "alias",
         "comment" : "タスクの状態\n",
-        "line" : 2326,
+        "line" : 2339,
         "char" : 3,
         "deco" : "E5voile4sync8TaskData5State",
         "originalType" : "TaskData.State"
@@ -29568,7 +29568,7 @@
         "name" : "state",
         "kind" : "variable",
         "comment" : "ditto\n",
-        "line" : 2328,
+        "line" : 2341,
         "char" : 9,
         "deco" : "E5voile4sync8TaskData5State",
         "offset" : 96
@@ -29576,7 +29576,7 @@
        {
         "name" : "opAssign",
         "kind" : "generated function",
-        "line" : 2311,
+        "line" : 2324,
         "char" : 2,
         "deco" : "FNaNbNcNiNjNfS5voile4sync14MultiTaskQueue8TaskInfoZQBm",
         "originalType" : "pure nothrow ref @safe TaskInfo(TaskInfo p) return",
@@ -29593,23 +29593,23 @@
       "name" : "informations",
       "kind" : "function",
       "comment" : " 情報取得\n\n タスクの実行状況を調べる。\n\n Returns:\n      タスクの情報を$(D TaskInfo)の配列で返す。\n",
-      "line" : 2339,
+      "line" : 2352,
       "char" : 13,
       "deco" : "xFNdNfZAS5voile4sync14MultiTaskQueue8TaskInfo",
-      "endline" : 2351,
+      "endline" : 2364,
       "endchar" : 2
      }
     ]
    },
    {
-    "name" : "__unittest_L2355_C9",
+    "name" : "__unittest_L2368_C9",
     "kind" : "function",
-    "line" : 2355,
+    "line" : 2368,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2539,
+    "endline" : 2552,
     "endchar" : 1
    }
   ]

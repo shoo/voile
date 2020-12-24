@@ -699,10 +699,21 @@ shared bool <code class="ddoc_psymbol">invoke</code>(string <span class="ddoc_pa
 <div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
  タスクを追加することができたらtrueを、追加できなかったらfalseを返す。</div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.drop"></span><div class="quickindex" id="quickindex.MultiTaskQueue.drop"></div>void <code class="ddoc_psymbol">drop</code>(string <span class="ddoc_param">type</span>, UUID <span class="ddoc_param">id</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.drop"></span><div class="quickindex" id="quickindex.MultiTaskQueue.drop"></div>bool <code class="ddoc_psymbol">drop</code>(string <span class="ddoc_param">type</span>, UUID <span class="ddoc_param">id</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">タスク実行を取りやめる
-</div><div class="ddoc_description">タスクがまだ実行されていない場合は、実行を取りやめる。</div>
+</div><div class="ddoc_description">タスクがまだ実行されていない場合は、実行を取りやめる。
+
+</div>
+<div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">string <span class="ddoc_param">type</span></td>
+<td class="ddoc_param_desc">タスク種別を指定する</td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">UUID <span class="ddoc_param">id</span></td>
+<td class="ddoc_param_desc">タスクの識別用IDを指定する</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ 正常にドロップされた場合はtrueが返り、さもなくばfalseが返る。</div>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".MultiTaskQueue.peek"></span><div class="quickindex" id="quickindex.MultiTaskQueue.peek"></div>shared(TaskData) <code class="ddoc_psymbol">peek</code>(string <span class="ddoc_param">type</span>, UUID <span class="ddoc_param">id</span>);
 <br></div></dt>
