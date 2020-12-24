@@ -2280,14 +2280,27 @@ public:
 	 * タスク実行を取りやめる
 	 * 
 	 * タスクがまだ実行されていない場合は、実行を取りやめる。
+	 * 
+	 * Params:
+	 *      type = タスク種別を指定する
+	 *      id = タスクの識別用IDを指定する
+	 * Returns:
+	 *      正常にドロップされた場合はtrueが返り、さもなくばfalseが返る。
 	 */
-	void drop(string type, UUID id)
+	bool drop(string type, UUID id)
 	{
 		with (_taskQueue.locked)
 		{
 			if (_state == State.ready)
-				removeAt(type, id);
+			{
+				if (auto t = removeAt(type, id))
+				{
+					(cast(shared)t).onDropped();
+					return true;
+				}
+			}
 		}
+		return false;
 	}
 	
 	/***************************************************************************
