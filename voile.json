@@ -559,7 +559,7 @@
      "enum"
     ],
     "deco" : "E5voile4attr6Ignore",
-    "init" : "cast(Ignore)0"
+    "init" : "Ignore.init"
    },
    {
     "kind" : "template",
@@ -626,7 +626,7 @@
      "enum"
     ],
     "deco" : "E5voile4attr9Essential",
-    "init" : "cast(Essential)0"
+    "init" : "Essential.init"
    },
    {
     "kind" : "template",
@@ -693,7 +693,7 @@
      "enum"
     ],
     "deco" : "E5voile4attr3Key",
-    "init" : "cast(Key)0"
+    "init" : "Key.init"
    },
    {
     "kind" : "template",
@@ -2501,7 +2501,7 @@
      "enum"
     ],
     "deco" : "E5voile6bindat6Endian",
-    "init" : "cast(Endian)0"
+    "init" : "Endian.little"
    },
    {
     "name" : "bigEndian",
@@ -2513,7 +2513,7 @@
      "enum"
     ],
     "deco" : "E5voile6bindat6Endian",
-    "init" : "cast(Endian)1"
+    "init" : "Endian.big"
    },
    {
     "name" : "systemEndian",
@@ -2525,7 +2525,7 @@
      "enum"
     ],
     "deco" : "E5voile6bindat6Endian",
-    "init" : "cast(Endian)0"
+    "init" : "Endian.little"
    },
    {
     "kind" : "template",
@@ -6580,7 +6580,7 @@
        {
         "name" : "mode",
         "deco" : "E3std4file8SpanMode",
-        "default" : "cast(SpanMode)0"
+        "default" : "SpanMode.shallow"
        },
        {
         "name" : "followSymlink",
@@ -8513,7 +8513,7 @@
        {
         "name" : "cfg",
         "deco" : "E3std7process6Config",
-        "default" : "cast(Config)0"
+        "default" : "Config.none"
        }
       ],
       "endline" : 1696,
@@ -8555,7 +8555,7 @@
        {
         "name" : "cfg",
         "deco" : "E3std7process6Config",
-        "default" : "cast(Config)16"
+        "default" : "Config.suppressConsole"
        }
       ],
       "endline" : 1709,
@@ -8597,7 +8597,7 @@
        {
         "name" : "cfg",
         "deco" : "E3std7process6Config",
-        "default" : "cast(Config)16"
+        "default" : "Config.suppressConsole"
        }
       ],
       "endline" : 1722,
@@ -8627,7 +8627,7 @@
        {
         "name" : "cfg",
         "deco" : "E3std7process6Config",
-        "default" : "cast(Config)16"
+        "default" : "Config.suppressConsole"
        }
       ],
       "endline" : 1731,
@@ -8657,7 +8657,7 @@
        {
         "name" : "cfg",
         "deco" : "E3std7process6Config",
-        "default" : "cast(Config)16"
+        "default" : "Config.suppressConsole"
        }
       ],
       "endline" : 1740,
@@ -14939,7 +14939,7 @@
        {
         "name" : "lv",
         "deco" : "E3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 273,
@@ -15012,7 +15012,7 @@
        {
         "name" : "lv",
         "deco" : "E3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 311,
@@ -15148,7 +15148,7 @@
        {
         "name" : "lv",
         "deco" : "xE3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 373,
@@ -15198,7 +15198,7 @@
        {
         "name" : "lv",
         "deco" : "xE3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 383,
@@ -15392,7 +15392,7 @@
        {
         "name" : "lv",
         "deco" : "xE3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 433,
@@ -15442,7 +15442,7 @@
        {
         "name" : "lv",
         "deco" : "xE3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 470,
@@ -15612,7 +15612,7 @@
        {
         "name" : "lv",
         "deco" : "xE3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 624,
@@ -15662,7 +15662,7 @@
        {
         "name" : "lv",
         "deco" : "xE3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 661,
@@ -15802,7 +15802,7 @@
        {
         "name" : "lv",
         "deco" : "xE3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 730,
@@ -15852,7 +15852,7 @@
        {
         "name" : "lv",
         "deco" : "xE3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 755,
@@ -15992,7 +15992,7 @@
        {
         "name" : "lv",
         "deco" : "xE3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 811,
@@ -16042,7 +16042,7 @@
        {
         "name" : "lv",
         "deco" : "xE3std12experimental6logger4core8LogLevel",
-        "default" : "cast(LogLevel)cast(ubyte)1u"
+        "default" : "LogLevel.all"
        }
       ],
       "endline" : 836,
@@ -16280,7 +16280,7 @@
         "line" : 935,
         "char" : 14,
         "deco" : "E3std12experimental6logger4core8LogLevel",
-        "init" : "cast(LogLevel)cast(ubyte)1u",
+        "init" : "LogLevel.all",
         "offset" : 872
        },
        {
@@ -28828,7 +28828,7 @@
       "line" : 1909,
       "char" : 8,
       "deco" : "E5voile4sync8TaskData5State",
-      "init" : "cast(State)0",
+      "init" : "State.waiting",
       "offset" : 128
      },
      {
@@ -29043,7 +29043,7 @@
         "line" : 1968,
         "char" : 9,
         "deco" : "E5voile4sync14MultiTaskQueue9TaskQueue5State",
-        "init" : "cast(State)0",
+        "init" : "State.ready",
         "offset" : 8
        },
        {
