@@ -140,6 +140,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 関数のパラメータに付与されたUDAを取り出す。\n\n Params:\n      Func = 関数\n      i    = 引数の番号(最初の引数は0番目)\n      attr = UDAの種類を指定できます(指定しないとすべて返します)\n Returns:\n      UDAのタプルが返ります\n",
     "line" : 46,
     "char" : 1,
@@ -167,6 +168,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 62,
     "char" : 1,
@@ -199,6 +201,7 @@
    {
     "name" : "__unittest_L64_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 64,
     "char" : 26,
@@ -213,6 +216,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 関数のパラメータに付与されたUDAのうち、型についたUDAを取り出す。\n\n Params:\n      Func = 関数\n      i    = 引数の番号(最初の引数は0番目)\n      attr = UDAの種類を指定できます(指定しないとすべて返します)\n Returns:\n      UDAのタプルが返ります\n",
     "line" : 99,
     "char" : 1,
@@ -240,6 +244,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 111,
     "char" : 1,
@@ -272,6 +277,7 @@
    {
     "name" : "__unittest_L114_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 114,
     "char" : 26,
@@ -286,6 +292,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 関数のパラメータに付与されたUDAのうち、引数についたUDAを取り出す。\n\n Params:\n      Func = 関数\n      i    = 引数の番号(最初の引数は0番目)\n      attr = UDAの種類を指定できます(指定しないとすべて返します)\n Returns:\n      UDAのタプルが返ります\n",
     "line" : 141,
     "char" : 1,
@@ -338,6 +345,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 147,
     "char" : 1,
@@ -370,6 +378,7 @@
    {
     "name" : "__unittest_L149_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 149,
     "char" : 26,
@@ -384,6 +393,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 関数のパラメータにUDAが付与されているか確認します\n\n Params:\n      Func = 関数\n      i    = 引数の番号(最初の引数は0番目)\n      attr = チェックするUDA\n Returns:\n      UDAがあったらtrue\n",
     "line" : 183,
     "char" : 11,
@@ -420,6 +430,7 @@
    {
     "name" : "__unittest_L185_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 185,
     "char" : 26,
@@ -434,6 +445,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 関数のパラメータに付与されたUDAのうち、型にUDAがついているか確認します\n\n Params:\n      Func = 関数\n      i    = 引数の番号(最初の引数は0番目)\n      attr = チェックするUDA\n Returns:\n      UDAがあったらtrue\n",
     "line" : 210,
     "char" : 11,
@@ -470,6 +482,7 @@
    {
     "name" : "__unittest_L212_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 212,
     "char" : 26,
@@ -484,6 +497,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 関数のパラメータに付与されたUDAのうち、引数にUDAがついているか確認します\n\n Params:\n      Func = 関数\n      i    = 引数の番号(最初の引数は0番目)\n      attr = チェックするUDA\n Returns:\n      UDAがあったらtrue\n",
     "line" : 237,
     "char" : 11,
@@ -520,6 +534,7 @@
    {
     "name" : "__unittest_L239_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 239,
     "char" : 26,
@@ -543,6 +558,7 @@
      {
       "name" : "init",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "0",
       "line" : 254,
       "char" : 22
@@ -552,6 +568,7 @@
    {
     "name" : "ignore",
     "kind" : "variable",
+    "protection" : "public",
     "comment" : " Attribute marking ignore data\n",
     "line" : 259,
     "char" : 13,
@@ -563,6 +580,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 262,
     "char" : 11,
@@ -590,6 +608,7 @@
    {
     "name" : "__unittest_L265_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 265,
     "char" : 7,
@@ -610,6 +629,7 @@
      {
       "name" : "init",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "0",
       "line" : 276,
       "char" : 25
@@ -619,6 +639,7 @@
    {
     "name" : "essential",
     "kind" : "variable",
+    "protection" : "public",
     "comment" : " Attribute marking essential field\n",
     "line" : 281,
     "char" : 16,
@@ -630,6 +651,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 284,
     "char" : 11,
@@ -657,6 +679,7 @@
    {
     "name" : "__unittest_L287_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 287,
     "char" : 7,
@@ -677,6 +700,7 @@
      {
       "name" : "init",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "0",
       "line" : 299,
       "char" : 19
@@ -686,6 +710,7 @@
    {
     "name" : "key",
     "kind" : "variable",
+    "protection" : "public",
     "comment" : " Attribute marking essential field\n",
     "line" : 304,
     "char" : 10,
@@ -697,6 +722,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 307,
     "char" : 11,
@@ -723,6 +749,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 310,
     "char" : 11,
@@ -754,6 +781,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 313,
     "char" : 1,
@@ -776,6 +804,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 316,
     "char" : 11,
@@ -802,6 +831,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 319,
     "char" : 13,
@@ -829,6 +859,7 @@
    {
     "name" : "__unittest_L322_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 322,
     "char" : 7,
@@ -848,6 +879,7 @@
      {
       "name" : "name",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 342,
       "char" : 9,
       "deco" : "Aya",
@@ -858,6 +890,7 @@
    {
     "name" : "name",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " Attribute forcing field name\n",
     "line" : 348,
     "char" : 6,
@@ -873,6 +906,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 353,
     "char" : 11,
@@ -900,6 +934,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 356,
     "char" : 11,
@@ -926,6 +961,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 359,
     "char" : 1,
@@ -954,6 +990,7 @@
    {
     "name" : "__unittest_L366_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 366,
     "char" : 7,
@@ -979,6 +1016,7 @@
      {
       "name" : "Value",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 379,
       "char" : 9,
       "members" : [
@@ -995,6 +1033,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " Attribute forcing field value\n",
     "line" : 387,
     "char" : 9,
@@ -1025,6 +1064,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 392,
     "char" : 24,
@@ -1051,6 +1091,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 395,
     "char" : 1,
@@ -1077,6 +1118,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 409,
     "char" : 1,
@@ -1123,6 +1165,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 424,
     "char" : 1,
@@ -1150,6 +1193,7 @@
    {
     "name" : "__unittest_L431_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 431,
     "char" : 7,
@@ -1161,6 +1205,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 446,
     "char" : 1,
@@ -1175,6 +1220,7 @@
      {
       "name" : "ConvBy",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 446,
       "char" : 1,
       "members" : []
@@ -1184,6 +1230,7 @@
    {
     "name" : "convBy",
     "kind" : "alias",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 449,
     "char" : 1,
@@ -1191,6 +1238,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 452,
     "char" : 1,
@@ -1217,6 +1265,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 469,
     "char" : 1,
@@ -1240,6 +1289,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 485,
     "char" : 1,
@@ -1262,6 +1312,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 488,
     "char" : 1,
@@ -1291,6 +1342,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 496,
     "char" : 1,
@@ -1328,6 +1380,7 @@
    {
     "name" : "__unittest_L503_C7",
     "kind" : "function",
+    "protection" : "public",
     "line" : 503,
     "char" : 7,
     "storageClass" : [
@@ -1347,6 +1400,7 @@
      {
       "name" : "none",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "0",
       "line" : 526,
       "char" : 2
@@ -1354,6 +1408,7 @@
      {
       "name" : "type1",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "1",
       "line" : 527,
       "char" : 2
@@ -1361,6 +1416,7 @@
      {
       "name" : "type2",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "2",
       "line" : 528,
       "char" : 2
@@ -1368,6 +1424,7 @@
      {
       "name" : "type3",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "3",
       "line" : 529,
       "char" : 2
@@ -1375,6 +1432,7 @@
      {
       "name" : "type4",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "4",
       "line" : 530,
       "char" : 2
@@ -1382,6 +1440,7 @@
      {
       "name" : "type5",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "5",
       "line" : 531,
       "char" : 2
@@ -1389,6 +1448,7 @@
      {
       "name" : "type6",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "6",
       "line" : 532,
       "char" : 2
@@ -1441,6 +1501,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 580,
     "char" : 1,
@@ -1471,6 +1532,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 594,
     "char" : 1,
@@ -1572,6 +1634,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 670,
     "char" : 1,
@@ -1616,6 +1679,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 715,
     "char" : 1,
@@ -1646,6 +1710,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 727,
     "char" : 1,
@@ -1747,6 +1812,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 807,
     "char" : 1,
@@ -1859,6 +1925,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 874,
     "char" : 1,
@@ -1971,6 +2038,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 942,
     "char" : 6,
@@ -2001,6 +2069,7 @@
    {
     "name" : "__unittest_L945_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 945,
     "char" : 9,
     "storageClass" : [
@@ -2012,6 +2081,7 @@
    {
     "name" : "__unittest_L1169_C7",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1169,
     "char" : 7,
     "storageClass" : [
@@ -2091,6 +2161,7 @@
    {
     "name" : "FootPrintBenchmark",
     "kind" : "struct",
+    "protection" : "public",
     "comment" : " 足跡を記録する\n\n このクラスは、ファイルと行番号ごとに足跡をつけ、前回の足跡からどの程度の時間\n が経過したかを記録し、時間がかかっている個所を特定するためのクラスです。\n------------------------------------------------------------------------------\nvoid main()\n{\n    scope fp = new FootPrint;\n    fp.stamp(__FILE__,__LINE__);\n    func1();\n    fp.stamp(__FILE__,__LINE__);\n    func2();\n    fp.stamp(__FILE__,__LINE__);\n    Stdout(\"Stamp infomations\").newline;\n    foreach (d; fp.result)\n    {\n        Stdout.formatln(\"{}({}): {} sec\", d.file, d.line, d.time.interval);\n    }\n}\n------------------------------------------------------------------------------\n For profiling.\n\n It stamps the code footprints for searching bottlenecks.\n When not enough to profile in -profile, this object is useful.\n\n",
     "line" : 56,
     "char" : 1,
@@ -2098,6 +2169,7 @@
      {
       "name" : "Data",
       "kind" : "struct",
+      "protection" : "public",
       "comment" : " 記録されるデータ\n",
       "line" : 61,
       "char" : 9,
@@ -2105,6 +2177,7 @@
        {
         "name" : "time",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "時間\n",
         "line" : 64,
         "char" : 12,
@@ -2114,6 +2187,7 @@
        {
         "name" : "file",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "呼び出し元ファイル名\n",
         "line" : 68,
         "char" : 10,
@@ -2123,6 +2197,7 @@
        {
         "name" : "line",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "呼び出し元行数\n",
         "line" : 72,
         "char" : 8,
@@ -2132,6 +2207,7 @@
        {
         "name" : "toString",
         "kind" : "function",
+        "protection" : "public",
         "comment" : " 文字列表現\n",
         "line" : 78,
         "char" : 10,
@@ -2162,6 +2238,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : " 自動測定コンストラクタ\n\n AutoStartの値によって、自動的にストップウォッチ開始するか決まります。\n",
       "line" : 95,
       "char" : 2,
@@ -2179,6 +2256,7 @@
      {
       "name" : "start",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ストップウォッチスタート\n\n 初めてのスタートの場合、この時刻からの時間を測定して足跡に記録します。\n 一時停止からの復帰の場合、継続的に時間の測定を行います。\n",
       "line" : 107,
       "char" : 7,
@@ -2189,6 +2267,7 @@
      {
       "name" : "stop",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ストップウォッチストップ\n\n 一時停止です。再び復帰する場合はstart()します\n",
       "line" : 118,
       "char" : 7,
@@ -2199,28 +2278,31 @@
      {
       "name" : "reset",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ストップウォッチリセット\n",
       "line" : 127,
       "char" : 7,
       "deco" : "FZv",
-      "endline" : 135,
+      "endline" : 131,
       "endchar" : 2
      },
      {
       "name" : "clear",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " データをクリアします。\n\n ストップウォッチの状態はそのままです。\n ストップウォッチをリセットする場合はresetをコールしてください\n",
-      "line" : 144,
+      "line" : 140,
       "char" : 7,
       "deco" : "FZv",
-      "endline" : 147,
+      "endline" : 143,
       "endchar" : 2
      },
      {
       "name" : "stamp",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 足跡を記録します。\n\n この関数を呼び出した時点での時間と、呼び出し元を記録してデータに追加しま\n す。\n",
-      "line" : 156,
+      "line" : 152,
       "char" : 7,
       "deco" : "FAyakZv",
       "originalType" : "void(string f = __FILE__, uint l = __LINE__)",
@@ -2236,43 +2318,47 @@
         "default" : "cast(uint)__LINE__"
        }
       ],
-      "endline" : 159,
+      "endline" : 155,
       "endchar" : 2
      },
      {
       "name" : "intervals",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 各データのそれぞれの呼び出し間隔を返します。\n",
-      "line" : 165,
+      "line" : 161,
       "char" : 20,
       "deco" : "FZAye",
-      "endline" : 177,
+      "endline" : 173,
       "endchar" : 2
      },
      {
       "name" : "datas",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 記録されたデータそのものを返します\n",
-      "line" : 183,
+      "line" : 179,
       "char" : 20,
       "deco" : "FZAyS5voile9benchmark18FootPrintBenchmark4Data",
-      "endline" : 186,
+      "endline" : 182,
       "endchar" : 2
      },
      {
       "name" : "intervalDatas",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 記録されたデータそのものを返します\n",
-      "line" : 192,
+      "line" : 188,
       "char" : 20,
       "deco" : "FZAyS5voile9benchmark18FootPrintBenchmark4Data",
-      "endline" : 206,
+      "endline" : 202,
       "endchar" : 2
      },
      {
       "name" : "opSlice",
       "kind" : "alias",
-      "line" : 208,
+      "protection" : "public",
+      "line" : 204,
       "char" : 2,
       "originalType" : "datas"
      }
@@ -2281,22 +2367,25 @@
    {
     "name" : "CallCounter",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " 呼び出しの情報を記録する\n\n このクラスは呼び出した回数を記録する。呼び出された回数が多いほどその周囲は\n 時間に気をつけるようにするとよい。\n",
-    "line" : 218,
+    "line" : 214,
     "char" : 1,
     "members" : [
      {
       "name" : "Data",
       "kind" : "struct",
+      "protection" : "public",
       "comment" : " 記録されるデータ\n",
-      "line" : 223,
+      "line" : 219,
       "char" : 26,
       "members" : [
        {
         "name" : "file",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "ファイル名\n",
-        "line" : 226,
+        "line" : 222,
         "char" : 10,
         "storageClass" : [
          "immutable"
@@ -2308,8 +2397,9 @@
        {
         "name" : "line",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "行番号\n",
-        "line" : 228,
+        "line" : 224,
         "char" : 8,
         "storageClass" : [
          "immutable"
@@ -2321,8 +2411,9 @@
        {
         "name" : "count",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "回数\n",
-        "line" : 230,
+        "line" : 226,
         "char" : 9,
         "storageClass" : [
          "immutable"
@@ -2337,7 +2428,7 @@
       "name" : "_data",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 232,
+      "line" : 228,
       "char" : 30,
       "deco" : "HAyaHkm",
       "offset" : 16
@@ -2345,8 +2436,9 @@
      {
       "name" : "call",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 呼び出す\n\n この関数を呼び出すことで、その場所の呼び出し回数カウントしていく。\n",
-      "line" : 240,
+      "line" : 236,
       "char" : 7,
       "deco" : "FAyakZv",
       "originalType" : "void(string file = __FILE__, uint line = __LINE__)",
@@ -2362,17 +2454,18 @@
         "default" : "cast(uint)__LINE__"
        }
       ],
-      "endline" : 259,
+      "endline" : 255,
       "endchar" : 2
      },
      {
       "name" : "result",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 結果を返す\n\n このクラスは呼び出した回数を記録する。呼び出された回数が多いほどその周囲は\n 時間に気をつけるようにするとよい。\n",
-      "line" : 268,
+      "line" : 264,
       "char" : 20,
       "deco" : "FZAyS5voile9benchmark11CallCounter4Data",
-      "endline" : 279,
+      "endline" : 275,
       "endchar" : 2
      }
     ]
@@ -2380,15 +2473,17 @@
    {
     "name" : "ProfileData",
     "kind" : "struct",
+    "protection" : "public",
     "comment" : "\n",
-    "line" : 286,
+    "line" : 282,
     "char" : 1,
     "members" : [
      {
       "name" : "thread",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
-      "line" : 289,
+      "line" : 285,
       "char" : 15,
       "deco" : "C4core6thread8osthread6Thread",
       "originalType" : "Thread",
@@ -2397,8 +2492,9 @@
      {
       "name" : "file",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
-      "line" : 291,
+      "line" : 287,
       "char" : 15,
       "deco" : "Aya",
       "offset" : 8
@@ -2406,8 +2502,9 @@
      {
       "name" : "line",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
-      "line" : 293,
+      "line" : 289,
       "char" : 15,
       "deco" : "k",
       "offset" : 24
@@ -2415,8 +2512,9 @@
      {
       "name" : "time",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
-      "line" : 295,
+      "line" : 291,
       "char" : 15,
       "deco" : "S4core4time12TickDuration",
       "offset" : 32
@@ -2424,8 +2522,9 @@
      {
       "name" : "duration",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
-      "line" : 297,
+      "line" : 293,
       "char" : 15,
       "deco" : "S4core4time12TickDuration",
       "offset" : 40
@@ -2478,6 +2577,7 @@
      {
       "name" : "little",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "0",
       "line" : 12,
       "char" : 2
@@ -2485,6 +2585,7 @@
      {
       "name" : "big",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "1",
       "line" : 12,
       "char" : 10
@@ -2494,6 +2595,7 @@
    {
     "name" : "littleEndian",
     "kind" : "variable",
+    "protection" : "public",
     "comment" : " リトルエンディアンのデータに付与するUDA\n",
     "line" : 18,
     "char" : 6,
@@ -2506,6 +2608,7 @@
    {
     "name" : "bigEndian",
     "kind" : "variable",
+    "protection" : "public",
     "comment" : " ビッグエンディアンのデータに付与するUDA\n",
     "line" : 23,
     "char" : 6,
@@ -2518,6 +2621,7 @@
    {
     "name" : "systemEndian",
     "kind" : "variable",
+    "protection" : "public",
     "comment" : " システムのエンディアンがリトルかビッグかで切り替えが行われるUDA\n",
     "line" : 30,
     "char" : 7,
@@ -2555,6 +2659,7 @@
    {
     "name" : "__unittest_L53_C7",
     "kind" : "function",
+    "protection" : "public",
     "line" : 53,
     "char" : 7,
     "storageClass" : [
@@ -2591,6 +2696,7 @@
    {
     "name" : "__unittest_L68_C7",
     "kind" : "function",
+    "protection" : "public",
     "line" : 68,
     "char" : 7,
     "storageClass" : [
@@ -2690,6 +2796,7 @@
      {
       "name" : "PreLength",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 132,
       "char" : 9,
       "members" : [
@@ -2706,6 +2813,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 配列の長さがバイナリの前方に現れる場合のUDA\n",
     "line" : 140,
     "char" : 1,
@@ -2736,6 +2844,7 @@
      {
       "name" : "predication",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 147,
       "char" : 9,
       "deco" : "Aya",
@@ -2745,6 +2854,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 配列の長さを計算によって行うUDA\n",
     "line" : 153,
     "char" : 1,
@@ -2771,6 +2881,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 158,
     "char" : 13,
@@ -2894,6 +3005,7 @@
    {
     "name" : "__unittest_L184_C7",
     "kind" : "function",
+    "protection" : "public",
     "line" : 184,
     "char" : 7,
     "storageClass" : [
@@ -2904,6 +3016,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 入力対象のバイナリデータ型\n",
     "line" : 209,
     "char" : 11,
@@ -2930,6 +3043,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 出力対象のバイナリデータ型\n",
     "line" : 214,
     "char" : 11,
@@ -2956,6 +3070,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 基本型要素をもつ配列\n",
     "line" : 219,
     "char" : 1,
@@ -2982,6 +3097,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " Proxy\n\n 1. 以下の関数を持つ\n    - `void writeBinary(InputRange)(ref InputRange) const;`\n    - `void readBinary(OutputRange)(ref OutputRange);`\n 2. 【未実装】以下の関数を持つ\n    - `size_t binaryLength() const @property;`\n    - `immutable(ubyte)[] toBinary() const;`\n    - `void fromBinary(in byte[]);`\n 3. 【未実装】型の宣言に以下のUDAを持つ\n    - `@convBy!Proxy`\n      - Proxy: `void to(OutputRange)(in T src, ref OutputRange r);`\n      - Proxy: `void from(InputRange)(ref InputRange r, ref T dst);`\n 4. メンバの宣言に以下のUDAを持つ\n    - `@convBy!Proxy`\n      - Proxy type3: `void to(OutputRange)(in T src, ref OutputRange);`\n      - Proxy type3: `void from(InputRange)(ref InputRange, ref T dst);`\n 5. 【未実装】メンバの宣言に以下のUDAを持つ\n    - `@preLength!Size`\n    - `@convBy!Proxy` : `immutable(ubyte)[]`\n 6. 【未実装】メンバの宣言に以下のUDAを持つ\n    - `@arrayLength!\"...\"`\n    - `@convBy!Proxy` : `immutable(ubyte)[]`\n",
     "line" : 252,
     "char" : 1,
@@ -3022,6 +3138,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 269,
     "char" : 1,
@@ -3074,6 +3191,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " バイナリのシリアライズ\n",
     "line" : 294,
     "char" : 6,
@@ -3124,6 +3242,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 308,
     "char" : 6,
@@ -3175,6 +3294,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 314,
     "char" : 6,
@@ -3220,6 +3340,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 320,
     "char" : 6,
@@ -3266,6 +3387,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 326,
     "char" : 6,
@@ -3316,6 +3438,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 340,
     "char" : 6,
@@ -3361,6 +3484,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 354,
     "char" : 6,
@@ -3406,6 +3530,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 421,
     "char" : 6,
@@ -3456,6 +3581,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 462,
     "char" : 20,
@@ -3489,6 +3615,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 470,
     "char" : 20,
@@ -3529,6 +3656,7 @@
    {
     "name" : "__unittest_L480_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "基本型と列挙値\n",
     "line" : 480,
     "char" : 7,
@@ -3541,6 +3669,7 @@
    {
     "name" : "__unittest_L500_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "配列\n",
     "line" : 500,
     "char" : 7,
@@ -3553,6 +3682,7 @@
    {
     "name" : "__unittest_L519_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "エンディアン変換\n",
     "line" : 519,
     "char" : 7,
@@ -3565,6 +3695,7 @@
    {
     "name" : "__unittest_L530_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "構造体\n",
     "line" : 530,
     "char" : 7,
@@ -3577,6 +3708,7 @@
    {
     "name" : "__unittest_L560_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "Endata\n",
     "line" : 560,
     "char" : 7,
@@ -3589,6 +3721,7 @@
    {
     "name" : "__unittest_L575_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "Proxy\n",
     "line" : 575,
     "char" : 7,
@@ -3646,6 +3779,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " バイナリのデシリアライズ\n",
     "line" : 660,
     "char" : 6,
@@ -3696,6 +3830,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 668,
     "char" : 6,
@@ -3741,6 +3876,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 674,
     "char" : 6,
@@ -3791,6 +3927,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 685,
     "char" : 6,
@@ -3836,6 +3973,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 699,
     "char" : 6,
@@ -3881,6 +4019,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 778,
     "char" : 6,
@@ -3931,6 +4070,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 820,
     "char" : 6,
@@ -3978,6 +4118,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 826,
     "char" : 6,
@@ -4020,6 +4161,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 832,
     "char" : 3,
@@ -4056,6 +4198,7 @@
    {
     "name" : "__unittest_L841_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "基本型と列挙値\n",
     "line" : 841,
     "char" : 7,
@@ -4068,6 +4211,7 @@
    {
     "name" : "__unittest_L869_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "配列\n",
     "line" : 869,
     "char" : 7,
@@ -4080,6 +4224,7 @@
    {
     "name" : "__unittest_L895_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "エンディアン変換\n",
     "line" : 895,
     "char" : 7,
@@ -4092,6 +4237,7 @@
    {
     "name" : "__unittest_L909_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "構造体\n",
     "line" : 909,
     "char" : 7,
@@ -4104,6 +4250,7 @@
    {
     "name" : "__unittest_L944_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "Endata\n",
     "line" : 944,
     "char" : 7,
@@ -4116,6 +4263,7 @@
    {
     "name" : "__unittest_L964_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "Proxy\n",
     "line" : 964,
     "char" : 7,
@@ -4128,6 +4276,7 @@
    {
     "name" : "__unittest_L1043_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " バイナリの解析\n\n - [0-2] タグタイプ\n   - if [0-2]が 0x0001\n     - [2-4] 長さ\n     - [4-X] ペイロード\n   - if [0-2]が 0x0002\n     - [2] コマンド種別\n       - if [2] が 0x01\n         - [3-5] 付与データ\n       - if [2] が 0x02\n         - (なし)\n       - if [2] が 0x03\n         - [3.0]     フラグ1\n         - [3.1-3.3] フラグ2\n         - [3.3-3.6] reserved\n         - [3.7]     フラグ8\n",
     "line" : 1043,
     "char" : 7,
@@ -4189,6 +4338,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 22,
     "char" : 1,
@@ -4210,6 +4360,7 @@
      {
       "name" : "DataWriter",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 22,
       "char" : 1,
       "members" : [
@@ -4492,6 +4643,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 210,
     "char" : 55,
@@ -4526,6 +4678,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 218,
     "char" : 41,
@@ -4557,6 +4710,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 227,
     "char" : 52,
@@ -4591,6 +4745,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 235,
     "char" : 38,
@@ -4623,6 +4778,7 @@
    {
     "name" : "__unittest_L243_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 243,
     "char" : 9,
     "storageClass" : [
@@ -4633,6 +4789,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 431,
     "char" : 6,
@@ -4675,6 +4832,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 495,
     "char" : 6,
@@ -4717,6 +4875,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 539,
     "char" : 6,
@@ -4762,6 +4921,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 547,
     "char" : 6,
@@ -4791,6 +4951,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 561,
     "char" : 1,
@@ -4812,6 +4973,7 @@
      {
       "name" : "DataReader",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 561,
       "char" : 1,
       "members" : [
@@ -5120,6 +5282,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 728,
     "char" : 55,
@@ -5154,6 +5317,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 735,
     "char" : 41,
@@ -5185,6 +5349,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 743,
     "char" : 52,
@@ -5219,6 +5384,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 750,
     "char" : 38,
@@ -5251,6 +5417,7 @@
    {
     "name" : "__unittest_L758_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 758,
     "char" : 9,
     "storageClass" : [
@@ -5332,6 +5499,7 @@
    {
     "name" : "splitPath",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " パスを分解してパンくずリストにする\n\n Params:\n     path  = 変換したい絶対/相対パス\n",
     "line" : 15,
     "char" : 17,
@@ -5351,6 +5519,7 @@
    {
     "name" : "joinPath",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " パンくずリストをPosixパスに再構築する\n\n Params:\n     path      = 変換したい絶対/相対パス\n     delimiter = パスの区切り文字を指定する\n",
     "line" : 31,
     "char" : 15,
@@ -5376,6 +5545,7 @@
    {
     "name" : "joinWindowsPath",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " パンくずリストをWindowsパスに再構築する\n\n Params:\n     path  = 変換したい絶対/相対パス\n",
     "line" : 43,
     "char" : 15,
@@ -5395,6 +5565,7 @@
    {
     "name" : "joinPosixPath",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " パンくずリストをPosixパスに再構築する\n\n Params:\n     path  = 変換したい絶対/相対パス\n",
     "line" : 54,
     "char" : 15,
@@ -5414,6 +5585,7 @@
    {
     "name" : "posixPath",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " パンをPosixパスに変換する(/を使うように変換)\n\n Params:\n     path  = 変換したい絶対/相対パス\n",
     "line" : 66,
     "char" : 8,
@@ -5430,6 +5602,7 @@
    {
     "name" : "windowsPath",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " パンをWindowsパスに変換する(\\を使うように変換)\n\n Params:\n     path  = 変換したい絶対/相対パス\n",
     "line" : 77,
     "char" : 8,
@@ -5462,6 +5635,7 @@
    {
     "name" : "joinNativePath",
     "kind" : "alias",
+    "protection" : "public",
     "comment" : "In Posix\n",
     "line" : 108,
     "char" : 2,
@@ -5470,6 +5644,7 @@
    {
     "name" : "nativePath",
     "kind" : "alias",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 110,
     "char" : 2,
@@ -5478,6 +5653,7 @@
    {
     "name" : "FileSystem",
     "kind" : "struct",
+    "protection" : "public",
     "comment" : " ファイルシステムの操作に関するヘルパ\n",
     "line" : 117,
     "char" : 1,
@@ -5485,6 +5661,7 @@
      {
       "name" : "workDir",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 120,
       "char" : 9,
@@ -5494,6 +5671,7 @@
      {
       "name" : "onCreating",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "作成前に呼ばれる。作成しない場合は例外を投げる\n",
       "line" : 123,
       "char" : 66,
@@ -5504,6 +5682,7 @@
      {
       "name" : "onCreated",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "作成後に呼ばれる。\n",
       "line" : 125,
       "char" : 66,
@@ -5514,6 +5693,7 @@
      {
       "name" : "onCreateFailed",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "作成に失敗したら呼ばれる。処理を継続を継続するならtrueを返す。\n",
       "line" : 127,
       "char" : 66,
@@ -5524,6 +5704,7 @@
      {
       "name" : "onCopying",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "コピー前に呼ばれる。コピーしない場合は例外を投げる。\n",
       "line" : 129,
       "char" : 66,
@@ -5534,6 +5715,7 @@
      {
       "name" : "onCopied",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "コピー後に呼ばれる。\n",
       "line" : 131,
       "char" : 66,
@@ -5544,6 +5726,7 @@
      {
       "name" : "onCopyFailed",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "コピー失敗したら呼ばれる。処理を継続を継続するならtrueを返す。\n",
       "line" : 133,
       "char" : 66,
@@ -5554,6 +5737,7 @@
      {
       "name" : "onRemoving",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "削除前に呼ばれる。削除しない場合は例外を投げる。\n",
       "line" : 135,
       "char" : 66,
@@ -5564,6 +5748,7 @@
      {
       "name" : "onRemoved",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "削除後に呼ばれる。\n",
       "line" : 137,
       "char" : 66,
@@ -5574,6 +5759,7 @@
      {
       "name" : "onRemoveFailed",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "削除に失敗したら呼ばれる。処理を継続を継続するならtrueを返す。\n",
       "line" : 139,
       "char" : 66,
@@ -5584,6 +5770,7 @@
      {
       "name" : "onDestroyed",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "インスタンスが破棄される際に呼ばれる\n",
       "line" : 141,
       "char" : 66,
@@ -5594,6 +5781,7 @@
      {
       "name" : "onPostMove",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ムーブの後に呼ばれる\n",
       "line" : 146,
       "char" : 7,
@@ -5604,6 +5792,7 @@
      {
       "name" : "~this",
       "kind" : "destructor",
+      "protection" : "public",
       "comment" : " 破棄する際に workDir に値がある場合に呼ばれる\n",
       "line" : 154,
       "char" : 2,
@@ -5614,6 +5803,7 @@
      {
       "name" : "absolutePath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 絶対パスに変換する\n\n Params:\n     target     = 変換したい相対パス(何も指定しないとworkDirの絶対パスが返る)\n     targetPath = 変換したい相対パスのパンくずリスト\n     base       = 基準となるパス(このパスの基準はworkDir)\n",
       "line" : 168,
       "char" : 9,
@@ -5624,6 +5814,7 @@
      {
       "name" : "absolutePath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 175,
       "char" : 9,
@@ -5640,6 +5831,7 @@
      {
       "name" : "absolutePath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 182,
       "char" : 9,
@@ -5656,6 +5848,7 @@
      {
       "name" : "absolutePath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 187,
       "char" : 9,
@@ -5676,6 +5869,7 @@
      {
       "name" : "absolutePath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 194,
       "char" : 9,
@@ -5696,6 +5890,7 @@
      {
       "name" : "__unittest_L199_C8",
       "kind" : "function",
+      "protection" : "public",
       "line" : 199,
       "char" : 8,
       "storageClass" : [
@@ -5707,6 +5902,7 @@
      {
       "name" : "actualPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 実際のパス名に修正する\n",
       "line" : 208,
       "char" : 9,
@@ -5724,6 +5920,7 @@
      {
       "name" : "__unittest_L234_C10",
       "kind" : "function",
+      "protection" : "public",
       "line" : 234,
       "char" : 10,
       "storageClass" : [
@@ -5735,6 +5932,7 @@
      {
       "name" : "relativePath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 相対パスに変換する\n\n Params:\n     target     = 変換したい絶対/相対パス\n     targetPath = 変換したい相対パスのパンくずリスト\n     base       = 基準となるパス(このパスの基準はworkDir)\n",
       "line" : 256,
       "char" : 9,
@@ -5751,6 +5949,7 @@
      {
       "name" : "relativePath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 261,
       "char" : 9,
@@ -5767,6 +5966,7 @@
      {
       "name" : "relativePath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 266,
       "char" : 9,
@@ -5787,6 +5987,7 @@
      {
       "name" : "relativePath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 271,
       "char" : 9,
@@ -5807,6 +6008,7 @@
      {
       "name" : "__unittest_L276_C8",
       "kind" : "function",
+      "protection" : "public",
       "line" : 276,
       "char" : 8,
       "storageClass" : [
@@ -5818,6 +6020,7 @@
      {
       "name" : "buildSplittedPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " パスをパンくず表現に変換\n\n Params:\n     path  = 変換したい絶対/相対パス\n     paths = 変換したい相対パスのパンくずリスト\n",
       "line" : 300,
       "char" : 11,
@@ -5834,6 +6037,7 @@
      {
       "name" : "buildSplittedPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 308,
       "char" : 11,
@@ -5850,6 +6054,7 @@
      {
       "name" : "buildSplittedPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 314,
       "char" : 11,
@@ -5860,6 +6065,7 @@
      {
       "name" : "__unittest_L319_C8",
       "kind" : "function",
+      "protection" : "public",
       "line" : 319,
       "char" : 8,
       "storageClass" : [
@@ -5871,6 +6077,7 @@
      {
       "name" : "buildPosixPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " パスをPosix表現に変換\n\n Params:\n     path  = 変換したい絶対/相対パス\n     paths = 変換したい相対パスのパンくずリスト\n",
       "line" : 344,
       "char" : 9,
@@ -5887,6 +6094,7 @@
      {
       "name" : "buildPosixPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 350,
       "char" : 9,
@@ -5903,6 +6111,7 @@
      {
       "name" : "buildPosixPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 356,
       "char" : 9,
@@ -5913,6 +6122,7 @@
      {
       "name" : "__unittest_L362_C8",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 362,
       "char" : 8,
@@ -5925,6 +6135,7 @@
      {
       "name" : "buildWindowsPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " パスをWindows表現に変換\n\n Params:\n     path  = 変換したい絶対/相対パス\n     paths = 変換したい相対パスのパンくずリスト\n",
       "line" : 377,
       "char" : 9,
@@ -5941,6 +6152,7 @@
      {
       "name" : "buildWindowsPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 383,
       "char" : 9,
@@ -5957,6 +6169,7 @@
      {
       "name" : "buildWindowsPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 389,
       "char" : 9,
@@ -5967,6 +6180,7 @@
      {
       "name" : "__unittest_L395_C8",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 395,
       "char" : 8,
@@ -5979,6 +6193,7 @@
      {
       "name" : "buildNormalizedSplittedPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " パスを正規化して分解してパンくずリストにする\n\n Params:\n     path  = 変換したい絶対/相対パス\n     paths = 変換したい相対パスのパンくずリスト\n",
       "line" : 412,
       "char" : 11,
@@ -5995,6 +6210,7 @@
      {
       "name" : "buildNormalizedSplittedPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 419,
       "char" : 11,
@@ -6011,6 +6227,7 @@
      {
       "name" : "buildNormalizedSplittedPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 426,
       "char" : 11,
@@ -6021,6 +6238,7 @@
      {
       "name" : "__unittest_L432_C8",
       "kind" : "function",
+      "protection" : "public",
       "line" : 432,
       "char" : 8,
       "storageClass" : [
@@ -6032,6 +6250,7 @@
      {
       "name" : "buildNormalizedPosixPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " パスを正規化してPosix表現に変換\n\n Params:\n     path  = 変換したい絶対/相対パス\n     paths = 変換したい相対パスのパンくずリスト\n",
       "line" : 454,
       "char" : 9,
@@ -6048,6 +6267,7 @@
      {
       "name" : "buildNormalizedPosixPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 461,
       "char" : 9,
@@ -6064,6 +6284,7 @@
      {
       "name" : "buildNormalizedPosixPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 468,
       "char" : 9,
@@ -6074,6 +6295,7 @@
      {
       "name" : "__unittest_L475_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 475,
       "char" : 10,
@@ -6086,6 +6308,7 @@
      {
       "name" : "__unittest_L483_C10",
       "kind" : "function",
+      "protection" : "public",
       "line" : 483,
       "char" : 10,
       "storageClass" : [
@@ -6097,6 +6320,7 @@
      {
       "name" : "buildNormalizedWindowsPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " パスを正規化してWindows表現に変換\n\n Params:\n     path  = 変換したい絶対/相対パス\n     paths = 変換したい相対パスのパンくずリスト\n",
       "line" : 498,
       "char" : 9,
@@ -6113,6 +6337,7 @@
      {
       "name" : "buildNormalizedWindowsPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 505,
       "char" : 9,
@@ -6129,6 +6354,7 @@
      {
       "name" : "buildNormalizedWindowsPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 512,
       "char" : 9,
@@ -6139,6 +6365,7 @@
      {
       "name" : "__unittest_L519_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 519,
       "char" : 10,
@@ -6151,6 +6378,7 @@
      {
       "name" : "__unittest_L527_C10",
       "kind" : "function",
+      "protection" : "public",
       "line" : 527,
       "char" : 10,
       "storageClass" : [
@@ -6162,6 +6390,7 @@
      {
       "name" : "buildNativePath",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "In Posix\n",
       "line" : 546,
       "char" : 3,
@@ -6170,6 +6399,7 @@
      {
       "name" : "buildNormalizedNativePath",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 548,
       "char" : 3,
@@ -6178,6 +6408,7 @@
      {
       "name" : "exists",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " パスが存在するか確認する\n\n Params:\n     target = パス\n",
       "line" : 557,
       "char" : 7,
@@ -6260,6 +6491,7 @@
      {
       "name" : "isFile",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " パスがファイルかどうか確認する\n\n Params:\n     target = パス\n",
       "line" : 581,
       "char" : 7,
@@ -6341,6 +6573,7 @@
      {
       "name" : "isDir",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " パスがファイルかどうか確認する\n\n Params:\n     target = パス\n",
       "line" : 605,
       "char" : 7,
@@ -6501,6 +6734,7 @@
      {
       "name" : "makeDir",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ディレクトリを作成する\n\n Params:\n     target   = パス\n     force    = 強制的に作成\n     retrycnt = リトライする回数\n",
       "line" : 673,
       "char" : 7,
@@ -6528,6 +6762,7 @@
      {
       "name" : "__unittest_L678_C10",
       "kind" : "function",
+      "protection" : "public",
       "line" : 678,
       "char" : 10,
       "storageClass" : [
@@ -6539,6 +6774,7 @@
      {
       "name" : "entries",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " エントリー一覧\n",
       "line" : 723,
       "char" : 7,
@@ -6564,6 +6800,7 @@
      {
       "name" : "entries",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 729,
       "char" : 7,
@@ -6593,6 +6830,7 @@
      },
      {
       "kind" : "template",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 735,
       "char" : 7,
@@ -6637,6 +6875,7 @@
      {
       "name" : "__unittest_L743_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 743,
       "char" : 10,
@@ -6649,6 +6888,7 @@
      {
       "name" : "writeText",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " テキストファイルを書き出す\n",
       "line" : 769,
       "char" : 7,
@@ -6749,6 +6989,7 @@
      {
       "name" : "__unittest_L786_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 786,
       "char" : 10,
@@ -6761,6 +7002,7 @@
      {
       "name" : "readText",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " テキストファイルを読み込む\n",
       "line" : 799,
       "char" : 9,
@@ -6840,6 +7082,7 @@
      {
       "name" : "__unittest_L818_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 818,
       "char" : 10,
@@ -6852,6 +7095,7 @@
      {
       "name" : "writeBinary",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " バイナリファイルを書き出す\n",
       "line" : 828,
       "char" : 7,
@@ -6952,6 +7196,7 @@
      {
       "name" : "__unittest_L845_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 845,
       "char" : 10,
@@ -6964,6 +7209,7 @@
      {
       "name" : "readBinary",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " バイナリファイルを読み込む\n",
       "line" : 858,
       "char" : 21,
@@ -7043,6 +7289,7 @@
      {
       "name" : "__unittest_L876_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 876,
       "char" : 10,
@@ -7054,6 +7301,7 @@
      },
      {
       "kind" : "template",
+      "protection" : "public",
       "comment" : " JSONファイルを書き出す\n",
       "line" : 886,
       "char" : 7,
@@ -7096,6 +7344,7 @@
      },
      {
       "kind" : "template",
+      "protection" : "public",
       "comment" : " JSONファイルを書き出す\n",
       "line" : 896,
       "char" : 4,
@@ -7127,6 +7376,7 @@
      {
       "name" : "__unittest_L909_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 909,
       "char" : 10,
@@ -7139,6 +7389,7 @@
      {
       "name" : "__unittest_L917_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 917,
       "char" : 10,
@@ -7151,6 +7402,7 @@
      {
       "name" : "createFile",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ファイルを新しく作成する\n",
       "line" : 943,
       "char" : 7,
@@ -7167,6 +7419,7 @@
      {
       "name" : "openFile",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ファイルを開く\n\n ファイルがなければ新しく作成して開く\n",
       "line" : 957,
       "char" : 7,
@@ -7251,6 +7504,7 @@
      {
       "name" : "clearReadonly",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 994,
       "char" : 7,
@@ -7346,6 +7600,7 @@
      {
       "name" : "removeFiles",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1068,
       "char" : 7,
@@ -7373,6 +7628,7 @@
      {
       "name" : "__unittest_L1072_C10",
       "kind" : "function",
+      "protection" : "public",
       "line" : 1072,
       "char" : 10,
       "storageClass" : [
@@ -7384,6 +7640,7 @@
      {
       "name" : "removeFiles",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1100,
       "char" : 7,
@@ -7415,6 +7672,7 @@
      {
       "name" : "__unittest_L1123_C10",
       "kind" : "function",
+      "protection" : "public",
       "line" : 1123,
       "char" : 10,
       "storageClass" : [
@@ -7513,6 +7771,7 @@
      {
       "name" : "copyFile",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ファイルをコピーする\n",
       "line" : 1202,
       "char" : 7,
@@ -7544,6 +7803,7 @@
      {
       "name" : "__unittest_L1206_C10",
       "kind" : "function",
+      "protection" : "public",
       "line" : 1206,
       "char" : 10,
       "storageClass" : [
@@ -7737,6 +7997,7 @@
      {
       "name" : "copyFiles",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1278,
       "char" : 7,
@@ -7768,6 +8029,7 @@
      {
       "name" : "__unittest_L1291_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1291,
       "char" : 10,
@@ -7780,6 +8042,7 @@
      {
       "name" : "__unittest_L1300_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1300,
       "char" : 10,
@@ -7792,6 +8055,7 @@
      {
       "name" : "copyFiles",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1312,
       "char" : 7,
@@ -7827,6 +8091,7 @@
      {
       "name" : "__unittest_L1317_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1317,
       "char" : 10,
@@ -7926,6 +8191,7 @@
      {
       "name" : "mirrorFiles",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ファイルをミラーリングする\n",
       "line" : 1418,
       "char" : 7,
@@ -8044,6 +8310,7 @@
      {
       "name" : "moveFiles",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ファイルを移動する\n",
       "line" : 1505,
       "char" : 7,
@@ -8244,6 +8511,7 @@
      {
       "name" : "setTimeStamp",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " タイムスタンプを変更/取得する\n",
       "line" : 1538,
       "char" : 7,
@@ -8268,6 +8536,7 @@
      {
       "name" : "setTimeStamp",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1543,
       "char" : 7,
@@ -8288,6 +8557,7 @@
      {
       "name" : "setTimeStamp",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1548,
       "char" : 7,
@@ -8312,6 +8582,7 @@
      {
       "name" : "setTimeStamp",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1553,
       "char" : 7,
@@ -8332,6 +8603,7 @@
      {
       "name" : "getTimeStamp",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1558,
       "char" : 7,
@@ -8362,6 +8634,7 @@
      {
       "name" : "getTimeStamp",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1563,
       "char" : 7,
@@ -8385,6 +8658,7 @@
      {
       "name" : "getTimeStamp",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1569,
       "char" : 7,
@@ -8415,6 +8689,7 @@
      {
       "name" : "getTimeStamp",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1577,
       "char" : 7,
@@ -8438,6 +8713,7 @@
      {
       "name" : "getTimeStamp",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1584,
       "char" : 10,
@@ -8454,6 +8730,7 @@
      {
       "name" : "__unittest_L1591_C10",
       "kind" : "function",
+      "protection" : "public",
       "line" : 1591,
       "char" : 10,
       "storageClass" : [
@@ -8465,6 +8742,7 @@
      {
       "name" : "searchPath",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " パスを検索する\n",
       "line" : 1645,
       "char" : 9,
@@ -8492,6 +8770,7 @@
      {
       "name" : "spawnProcess",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " プロセスを実行する\n",
       "line" : 1690,
       "char" : 7,
@@ -8522,6 +8801,7 @@
      {
       "name" : "spawnProcess",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1699,
       "char" : 7,
@@ -8564,6 +8844,7 @@
      {
       "name" : "spawnProcess",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1712,
       "char" : 7,
@@ -8606,6 +8887,7 @@
      {
       "name" : "pipeProcess",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1725,
       "char" : 7,
@@ -8636,6 +8918,7 @@
      {
       "name" : "execute",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 1734,
       "char" : 7,
@@ -8666,6 +8949,7 @@
      {
       "name" : "__unittest_L1743_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1743,
       "char" : 10,
@@ -8678,6 +8962,7 @@
      {
       "name" : "__unittest_L1763_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1763,
       "char" : 10,
@@ -8690,6 +8975,7 @@
      {
       "name" : "__unittest_L1783_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1783,
       "char" : 10,
@@ -8702,6 +8988,7 @@
      {
       "name" : "__unittest_L1804_C10",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1804,
       "char" : 10,
@@ -8714,6 +9001,7 @@
      {
       "name" : "~this",
       "kind" : "destructor",
+      "protection" : "public",
       "line" : 154,
       "char" : 2,
       "deco" : "FNaNbNeZv"
@@ -8721,21 +9009,25 @@
      {
       "name" : "~this",
       "kind" : "destructor",
+      "protection" : "public",
       "line" : 154,
       "char" : 2,
       "deco" : "FNeZv"
      },
      {
       "name" : "__xdtor",
-      "kind" : "alias"
+      "kind" : "alias",
+      "protection" : "public"
      },
      {
       "name" : "__xpostblit",
-      "kind" : "alias"
+      "kind" : "alias",
+      "protection" : "public"
      },
      {
       "name" : "opAssign",
       "kind" : "generated function",
+      "protection" : "public",
       "line" : 117,
       "char" : 1,
       "deco" : "FNcNjS5voile2fs10FileSystemZQx",
@@ -8752,6 +9044,7 @@
    {
     "name" : "__unittest_L1821_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "コピー禁止とムーブ、インスタンス削除の例\n",
     "line" : 1821,
     "char" : 9,
@@ -8764,6 +9057,7 @@
    {
     "name" : "createTempDir",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " 一時ディレクトリを作成し、作成したディレクトリのFileSystemを返す\n",
     "line" : 1839,
     "char" : 12,
@@ -8792,6 +9086,7 @@
    {
     "name" : "createDisposableDir",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " 使い捨ての一時ディレクトリを作成\n\n 作成したディレクトリのFileSystemを返す。返されたFileSystemは、インスタンスの破棄時に削除される。\n",
     "line" : 1871,
     "char" : 12,
@@ -8820,6 +9115,7 @@
    {
     "name" : "__unittest_L1884_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1884,
     "char" : 7,
@@ -9077,6 +9373,7 @@
      {
       "name" : "GenParams",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 227,
       "char" : 9,
       "members" : [
@@ -9170,6 +9467,7 @@
      {
       "name" : "DelegateFakerEx",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 292,
       "char" : 9,
       "members" : [
@@ -9372,6 +9670,7 @@
    {
     "name" : "__unittest_L347_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 347,
     "char" : 9,
     "storageClass" : [
@@ -9397,12 +9696,14 @@
      {
       "name" : "List",
       "kind" : "class",
+      "protection" : "public",
       "line" : 400,
       "char" : 9,
       "members" : [
        {
         "name" : "Node",
         "kind" : "struct",
+        "protection" : "public",
         "line" : 403,
         "char" : 9,
         "members" : [
@@ -9475,6 +9776,7 @@
          {
           "name" : "TIterator",
           "kind" : "struct",
+          "protection" : "public",
           "line" : 420,
           "char" : 9,
           "members" : [
@@ -9822,6 +10124,7 @@
          {
           "name" : "TRange",
           "kind" : "struct",
+          "protection" : "public",
           "line" : 544,
           "char" : 9,
           "members" : [
@@ -10390,6 +10693,7 @@
    {
     "name" : "__unittest_L805_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 805,
     "char" : 9,
     "storageClass" : [
@@ -10401,6 +10705,7 @@
    {
     "name" : "__unittest_L843_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 843,
     "char" : 9,
     "storageClass" : [
@@ -10412,6 +10717,7 @@
    {
     "name" : "__unittest_L857_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 857,
     "char" : 9,
     "storageClass" : [
@@ -10423,6 +10729,7 @@
    {
     "name" : "__unittest_L871_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 871,
     "char" : 9,
     "storageClass" : [
@@ -10433,6 +10740,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 889,
     "char" : 1,
@@ -10640,6 +10948,7 @@
    {
     "name" : "__unittest_L955_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 955,
     "char" : 9,
     "storageClass" : [
@@ -10650,6 +10959,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " Generic Handler\n\n\n $(__123 a, bbb) = xxx\n\n Macros:\n     bbb  = cccccc\n     _123 = [$1 ::: $($2)]\n",
     "line" : 986,
     "char" : 1,
@@ -10665,6 +10975,7 @@
      {
       "name" : "Handler",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 986,
       "char" : 1,
       "members" : [
@@ -10758,6 +11069,7 @@
        {
         "name" : "DummyData",
         "kind" : "struct",
+        "protection" : "public",
         "line" : 1003,
         "char" : 9,
         "members" : [
@@ -11676,6 +11988,7 @@
    {
     "name" : "__unittest_L1467_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1467,
     "char" : 9,
     "storageClass" : [
@@ -11687,6 +12000,7 @@
    {
     "name" : "__unittest_L1519_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "コピー禁止・ムーブ可\n",
     "line" : 1519,
     "char" : 9,
@@ -11771,6 +12085,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " JSONValueデータを得る\n",
     "line" : 13,
     "char" : 11,
@@ -11808,6 +12123,7 @@
    {
     "name" : "__unittest_L19_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 19,
     "char" : 9,
@@ -11819,6 +12135,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 37,
     "char" : 11,
@@ -11856,6 +12173,7 @@
    {
     "name" : "__unittest_L45_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 45,
     "char" : 9,
@@ -11868,6 +12186,7 @@
    {
     "name" : "__unittest_L55_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 55,
     "char" : 9,
@@ -11879,6 +12198,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 83,
     "char" : 11,
@@ -11916,6 +12236,7 @@
    {
     "name" : "__unittest_L89_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 89,
     "char" : 9,
@@ -11927,6 +12248,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 102,
     "char" : 11,
@@ -11964,6 +12286,7 @@
    {
     "name" : "__unittest_L115_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 115,
     "char" : 9,
@@ -11976,6 +12299,7 @@
    {
     "name" : "__unittest_L128_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 128,
     "char" : 9,
@@ -11988,6 +12312,7 @@
    {
     "name" : "__unittest_L142_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 142,
     "char" : 9,
@@ -11999,6 +12324,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 171,
     "char" : 11,
@@ -12040,6 +12366,7 @@
    {
     "name" : "__unittest_L188_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 188,
     "char" : 9,
@@ -12051,6 +12378,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 198,
     "char" : 11,
@@ -12135,6 +12463,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " JSONValueデータの操作\n",
     "line" : 224,
     "char" : 6,
@@ -12177,6 +12506,7 @@
    {
     "name" : "__unittest_L236_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 236,
     "char" : 9,
@@ -12189,6 +12519,7 @@
    {
     "name" : "__unittest_L249_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 249,
     "char" : 9,
@@ -12201,6 +12532,7 @@
    {
     "name" : "__unittest_L264_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 264,
     "char" : 9,
@@ -12213,6 +12545,7 @@
    {
     "name" : "__unittest_L284_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 284,
     "char" : 9,
@@ -12224,6 +12557,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 299,
     "char" : 6,
@@ -12267,6 +12601,7 @@
    {
     "name" : "__unittest_L317_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 317,
     "char" : 9,
@@ -12278,6 +12613,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 328,
     "char" : 6,
@@ -12321,6 +12657,7 @@
    {
     "name" : "__unittest_L344_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 344,
     "char" : 9,
@@ -12332,6 +12669,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 354,
     "char" : 6,
@@ -12375,6 +12713,7 @@
    {
     "name" : "__unittest_L373_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 373,
     "char" : 9,
@@ -12386,6 +12725,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 384,
     "char" : 6,
@@ -12429,6 +12769,7 @@
    {
     "name" : "__unittest_L447_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 447,
     "char" : 9,
@@ -12440,6 +12781,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 459,
     "char" : 6,
@@ -12482,6 +12824,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 473,
     "char" : 6,
@@ -12524,6 +12867,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 485,
     "char" : 6,
@@ -12566,6 +12910,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 502,
     "char" : 6,
@@ -12608,6 +12953,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 520,
     "char" : 6,
@@ -12654,6 +13000,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 548,
     "char" : 6,
@@ -12743,6 +13090,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 589,
     "char" : 3,
@@ -12791,6 +13139,7 @@
    {
     "name" : "__unittest_L610_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 610,
     "char" : 9,
@@ -12803,6 +13152,7 @@
    {
     "name" : "__unittest_L625_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 625,
     "char" : 9,
@@ -12815,6 +13165,7 @@
    {
     "name" : "__unittest_L640_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 640,
     "char" : 9,
@@ -12827,6 +13178,7 @@
    {
     "name" : "__unittest_L667_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 667,
     "char" : 9,
@@ -12839,6 +13191,7 @@
    {
     "name" : "__unittest_L694_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 694,
     "char" : 9,
@@ -12851,6 +13204,7 @@
    {
     "name" : "__unittest_L709_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 709,
     "char" : 9,
@@ -12863,6 +13217,7 @@
    {
     "name" : "__unittest_L726_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 726,
     "char" : 9,
@@ -12875,6 +13230,7 @@
    {
     "name" : "__unittest_L754_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 754,
     "char" : 9,
@@ -12887,6 +13243,7 @@
    {
     "name" : "JSONValueArray",
     "kind" : "alias",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 782,
     "char" : 1,
@@ -12896,6 +13253,7 @@
    {
     "name" : "JSONValueObject",
     "kind" : "alias",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 784,
     "char" : 1,
@@ -12904,6 +13262,7 @@
    {
     "name" : "getArray",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 789,
     "char" : 6,
@@ -12932,6 +13291,7 @@
    {
     "name" : "getObject",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 806,
     "char" : 6,
@@ -12959,6 +13319,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 821,
     "char" : 1,
@@ -12973,6 +13334,7 @@
      {
       "name" : "AttrConverter",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 821,
       "char" : 1,
       "members" : [
@@ -12998,6 +13360,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " Attribute converting method\n",
     "line" : 832,
     "char" : 17,
@@ -13107,6 +13470,7 @@
    {
     "name" : "__unittest_L863_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 863,
     "char" : 9,
     "storageClass" : [
@@ -13125,6 +13489,7 @@
      {
       "name" : "key",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 943,
       "char" : 9,
       "deco" : "Aya",
@@ -13133,6 +13498,7 @@
      {
       "name" : "value",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 944,
       "char" : 12,
       "deco" : "S3std4json9JSONValue",
@@ -13142,6 +13508,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 948,
     "char" : 6,
@@ -13179,6 +13546,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 955,
     "char" : 6,
@@ -13278,6 +13646,7 @@
    {
     "name" : "__unittest_L1034_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1034,
     "char" : 9,
@@ -13290,6 +13659,7 @@
    {
     "name" : "__unittest_L1048_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1048,
     "char" : 9,
@@ -13336,6 +13706,7 @@
    {
     "name" : "__unittest_L1101_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1101,
     "char" : 9,
@@ -13348,6 +13719,7 @@
    {
     "name" : "__unittest_L1118_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1118,
     "char" : 9,
@@ -13397,6 +13769,7 @@
    {
     "name" : "__unittest_L1161_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1161,
     "char" : 9,
@@ -13408,6 +13781,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " serialize data to JSON\n",
     "line" : 1180,
     "char" : 11,
@@ -13441,6 +13815,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1240,
     "char" : 8,
@@ -13479,6 +13854,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1246,
     "char" : 6,
@@ -13563,6 +13939,7 @@
    {
     "name" : "__unittest_L1392_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1392,
     "char" : 9,
@@ -13616,6 +13993,7 @@
    {
     "name" : "__unittest_L1428_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1428,
     "char" : 9,
@@ -13627,6 +14005,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "Endata\n",
     "line" : 1438,
     "char" : 6,
@@ -13669,6 +14048,7 @@
    {
     "name" : "__unittest_L1459_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1459,
     "char" : 9,
     "storageClass" : [
@@ -13679,6 +14059,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " deserialize data from JSON\n",
     "line" : 1473,
     "char" : 6,
@@ -13719,6 +14100,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1580,
     "char" : 6,
@@ -13756,6 +14138,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1586,
     "char" : 6,
@@ -13794,6 +14177,7 @@
    {
     "name" : "__unittest_L1593_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1593,
     "char" : 9,
@@ -13806,6 +14190,7 @@
    {
     "name" : "__unittest_L1694_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1694,
     "char" : 9,
     "storageClass" : [
@@ -13817,6 +14202,7 @@
    {
     "name" : "__unittest_L1712_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1712,
     "char" : 9,
     "storageClass" : [
@@ -13828,6 +14214,7 @@
    {
     "name" : "deepCopy",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1731,
     "char" : 11,
@@ -13847,6 +14234,7 @@
    {
     "name" : "__unittest_L1756_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1756,
     "char" : 9,
     "storageClass" : [
@@ -13858,6 +14246,7 @@
    {
     "name" : "__unittest_L1766_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1766,
     "char" : 9,
     "storageClass" : [
@@ -13904,6 +14293,7 @@
      {
       "name" : "MessageText",
       "kind" : "class",
+      "protection" : "public",
       "line" : 17,
       "char" : 9,
       "members" : [
@@ -13979,6 +14369,7 @@
    {
     "name" : "JudgementException",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " 審判を含めて投げることのできる例外\n\n 投げる際にJudgementオブジェクトを含めて投げることが可能です。\n------------------------------------------------------------------------------\n auto dJudge = new Judgement;\n ...\n if (dJudge.bad)\n {\n     throw new JudgementException(dJudge);\n }\n------------------------------------------------------------------------------\n",
     "line" : 56,
     "char" : 1,
@@ -13987,6 +14378,7 @@
      {
       "name" : "judgement",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "Judgementオブジェクトへのアクセス\n",
       "line" : 59,
       "char" : 12,
@@ -13997,6 +14389,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "コンストラクタ\n",
       "line" : 61,
       "char" : 2,
@@ -14024,6 +14417,7 @@
      {
       "name" : "results",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "See_Also: Judgement.result()\n",
       "line" : 67,
       "char" : 11,
@@ -14034,6 +14428,7 @@
      {
       "name" : "opApply",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "See_Also: Judgement.opApply()\n",
       "line" : 72,
       "char" : 6,
@@ -14050,6 +14445,7 @@
      {
       "name" : "opApply",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 77,
       "char" : 6,
@@ -14069,6 +14465,7 @@
    {
     "name" : "Judgement",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " 審判クラス\n\n discuss() 関数の引数の結果が、存在するか否かで審判を下す。\n 詳しくは discuss() 関数を参照。$(BR)\n また、 discuss() 関数により審判を行ったあとは results() 関数で結果を得ること\n が可能。 results() 関数は、 discuss() を行う際の引数に指定した文字列や Object\n 実行する際に生じた例外などが含まれます。$(BR)\n ヘルパ関数の judge() 関数と with 文と if 文、 ok ステータスを使うとスマートに\n 見えるかも？\n Example:\n -----------------------------------------------------------------------------\n void checkFunc()\n {\n     if (a.checked && b.checked)\n     {\n         throw new Exception(\"conflict switches 'a' and 'b'.\");\n     }\n }\n\n void func()\n {\n     with (judge(checkFunc))\n     {\n         if (ok)\n         {\n             status = \"OK\";\n         }\n         else\n         {\n             status = \"NG [\" ~ messages[0].toString ~ \"]\";\n         }\n     }\n }\n -----------------------------------------------------------------------------\n",
     "line" : 118,
     "char" : 1,
@@ -14084,6 +14481,7 @@
      },
      {
       "kind" : "template",
+      "protection" : "public",
       "comment" : " 審議\n\n 引数を指定して審判を行います。$(BR)\n 下記の、引数の説明にあるリストの実行結果を判定し、\n $(UL\n     $(LI 引数                                                           )\n     $(LI 引数の実行結果                                                 )\n     $(LI 引数の実行に際して生じる例外                                   )\n     $(LI 引数のdelegateやfunctionの実行結果                             )\n     $(LI 引数のdelegateやfunctionの実行に際して生じる例外               )\n )\n を検出し、結果に加えます。$(BR)\n 実行の結果、nullを返すというのが良い結果であり、戻り値が発生する場合、\n 審判に否決したということになります。$(BR)\n 審判の結果は success や rejection またはそれらのすきな別名を使用して得る\n とが可能です。$(BR)\n ダイレクトに結果を得たい場合は results() 関数を呼び出すことで結果を出す\n 過程において生じた Object の配列を得ることが可能です。\n\n Params:\n     args=下記リスト参照\n     $(UL\n         $(LI string                                                     )\n         $(LI Object                                                     )\n         $(LI string delegate()                                          )\n         $(LI Object delegate()                                          )\n         $(LI bool delegate()                                            )\n         $(LI void delegate()                                            )\n         $(LI string function()                                          )\n         $(LI Object function()                                          )\n         $(LI bool function()                                            )\n         $(LI void function()                                            )\n         $(LI 上記delegateおよびfunctionの実行結果                       )\n     )\n     複数の指定が可能です。$(BR)\n     引数のlazy属性によって、引数の順番通りの実行が保証されます。$(BR)\n     必ず1つ以上の引数を指定してください。\n Returns:\n     自分自身を返します\n",
       "line" : 164,
       "char" : 15,
@@ -14118,6 +14516,7 @@
      {
       "name" : "certified",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 合格しているか\n",
       "line" : 260,
       "char" : 17,
@@ -14131,6 +14530,7 @@
      {
       "name" : "ok",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 266,
       "char" : 2,
@@ -14139,6 +14539,7 @@
      {
       "name" : "good",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 268,
       "char" : 2,
@@ -14147,6 +14548,7 @@
      {
       "name" : "success",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 270,
       "char" : 2,
@@ -14155,6 +14557,7 @@
      {
       "name" : "succeeded",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 272,
       "char" : 2,
@@ -14163,6 +14566,7 @@
      {
       "name" : "rejected",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 否決されているか\n",
       "line" : 277,
       "char" : 17,
@@ -14176,6 +14580,7 @@
      {
       "name" : "ng",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 282,
       "char" : 2,
@@ -14184,6 +14589,7 @@
      {
       "name" : "bad",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 284,
       "char" : 2,
@@ -14192,6 +14598,7 @@
      {
       "name" : "failure",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 286,
       "char" : 2,
@@ -14200,6 +14607,7 @@
      {
       "name" : "failed",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 288,
       "char" : 2,
@@ -14208,6 +14616,7 @@
      {
       "name" : "results",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 結果\n\n 生じた Object のリストを返します。$(BR)\n 審判ではこの戻り値がnullであることが望ましい。\n",
       "line" : 296,
       "char" : 21,
@@ -14221,6 +14630,7 @@
      {
       "name" : "opApply",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " foreach (d; judgement.result)と同義\n",
       "line" : 305,
       "char" : 6,
@@ -14240,6 +14650,7 @@
      {
       "name" : "opApply",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " foreach (i, d; judgement.result)と同義\n",
       "line" : 321,
       "char" : 6,
@@ -14260,6 +14671,7 @@
      {
       "name" : "toString",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 文字列を返す\n Returns:\n     results のそれぞれのオブジェクトのtoStringで得られる文字列を改行でつ\n     ないだ文字列を返します。\n",
       "line" : 340,
       "char" : 18,
@@ -14277,6 +14689,7 @@
      {
       "name" : "throwIfFailure",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 例外を投げる\n Throws:\n     JudgementException=自身を含めたJudgementExceptionを投げる\n",
       "line" : 356,
       "char" : 7,
@@ -14298,6 +14711,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " Judgementクラスのヘルパ関数\n\n インスタンスオブジェクトを生成し、審議し、返す。\n Params:\n     args=Judgement.discuss() の引数\n Returns:\n     審議した後の Judgement オブジェクト\n",
     "line" : 371,
     "char" : 11,
@@ -14332,6 +14746,7 @@
    {
     "name" : "__unittest_L379_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 379,
     "char" : 9,
     "storageClass" : [
@@ -14378,6 +14793,7 @@
    {
     "name" : "LogData",
     "kind" : "struct",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 15,
     "char" : 1,
@@ -14413,6 +14829,7 @@
      {
       "name" : "id",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 21,
       "char" : 11,
@@ -14422,6 +14839,7 @@
      {
       "name" : "level",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 23,
       "char" : 11,
@@ -14431,6 +14849,7 @@
      {
       "name" : "time",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 25,
       "char" : 11,
@@ -14440,6 +14859,7 @@
      {
       "name" : "file",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 27,
       "char" : 11,
@@ -14449,6 +14869,7 @@
      {
       "name" : "line",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 29,
       "char" : 11,
@@ -14458,6 +14879,7 @@
      {
       "name" : "msg",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 31,
       "char" : 11,
@@ -14467,6 +14889,7 @@
      {
       "name" : "moduleName",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 33,
       "char" : 11,
@@ -14476,6 +14899,7 @@
      {
       "name" : "funcName",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 35,
       "char" : 11,
@@ -14485,6 +14909,7 @@
      {
       "name" : "prettyFuncName",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 37,
       "char" : 11,
@@ -14494,6 +14919,7 @@
      {
       "name" : "threadId",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 39,
       "char" : 11,
@@ -14503,6 +14929,7 @@
      {
       "name" : "json",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 42,
       "char" : 12,
@@ -14513,6 +14940,7 @@
      {
       "name" : "json",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 58,
       "char" : 7,
@@ -14529,6 +14957,7 @@
      {
       "name" : "toString",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 80,
       "char" : 9,
@@ -14539,6 +14968,7 @@
      {
       "name" : "opAssign",
       "kind" : "generated function",
+      "protection" : "public",
       "line" : 15,
       "char" : 1,
       "deco" : "FNaNbNcNiNjNfS5voile3log7LogDataZQu",
@@ -14555,6 +14985,7 @@
    {
     "name" : "__unittest_L86_C7",
     "kind" : "function",
+    "protection" : "public",
     "line" : 86,
     "char" : 7,
     "storageClass" : [
@@ -14566,6 +14997,7 @@
    {
     "name" : "LogStorageInput",
     "kind" : "interface",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 120,
     "char" : 1,
@@ -14573,6 +15005,7 @@
      {
       "name" : "front",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 123,
       "char" : 10,
@@ -14584,6 +15017,7 @@
      {
       "name" : "empty",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 125,
       "char" : 7,
@@ -14595,6 +15029,7 @@
      {
       "name" : "popFront",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 127,
       "char" : 7,
@@ -14606,6 +15041,7 @@
      {
       "name" : "reset",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 129,
       "char" : 7,
@@ -14619,6 +15055,7 @@
    {
     "name" : "LogStorageOutput",
     "kind" : "interface",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 135,
     "char" : 1,
@@ -14633,6 +15070,7 @@
      {
       "name" : "put",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 139,
       "char" : 7,
@@ -14650,6 +15088,7 @@
      {
       "name" : "clear",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 141,
       "char" : 7,
@@ -14663,6 +15102,7 @@
    {
     "name" : "LogStorageInMemory",
     "kind" : "class",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 153,
     "char" : 1,
@@ -14693,6 +15133,7 @@
      {
       "name" : "front",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 160,
       "char" : 10,
@@ -14706,6 +15147,7 @@
      {
       "name" : "empty",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 166,
       "char" : 7,
@@ -14719,6 +15161,7 @@
      {
       "name" : "popFront",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 172,
       "char" : 7,
@@ -14732,6 +15175,7 @@
      {
       "name" : "put",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 178,
       "char" : 7,
@@ -14751,6 +15195,7 @@
      {
       "name" : "reset",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 184,
       "char" : 7,
@@ -14764,6 +15209,7 @@
      {
       "name" : "clear",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 189,
       "char" : 7,
@@ -14777,6 +15223,7 @@
      {
       "name" : "save",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 196,
       "char" : 21,
@@ -14787,6 +15234,7 @@
      {
       "name" : "currentIndex",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 205,
       "char" : 9,
@@ -14798,6 +15246,7 @@
      {
       "name" : "length",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 211,
       "char" : 9,
@@ -14809,6 +15258,7 @@
      {
       "name" : "opSlice",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 217,
       "char" : 21,
@@ -14819,6 +15269,7 @@
      {
       "name" : "opSlice",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 223,
       "char" : 21,
@@ -14840,6 +15291,7 @@
      {
       "name" : "slice",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 232,
       "char" : 7,
@@ -14854,6 +15306,7 @@
      {
       "name" : "slice",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 238,
       "char" : 7,
@@ -14878,6 +15331,7 @@
      {
       "name" : "opDoller",
       "kind" : "alias",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 244,
       "char" : 2,
@@ -14888,6 +15342,7 @@
    {
     "name" : "LogStorageLogger",
     "kind" : "class",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 259,
     "char" : 1,
@@ -14926,6 +15381,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 268,
       "char" : 2,
@@ -14948,6 +15404,7 @@
      {
       "name" : "writeLogMsg",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 276,
       "char" : 16,
@@ -14975,6 +15432,7 @@
    {
     "name" : "InMemoryLogger",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " メモリ内のロガー\n",
     "line" : 297,
     "char" : 1,
@@ -15003,6 +15461,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 307,
       "char" : 2,
@@ -15021,6 +15480,7 @@
      {
       "name" : "logStorage",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 314,
       "char" : 28,
@@ -15031,6 +15491,7 @@
      {
       "name" : "slice",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 320,
       "char" : 7,
@@ -15045,6 +15506,7 @@
      {
       "name" : "slice",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 326,
       "char" : 7,
@@ -15071,6 +15533,7 @@
    {
     "name" : "__unittest_L334_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 334,
     "char" : 9,
@@ -15083,6 +15546,7 @@
    {
     "name" : "TextFileLogger",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " テキストファイルのロガー\n",
     "line" : 362,
     "char" : 1,
@@ -15132,6 +15596,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 370,
       "char" : 2,
@@ -15157,6 +15622,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 375,
       "char" : 2,
@@ -15185,6 +15651,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 380,
       "char" : 2,
@@ -15309,6 +15776,7 @@
    {
     "name" : "JsonFileLogger",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " JSONファイルのロガー\n",
     "line" : 419,
     "char" : 1,
@@ -15376,6 +15844,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 430,
       "char" : 2,
@@ -15401,6 +15870,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 435,
       "char" : 2,
@@ -15429,6 +15899,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 466,
       "char" : 2,
@@ -15451,6 +15922,7 @@
      {
       "name" : "writeLogMsg",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 472,
       "char" : 16,
@@ -15476,6 +15948,7 @@
      {
       "name" : "getFilename",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 520,
       "char" : 9,
@@ -15486,6 +15959,7 @@
      {
       "name" : "loadFromFile",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 526,
       "char" : 25,
@@ -15505,19 +15979,22 @@
      {
       "name" : "~this",
       "kind" : "destructor",
+      "protection" : "public",
       "line" : 419,
       "char" : 1,
       "deco" : "FNeZv"
      },
      {
       "name" : "__xdtor",
-      "kind" : "alias"
+      "kind" : "alias",
+      "protection" : "public"
      }
     ]
    },
    {
     "name" : "__unittest_L575_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 575,
     "char" : 9,
     "storageClass" : [
@@ -15529,6 +16006,7 @@
    {
     "name" : "XmlFileLogger",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " XMLファイルのロガー\n",
     "line" : 610,
     "char" : 1,
@@ -15596,6 +16074,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 621,
       "char" : 2,
@@ -15621,6 +16100,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 626,
       "char" : 2,
@@ -15649,6 +16129,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 657,
       "char" : 2,
@@ -15671,6 +16152,7 @@
      {
       "name" : "writeLogMsg",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 663,
       "char" : 16,
@@ -15696,6 +16178,7 @@
      {
       "name" : "getFilename",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 706,
       "char" : 9,
@@ -15706,19 +16189,22 @@
      {
       "name" : "~this",
       "kind" : "destructor",
+      "protection" : "public",
       "line" : 610,
       "char" : 1,
       "deco" : "FNeZv"
      },
      {
       "name" : "__xdtor",
-      "kind" : "alias"
+      "kind" : "alias",
+      "protection" : "public"
      }
     ]
    },
    {
     "name" : "CsvFileLogger",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " CSVファイルのロガー\n",
     "line" : 716,
     "char" : 1,
@@ -15786,6 +16272,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 727,
       "char" : 2,
@@ -15811,6 +16298,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 732,
       "char" : 2,
@@ -15839,6 +16327,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 751,
       "char" : 2,
@@ -15861,6 +16350,7 @@
      {
       "name" : "writeLogMsg",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 757,
       "char" : 16,
@@ -15886,6 +16376,7 @@
      {
       "name" : "getFilename",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 788,
       "char" : 9,
@@ -15896,19 +16387,22 @@
      {
       "name" : "~this",
       "kind" : "destructor",
+      "protection" : "public",
       "line" : 716,
       "char" : 1,
       "deco" : "FNeZv"
      },
      {
       "name" : "__xdtor",
-      "kind" : "alias"
+      "kind" : "alias",
+      "protection" : "public"
      }
     ]
    },
    {
     "name" : "TsvFileLogger",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " TSVファイルのロガー\n",
     "line" : 797,
     "char" : 1,
@@ -15976,6 +16470,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 808,
       "char" : 2,
@@ -16001,6 +16496,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 813,
       "char" : 2,
@@ -16029,6 +16525,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 832,
       "char" : 2,
@@ -16051,6 +16548,7 @@
      {
       "name" : "writeLogMsg",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 838,
       "char" : 16,
@@ -16076,6 +16574,7 @@
      {
       "name" : "getFilename",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 867,
       "char" : 9,
@@ -16086,19 +16585,22 @@
      {
       "name" : "~this",
       "kind" : "destructor",
+      "protection" : "public",
       "line" : 797,
       "char" : 1,
       "deco" : "FNeZv"
      },
      {
       "name" : "__xdtor",
-      "kind" : "alias"
+      "kind" : "alias",
+      "protection" : "public"
      }
     ]
    },
    {
     "name" : "NamedLogger",
     "kind" : "class",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 878,
     "char" : 1,
@@ -16107,6 +16609,7 @@
      {
       "name" : "getLogger",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ロガーを取得する\n",
       "line" : 884,
       "char" : 9,
@@ -16123,6 +16626,7 @@
      {
       "name" : "insertLogger",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ロガーを追加する\n\n 重複チェックをする\n",
       "line" : 896,
       "char" : 16,
@@ -16149,6 +16653,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "line" : 878,
       "char" : 1,
       "deco" : "FNfZC5voile3log11NamedLogger",
@@ -16159,6 +16664,7 @@
    {
     "name" : "DispatchLogger",
     "kind" : "class",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 908,
     "char" : 1,
@@ -16184,6 +16690,7 @@
      {
       "name" : "Filter",
       "kind" : "struct",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 915,
       "char" : 2,
@@ -16286,6 +16793,7 @@
        {
         "name" : "file",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 938,
         "char" : 21,
@@ -16296,6 +16804,7 @@
        {
         "name" : "file",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 943,
         "char" : 8,
@@ -16312,6 +16821,7 @@
        {
         "name" : "file",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 948,
         "char" : 8,
@@ -16328,6 +16838,7 @@
        {
         "name" : "moduleName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 953,
         "char" : 21,
@@ -16338,6 +16849,7 @@
        {
         "name" : "moduleName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 958,
         "char" : 8,
@@ -16354,6 +16866,7 @@
        {
         "name" : "moduleName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 963,
         "char" : 8,
@@ -16370,6 +16883,7 @@
        {
         "name" : "funcName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 968,
         "char" : 21,
@@ -16380,6 +16894,7 @@
        {
         "name" : "funcName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 973,
         "char" : 8,
@@ -16396,6 +16911,7 @@
        {
         "name" : "funcName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 978,
         "char" : 8,
@@ -16412,6 +16928,7 @@
        {
         "name" : "prettyFuncName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 983,
         "char" : 21,
@@ -16422,6 +16939,7 @@
        {
         "name" : "prettyFuncName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 988,
         "char" : 8,
@@ -16438,6 +16956,7 @@
        {
         "name" : "prettyFuncName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 993,
         "char" : 8,
@@ -16454,6 +16973,7 @@
        {
         "name" : "msg",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 998,
         "char" : 21,
@@ -16464,6 +16984,7 @@
        {
         "name" : "msg",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 1003,
         "char" : 8,
@@ -16480,6 +17001,7 @@
        {
         "name" : "msg",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 1008,
         "char" : 8,
@@ -16496,6 +17018,7 @@
        {
         "name" : "targetName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 1013,
         "char" : 10,
@@ -16506,6 +17029,7 @@
        {
         "name" : "targetName",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 1018,
         "char" : 8,
@@ -16522,6 +17046,7 @@
        {
         "name" : "lineMax",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 1023,
         "char" : 10,
@@ -16533,6 +17058,7 @@
        {
         "name" : "lineMax",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 1028,
         "char" : 8,
@@ -16550,6 +17076,7 @@
        {
         "name" : "lineMin",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 1033,
         "char" : 10,
@@ -16561,6 +17088,7 @@
        {
         "name" : "lineMin",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 1038,
         "char" : 8,
@@ -16578,6 +17106,7 @@
        {
         "name" : "setLineSpan",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 1043,
         "char" : 8,
@@ -16599,6 +17128,7 @@
        {
         "name" : "logLevel",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 1049,
         "char" : 12,
@@ -16609,6 +17139,7 @@
        {
         "name" : "logLevel",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 1054,
         "char" : 8,
@@ -16636,6 +17167,7 @@
      {
       "name" : "addFilter",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1066,
       "char" : 7,
@@ -16652,6 +17184,7 @@
      {
       "name" : "writeLogMsg",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1073,
       "char" : 16,
@@ -16677,6 +17210,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "line" : 908,
       "char" : 1,
       "deco" : "FNfZC5voile3log14DispatchLogger",
@@ -16686,6 +17220,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " クラス内で使用するロガーを切り替えるためのミックスインテンプレート\n",
     "line" : 1111,
     "char" : 7,
@@ -17187,6 +17722,7 @@
    {
     "name" : "getLogger",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " 名前からロガーを取得する\n",
     "line" : 1302,
     "char" : 8,
@@ -17244,6 +17780,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 13,
     "char" : 10,
@@ -17290,6 +17827,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 26,
     "char" : 10,
@@ -17336,6 +17874,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 39,
     "char" : 6,
@@ -17374,6 +17913,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 48,
     "char" : 1,
@@ -17406,6 +17946,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 68,
     "char" : 10,
@@ -17447,6 +17988,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 74,
     "char" : 6,
@@ -17481,6 +18023,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 83,
     "char" : 10,
@@ -17522,6 +18065,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 89,
     "char" : 6,
@@ -17556,6 +18100,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 99,
     "char" : 10,
@@ -17597,6 +18142,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 105,
     "char" : 6,
@@ -17660,6 +18206,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 162,
     "char" : 10,
@@ -17696,6 +18243,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 170,
     "char" : 10,
@@ -17732,6 +18280,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 179,
     "char" : 1,
@@ -17795,6 +18344,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 191,
     "char" : 3,
@@ -17888,6 +18438,7 @@
    {
     "name" : "__unittest_L212_C13",
     "kind" : "function",
+    "protection" : "public",
     "line" : 212,
     "char" : 13,
     "storageClass" : [
@@ -17899,6 +18450,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 232,
     "char" : 1,
@@ -17947,6 +18499,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 255,
     "char" : 2,
@@ -17986,6 +18539,7 @@
    {
     "name" : "__unittest_L334_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 334,
     "char" : 9,
     "storageClass" : [
@@ -17996,6 +18550,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 540,
     "char" : 2,
@@ -18104,6 +18659,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 833,
     "char" : 3,
@@ -18132,34 +18688,36 @@
         "default" : "\"\\x09\""
        }
       ],
-      "endline" : 844,
+      "endline" : 842,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L846_C9",
+    "name" : "__unittest_L844_C9",
     "kind" : "function",
-    "line" : 846,
+    "protection" : "public",
+    "line" : 844,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 866,
+    "endline" : 864,
     "endchar" : 1
    },
    {
     "name" : "std.stdio",
     "kind" : "import",
-    "line" : 866,
+    "line" : 864,
     "char" : 8,
     "protection" : "private"
    },
    {
     "name" : "truncate",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
-    "line" : 870,
+    "line" : 868,
     "char" : 6,
     "deco" : "FKS3std5stdio4FilemZv",
     "originalType" : "void(ref File f, size_t fileSize = -1)",
@@ -18177,14 +18735,15 @@
       "default" : "18446744073709551615LU"
      }
     ],
-    "endline" : 895,
+    "endline" : 893,
     "endchar" : 1
    },
    {
     "name" : "addPathAfter",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " 新しいパスを現在のパスの後ろに追加します\n",
-    "line" : 902,
+    "line" : 900,
     "char" : 6,
     "deco" : "FAyaZv",
     "parameters" : [
@@ -18193,14 +18752,15 @@
       "deco" : "Aya"
      }
     ],
-    "endline" : 921,
+    "endline" : 919,
     "endchar" : 1
    },
    {
     "name" : "addPathBefore",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " 新しいパスを現在のパスの前に追加します\n",
-    "line" : 926,
+    "line" : 924,
     "char" : 6,
     "deco" : "FAyaZv",
     "parameters" : [
@@ -18209,14 +18769,15 @@
       "deco" : "Aya"
      }
     ],
-    "endline" : 945,
+    "endline" : 943,
     "endchar" : 1
    },
    {
     "name" : "fromMBS",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " MBS(ZeroNIL)文字列からUTF8に変換\n",
-    "line" : 950,
+    "line" : 948,
     "char" : 8,
     "deco" : "FIAhkZAya",
     "originalType" : "string(in ubyte[] data, uint codePage = 0)",
@@ -18234,14 +18795,15 @@
       "default" : "0u"
      }
     ],
-    "endline" : 963,
+    "endline" : 961,
     "endchar" : 1
    },
    {
     "name" : "fromUTF16z",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " UTF16(ZeroNIL)文字列からUTF8に変換\n",
-    "line" : 969,
+    "line" : 967,
     "char" : 8,
     "deco" : "FIPuZAya",
     "parameters" : [
@@ -18253,14 +18815,15 @@
       ]
      }
     ],
-    "endline" : 976,
+    "endline" : 974,
     "endchar" : 1
    },
    {
     "name" : "toMBS",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " UTF8からMBS(ZeroNIL)文字列に変換\n",
-    "line" : 983,
+    "line" : 981,
     "char" : 15,
     "deco" : "FIAakZAxa",
     "originalType" : "const(char)[](in char[] data, uint codePage = 0)",
@@ -18278,39 +18841,43 @@
       "default" : "0u"
      }
     ],
-    "endline" : 997,
+    "endline" : 995,
     "endchar" : 1
    },
    {
     "name" : "MacroType",
     "kind" : "enum",
+    "protection" : "public",
     "comment" : "\n",
-    "line" : 1003,
+    "line" : 1001,
     "char" : 1,
     "baseDeco" : "i",
     "members" : [
      {
       "name" : "str",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "0",
       "comment" : "$xxx, ${xxx}\n",
-      "line" : 1006,
+      "line" : 1004,
       "char" : 2
      },
      {
       "name" : "expr",
       "kind" : "enum member",
+      "protection" : "public",
       "value" : "1",
       "comment" : "$(xxx)\n",
-      "line" : 1008,
+      "line" : 1006,
       "char" : 2
      }
     ]
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " Expands macro variables contained within a str\n",
-    "line" : 1014,
+    "line" : 1012,
     "char" : 3,
     "name" : "expandMacro",
     "parameters" : [
@@ -18328,7 +18895,7 @@
      {
       "name" : "expandMacro",
       "kind" : "function",
-      "line" : 1014,
+      "line" : 1012,
       "char" : 3,
       "type" : "T(in T str, Func mapFunc)",
       "parameters" : [
@@ -18344,15 +18911,16 @@
         "type" : "Func"
        }
       ],
-      "endline" : 1036,
+      "endline" : 1034,
       "endchar" : 1
      }
     ]
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1039,
+    "line" : 1037,
     "char" : 3,
     "name" : "expandMacro",
     "parameters" : [
@@ -18370,7 +18938,7 @@
      {
       "name" : "expandMacro",
       "kind" : "function",
-      "line" : 1039,
+      "line" : 1037,
       "char" : 3,
       "type" : "T(in T str, Func mapFunc)",
       "parameters" : [
@@ -18386,15 +18954,16 @@
         "type" : "Func"
        }
       ],
-      "endline" : 1062,
+      "endline" : 1060,
       "endchar" : 1
      }
     ]
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1065,
+    "line" : 1063,
     "char" : 3,
     "name" : "expandMacro",
     "parameters" : [
@@ -18412,7 +18981,7 @@
      {
       "name" : "expandMacro",
       "kind" : "function",
-      "line" : 1065,
+      "line" : 1063,
       "char" : 3,
       "type" : "T(in T str, MAP map)",
       "parameters" : [
@@ -18428,7 +18997,7 @@
         "type" : "MAP"
        }
       ],
-      "endline" : 1081,
+      "endline" : 1079,
       "endchar" : 1
      }
     ]
@@ -18436,7 +19005,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1084,
+    "line" : 1082,
     "char" : 16,
     "name" : "searchEnd1",
     "parameters" : [
@@ -18449,7 +19018,7 @@
      {
       "name" : "searchEnd1",
       "kind" : "function",
-      "line" : 1084,
+      "line" : 1082,
       "char" : 16,
       "type" : "size_t(const(Ch)[] str)",
       "parameters" : [
@@ -18458,26 +19027,27 @@
         "type" : "const(Ch)[]"
        }
       ],
-      "endline" : 1093,
+      "endline" : 1091,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1095_C9",
+    "name" : "__unittest_L1093_C9",
     "kind" : "function",
-    "line" : 1095,
+    "protection" : "public",
+    "line" : 1093,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1105,
+    "endline" : 1103,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1105,
+    "line" : 1103,
     "char" : 16,
     "name" : "searchEnd2",
     "parameters" : [
@@ -18490,7 +19060,7 @@
      {
       "name" : "searchEnd2",
       "kind" : "function",
-      "line" : 1105,
+      "line" : 1103,
       "char" : 16,
       "type" : "size_t(const(Ch)[] str, Ch ch)",
       "parameters" : [
@@ -18503,26 +19073,27 @@
         "type" : "Ch"
        }
       ],
-      "endline" : 1155,
+      "endline" : 1153,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1156_C9",
+    "name" : "__unittest_L1154_C9",
     "kind" : "function",
-    "line" : 1156,
+    "protection" : "public",
+    "line" : 1154,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1166,
+    "endline" : 1164,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1166,
+    "line" : 1164,
     "char" : 11,
     "name" : "expandMacroImpl",
     "parameters" : [
@@ -18540,7 +19111,7 @@
      {
       "name" : "expandMacroImpl",
       "kind" : "function",
-      "line" : 1166,
+      "line" : 1164,
       "char" : 11,
       "type" : "T(in T str)",
       "parameters" : [
@@ -18552,26 +19123,28 @@
         ]
        }
       ],
-      "endline" : 1255,
+      "endline" : 1253,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1257_C9",
+    "name" : "__unittest_L1255_C9",
     "kind" : "function",
-    "line" : 1257,
+    "protection" : "public",
+    "line" : 1255,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1341,
+    "endline" : 1339,
     "endchar" : 1
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 文字列内に含まれる変数を展開します。\n\n `aaa%VAR%bbb`のVAR変数を展開します。変数が存在しない場合は何もしません。\n VARがxxxであれば、`aaaxxxbbb`となります。\n VARが存在しなければ、`aaa%VAR%bbb`のままです。\n",
-    "line" : 1341,
+    "line" : 1339,
     "char" : 3,
     "name" : "expandVariable",
     "parameters" : [
@@ -18589,7 +19162,7 @@
      {
       "name" : "expandVariable",
       "kind" : "function",
-      "line" : 1341,
+      "line" : 1339,
       "char" : 3,
       "type" : "T(in T str, MAP map)",
       "parameters" : [
@@ -18605,15 +19178,16 @@
         "type" : "MAP"
        }
       ],
-      "endline" : 1355,
+      "endline" : 1353,
       "endchar" : 1
      }
     ]
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1357,
+    "line" : 1355,
     "char" : 3,
     "name" : "expandVariable",
     "parameters" : [
@@ -18631,7 +19205,7 @@
      {
       "name" : "expandVariable",
       "kind" : "function",
-      "line" : 1357,
+      "line" : 1355,
       "char" : 3,
       "type" : "T(in T str, Func mapFunc)",
       "parameters" : [
@@ -18647,7 +19221,7 @@
         "type" : "Func"
        }
       ],
-      "endline" : 1370,
+      "endline" : 1368,
       "endchar" : 1
      }
     ]
@@ -18655,7 +19229,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1372,
+    "line" : 1370,
     "char" : 11,
     "name" : "expandVariableImpl",
     "parameters" : [
@@ -18673,7 +19247,7 @@
      {
       "name" : "expandVariableImpl",
       "kind" : "function",
-      "line" : 1372,
+      "line" : 1370,
       "char" : 11,
       "type" : "T(in T str)",
       "parameters" : [
@@ -18685,20 +19259,21 @@
         ]
        }
       ],
-      "endline" : 1417,
+      "endline" : 1415,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1418_C9",
+    "name" : "__unittest_L1416_C9",
     "kind" : "function",
-    "line" : 1418,
+    "protection" : "public",
+    "line" : 1416,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1429,
+    "endline" : 1427,
     "endchar" : 1
    }
   ]
@@ -19166,6 +19741,7 @@
    {
     "name" : "__unittest_L91_C7",
     "kind" : "function",
+    "protection" : "public",
     "line" : 91,
     "char" : 7,
     "storageClass" : [
@@ -19669,6 +20245,7 @@
      {
       "name" : "TypeEnumImpl",
       "kind" : "union",
+      "protection" : "public",
       "line" : 281,
       "char" : 9,
       "members" : [
@@ -19682,6 +20259,7 @@
        {
         "name" : "Instance",
         "kind" : "union",
+        "protection" : "public",
         "line" : 285,
         "char" : 2,
         "members" : [
@@ -19711,6 +20289,7 @@
        {
         "name" : "ManagedUnionImpl!Instance",
         "kind" : "mixin",
+        "protection" : "public",
         "line" : 294,
         "char" : 2
        },
@@ -19999,6 +20578,7 @@
        {
         "name" : "WithType!()",
         "kind" : "mixin",
+        "protection" : "public",
         "line" : 374,
         "char" : 2
        }
@@ -20008,6 +20588,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 型列挙\n",
     "line" : 381,
     "char" : 1,
@@ -20023,6 +20604,7 @@
      {
       "name" : "TypeEnum",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 381,
       "char" : 1,
       "members" : [
@@ -20187,6 +20769,7 @@
    {
     "name" : "__unittest_L470_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 470,
     "char" : 26,
@@ -20202,6 +20785,7 @@
    {
     "name" : "__unittest_L510_C26",
     "kind" : "function",
+    "protection" : "public",
     "line" : 510,
     "char" : 26,
     "storageClass" : [
@@ -20230,6 +20814,7 @@
      {
       "name" : "TaggedImpl",
       "kind" : "union",
+      "protection" : "public",
       "line" : 534,
       "char" : 9,
       "members" : [
@@ -20250,6 +20835,7 @@
        {
         "name" : "ManagedUnionImpl!Instance",
         "kind" : "mixin",
+        "protection" : "public",
         "line" : 538,
         "char" : 2
        },
@@ -20340,6 +20926,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " タグ付き共用体\n",
     "line" : 549,
     "char" : 1,
@@ -20355,6 +20942,7 @@
      {
       "name" : "Tagged",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 549,
       "char" : 1,
       "members" : [
@@ -20482,6 +21070,7 @@
    {
     "name" : "__unittest_L632_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 632,
     "char" : 7,
@@ -20493,6 +21082,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " Taggedの構築\n",
     "line" : 657,
     "char" : 10,
@@ -20536,6 +21126,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 666,
     "char" : 10,
@@ -20580,6 +21171,7 @@
    {
     "name" : "__unittest_L675_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 675,
     "char" : 26,
@@ -20608,12 +21200,14 @@
      {
       "name" : "EndataImpl",
       "kind" : "union",
+      "protection" : "public",
       "line" : 692,
       "char" : 9,
       "members" : [
        {
         "name" : "Instance",
         "kind" : "union",
+        "protection" : "public",
         "line" : 694,
         "char" : 2,
         "members" : []
@@ -20628,6 +21222,7 @@
        {
         "name" : "ManagedUnionImpl!(Instance, tags)",
         "kind" : "mixin",
+        "protection" : "public",
         "line" : 703,
         "char" : 2
        },
@@ -20718,6 +21313,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " データ付きのenum\n",
     "line" : 714,
     "char" : 1,
@@ -20733,6 +21329,7 @@
      {
       "name" : "Endata",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 714,
       "char" : 1,
       "members" : [
@@ -20852,6 +21449,7 @@
    {
     "name" : "__unittest_L776_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 776,
     "char" : 26,
@@ -20867,6 +21465,7 @@
    {
     "name" : "__unittest_L814_C20",
     "kind" : "function",
+    "protection" : "public",
     "line" : 814,
     "char" : 20,
     "storageClass" : [
@@ -20879,6 +21478,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " Endataの構築\n",
     "line" : 846,
     "char" : 22,
@@ -20918,6 +21518,7 @@
    {
     "name" : "__unittest_L854_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 854,
     "char" : 26,
@@ -20932,6 +21533,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 引数によって実装を切り替えるManagedUnion\n\n - 引数が1つでunionならTaggedになる\n - 引数が1つでenumならEndataになる\n - それ以外ならTypeEnumになる\n",
     "line" : 875,
     "char" : 1,
@@ -20955,6 +21557,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " TypeEnumか判定する\n",
     "line" : 897,
     "char" : 11,
@@ -20981,6 +21584,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " Taggedか判定する\n",
     "line" : 902,
     "char" : 11,
@@ -21007,6 +21611,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " Endataか判定する\n",
     "line" : 907,
     "char" : 11,
@@ -21033,6 +21638,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " ManagedUnionか判定する\n",
     "line" : 912,
     "char" : 11,
@@ -21143,6 +21749,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " ManagedUnionのタグ型を得る\n",
     "line" : 953,
     "char" : 1,
@@ -21167,6 +21774,7 @@
    {
     "name" : "__unittest_L959_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 959,
     "char" : 26,
@@ -21182,6 +21790,7 @@
    {
     "name" : "__unittest_L964_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 964,
     "char" : 26,
@@ -21196,6 +21805,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 有効なタグか確認する\n",
     "line" : 973,
     "char" : 1,
@@ -21228,6 +21838,7 @@
    {
     "name" : "__unittest_L986_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 986,
     "char" : 26,
@@ -21243,6 +21854,7 @@
    {
     "name" : "__unittest_L993_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 993,
     "char" : 26,
@@ -21257,6 +21869,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 無効なタグを取得する\n",
     "line" : 1005,
     "char" : 1,
@@ -21285,6 +21898,7 @@
    {
     "name" : "__unittest_L1011_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1011,
     "char" : 26,
@@ -21300,6 +21914,7 @@
    {
     "name" : "__unittest_L1018_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1018,
     "char" : 26,
@@ -21314,6 +21929,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 型を持っているか確認する\n",
     "line" : 1029,
     "char" : 1,
@@ -21346,6 +21962,7 @@
    {
     "name" : "__unittest_L1035_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1035,
     "char" : 26,
@@ -21360,6 +21977,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 持っている型を列挙する\n",
     "line" : 1048,
     "char" : 1,
@@ -21384,6 +22002,7 @@
    {
     "name" : "__unittest_L1054_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1054,
     "char" : 26,
@@ -21398,6 +22017,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " タグを列挙する\n",
     "line" : 1066,
     "char" : 1,
@@ -21425,6 +22045,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1078,
     "char" : 1,
@@ -21449,6 +22070,7 @@
    {
     "name" : "__unittest_L1084_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1084,
     "char" : 26,
@@ -21463,6 +22085,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " タグから型を得る\n",
     "line" : 1102,
     "char" : 1,
@@ -21491,6 +22114,7 @@
    {
     "name" : "__unittest_L1108_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1108,
     "char" : 26,
@@ -21505,6 +22129,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 型が代入可能か\n",
     "line" : 1118,
     "char" : 1,
@@ -21536,6 +22161,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " タグを確認する\n",
     "line" : 1127,
     "char" : 12,
@@ -21573,6 +22199,7 @@
    {
     "name" : "__unittest_L1133_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1133,
     "char" : 26,
@@ -21588,6 +22215,7 @@
    {
     "name" : "__unittest_L1146_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1146,
     "char" : 26,
@@ -21602,6 +22230,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 初期化する\n",
     "line" : 1165,
     "char" : 6,
@@ -21653,6 +22282,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1171,
     "char" : 6,
@@ -21705,6 +22335,7 @@
    {
     "name" : "__unittest_L1177_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1177,
     "char" : 26,
@@ -21720,6 +22351,7 @@
    {
     "name" : "__unittest_L1191_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1191,
     "char" : 7,
@@ -21731,6 +22363,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " データをセットする\n",
     "line" : 1209,
     "char" : 6,
@@ -21782,6 +22415,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1217,
     "char" : 6,
@@ -21829,6 +22463,7 @@
    {
     "name" : "__unittest_L1225_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1225,
     "char" : 26,
@@ -21844,6 +22479,7 @@
    {
     "name" : "__unittest_L1239_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1239,
     "char" : 26,
@@ -21858,6 +22494,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " データを取得する\n",
     "line" : 1255,
     "char" : 10,
@@ -21901,6 +22538,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1261,
     "char" : 10,
@@ -21945,6 +22583,7 @@
    {
     "name" : "__unittest_L1267_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1267,
     "char" : 7,
@@ -21957,6 +22596,7 @@
    {
     "name" : "__unittest_L1280_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1280,
     "char" : 26,
@@ -21971,6 +22611,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " データが入っていることを確認する\n",
     "line" : 1297,
     "char" : 6,
@@ -22011,6 +22652,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1303,
     "char" : 6,
@@ -22052,6 +22694,7 @@
    {
     "name" : "__unittest_L1309_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1309,
     "char" : 7,
@@ -22064,6 +22707,7 @@
    {
     "name" : "__unittest_L1322_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1322,
     "char" : 26,
@@ -22078,6 +22722,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " データをクリアする\n",
     "line" : 1338,
     "char" : 6,
@@ -22114,6 +22759,7 @@
    {
     "name" : "__unittest_L1344_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1344,
     "char" : 26,
@@ -22129,6 +22775,7 @@
    {
     "name" : "__unittest_L1358_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1358,
     "char" : 26,
@@ -22143,6 +22790,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " データがクリアされているか確認する\n",
     "line" : 1374,
     "char" : 6,
@@ -22180,6 +22828,7 @@
    {
     "name" : "__unittest_L1380_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1380,
     "char" : 26,
@@ -22195,6 +22844,7 @@
    {
     "name" : "__unittest_L1389_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1389,
     "char" : 26,
@@ -22210,6 +22860,7 @@
    {
     "name" : "__unittest_L1403_C7",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1403,
     "char" : 7,
     "storageClass" : [
@@ -22234,6 +22885,7 @@
      {
       "name" : "AttrData",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 1554,
       "char" : 9,
       "members" : []
@@ -22243,6 +22895,7 @@
    {
     "name" : "data",
     "kind" : "alias",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1559,
     "char" : 1,
@@ -22250,6 +22903,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1565,
     "char" : 1,
@@ -22276,6 +22930,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1584,
     "char" : 1,
@@ -22329,6 +22984,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1607,
     "char" : 1,
@@ -22344,6 +23000,7 @@
      {
       "name" : "Data",
       "kind" : "union",
+      "protection" : "public",
       "line" : 1610,
       "char" : 5,
       "members" : [
@@ -22366,6 +23023,7 @@
        {
         "name" : "Value!()",
         "kind" : "mixin",
+        "protection" : "public",
         "line" : 1616,
         "char" : 3
        }
@@ -22375,6 +23033,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1625,
     "char" : 7,
@@ -22478,6 +23137,7 @@
    {
     "name" : "__unittest_L1677_C7",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1677,
     "char" : 7,
     "storageClass" : [
@@ -22617,6 +23277,7 @@
    {
     "name" : "__unittest_L1749_C7",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1749,
     "char" : 7,
     "storageClass" : [
@@ -22763,6 +23424,7 @@
    {
     "name" : "__unittest_L1869_C26",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1869,
     "char" : 26,
     "storageClass" : [
@@ -23115,6 +23777,7 @@
    {
     "name" : "__unittest_L1961_C26",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1961,
     "char" : 26,
     "storageClass" : [
@@ -23128,6 +23791,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " パターンマッチ\n",
     "line" : 2023,
     "char" : 1,
@@ -23210,6 +23874,7 @@
    {
     "name" : "__unittest_L2086_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 2086,
     "char" : 26,
@@ -23225,6 +23890,7 @@
    {
     "name" : "__unittest_L2116_C26",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 2116,
     "char" : 26,
@@ -23240,6 +23906,7 @@
    {
     "name" : "__unittest_L2136_C26",
     "kind" : "function",
+    "protection" : "public",
     "line" : 2136,
     "char" : 26,
     "storageClass" : [
@@ -23283,6 +23950,7 @@
      {
       "name" : "help",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 76,
       "char" : 9,
       "deco" : "Aya",
@@ -23324,6 +23992,7 @@
      {
       "name" : "assignChar",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 91,
       "char" : 8,
       "deco" : "w",
@@ -23341,6 +24010,7 @@
      {
       "name" : "arraySeparator",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 95,
       "char" : 8,
       "deco" : "w",
@@ -23358,6 +24028,7 @@
      {
       "name" : "endOfOptions",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 100,
       "char" : 9,
       "deco" : "Aya",
@@ -23375,6 +24046,7 @@
      {
       "name" : "optShort",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 105,
       "char" : 11,
       "deco" : "AAya",
@@ -23392,6 +24064,7 @@
      {
       "name" : "optLong",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 109,
       "char" : 11,
       "deco" : "AAya",
@@ -23409,6 +24082,7 @@
      {
       "name" : "Type",
       "kind" : "enum",
+      "protection" : "public",
       "line" : 114,
       "char" : 2,
       "baseDeco" : "i",
@@ -23416,6 +24090,7 @@
        {
         "name" : "none",
         "kind" : "enum member",
+        "protection" : "public",
         "value" : "0",
         "line" : 114,
         "char" : 14
@@ -23423,6 +24098,7 @@
        {
         "name" : "shortOpt",
         "kind" : "enum member",
+        "protection" : "public",
         "value" : "1",
         "line" : 114,
         "char" : 20
@@ -23430,6 +24106,7 @@
        {
         "name" : "longOpt",
         "kind" : "enum member",
+        "protection" : "public",
         "value" : "2",
         "line" : 114,
         "char" : 30
@@ -23439,6 +24116,7 @@
      {
       "name" : "type",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 115,
       "char" : 9,
       "deco" : "E5voile8parseopt9OptPrefix4Type",
@@ -23447,6 +24125,7 @@
      {
       "name" : "prefix",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 116,
       "char" : 9,
       "deco" : "Aya",
@@ -23496,6 +24175,7 @@
      {
       "name" : "help",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 141,
       "char" : 11,
       "deco" : "Aya",
@@ -23504,6 +24184,7 @@
      {
       "name" : "caseSensitive",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 142,
       "char" : 11,
       "deco" : "b",
@@ -23512,6 +24193,7 @@
      {
       "name" : "passThrough",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 143,
       "char" : 11,
       "deco" : "b",
@@ -23520,6 +24202,7 @@
      {
       "name" : "binding",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 144,
       "char" : 11,
       "deco" : "b",
@@ -23528,6 +24211,7 @@
      {
       "name" : "assignChar",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 145,
       "char" : 11,
       "deco" : "w",
@@ -23536,6 +24220,7 @@
      {
       "name" : "arraySeparator",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 146,
       "char" : 11,
       "deco" : "w",
@@ -23544,6 +24229,7 @@
      {
       "name" : "endOfOptions",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 147,
       "char" : 11,
       "deco" : "Aya",
@@ -23552,6 +24238,7 @@
      {
       "name" : "optShort",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 148,
       "char" : 11,
       "deco" : "AAya",
@@ -23560,6 +24247,7 @@
      {
       "name" : "optLong",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 149,
       "char" : 11,
       "deco" : "AAya",
@@ -23680,6 +24368,7 @@
      {
       "name" : "option",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 231,
       "char" : 9,
       "deco" : "Aya",
@@ -23711,6 +24400,7 @@
      {
       "name" : "ConvBy",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 238,
       "char" : 1,
       "members" : []
@@ -23861,6 +24551,7 @@
      {
       "name" : "option",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 277,
       "char" : 9,
       "deco" : "Aya",
@@ -23869,6 +24560,7 @@
      {
       "name" : "help",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 278,
       "char" : 9,
       "deco" : "Aya",
@@ -23877,6 +24569,7 @@
      {
       "name" : "required",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 279,
       "char" : 9,
       "deco" : "b",
@@ -23885,6 +24578,7 @@
      {
       "name" : "shortOptions",
       "kind" : "function",
+      "protection" : "public",
       "line" : 281,
       "char" : 10,
       "deco" : "xFNdZAw",
@@ -23894,6 +24588,7 @@
      {
       "name" : "longOptions",
       "kind" : "function",
+      "protection" : "public",
       "line" : 286,
       "char" : 11,
       "deco" : "xFNdZAAya",
@@ -24058,6 +24753,7 @@
    {
     "name" : "help",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 722,
     "char" : 6,
@@ -24074,6 +24770,7 @@
    {
     "name" : "caseSensitive",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 728,
     "char" : 15,
@@ -24084,6 +24781,7 @@
    {
     "name" : "passThrough",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 734,
     "char" : 13,
@@ -24094,6 +24792,7 @@
    {
     "name" : "binding",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 740,
     "char" : 9,
@@ -24104,6 +24803,7 @@
    {
     "name" : "assignChar",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 746,
     "char" : 12,
@@ -24121,6 +24821,7 @@
    {
     "name" : "arraySeparator",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 751,
     "char" : 16,
@@ -24138,6 +24839,7 @@
    {
     "name" : "endOfOptions",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 757,
     "char" : 14,
@@ -24154,6 +24856,7 @@
    {
     "name" : "opt",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 763,
     "char" : 5,
@@ -24170,6 +24873,7 @@
    {
     "name" : "required",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 769,
     "char" : 5,
@@ -24180,6 +24884,7 @@
    {
     "name" : "optShort",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 775,
     "char" : 10,
@@ -24196,6 +24901,7 @@
    {
     "name" : "optLong",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 781,
     "char" : 9,
@@ -24211,6 +24917,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 787,
     "char" : 1,
@@ -24234,6 +24941,7 @@
    {
     "name" : "ignore",
     "kind" : "alias",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 790,
     "char" : 1,
@@ -24242,6 +24950,7 @@
    {
     "name" : "typeOption",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 793,
     "char" : 12,
@@ -24299,6 +25008,7 @@
    {
     "name" : "option",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 810,
     "char" : 8,
@@ -24325,6 +25035,7 @@
    {
     "name" : "ParseOptException",
     "kind" : "class",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 819,
     "char" : 1,
@@ -24343,6 +25054,7 @@
      {
       "name" : "basicExceptionCtors!()",
       "kind" : "mixin",
+      "protection" : "public",
       "line" : 822,
       "char" : 2
      }
@@ -24351,6 +25063,7 @@
    {
     "name" : "HelpInformation",
     "kind" : "struct",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 827,
     "char" : 1,
@@ -24358,6 +25071,7 @@
      {
       "name" : "help",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 830,
       "char" : 9,
@@ -24367,6 +25081,7 @@
      {
       "name" : "wanted",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 833,
       "char" : 7,
@@ -24375,6 +25090,7 @@
      },
      {
       "kind" : "template",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 836,
       "char" : 4,
@@ -24410,6 +25126,7 @@
      {
       "name" : "idx",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 845,
       "char" : 12,
       "deco" : "Am",
@@ -24419,6 +25136,7 @@
      {
       "name" : "prefix",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 846,
       "char" : 12,
       "deco" : "S5voile8parseopt9OptPrefix",
@@ -24427,6 +25145,7 @@
      {
       "name" : "key",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 847,
       "char" : 12,
       "deco" : "Aya",
@@ -24435,6 +25154,7 @@
      {
       "name" : "data",
       "kind" : "variable",
+      "protection" : "public",
       "line" : 848,
       "char" : 12,
       "deco" : "Aya",
@@ -24496,6 +25216,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 943,
     "char" : 17,
@@ -24537,6 +25258,7 @@
    {
     "name" : "__unittest_L1099_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1099,
     "char" : 7,
@@ -24549,6 +25271,7 @@
    {
     "name" : "__unittest_L1128_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1128,
     "char" : 7,
@@ -24561,6 +25284,7 @@
    {
     "name" : "__unittest_L1155_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1155,
     "char" : 7,
@@ -24573,6 +25297,7 @@
    {
     "name" : "__unittest_L1194_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "This behavior is different from Phobos' std.getopt.\n",
     "line" : 1194,
     "char" : 7,
@@ -24585,6 +25310,7 @@
    {
     "name" : "__unittest_L1218_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1218,
     "char" : 7,
@@ -24597,6 +25323,7 @@
    {
     "name" : "__unittest_L1250_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1250,
     "char" : 7,
@@ -24609,6 +25336,7 @@
    {
     "name" : "__unittest_L1289_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1289,
     "char" : 7,
@@ -24646,6 +25374,7 @@
    {
     "name" : "Allocator",
     "kind" : "alias",
+    "protection" : "public",
     "comment" : " アロケータ\n\n CountedDataを作成する際、メモリを割り当てる関数の型。\n",
     "line" : 17,
     "char" : 1,
@@ -24654,6 +25383,7 @@
    {
     "name" : "Deallocator",
     "kind" : "alias",
+    "protection" : "public",
     "comment" : " デアロケータ\n\n CountedDataを解放する際、メモリを解放する関数の型。\n",
     "line" : 24,
     "char" : 1,
@@ -24661,6 +25391,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " アロケータかどうかを判定する\n",
     "line" : 29,
     "char" : 1,
@@ -24689,6 +25420,7 @@
    {
     "name" : "__unittest_L42_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 42,
     "char" : 9,
@@ -24700,6 +25432,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " デアロケータかどうかを判定する\n",
     "line" : 60,
     "char" : 1,
@@ -24728,6 +25461,7 @@
    {
     "name" : "__unittest_L73_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 73,
     "char" : 9,
@@ -24740,6 +25474,7 @@
    {
     "name" : "defaultAllocatorByMalloc",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " malloc/freeによるアロケータ\n",
     "line" : 90,
     "char" : 6,
@@ -24761,6 +25496,7 @@
    {
     "name" : "defaultAllocatorByGC",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " GCによるアロケータ\n",
     "line" : 131,
     "char" : 6,
@@ -24782,6 +25518,7 @@
    {
     "name" : "CountedInstance",
     "kind" : "struct",
+    "protection" : "public",
     "comment" : " 参照カウンタ用のデータを作成する\n",
     "line" : 156,
     "char" : 1,
@@ -24789,6 +25526,7 @@
      {
       "name" : "counter",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "参照カウンタ\n",
       "line" : 159,
       "char" : 10,
@@ -24798,6 +25536,7 @@
      {
       "name" : "rawData",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "生データ(データのインスタンスと拡張領域を含むメモリ領域全体)\n",
       "line" : 161,
       "char" : 10,
@@ -24807,6 +25546,7 @@
      {
       "name" : "deallocator",
       "kind" : "variable",
+      "protection" : "public",
       "comment" : "解放時に呼び出すためのコールバック\n",
       "line" : 163,
       "char" : 14,
@@ -24818,6 +25558,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 参照カウンタ用のデータを作成するmixinテンプレート\n",
     "line" : 169,
     "char" : 7,
@@ -24981,6 +25722,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 参照カウントを持つを形成する(RefCounted専用)\n\n CountedImplを実装しており、isCountedData!Tでtrueを返す型です。\n ただし、メソッドはすべてモジュール内ローカルとなっており、アクセスは許されません。\n かならずRefCountedを通してアクセスしてください。\n",
     "line" : 280,
     "char" : 1,
@@ -24995,12 +25737,14 @@
      {
       "name" : "CountedData",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 280,
       "char" : 1,
       "members" : [
        {
         "name" : "CountedImpl!T",
         "kind" : "mixin",
+        "protection" : "public",
         "line" : 283,
         "char" : 2
        }
@@ -25036,6 +25780,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " RefCountedにできるデータか検証する\n\n RefCountedに直接対応可能な型は以下の特徴を備えています。\n  - 参照型か、ポインタのサイズと同じサイズ\n  - releaseまたはRelease関数を備えていて、それらは整数を返す\n  - addRefまたはAddRef関数を備えていて、それらは整数を返す\n\n 上記に該当しない場合、RefCounted!Tとすると、自動的に上記特徴を備えたCountedData!Tが内部的に使用されます。\n\n Params:\n      T = 調べたい型\n See_Also:\n      $(LINK2 #.CountedData, CountedData)\n",
     "line" : 303,
     "char" : 1,
@@ -25062,6 +25807,7 @@
    {
     "name" : "__unittest_L320_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 320,
     "char" : 9,
@@ -25151,6 +25897,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 参照カウンタのあるデータを管理する\n\n isCountedDataなデータの参照カウントをコピーの発生や寿命の終了で自動的に増減させる。\n\n Params:\n      T = isCountedDataなclass/interface/structのポインタ/size_tと同サイズのstruct、およびCountedDataのインスタンス\n See_Also:\n      $(LINK2 #.isCountedData, isCountedData)\n",
     "line" : 382,
     "char" : 1,
@@ -25165,6 +25912,7 @@
      {
       "name" : "RefCounted",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 382,
       "char" : 1,
       "members" : [
@@ -25278,6 +26026,7 @@
    {
     "name" : "__unittest_L507_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 507,
     "char" : 7,
@@ -25289,6 +26038,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 参照カウンタかどうか確認します\n",
     "line" : 534,
     "char" : 6,
@@ -25315,6 +26065,7 @@
    {
     "name" : "__unittest_L536_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 536,
     "char" : 7,
@@ -25326,6 +26077,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 参照カウンタの元データの型を得ます\n",
     "line" : 545,
     "char" : 1,
@@ -25350,6 +26102,7 @@
    {
     "name" : "__unittest_L551_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 551,
     "char" : 7,
@@ -25361,6 +26114,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 参照が初期化されているか確認する\n",
     "line" : 559,
     "char" : 6,
@@ -25395,6 +26149,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 579,
     "char" : 6,
@@ -25430,6 +26185,7 @@
    {
     "name" : "isNull",
     "kind" : "alias",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 584,
     "char" : 1,
@@ -25438,6 +26194,7 @@
    {
     "name" : "__unittest_L586_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 586,
     "char" : 7,
@@ -25449,6 +26206,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 参照カウンタ加算せずにアタッチする\n",
     "line" : 601,
     "char" : 6,
@@ -25496,6 +26254,7 @@
    {
     "name" : "__unittest_L609_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 609,
     "char" : 7,
@@ -25507,6 +26266,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 参照外し\n",
     "line" : 633,
     "char" : 29,
@@ -25542,6 +26302,7 @@
    {
     "name" : "__unittest_L638_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 638,
     "char" : 7,
@@ -25553,6 +26314,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " ポインタを得る\n",
     "line" : 650,
     "char" : 26,
@@ -25588,6 +26350,7 @@
    {
     "name" : "__unittest_L655_C7",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 655,
     "char" : 7,
@@ -25599,6 +26362,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 参照カウンタを生成\n",
     "line" : 668,
     "char" : 6,
@@ -25641,6 +26405,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 674,
     "char" : 6,
@@ -25683,6 +26448,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 680,
     "char" : 6,
@@ -25725,6 +26491,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 686,
     "char" : 6,
@@ -25767,6 +26534,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 693,
     "char" : 6,
@@ -25809,6 +26577,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 704,
     "char" : 6,
@@ -25856,6 +26625,7 @@
    {
     "name" : "__unittest_L713_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 713,
     "char" : 9,
@@ -25867,6 +26637,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 参照カウンタを追加せずにRefCountedを得る\n",
     "line" : 780,
     "char" : 14,
@@ -25928,6 +26699,7 @@
    {
     "name" : "__unittest_L799_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 799,
     "char" : 9,
     "storageClass" : [
@@ -25973,6 +26745,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " バッファ領域へアクセス\n\n バッファ領域は、Tのインスタンスと拡張領域のメモリ領域全体を指す。\n\n Note:\n      release後に触れた場合、ダングリングポインタへのアクセスの可能性がある。\n      また、書き換えた場合、本来RefCountedで管理しているデータが損失する可能性がある。\n",
     "line" : 842,
     "char" : 16,
@@ -26009,6 +26782,7 @@
    {
     "name" : "__unittest_L849_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 849,
     "char" : 9,
@@ -26020,6 +26794,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 拡張データ領域へアクセス\n\n 初期化時にTのインスタンスより大きなバッファを与えることで、拡張データ領域を持つことができる。\n この関数は拡張データ領域へのアクセス手段を提供する。\n\n Note:\n      release後に触れた場合、ダングリングポインタへのアクセスの可能性がある。\n      また、書き換えた場合、本来RefCountedで管理しているデータが損失する可能性がある。\n",
     "line" : 866,
     "char" : 16,
@@ -26056,6 +26831,7 @@
    {
     "name" : "__unittest_L874_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 874,
     "char" : 9,
@@ -26067,6 +26843,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " カウント値を得る\n",
     "line" : 884,
     "char" : 5,
@@ -26103,6 +26880,7 @@
    {
     "name" : "__unittest_L892_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 892,
     "char" : 9,
@@ -26182,6 +26960,7 @@
    {
     "name" : "SyncEvent",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " 同期イベントクラス\n\n Windowsの CreateEvent や SetEvent のラッパー\n Windows以外の環境でも動作するが、最適な実装ではないかもしれない。\n Example:\n------------------------------------------------------------------------------\nSyncEvent[3] ev;\nint data;\nvoid run1()\n{\n\tdata = 1;\n\tev[0].signal = true;\n}\n\nvoid run2()\n{\n\tdata = 2;\n\tev[1].signal = true;\n}\n\nvoid run3()\n{\n\tdata = 3;\n\tev[2].signal = true;\n}\nvoid main()\n{\n\tev[] = [new Light, new Light, new Light];\n\tscope t = new ThreadGroup;\n\tdata = 0;\n\tt.create(&run1);\n\tev[0].wait;\n\tassert(data == 1);\n\tdata = 0;\n\tt.create(&run2);\n\tev[1].wait;\n\tassert(data == 2);\n\tdata = 0;\n\tt.create(&run3);\n\tev[2].wait;\n\tassert(data == 3);\n}\n------------------------------------------------------------------------------\n",
     "line" : 74,
     "char" : 1,
@@ -26218,6 +26997,7 @@
      {
       "name" : "handle",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ハンドルを得る\n\n ただしOS依存する処理をする場合にのみ使用すること\n",
       "line" : 192,
       "char" : 13,
@@ -26228,6 +27008,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : " コンストラクタ\n\n Params: firstCondition = 初期状態\n",
       "line" : 201,
       "char" : 3,
@@ -26246,6 +27027,7 @@
      {
       "name" : "signaled",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " シグナル状態を返す\n\n Returns:\n     trueならシグナル状態で、waitはすぐに制御を返す\n     falseなら非シグナル状態で、waitしたらシグナル状態になるか、時間が\n     過ぎるまで制御を返さない状態であることを示す。\n",
       "line" : 216,
       "char" : 8,
@@ -26256,6 +27038,7 @@
      {
       "name" : "signaled",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " シグナル状態を設定する\n\n Params: cond=\n     trueならシグナル状態にし、waitしているスレッドの制御を返す。\n     falseなら非シグナル状態で、waitしたらシグナル状態になるまで制御を\n     返さない状態にする。\n",
       "line" : 232,
       "char" : 8,
@@ -26272,6 +27055,7 @@
      {
       "name" : "wait",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " シグナル状態になるまで待つ\n\n conditionがtrueならシグナル状態であり、すぐに制御が返る。\n conditionがfalseなら非シグナル状態で、シグナル状態になるまで制御を\n 返さない。\n",
       "line" : 247,
       "char" : 8,
@@ -26282,6 +27066,7 @@
      {
       "name" : "wait",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " シグナル状態になるまで待つ\n\n conditionがtrueならシグナル状態であり、すぐに制御が返る。\n conditionがfalseなら非シグナル状態で、シグナル状態になるか、時間が\n 過ぎるまで制御を返さない。\n",
       "line" : 262,
       "char" : 8,
@@ -26300,6 +27085,7 @@
    {
     "name" : "__unittest_L274_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 274,
     "char" : 9,
     "storageClass" : [
@@ -26366,6 +27152,7 @@
    {
     "name" : "NamedMutex",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " 名前付きミューテックス\n\n プロセス間で共有される名前付きミューテックスの作成を行う。\n",
     "line" : 351,
     "char" : 1,
@@ -26383,6 +27170,7 @@
        {
         "name" : "link",
         "kind" : "variable",
+        "protection" : "public",
         "line" : 356,
         "char" : 18,
         "deco" : "C6object6Object7Monitor",
@@ -26431,6 +27219,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : " コンストラクタ\n\n Params:\n     aName=名前付きミューテックスの名前を指定する。名前は128文字以内。\n",
       "line" : 369,
       "char" : 2,
@@ -26448,6 +27237,7 @@
      {
       "name" : "name",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 名前を返す。\n",
       "line" : 444,
       "char" : 9,
@@ -26458,6 +27248,7 @@
      {
       "name" : "~this",
       "kind" : "destructor",
+      "protection" : "public",
       "comment" : " デストラクタ\n\n 名前付きミューテックスの削除を行う\n",
       "line" : 454,
       "char" : 2,
@@ -26468,6 +27259,7 @@
      {
       "name" : "lock",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ロックする\n\n ロックが成功するまで制御は返らない\n",
       "line" : 472,
       "char" : 7,
@@ -26481,6 +27273,7 @@
      {
       "name" : "tryLock",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ロックの試行\n\n 即座に制御が返る。\n trueが帰った場合ロックが成功している。\n falseなら別のMutexにロックされているため、ロックされなかった。\n",
       "line" : 490,
       "char" : 7,
@@ -26491,6 +27284,7 @@
      {
       "name" : "unlock",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " ロック解除\n",
       "line" : 504,
       "char" : 7,
@@ -26503,7 +27297,8 @@
      },
      {
       "name" : "__xdtor",
-      "kind" : "alias"
+      "kind" : "alias",
+      "protection" : "public"
      }
     ]
    },
@@ -26597,6 +27392,7 @@
    {
     "name" : "QueuedMutex",
     "kind" : "class",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 585,
     "char" : 1,
@@ -26614,6 +27410,7 @@
        {
         "name" : "link",
         "kind" : "variable",
+        "protection" : "public",
         "line" : 590,
         "char" : 18,
         "deco" : "C6object6Object7Monitor",
@@ -26634,12 +27431,14 @@
      {
       "name" : "QueuedSemImpl!()",
       "kind" : "mixin",
+      "protection" : "public",
       "line" : 593,
       "char" : 2
      },
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 596,
       "char" : 2,
@@ -26651,6 +27450,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 603,
       "char" : 2,
@@ -26662,6 +27462,7 @@
      {
       "name" : "lock",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 612,
       "char" : 7,
@@ -26675,6 +27476,7 @@
      {
       "name" : "lock",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 618,
       "char" : 7,
@@ -26685,6 +27487,7 @@
      {
       "name" : "tryLock",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 624,
       "char" : 7,
@@ -26695,6 +27498,7 @@
      {
       "name" : "tryLock",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 630,
       "char" : 7,
@@ -26705,6 +27509,7 @@
      {
       "name" : "unlock",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 636,
       "char" : 7,
@@ -26718,6 +27523,7 @@
      {
       "name" : "unlock",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 642,
       "char" : 7,
@@ -26730,6 +27536,7 @@
    {
     "name" : "QueuedSemaphore",
     "kind" : "class",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 654,
     "char" : 1,
@@ -26737,12 +27544,14 @@
      {
       "name" : "QueuedSemImpl!()",
       "kind" : "mixin",
+      "protection" : "public",
       "line" : 657,
       "char" : 2
      },
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 660,
       "char" : 2,
@@ -26761,6 +27570,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 665,
       "char" : 2,
@@ -26779,6 +27589,7 @@
      {
       "name" : "wait",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 671,
       "char" : 7,
@@ -26789,6 +27600,7 @@
      {
       "name" : "wait",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 677,
       "char" : 7,
@@ -26799,6 +27611,7 @@
      {
       "name" : "tryWait",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 683,
       "char" : 7,
@@ -26809,6 +27622,7 @@
      {
       "name" : "tryWait",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 689,
       "char" : 7,
@@ -26819,6 +27633,7 @@
      {
       "name" : "notify",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 695,
       "char" : 7,
@@ -26829,6 +27644,7 @@
      {
       "name" : "notify",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 701,
       "char" : 7,
@@ -26994,6 +27810,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 809,
     "char" : 7,
@@ -27008,6 +27825,7 @@
      {
       "name" : "Future",
       "kind" : "class",
+      "protection" : "public",
       "line" : 809,
       "char" : 7,
       "members" : [
@@ -28037,6 +28855,7 @@
    {
     "name" : "__unittest_L1377_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1377,
     "char" : 9,
@@ -28049,6 +28868,7 @@
    {
     "name" : "__unittest_L1408_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1408,
     "char" : 9,
@@ -28061,6 +28881,7 @@
    {
     "name" : "__unittest_L1430_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1430,
     "char" : 9,
@@ -28073,6 +28894,7 @@
    {
     "name" : "__unittest_L1455_C9",
     "kind" : "function",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1455,
     "char" : 9,
@@ -28085,6 +28907,7 @@
    {
     "name" : "async",
     "kind" : "function",
+    "protection" : "public",
     "comment" : " 非同期処理の開始\n",
     "line" : 1497,
     "char" : 6,
@@ -28099,6 +28922,7 @@
    {
     "name" : "__unittest_L1503_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1503,
     "char" : 9,
     "storageClass" : [
@@ -28110,6 +28934,7 @@
    {
     "name" : "__unittest_L1511_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1511,
     "char" : 9,
     "storageClass" : [
@@ -28120,6 +28945,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1522,
     "char" : 6,
@@ -28167,6 +28993,7 @@
    {
     "name" : "__unittest_L1531_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1531,
     "char" : 9,
     "storageClass" : [
@@ -28177,6 +29004,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1538,
     "char" : 6,
@@ -28220,6 +29048,7 @@
    {
     "name" : "__unittest_L1546_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1546,
     "char" : 9,
     "storageClass" : [
@@ -28230,6 +29059,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1552,
     "char" : 6,
@@ -28273,6 +29103,7 @@
    {
     "name" : "__unittest_L1561_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1561,
     "char" : 9,
     "storageClass" : [
@@ -28283,6 +29114,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "ditto\n",
     "line" : 1567,
     "char" : 6,
@@ -28322,6 +29154,7 @@
    {
     "name" : "__unittest_L1575_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1575,
     "char" : 9,
     "storageClass" : [
@@ -28332,6 +29165,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 管理された共有資源\n\n\n",
     "line" : 1588,
     "char" : 1,
@@ -28346,6 +29180,7 @@
      {
       "name" : "ManagedShared",
       "kind" : "class",
+      "protection" : "public",
       "line" : 1588,
       "char" : 1,
       "members" : [
@@ -28359,6 +29194,7 @@
        {
         "name" : "MonitorProxy",
         "kind" : "struct",
+        "protection" : "public",
         "line" : 1592,
         "char" : 9,
         "members" : [
@@ -28586,6 +29422,7 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
     "line" : 1767,
     "char" : 17,
@@ -28621,6 +29458,7 @@
    {
     "name" : "__unittest_L1781_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1781,
     "char" : 9,
     "storageClass" : [
@@ -28632,6 +29470,7 @@
    {
     "name" : "__unittest_L1822_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 1822,
     "char" : 9,
     "storageClass" : [
@@ -28643,6 +29482,7 @@
    {
     "name" : "TaskData",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " マルチタスクキューによって管理されるタスクデータ\n",
     "line" : 1873,
     "char" : 1,
@@ -28664,6 +29504,7 @@
      {
       "name" : "State",
       "kind" : "enum",
+      "protection" : "public",
       "comment" : "状態\n",
       "line" : 1878,
       "char" : 2,
@@ -28672,6 +29513,7 @@
        {
         "name" : "waiting",
         "kind" : "enum member",
+        "protection" : "public",
         "value" : "0",
         "comment" : "初期状態で、タスクプールに追加される前\n",
         "line" : 1881,
@@ -28680,6 +29522,7 @@
        {
         "name" : "ready",
         "kind" : "enum member",
+        "protection" : "public",
         "value" : "1",
         "comment" : "タスクプールに追加された状態\n",
         "line" : 1883,
@@ -28688,6 +29531,7 @@
        {
         "name" : "running",
         "kind" : "enum member",
+        "protection" : "public",
         "value" : "2",
         "comment" : "実行中の状態\n",
         "line" : 1885,
@@ -28696,6 +29540,7 @@
        {
         "name" : "finished",
         "kind" : "enum member",
+        "protection" : "public",
         "value" : "3",
         "comment" : "実行が終了した状態\n",
         "line" : 1887,
@@ -28704,6 +29549,7 @@
        {
         "name" : "failed",
         "kind" : "enum member",
+        "protection" : "public",
         "value" : "4",
         "comment" : "実行の結果、異常終了した状態\n",
         "line" : 1889,
@@ -28712,6 +29558,7 @@
        {
         "name" : "dropped",
         "kind" : "enum member",
+        "protection" : "public",
         "value" : "5",
         "comment" : "実行されずにドロップされた状態\n",
         "line" : 1891,
@@ -28896,6 +29743,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "\n",
       "line" : 1923,
       "char" : 2,
@@ -28924,6 +29772,7 @@
    {
     "name" : "MultiTaskQueue",
     "kind" : "class",
+    "protection" : "public",
     "comment" : " マルチタスクキュー\n\n タスクの待ち行列を作成する。\n 同じ種類のタスクは待ち行列によって順次実行し、違う種類のタスクはタスクプールで並列実行する。\n コンストラクタでタスクプールの設定を行い、$(D invoke)関数によってタスクの種類と実行内容を指定する。\n $(D invoke)により指定されるタスクは、$(D TaskData)クラスを継承することで細かく内容を調整することができる。\n $(D invoke)によって待ち行列に追加された未だ実行されていないタスクを、$(D drop)によって実行取り消しすることができる。\n $(D informations)関数により、各タスクの実行状況を調べることができる。\n\n 以下のようなことが可能\n\n <img src=\"img/voile.sync.MultiTaskQueue-testcase.drawio.svg\" />\n",
     "line" : 1946,
     "char" : 1,
@@ -29023,6 +29872,7 @@
          {
           "name" : "ready",
           "kind" : "enum member",
+          "protection" : "public",
           "value" : "0",
           "line" : 1966,
           "char" : 4
@@ -29030,6 +29880,7 @@
          {
           "name" : "finish",
           "kind" : "enum member",
+          "protection" : "public",
           "value" : "1",
           "line" : 1966,
           "char" : 11
@@ -29049,6 +29900,7 @@
        {
         "name" : "pushBack",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 1971,
         "char" : 8,
@@ -29071,6 +29923,7 @@
        {
         "name" : "removeAt",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 1988,
         "char" : 12,
@@ -29091,6 +29944,7 @@
        {
         "name" : "removeFront",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 2013,
         "char" : 12,
@@ -29107,6 +29961,7 @@
        {
         "name" : "removeFrontAndGetNext",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 2032,
         "char" : 12,
@@ -29130,6 +29985,7 @@
        {
         "name" : "refFront",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 2053,
         "char" : 12,
@@ -29146,6 +30002,7 @@
        {
         "name" : "getFront",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 2059,
         "char" : 12,
@@ -29162,6 +30019,7 @@
        {
         "name" : "getAt",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 2067,
         "char" : 12,
@@ -29182,6 +30040,7 @@
        {
         "name" : "getNext",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "現在実行中の次のタスクを得る\n",
         "line" : 2079,
         "char" : 12,
@@ -29198,6 +30057,7 @@
        {
         "name" : "dropNext",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "現在実行中のタスクの次のタスクを破棄する。破棄されたタスクを返す。\n",
         "line" : 2087,
         "char" : 12,
@@ -29214,6 +30074,7 @@
        {
         "name" : "types",
         "kind" : "function",
+        "protection" : "public",
         "comment" : "\n",
         "line" : 2102,
         "char" : 12,
@@ -29275,6 +30136,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : " コンストラクタ\n\n Params:\n      pool = 使用するタスクプールを指定できる\n      callbackFinishPool = タスクキューを破棄した際に全てのタスクが終了した際に呼ばれる。タスクプールを終了するために使用できる。\n      worker = ワーカースレッド数を指定して作成できる\n      daemon = スレッドのデーモン化をする場合はtrue。disposeしない場合がある場合にtrueを指定する。\n",
       "line" : 2186,
       "char" : 2,
@@ -29297,6 +30159,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 2192,
       "char" : 2,
@@ -29319,6 +30182,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 2199,
       "char" : 2,
@@ -29342,6 +30206,7 @@
      {
       "name" : "this",
       "kind" : "constructor",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 2206,
       "char" : 2,
@@ -29365,6 +30230,7 @@
      {
       "name" : "dispose",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " インスタンスを破棄する。\n",
       "line" : 2216,
       "char" : 7,
@@ -29375,6 +30241,7 @@
      {
       "name" : "invoke",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " タスクを実行予約する\n\n タスクを待ち行列に追加する。待ち行列に追加されると、順次実行される。\n 待ち行列は$(D type)毎にあり、どの待ち行列に追加されるかはタスクの$(D type)により決まる。\n 同じ$(D type)では、追加された順に順次実行される。\n 異なる$(D type)の場合は並行して実行される。並行数はコンストラクタで指定したタスクプールに依存する。\n\n Params:\n      tsk = タスクデータを指定する\n      type = タスク種別を指定する\n      dg = タスクの処理内容のデリゲートを指定する\n      id = タスクの識別用IDを指定する\n Returns:\n      タスクを追加することができたらtrueを、追加できなかったらfalseを返す。\n",
       "line" : 2252,
       "char" : 7,
@@ -29391,6 +30258,7 @@
      {
       "name" : "invoke",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 2268,
       "char" : 7,
@@ -29407,6 +30275,7 @@
      {
       "name" : "invoke",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 2274,
       "char" : 7,
@@ -29432,6 +30301,7 @@
      {
       "name" : "invoke",
       "kind" : "function",
+      "protection" : "public",
       "comment" : "ditto\n",
       "line" : 2279,
       "char" : 7,
@@ -29457,6 +30327,7 @@
      {
       "name" : "drop",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " タスク実行を取りやめる\n\n タスクがまだ実行されていない場合は、実行を取りやめる。\n\n Params:\n      type = タスク種別を指定する\n      id = タスクの識別用IDを指定する\n Returns:\n      正常にドロップされた場合はtrueが返り、さもなくばfalseが返る。\n",
       "line" : 2295,
       "char" : 7,
@@ -29477,6 +30348,7 @@
      {
       "name" : "peek",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " タスクを取り出す\n",
       "line" : 2314,
       "char" : 19,
@@ -29497,6 +30369,7 @@
      {
       "name" : "TaskInfo",
       "kind" : "struct",
+      "protection" : "public",
       "comment" : " タスクの情報\n",
       "line" : 2324,
       "char" : 2,
@@ -29504,6 +30377,7 @@
        {
         "name" : "type",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "タスクの種類\n",
         "line" : 2327,
         "char" : 18,
@@ -29513,6 +30387,7 @@
        {
         "name" : "timCreate",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "Queueに追加された時刻\n",
         "line" : 2329,
         "char" : 18,
@@ -29522,6 +30397,7 @@
        {
         "name" : "timReady",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "Poolに追加された時刻\n",
         "line" : 2331,
         "char" : 18,
@@ -29531,6 +30407,7 @@
        {
         "name" : "timStart",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "実行開始した時刻\n",
         "line" : 2333,
         "char" : 18,
@@ -29540,6 +30417,7 @@
        {
         "name" : "timEnd",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "実行終了した時刻\n",
         "line" : 2335,
         "char" : 18,
@@ -29549,6 +30427,7 @@
        {
         "name" : "uuid",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "一意なID\n",
         "line" : 2337,
         "char" : 18,
@@ -29558,6 +30437,7 @@
        {
         "name" : "State",
         "kind" : "alias",
+        "protection" : "public",
         "comment" : "タスクの状態\n",
         "line" : 2339,
         "char" : 3,
@@ -29567,6 +30447,7 @@
        {
         "name" : "state",
         "kind" : "variable",
+        "protection" : "public",
         "comment" : "ditto\n",
         "line" : 2341,
         "char" : 9,
@@ -29576,6 +30457,7 @@
        {
         "name" : "opAssign",
         "kind" : "generated function",
+        "protection" : "public",
         "line" : 2324,
         "char" : 2,
         "deco" : "FNaNbNcNiNjNfS5voile4sync14MultiTaskQueue8TaskInfoZQBm",
@@ -29592,6 +30474,7 @@
      {
       "name" : "informations",
       "kind" : "function",
+      "protection" : "public",
       "comment" : " 情報取得\n\n タスクの実行状況を調べる。\n\n Returns:\n      タスクの情報を$(D TaskInfo)の配列で返す。\n",
       "line" : 2352,
       "char" : 13,
@@ -29604,6 +30487,7 @@
    {
     "name" : "__unittest_L2368_C9",
     "kind" : "function",
+    "protection" : "public",
     "line" : 2368,
     "char" : 9,
     "storageClass" : [
@@ -29823,6 +30707,7 @@
      {
       "name" : "UniqueDataImpl",
       "kind" : "struct",
+      "protection" : "public",
       "line" : 46,
       "char" : 9,
       "members" : [
@@ -29871,53 +30756,53 @@
           "type" : "size_t"
          }
         ],
-        "endline" : 73,
+        "endline" : 69,
         "endchar" : 2
        },
        {
         "name" : "detach",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 79,
+        "line" : 75,
         "char" : 7,
         "type" : "pure RefT()",
-        "endline" : 93,
+        "endline" : 85,
         "endchar" : 2
        },
        {
         "name" : "_instance",
         "kind" : "function",
         "comment" : " Forwards member access to contents\n",
-        "line" : 101,
+        "line" : 93,
         "char" : 12,
         "type" : "inout pure nothrow @property @trusted inout(T)()",
-        "endline" : 101,
+        "endline" : 93,
         "endchar" : 57
        },
        {
         "name" : "release",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 126,
+        "line" : 118,
         "char" : 7,
         "type" : "pure @trusted void()",
-        "endline" : 154,
+        "endline" : 146,
         "endchar" : 2
        },
        {
         "name" : "toHash",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 159,
+        "line" : 151,
         "char" : 10,
         "type" : "const nothrow @trusted hash_t()",
-        "endline" : 165,
+        "endline" : 157,
         "endchar" : 3
        },
        {
         "kind" : "template",
         "comment" : " Nullifies the current contents.\n",
-        "line" : 172,
+        "line" : 164,
         "char" : 7,
         "name" : "isEmpty",
         "parameters" : [
@@ -29930,10 +30815,10 @@
          {
           "name" : "isEmpty",
           "kind" : "function",
-          "line" : 172,
+          "line" : 164,
           "char" : 7,
           "type" : "pure nothrow @property @safe bool()",
-          "endline" : 175,
+          "endline" : 167,
           "endchar" : 2
          }
         ]
@@ -29944,8 +30829,9 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
-    "line" : 184,
+    "line" : 176,
     "char" : 1,
     "name" : "Unique",
     "parameters" : [
@@ -29958,13 +30844,14 @@
      {
       "name" : "Unique",
       "kind" : "struct",
-      "line" : 184,
+      "protection" : "public",
+      "line" : 176,
       "char" : 1,
       "members" : [
        {
         "kind" : "template",
         "comment" : " Constructor\n",
-        "line" : 191,
+        "line" : 183,
         "char" : 2,
         "name" : "this",
         "parameters" : [
@@ -29978,7 +30865,7 @@
          {
           "name" : "this",
           "kind" : "constructor",
-          "line" : 191,
+          "line" : 183,
           "char" : 2,
           "type" : "pure (U p, TypeOf!(__traits(getMember, Unique, uniqueMemberName!T).Dummy) dummy)",
           "parameters" : [
@@ -29991,7 +30878,7 @@
             "type" : "TypeOf!(__traits(getMember, Unique, uniqueMemberName!T).Dummy)"
            }
           ],
-          "endline" : 196,
+          "endline" : 188,
           "endchar" : 2
          }
         ]
@@ -29999,7 +30886,7 @@
        {
         "kind" : "template",
         "comment" : " Constructor that takes an rvalue.\n It will ensure uniqueness, as long as the rvalue\n isn't just a view on an lvalue (e.g., a cast)\n Typical usage:\n----\nUnique!(Foo) f = new Foo;\n----\n",
-        "line" : 207,
+        "line" : 199,
         "char" : 2,
         "name" : "this",
         "parameters" : [
@@ -30013,7 +30900,7 @@
          {
           "name" : "this",
           "kind" : "constructor",
-          "line" : 207,
+          "line" : 199,
           "char" : 2,
           "type" : "(U p, size_t sz)",
           "parameters" : [
@@ -30026,7 +30913,7 @@
             "type" : "size_t"
            }
           ],
-          "endline" : 212,
+          "endline" : 204,
           "endchar" : 2
          }
         ]
@@ -30034,7 +30921,7 @@
        {
         "kind" : "template",
         "comment" : " Constructor that takes an rvalue.\n It will ensure uniqueness, as long as the rvalue\n isn't just a view on an lvalue (e.g., a cast)\n Typical usage:\n----\nUnique!(Foo) f = unique!Bar;\n----\n",
-        "line" : 234,
+        "line" : 226,
         "char" : 2,
         "name" : "this",
         "parameters" : [
@@ -30048,7 +30935,7 @@
          {
           "name" : "this",
           "kind" : "constructor",
-          "line" : 234,
+          "line" : 226,
           "char" : 2,
           "type" : "(Unique!U u)",
           "parameters" : [
@@ -30057,7 +30944,7 @@
             "type" : "Unique!U"
            }
           ],
-          "endline" : 242,
+          "endline" : 234,
           "endchar" : 2
          }
         ]
@@ -30065,18 +30952,18 @@
        {
         "name" : "~this",
         "kind" : "destructor",
-        "line" : 245,
+        "line" : 237,
         "char" : 2,
         "storageClass" : [
          "pure"
         ],
-        "endline" : 251,
+        "endline" : 243,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 257,
+        "line" : 249,
         "char" : 7,
         "name" : "proxySwap",
         "parameters" : [],
@@ -30085,7 +30972,7 @@
          {
           "name" : "proxySwap",
           "kind" : "function",
-          "line" : 257,
+          "line" : 249,
           "char" : 7,
           "type" : "@safe void(ref Unique u)",
           "parameters" : [
@@ -30097,7 +30984,7 @@
             ]
            }
           ],
-          "endline" : 266,
+          "endline" : 258,
           "endchar" : 2
          }
         ]
@@ -30106,7 +30993,7 @@
         "name" : "opAssign",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 269,
+        "line" : 261,
         "char" : 13,
         "type" : "ref Unique(Unique u)",
         "parameters" : [
@@ -30115,13 +31002,14 @@
           "type" : "Unique"
          }
         ],
-        "endline" : 282,
+        "endline" : 270,
         "endchar" : 2
        },
        {
         "name" : "Proxy!(mixin(uniqueMemberName!T))",
         "kind" : "mixin",
-        "line" : 284,
+        "protection" : "public",
+        "line" : 272,
         "char" : 2
        }
       ]
@@ -30130,8 +31018,9 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
-    "line" : 291,
+    "line" : 279,
     "char" : 10,
     "name" : "unique",
     "parameters" : [
@@ -30149,7 +31038,7 @@
      {
       "name" : "unique",
       "kind" : "function",
-      "line" : 291,
+      "line" : 279,
       "char" : 10,
       "type" : "@trusted Unique!T(Args args)",
       "parameters" : [
@@ -30158,7 +31047,7 @@
         "type" : "Args"
        }
       ],
-      "endline" : 296,
+      "endline" : 284,
       "endchar" : 1
      }
     ]
@@ -30166,7 +31055,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 298,
+    "line" : 286,
     "char" : 18,
     "name" : "uniqueImpl",
     "parameters" : [
@@ -30184,7 +31073,7 @@
      {
       "name" : "uniqueImpl",
       "kind" : "function",
-      "line" : 298,
+      "line" : 286,
       "char" : 18,
       "type" : "Unique!T(Args args)",
       "parameters" : [
@@ -30193,15 +31082,16 @@
         "type" : "Args"
        }
       ],
-      "endline" : 312,
+      "endline" : 300,
       "endchar" : 1
      }
     ]
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
-    "line" : 315,
+    "line" : 303,
     "char" : 6,
     "name" : "release",
     "parameters" : [
@@ -30214,7 +31104,7 @@
      {
       "name" : "release",
       "kind" : "function",
-      "line" : 315,
+      "line" : 303,
       "char" : 6,
       "type" : "void(ref Unique!T u)",
       "parameters" : [
@@ -30226,15 +31116,16 @@
         ]
        }
       ],
-      "endline" : 318,
+      "endline" : 306,
       "endchar" : 1
      }
     ]
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : "\n",
-    "line" : 321,
+    "line" : 309,
     "char" : 6,
     "name" : "isEmpty",
     "parameters" : [
@@ -30247,7 +31138,7 @@
      {
       "name" : "isEmpty",
       "kind" : "function",
-      "line" : 321,
+      "line" : 309,
       "char" : 6,
       "type" : "bool(ref Unique!T u)",
       "parameters" : [
@@ -30259,70 +31150,76 @@
         ]
        }
       ],
-      "endline" : 324,
+      "endline" : 312,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L327_C9",
+    "name" : "__unittest_L315_C9",
     "kind" : "function",
-    "line" : 327,
+    "protection" : "public",
+    "line" : 315,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 382,
+    "endline" : 370,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L382_C9",
+    "name" : "__unittest_L370_C9",
     "kind" : "function",
-    "line" : 382,
+    "protection" : "public",
+    "line" : 370,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 432,
+    "endline" : 420,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L432_C9",
+    "name" : "__unittest_L420_C9",
     "kind" : "function",
-    "line" : 432,
+    "protection" : "public",
+    "line" : 420,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 490,
+    "endline" : 478,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L490_C9",
+    "name" : "__unittest_L478_C9",
     "kind" : "function",
-    "line" : 490,
+    "protection" : "public",
+    "line" : 478,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 524,
+    "endline" : 512,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L524_C9",
+    "name" : "__unittest_L512_C9",
     "kind" : "function",
-    "line" : 524,
+    "protection" : "public",
+    "line" : 512,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 585,
+    "endline" : 573,
     "endchar" : 1
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 生データを利用できない形で返す\n",
-    "line" : 585,
+    "line" : 573,
     "char" : 6,
     "name" : "toRawData",
     "parameters" : [
@@ -30335,7 +31232,7 @@
      {
       "name" : "toRawData",
       "kind" : "function",
-      "line" : 585,
+      "line" : 573,
       "char" : 6,
       "storageClass" : [
        "auto"
@@ -30350,15 +31247,16 @@
         ]
        }
       ],
-      "endline" : 591,
+      "endline" : 579,
       "endchar" : 1
      }
     ]
    },
    {
     "kind" : "template",
+    "protection" : "public",
     "comment" : " 生データから利用できる形のUnique型へと変換する\n",
-    "line" : 596,
+    "line" : 584,
     "char" : 6,
     "name" : "toUnique",
     "parameters" : [
@@ -30371,7 +31269,7 @@
      {
       "name" : "toUnique",
       "kind" : "function",
-      "line" : 596,
+      "line" : 584,
       "char" : 6,
       "storageClass" : [
        "auto"
@@ -30386,7 +31284,7 @@
         ]
        }
       ],
-      "endline" : 604,
+      "endline" : 592,
       "endchar" : 1
      }
     ]
