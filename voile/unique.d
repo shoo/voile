@@ -61,11 +61,7 @@ private struct UniqueDataImpl(T)
 	 * 
 	 */
 	void attach(RefT p, size_t sz) pure
-		in
-		{
-			assert(_p is null);
-		}
-	body
+	in (_p is null)
 	{
 		debug (Unique) writefln("%d: Unique Attach [%08x]", __LINE__,  cast(void*)p);
 		_p = p;
@@ -77,11 +73,7 @@ private struct UniqueDataImpl(T)
 	 * 
 	 */
 	RefT detach() pure
-		in
-		{
-			assert(_p !is null);
-		}
-	body
+	in (_p !is null)
 	{
 		debug (Unique) writefln("%d: Unique Detach [%08x]", __LINE__, cast(void*)_p);
 		scope (exit)
@@ -267,11 +259,7 @@ public:
 	
 	///
 	ref Unique opAssign(Unique u)
-		in
-		{
-			assert(__traits(getMember, this, uniqueMemberName!T)._p is null);
-		}
-		body
+	in (__traits(getMember, this, uniqueMemberName!T)._p is null)
 	{
 		debug (Unique) writefln("%d: Unique [%08x] assign [%08x]",
 		                        __LINE__, cast(void*)&this,
