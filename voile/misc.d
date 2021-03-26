@@ -831,14 +831,12 @@ private S indentCtfe(S)(S s, S indentStr = " ")
  * 
  */
 S indent(S)(S s, S indentStr = "\t")
-	out(r)
-	{
-		debug version(D_unittest)
-		{
-			assert(r == s.indentCtfe(indentStr));
-		}
-	}
-	body
+out(r)
+{
+	debug version(D_unittest)
+		assert( r == s.indentCtfe(indentStr));
+}
+do
 {
 	return __ctfe ? s.indentCtfe(indentStr) : s.indentRuntime(indentStr);
 }

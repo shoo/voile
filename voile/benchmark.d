@@ -125,11 +125,7 @@ struct FootPrintBenchmark
 	 * ストップウォッチリセット
 	 */
 	void reset()
-		in
-		{
-			assert(_datas.data.length == 0);
-		}
-		body
+	in (_datas.data.length == 0)
 	{
 		_sw.reset();
 	}
