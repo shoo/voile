@@ -8777,7 +8777,7 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "FAAyaHQeQgE3std7process6ConfigZCQvQt3Pid",
+      "deco" : "FAAyaHQeQgS3std7process6ConfigZCQvQt3Pid",
       "originalType" : "(string[] args, string[string] env = null, std.process.Config cfg = std.process.Config.none)",
       "parameters" : [
        {
@@ -8791,8 +8791,8 @@
        },
        {
         "name" : "cfg",
-        "deco" : "E3std7process6Config",
-        "default" : "Config.none"
+        "deco" : "S3std7process6Config",
+        "default" : "Config(Flags.none, null)"
        }
       ],
       "endline" : 1696,
@@ -8808,7 +8808,7 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "FAAyaS3std5stdio4FileQqQsHQyQBaEQBa7process6ConfigZCQBuQu3Pid",
+      "deco" : "FAAyaS3std5stdio4FileQqQsHQyQBaSQBa7process6ConfigZCQBuQu3Pid",
       "originalType" : "(string[] args, File fin, File fout, File ferr, string[string] env = null, std.process.Config cfg = std.process.Config.suppressConsole)",
       "parameters" : [
        {
@@ -8834,8 +8834,8 @@
        },
        {
         "name" : "cfg",
-        "deco" : "E3std7process6Config",
-        "default" : "Config.suppressConsole"
+        "deco" : "S3std7process6Config",
+        "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
       "endline" : 1709,
@@ -8851,7 +8851,7 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "FAAyaS3std7process4PipeQsQuHQBaQBdEQBdQBc6ConfigZCQBsQBr3Pid",
+      "deco" : "FAAyaS3std7process4PipeQsQuHQBaQBdSQBdQBc6ConfigZCQBsQBr3Pid",
       "originalType" : "(string[] args, Pipe pin, Pipe pout, Pipe perr, string[string] env = null, std.process.Config cfg = std.process.Config.suppressConsole)",
       "parameters" : [
        {
@@ -8877,8 +8877,8 @@
        },
        {
         "name" : "cfg",
-        "deco" : "E3std7process6Config",
-        "default" : "Config.suppressConsole"
+        "deco" : "S3std7process6Config",
+        "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
       "endline" : 1722,
@@ -8894,7 +8894,7 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "FNfAAyaHQeQgE3std7process6ConfigZSQvQt12ProcessPipes",
+      "deco" : "FNfAAyaHQeQgS3std7process6ConfigZSQvQt12ProcessPipes",
       "originalType" : "(string[] args, string[string] env = null, std.process.Config cfg = std.process.Config.suppressConsole)",
       "parameters" : [
        {
@@ -8908,8 +8908,8 @@
        },
        {
         "name" : "cfg",
-        "deco" : "E3std7process6Config",
-        "default" : "Config.suppressConsole"
+        "deco" : "S3std7process6Config",
+        "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
       "endline" : 1731,
@@ -8925,7 +8925,7 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "FNfAAyaHQeQgE3std7process6ConfigZSQv8typecons__T5TupleTiVQCba6_737461747573TQCuVQCya6_6f7574707574ZQBz",
+      "deco" : "FNfAAyaHQeQgS3std7process6ConfigZSQv8typecons__T5TupleTiVQCba6_737461747573TQCuVQCya6_6f7574707574ZQBz",
       "originalType" : "(string[] args, string[string] env = null, std.process.Config cfg = std.process.Config.suppressConsole)",
       "parameters" : [
        {
@@ -8939,8 +8939,8 @@
        },
        {
         "name" : "cfg",
-        "deco" : "E3std7process6Config",
-        "default" : "Config.suppressConsole"
+        "deco" : "S3std7process6Config",
+        "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
       "endline" : 1740,
