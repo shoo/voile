@@ -1340,7 +1340,7 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 	args.parseOptions(dat);
 	assert(dat.valueStr == "aaaaaa");
 	assert(dat.valueI32 == 12345+5);
-	assert(dat.valueF32.approxEqual(10.0f+12345 + 10));
+	assert(dat.valueF32.isClose(10.0f+12345 + 10));
 	assert(dat.hogeLen == 3);
 	assert(dat.hoge == "hogehogehoge");
 }
