@@ -445,7 +445,7 @@ Dat <span class="d_param">dat</span>;
 <span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
 <span class="d_keyword">assert</span>(<span class="d_param">dat</span>.valueStr == <span class="d_string">"aaaaaa"</span>);
 <span class="d_keyword">assert</span>(<span class="d_param">dat</span>.valueI32 == 12345+5);
-<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.valueF32.approxEqual(10.0f+12345 + 10));
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.valueF32.isClose(10.0f+12345 + 10));
 <span class="d_keyword">assert</span>(<span class="d_param">dat</span>.hogeLen == 3);
 <span class="d_keyword">assert</span>(<span class="d_param">dat</span>.hoge == <span class="d_string">"hogehogehoge"</span>);
 </pre>
