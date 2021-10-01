@@ -2549,3 +2549,621 @@ public:
 		assert(getTask(3, 3).state == TaskData.State.failed);
 	}
 }
+
+/*******************************************************************************
+ * 
+ */
+class MessageQueue(T)
+if (!hasUnsharedAliasing!T)
+{
+@safe:
+private:
+	import core.lifetime: move;
+	import core.time: Duration, msecs;
+	import core.sync.mutex: Mutex;
+	import core.sync.condition: Condition;
+	import std.container.dlist: DList;
+	import std.range: put, isInputRange, isOutputRange;
+	import std.exception: collectException;
+	Condition _cond;
+	DList!T _list;
+	size_t  _length;
+	shared(Mutex) _mutex() @trusted nothrow shared
+	{
+		try
+			return _cond.mutex;
+		catch (Exception)
+			assert(0);
+	}
+	void _wait() @trusted nothrow
+	{
+		try
+			_cond.wait();
+		catch (Exception)
+			assert(0);
+	}
+	bool _wait(Duration dur) @trusted nothrow
+	{
+		try
+			return _cond.wait(dur);
+		catch (Exception)
+			assert(0);
+	}
+	void _notify() @trusted nothrow
+	{
+		cast(void)_cond.notifyAll().collectException();
+	}
+public:
+	/***************************************************************************
+	 * コンストラクタ
+	 */
+	this(return scope Condition cond) @system nothrow
+	{
+		_cond = cond;
+	}
+	/// ditto
+	this() @system nothrow
+	{
+		this(new Condition(new Mutex));
+	}
+	/// ditto
+	this(Condition cond) @trusted shared nothrow
+	{
+		_cond = cast(shared)cond;
+	}
+	/// ditto
+	this(shared(Condition) cond) @safe shared nothrow
+	{
+		_cond = cond;
+	}
+	/// ditto
+	this() @safe shared nothrow
+	{
+		this(new Condition(new Mutex));
+	}
+	
+	/***************************************************************************
+	 * 供給
+	 */
+	void put(T dat) nothrow
+	{
+		_list.insertBack(dat);
+		++_length;
+		_notify();
+	}
+	/// ditto
+	void put(T dat) @trusted nothrow shared
+	{
+		auto m = _mutex;
+		m.lock_nothrow();
+		scope (exit)
+			m.unlock_nothrow();
+		(cast()this).put(dat.move);
+	}
+	/// ditto
+	void put(Range)(Range src) nothrow
+	if (isInputRange!Range && is(ForeachType!Range: T))
+	{
+		foreach (ref e; src)
+		{
+			_list.insertBack(e.move());
+			++_length;
+		}
+		_notify();
+	}
+	/// ditto
+	void put(Range)(Range src) @trusted nothrow shared
+	if (isInputRange!Range && is(ForeachType!Range: T))
+	{
+		auto m = _mutex;
+		m.lock_nothrow();
+		scope (exit)
+			m.unlock_nothrow();
+		(cast()this).put(src);
+	}
+	
+	/***************************************************************************
+	 * 消費
+	 */
+	T consume() nothrow
+	{
+		while (_list.empty)
+			_wait();
+		scope (exit)
+			_list.removeFront();
+		--_length;
+		return _list.front.move();
+	}
+	/// ditto
+	T consume() nothrow shared @trusted
+	{
+		auto m = _mutex;
+		m.lock_nothrow();
+		scope (exit)
+			m.unlock_nothrow();
+		return (cast()this).consume();
+	}
+	/// ditto
+	void consumeAll(OutputRange)(ref OutputRange dst) nothrow
+	if (isOutputRange!(OutputRange, T))
+	{
+		while (_list.empty)
+			_wait();
+		foreach (ref e; _list[])
+			put(dst, e.move);
+		_list.clear();
+		_length = 0;
+	}
+	/// ditto
+	void consumeAll(OutputRange)(ref OutputRange dst) @trusted nothrow shared
+	if (isOutputRange!(OutputRange, T))
+	{
+		auto m = _mutex;
+		m.lock_nothrow();
+		scope (exit)
+			m.unlock_nothrow();
+		return (cast()this).consumeAll(dst);
+	}
+	/// ditto
+	bool tryConsume(ref T dst, Duration timeout = 0.msecs) nothrow
+	{
+		try
+		{
+			if (_list.empty && !_wait(timeout))
+				return false;
+			if (_list.empty)
+				return false;
+		}
+		catch (Exception)
+			return false;
+		scope (exit)
+			_list.removeFront();
+		dst = _list.front.move();
+		--_length;
+		return true;
+	}
+	/// ditto
+	bool tryConsume(ref T dst, Duration timeout = 0.msecs) @trusted nothrow shared
+	{
+		auto m = _mutex;
+		m.lock_nothrow();
+		scope (exit)
+			m.unlock_nothrow();
+		return (cast()this).tryConsume(dst, timeout);
+	}
+	/// ditto
+	bool tryConsumeAll(OutputRange)(ref OutputRange dst, Duration timeout = 0.msecs) nothrow
+	if (isOutputRange!(OutputRange, T))
+	{
+		if (_list.empty && !_wait(timeout))
+			return false;
+		if (_list.empty)
+			return false;
+		foreach (ref e; _list[])
+			put(dst, e.move);
+		_list.clear();
+		_length = 0;
+		return true;
+	}
+	/// ditto
+	bool tryConsumeAll(OutputRange)(ref OutputRange dst, Duration timeout = 0.msecs) @trusted nothrow shared
+	if (isOutputRange!(OutputRange, T))
+	{
+		auto m = _mutex;
+		m.lock_nothrow();
+		scope (exit)
+			m.unlock_nothrow();
+		return (cast()this).tryConsumeAll(dst, timeout);
+	}
+	
+	/***************************************************************************
+	 * データ供給待ち
+	 */
+	bool waitForData() nothrow
+	{
+		if (_list.empty)
+			_wait();
+		return !_list.empty;
+	}
+	/// ditto
+	bool waitForData() @trusted nothrow shared
+	{
+		auto m = _mutex;
+		m.lock_nothrow();
+		scope (exit)
+			m.unlock_nothrow();
+		return (cast()this).waitForData();
+	}
+	/// ditto
+	bool waitForData(Duration timeout) nothrow
+	{
+		if (_list.empty)
+			_wait(timeout);
+		return !_list.empty;
+	}
+	/// ditto
+	bool waitForData(Duration timeout) @trusted nothrow shared
+	{
+		auto m = _mutex;
+		m.lock_nothrow();
+		scope (exit)
+			m.unlock_nothrow();
+		return (cast()this).waitForData(timeout);
+	}
+	
+	/***************************************************************************
+	 * 現在の待ち行列の長さ
+	 */
+	size_t length() @trusted nothrow const @property
+	{
+		return _length;
+	}
+	/// ditto
+	size_t length() @trusted nothrow const shared @property
+	{
+		import core.atomic;
+		return _length.atomicLoad();
+	}
+	
+	/***************************************************************************
+	 * とじる
+	 */
+	void close() nothrow
+	{
+		if (!_list.empty)
+			_wait();
+		_length = 0;
+		_notify();
+	}
+	/// ditto
+	void close() @trusted shared nothrow
+	{
+		auto m = _mutex;
+		m.lock_nothrow();
+		scope (exit)
+			m.unlock_nothrow();
+		(cast()this).close();
+	}
+}
+
+
+@system unittest
+{
+	import core.thread;
+	import core.sync.barrier;
+	auto tg = new ThreadGroup;
+	auto queue = new shared MessageQueue!string;
+	auto b = new Barrier(2);
+	string[] test;
+	// producer
+	tg.create({
+		b.wait();
+		queue.put("aaa");
+		queue.put("bbb");
+		queue.put(["ccc", "ddd"]);
+		b.wait();
+		queue.put(["eee", "fff"]);
+		b.wait();
+	});
+	// consumer
+	tg.create({
+		b.wait();
+		test ~= queue.consume();
+		string tmp;
+		auto tryres = queue.tryConsume(tmp, 100.msecs);
+		assert(tryres);
+		test ~= tmp;
+		import std.array;
+		auto app = appender!(string[]);
+		queue.consumeAll(app);
+		b.wait();
+		tryres = queue.tryConsumeAll(app, 100.msecs);
+		assert(tryres);
+		test ~= app.data;
+		b.wait();
+		assert(queue.length == 0);
+	});
+	
+	tg.joinAll();
+	assert(test == ["aaa", "bbb", "ccc", "ddd", "eee", "fff"]);
+}
+
+/*******************************************************************************
+ * 
+ */
+class MessageBox(T, Key = string)
+if (!hasUnsharedAliasing!T)
+{
+@safe:
+private:
+	import core.lifetime: move;
+	import core.time: Duration, msecs;
+	import std.container.dlist: DList;
+	import std.range: put, isInputRange, isOutputRange;
+	import std.exception: collectException;
+	version (Have_vibe_core)
+	{
+		import vibe.core.core: Task;
+		enum bool _isVibeTask = is(Key == Task);
+	}
+	else
+	{
+		enum bool _isVibeTask = false;
+	}
+	import std.concurrency: Tid, thisTid;
+	enum bool _isTid = is(Key == Tid);
+	import core.thread: Thread, ThreadID, Fiber;
+	enum bool _isFiber = is(Key == Fiber);
+	enum bool _isThread = is(Key == Thread);
+	static if (_isVibeTask)
+	{
+		alias MapKey = Fiber;
+		enum bool _hasDefaultKey = true;
+		pragma(inline, true) static MapKey _mapkey(Key k) { return k.fiber(); }
+		pragma(inline, true) static Key _defaultKey() { return Task.getThis; }
+	}
+	else static if (_isTid)
+	{
+		alias MapKey = Tid;
+		enum bool _hasDefaultKey = true;
+		pragma(inline, true) static MapKey _mapkey(Key k) { return k; }
+		pragma(inline, true) static Key _defaultKey() { return thisTid(); }
+	}
+	else static if (_isFiber)
+	{
+		alias MapKey = Fiber;
+		enum bool _hasDefaultKey = true;
+		pragma(inline, true) static MapKey _mapkey(Key k) { return k; }
+		pragma(inline, true) static Key _defaultKey() shared { return Fiber.getThis(); }
+	}
+	else static if (_isThread)
+	{
+		alias MapKey = ThreadID;
+		enum bool _hasDefaultKey = true;
+		pragma(inline, true) static MapKey _mapkey(Key k) { return k.id; }
+		pragma(inline, true) static Key _defaultKey() { return Thread.getThis; }
+	}
+	else
+	{
+		alias MapKey = Key;
+		enum bool _hasDefaultKey = false;
+		pragma(inline, true) static MapKey _mapkey(Key k) { return k; }
+		pragma(inline, true) static Key _defaultKey() { return MapKey.init; }
+	}
+	alias Queue = shared(MessageQueue!T);
+	shared ManagedShared!(Queue[MapKey]) _map;
+	
+	pragma(inline, true) Queue _reqQueue(Key k) @trusted nothrow
+	{
+		try
+		{
+			synchronized (_map)
+				return _map.asUnshared.require(_mapkey(k), new Queue);
+		}
+		catch (Exception)
+			assert(0);
+	}
+	pragma(inline, true) Queue _reqQueue(Key k) shared @trusted nothrow { return (cast()this)._reqQueue(k); }
+	pragma(inline, true) void _removeQueue(Key k) @trusted nothrow
+	{
+		try
+		{
+			synchronized (_map)
+				_map.asUnshared.remove(_mapkey(k));
+		}
+		catch (Exception)
+			assert(0);
+	}
+	pragma(inline, true) void _removeQueue(Key k) shared @trusted nothrow { return (cast()this)._removeQueue(k); }
+	pragma(inline, true) Queue[] _allQueue() @trusted nothrow
+	{
+		try
+		{
+			Queue[] ret;
+			synchronized (_map)
+				foreach (q; _map.asUnshared.byValue)
+					ret ~= q;
+			return ret;
+		}
+		catch (Exception)
+			assert(0);
+	}
+	pragma(inline, true) Queue[] _allQueue() shared @trusted nothrow { return (cast()this)._allQueue(); }
+	pragma(inline, true) void _clearQueue() @trusted nothrow
+	{
+		try
+		{
+			synchronized (_map)
+				_map.asUnshared.clear();
+		}
+		catch (Exception)
+			assert(0);
+	}
+	pragma(inline, true) void _clearQueue() shared @trusted nothrow { return (cast()this)._clearQueue(); }
+	
+public:
+	/***************************************************************************
+	 * コンストラクタ
+	 */
+	this() shared
+	{
+		_map = new shared ManagedShared!(Queue[Key]);
+	}
+	/// ditto
+	this() @system
+	{
+		_map = cast()new shared ManagedShared!(Queue[Key]);
+	}
+	
+	/***************************************************************************
+	 * 供給
+	 */
+	void put(Key key, T dat) nothrow shared
+	{
+		_reqQueue(key).put(dat);
+	}
+	/// ditto
+	void put()(T dat) nothrow shared
+	if (_hasDefaultKey)
+	{
+		put(_defaultKey(), dat.move);
+	}
+	/// ditto
+	void put(Range)(Key key, Range dat) nothrow shared
+	if (isInputRange!Range && is(ForeachType!Range: T))
+	{
+		_reqQueue(key).put(dat);
+	}
+	/// ditto
+	void put(Range)(Range src) nothrow shared
+	if (_hasDefaultKey && isInputRange!Range && is(ForeachType!Range: T))
+	{
+		put(_defaultKey(), src);
+	}
+	
+	/***************************************************************************
+	 * 消費
+	 */
+	T consume(Key key) nothrow shared
+	{
+		return _reqQueue(key).consume();
+	}
+	/// ditto
+	T consume()() nothrow shared
+	if (_hasDefaultKey)
+	{
+		return consume(_defaultKey());
+	}
+	/// ditto
+	void consumeAll(OutputRange)(Key key, ref OutputRange dst) nothrow shared
+	if (isOutputRange!(OutputRange, T))
+	{
+		_reqQueue(key).consumeAll(dst);
+	}
+	/// ditto
+	void consumeAll(OutputRange)(ref OutputRange dst) nothrow shared
+	if (_hasDefaultKey && isOutputRange!(OutputRange, T))
+	{
+		consumeAll(_defaultKey(), dst);
+	}
+	/// ditto
+	bool tryConsume(Key key, ref T dst, Duration timeout = 0.msecs) nothrow shared
+	{
+		return _reqQueue(key).tryConsume(dst, timeout);
+	}
+	/// ditto
+	bool tryConsume()(ref T dst, Duration timeout = 0.msecs) nothrow shared
+	if (_hasDefaultKey)
+	{
+		return tryConsume(_defaultKey(), dst, timeout);
+	}
+	/// ditto
+	bool tryConsumeAll(OutputRange)(Key key, ref OutputRange dst, Duration timeout = 0.msecs) nothrow shared
+	if (isOutputRange!(OutputRange, T))
+	{
+		return _reqQueue(key).tryConsumeAll(dst, timeout);
+	}
+	/// ditto
+	bool tryConsumeAll(OutputRange)(ref OutputRange dst, Duration timeout = 0.msecs) nothrow shared
+	if (_hasDefaultKey && isOutputRange!(OutputRange, T))
+	{
+		return tryConsumeAll(_defaultKey(), dst, timeout);
+	}
+	
+	/***************************************************************************
+	 * データ供給待ち
+	 */
+	bool waitForData(Key key) nothrow shared
+	{
+		return _reqQueue(key).waitForData();
+	}
+	/// ditto
+	bool waitForData()() nothrow shared
+	if (_hasDefaultKey)
+	{
+		return waitForData(_defauleKey());
+	}
+	/// ditto
+	bool waitForData(Key key, Duration timeout) nothrow shared
+	{
+		return _reqQueue(key).waitForData(timeout);
+	}
+	/// ditto
+	bool waitForData()(Duration timeout) nothrow shared
+	if (_hasDefaultKey)
+	{
+		return waitForData(_defauleKey(), timeout);
+	}
+	
+	
+	/***************************************************************************
+	 * とじる
+	 */
+	void close(Key key) nothrow shared
+	{
+		_reqQueue(key).close();
+		_removeQueue(key);
+	}
+	/// ditto
+	void close()(Key key) nothrow shared
+	if (_hasDefaultKey)
+	{
+		close(_defaultKey());
+	}
+	/// ditto
+	void closeAll() nothrow shared
+	{
+		foreach (q; _allQueue)
+			q.close();
+		_clearQueue();
+	}
+	
+	/***************************************************************************
+	 * Queueにアクセス
+	 */
+	Queue opIndex(Key key) nothrow shared
+	{
+		return _reqQueue(key);
+	}
+}
+
+@system unittest
+{
+	import core.thread;
+	import core.sync.barrier;
+	auto tg = new ThreadGroup;
+	auto channels = new shared MessageBox!string;
+	auto b = new Barrier(2);
+	string[] test;
+	// producer
+	tg.create({
+		b.wait();
+		channels["1"].put("aaa");
+		channels.put("2", "bbb");
+		channels["3"].put(["ccc", "ddd"]);
+		b.wait();
+		channels.put("1", ["eee", "fff"]);
+		b.wait();
+	});
+	// consumer
+	tg.create({
+		b.wait();
+		test ~= channels.consume("1");
+		string tmp;
+		auto tryres = channels["2"].tryConsume(tmp, 100.msecs);
+		assert(tryres);
+		test ~= tmp;
+		import std.array;
+		auto app = appender!(string[]);
+		channels.consumeAll("3", app);
+		b.wait();
+		tryres = channels["1"].tryConsumeAll(app, 100.msecs);
+		assert(tryres);
+		test ~= app.data;
+		b.wait();
+	});
+	
+	tg.joinAll();
+	channels.closeAll();
+	assert(test == ["aaa", "bbb", "ccc", "ddd", "eee", "fff"]);
+}
