@@ -756,6 +756,122 @@ shared bool <code class="ddoc_psymbol">invoke</code>(string <span class="ddoc_pa
 </dd>
 </div></dl>
 </dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageQueue"></span><div class="quickindex" id="quickindex.MessageQueue"></div>class <code class="ddoc_psymbol">MessageQueue</code>(T) if (!hasUnsharedAliasing!T);
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageQueue.this"></span><div class="quickindex" id="quickindex.MessageQueue.this"></div>nothrow @system this(return scope Condition <span class="ddoc_param">cond</span>);
+<br>
+nothrow @system this();
+<br>
+shared nothrow @trusted this(Condition <span class="ddoc_param">cond</span>);
+<br>
+shared nothrow @safe this(shared(Condition) <span class="ddoc_param">cond</span>);
+<br>
+shared nothrow @safe this();
+<br></div></dt>
+<dd><div class="ddoc_summary">コンストラクタ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageQueue.put"></span><div class="quickindex" id="quickindex.MessageQueue.put"></div>nothrow void <code class="ddoc_psymbol">put</code>(T <span class="ddoc_param">dat</span>);
+<br>
+shared nothrow @trusted void <code class="ddoc_psymbol">put</code>(T <span class="ddoc_param">dat</span>);
+<br>
+nothrow void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(Range <span class="ddoc_param">src</span>)<br><span class="ddoc_constraint">if(isInputRange!Range &amp;&amp; is(ForeachType!Range : T))</span>;
+<br>
+shared nothrow @trusted void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(Range <span class="ddoc_param">src</span>)<br><span class="ddoc_constraint">if(isInputRange!Range &amp;&amp; is(ForeachType!Range : T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">供給</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageQueue.consume"></span><div class="quickindex" id="quickindex.MessageQueue.consume"></div>nothrow T <code class="ddoc_psymbol">consume</code>();
+<br>
+shared nothrow @trusted T <code class="ddoc_psymbol">consume</code>();
+<br>
+<span class="def-anchor" id=".MessageQueue.consumeAll"></span><div class="quickindex" id="quickindex.MessageQueue.consumeAll"></div>nothrow void <code class="ddoc_psymbol">consumeAll</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange)</span>(ref OutputRange <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(isOutputRange!(OutputRange, T))</span>;
+<br>
+shared nothrow @trusted void <code class="ddoc_psymbol">consumeAll</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange)</span>(ref OutputRange <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(isOutputRange!(OutputRange, T))</span>;
+<br>
+<span class="def-anchor" id=".MessageQueue.tryConsume"></span><div class="quickindex" id="quickindex.MessageQueue.tryConsume"></div>nothrow bool <code class="ddoc_psymbol">tryConsume</code>(ref T <span class="ddoc_param">dst</span>, Duration <span class="ddoc_param">timeout</span> = 0.msecs);
+<br>
+shared nothrow @trusted bool <code class="ddoc_psymbol">tryConsume</code>(ref T <span class="ddoc_param">dst</span>, Duration <span class="ddoc_param">timeout</span> = 0.msecs);
+<br>
+<span class="def-anchor" id=".MessageQueue.tryConsumeAll"></span><div class="quickindex" id="quickindex.MessageQueue.tryConsumeAll"></div>nothrow bool <code class="ddoc_psymbol">tryConsumeAll</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange)</span>(ref OutputRange <span class="ddoc_param">dst</span>, Duration <span class="ddoc_param">timeout</span> = 0.msecs)<br><span class="ddoc_constraint">if(isOutputRange!(OutputRange, T))</span>;
+<br>
+shared nothrow @trusted bool <code class="ddoc_psymbol">tryConsumeAll</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange)</span>(ref OutputRange <span class="ddoc_param">dst</span>, Duration <span class="ddoc_param">timeout</span> = 0.msecs)<br><span class="ddoc_constraint">if(isOutputRange!(OutputRange, T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">消費</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageQueue.waitForData"></span><div class="quickindex" id="quickindex.MessageQueue.waitForData"></div>nothrow bool <code class="ddoc_psymbol">waitForData</code>();
+<br>
+shared nothrow @trusted bool <code class="ddoc_psymbol">waitForData</code>();
+<br>
+nothrow bool <code class="ddoc_psymbol">waitForData</code>(Duration <span class="ddoc_param">timeout</span>);
+<br>
+shared nothrow @trusted bool <code class="ddoc_psymbol">waitForData</code>(Duration <span class="ddoc_param">timeout</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">データ供給待ち</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageQueue.length"></span><div class="quickindex" id="quickindex.MessageQueue.length"></div>const nothrow @property @trusted size_t <code class="ddoc_psymbol">length</code>();
+<br>
+shared const nothrow @property @trusted size_t <code class="ddoc_psymbol">length</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">現在の待ち行列の長さ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageQueue.close"></span><div class="quickindex" id="quickindex.MessageQueue.close"></div>nothrow void <code class="ddoc_psymbol">close</code>();
+<br>
+shared nothrow @trusted void <code class="ddoc_psymbol">close</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">とじる</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageBox"></span><div class="quickindex" id="quickindex.MessageBox"></div>class <code class="ddoc_psymbol">MessageBox</code>(T, Key = string) if (!hasUnsharedAliasing!T);
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageBox.this"></span><div class="quickindex" id="quickindex.MessageBox.this"></div>shared this();
+<br>
+@system this();
+<br></div></dt>
+<dd><div class="ddoc_summary">コンストラクタ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageBox.put"></span><div class="quickindex" id="quickindex.MessageBox.put"></div>shared nothrow void <code class="ddoc_psymbol">put</code>(Key <span class="ddoc_param">key</span>, T <span class="ddoc_param">dat</span>);
+<br>
+shared nothrow void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(T <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(_hasDefaultKey)</span>;
+<br>
+shared nothrow void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(Key <span class="ddoc_param">key</span>, Range <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isInputRange!Range &amp;&amp; is(ForeachType!Range : T))</span>;
+<br>
+shared nothrow void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(Range)</span>(Range <span class="ddoc_param">src</span>)<br><span class="ddoc_constraint">if(_hasDefaultKey &amp;&amp; isInputRange!Range &amp;&amp; is(ForeachType!Range : T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">供給</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageBox.consume"></span><div class="quickindex" id="quickindex.MessageBox.consume"></div>shared nothrow T <code class="ddoc_psymbol">consume</code>(Key <span class="ddoc_param">key</span>);
+<br>
+shared nothrow T <code class="ddoc_psymbol">consume</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>()<br><span class="ddoc_constraint">if(_hasDefaultKey)</span>;
+<br>
+<span class="def-anchor" id=".MessageBox.consumeAll"></span><div class="quickindex" id="quickindex.MessageBox.consumeAll"></div>shared nothrow void <code class="ddoc_psymbol">consumeAll</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange)</span>(Key <span class="ddoc_param">key</span>, ref OutputRange <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(isOutputRange!(OutputRange, T))</span>;
+<br>
+shared nothrow void <code class="ddoc_psymbol">consumeAll</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange)</span>(ref OutputRange <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(_hasDefaultKey &amp;&amp; isOutputRange!(OutputRange, T))</span>;
+<br>
+<span class="def-anchor" id=".MessageBox.tryConsume"></span><div class="quickindex" id="quickindex.MessageBox.tryConsume"></div>shared nothrow bool <code class="ddoc_psymbol">tryConsume</code>(Key <span class="ddoc_param">key</span>, ref T <span class="ddoc_param">dst</span>, Duration <span class="ddoc_param">timeout</span> = 0.msecs);
+<br>
+shared nothrow bool <code class="ddoc_psymbol">tryConsume</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(ref T <span class="ddoc_param">dst</span>, Duration <span class="ddoc_param">timeout</span> = 0.msecs)<br><span class="ddoc_constraint">if(_hasDefaultKey)</span>;
+<br>
+<span class="def-anchor" id=".MessageBox.tryConsumeAll"></span><div class="quickindex" id="quickindex.MessageBox.tryConsumeAll"></div>shared nothrow bool <code class="ddoc_psymbol">tryConsumeAll</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange)</span>(Key <span class="ddoc_param">key</span>, ref OutputRange <span class="ddoc_param">dst</span>, Duration <span class="ddoc_param">timeout</span> = 0.msecs)<br><span class="ddoc_constraint">if(isOutputRange!(OutputRange, T))</span>;
+<br>
+shared nothrow bool <code class="ddoc_psymbol">tryConsumeAll</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange)</span>(ref OutputRange <span class="ddoc_param">dst</span>, Duration <span class="ddoc_param">timeout</span> = 0.msecs)<br><span class="ddoc_constraint">if(_hasDefaultKey &amp;&amp; isOutputRange!(OutputRange, T))</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">消費</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageBox.waitForData"></span><div class="quickindex" id="quickindex.MessageBox.waitForData"></div>shared nothrow bool <code class="ddoc_psymbol">waitForData</code>(Key <span class="ddoc_param">key</span>);
+<br>
+shared nothrow bool <code class="ddoc_psymbol">waitForData</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>()<br><span class="ddoc_constraint">if(_hasDefaultKey)</span>;
+<br>
+shared nothrow bool <code class="ddoc_psymbol">waitForData</code>(Key <span class="ddoc_param">key</span>, Duration <span class="ddoc_param">timeout</span>);
+<br>
+shared nothrow bool <code class="ddoc_psymbol">waitForData</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Duration <span class="ddoc_param">timeout</span>)<br><span class="ddoc_constraint">if(_hasDefaultKey)</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">データ供給待ち</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageBox.close"></span><div class="quickindex" id="quickindex.MessageBox.close"></div>shared nothrow void <code class="ddoc_psymbol">close</code>(Key <span class="ddoc_param">key</span>);
+<br>
+shared nothrow void <code class="ddoc_psymbol">close</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Key <span class="ddoc_param">key</span>)<br><span class="ddoc_constraint">if(_hasDefaultKey)</span>;
+<br>
+<span class="def-anchor" id=".MessageBox.closeAll"></span><div class="quickindex" id="quickindex.MessageBox.closeAll"></div>shared nothrow void <code class="ddoc_psymbol">closeAll</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">とじる</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageBox.opIndex"></span><div class="quickindex" id="quickindex.MessageBox.opIndex"></div>shared nothrow Queue <code class="ddoc_psymbol">opIndex</code>(Key <span class="ddoc_param">key</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Queueにアクセス</div></dd>
+</div></dl>
+</dd>
 </div></dl>
 
                 

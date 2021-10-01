@@ -30493,7 +30493,1521 @@
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2552,
+    "endline" : 2556,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "\n",
+    "line" : 2556,
+    "char" : 1,
+    "name" : "MessageQueue",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "!hasUnsharedAliasing!T",
+    "members" : [
+     {
+      "name" : "MessageQueue",
+      "kind" : "class",
+      "protection" : "public",
+      "line" : 2556,
+      "char" : 1,
+      "members" : [
+       {
+        "name" : "core.lifetime",
+        "kind" : "import",
+        "line" : 2561,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "move"
+        ]
+       },
+       {
+        "name" : "core.time",
+        "kind" : "import",
+        "line" : 2562,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "Duration",
+         "msecs"
+        ]
+       },
+       {
+        "name" : "core.sync.mutex",
+        "kind" : "import",
+        "line" : 2563,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "Mutex"
+        ]
+       },
+       {
+        "name" : "core.sync.condition",
+        "kind" : "import",
+        "line" : 2564,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "Condition"
+        ]
+       },
+       {
+        "name" : "std.container.dlist",
+        "kind" : "import",
+        "line" : 2565,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "DList"
+        ]
+       },
+       {
+        "name" : "std.range",
+        "kind" : "import",
+        "line" : 2566,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "put",
+         "isInputRange",
+         "isOutputRange"
+        ]
+       },
+       {
+        "name" : "std.exception",
+        "kind" : "import",
+        "line" : 2567,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "collectException"
+        ]
+       },
+       {
+        "name" : "_cond",
+        "kind" : "variable",
+        "line" : 2568,
+        "char" : 12,
+        "type" : "Condition"
+       },
+       {
+        "name" : "_list",
+        "kind" : "variable",
+        "line" : 2569,
+        "char" : 10,
+        "type" : "DList!T"
+       },
+       {
+        "name" : "_length",
+        "kind" : "variable",
+        "line" : 2570,
+        "char" : 10,
+        "type" : "size_t"
+       },
+       {
+        "name" : "_mutex",
+        "kind" : "function",
+        "line" : 2571,
+        "char" : 16,
+        "type" : "shared nothrow @trusted shared(Mutex)()",
+        "endline" : 2577,
+        "endchar" : 2
+       },
+       {
+        "name" : "_wait",
+        "kind" : "function",
+        "line" : 2578,
+        "char" : 7,
+        "type" : "nothrow @trusted void()",
+        "endline" : 2584,
+        "endchar" : 2
+       },
+       {
+        "name" : "_wait",
+        "kind" : "function",
+        "line" : 2585,
+        "char" : 7,
+        "type" : "nothrow @trusted bool(Duration dur)",
+        "parameters" : [
+         {
+          "name" : "dur",
+          "type" : "Duration"
+         }
+        ],
+        "endline" : 2591,
+        "endchar" : 2
+       },
+       {
+        "name" : "_notify",
+        "kind" : "function",
+        "line" : 2592,
+        "char" : 7,
+        "type" : "nothrow @trusted void()",
+        "endline" : 2595,
+        "endchar" : 2
+       },
+       {
+        "name" : "this",
+        "kind" : "constructor",
+        "comment" : " コンストラクタ\n",
+        "line" : 2600,
+        "char" : 2,
+        "type" : "nothrow @system (return scope Condition cond)",
+        "parameters" : [
+         {
+          "name" : "cond",
+          "type" : "Condition",
+          "storageClass" : [
+           "scope",
+           "return"
+          ]
+         }
+        ],
+        "endline" : 2603,
+        "endchar" : 2
+       },
+       {
+        "name" : "this",
+        "kind" : "constructor",
+        "comment" : "ditto\n",
+        "line" : 2605,
+        "char" : 2,
+        "type" : "nothrow @system ()",
+        "endline" : 2608,
+        "endchar" : 2
+       },
+       {
+        "name" : "this",
+        "kind" : "constructor",
+        "comment" : "ditto\n",
+        "line" : 2610,
+        "char" : 2,
+        "type" : "shared nothrow @trusted (Condition cond)",
+        "parameters" : [
+         {
+          "name" : "cond",
+          "type" : "Condition"
+         }
+        ],
+        "endline" : 2613,
+        "endchar" : 2
+       },
+       {
+        "name" : "this",
+        "kind" : "constructor",
+        "comment" : "ditto\n",
+        "line" : 2615,
+        "char" : 2,
+        "type" : "shared nothrow @safe (shared(Condition) cond)",
+        "parameters" : [
+         {
+          "name" : "cond",
+          "type" : "shared(Condition)"
+         }
+        ],
+        "endline" : 2618,
+        "endchar" : 2
+       },
+       {
+        "name" : "this",
+        "kind" : "constructor",
+        "comment" : "ditto\n",
+        "line" : 2620,
+        "char" : 2,
+        "type" : "shared nothrow @safe ()",
+        "endline" : 2623,
+        "endchar" : 2
+       },
+       {
+        "name" : "put",
+        "kind" : "function",
+        "comment" : " 供給\n",
+        "line" : 2628,
+        "char" : 7,
+        "type" : "nothrow void(T dat)",
+        "parameters" : [
+         {
+          "name" : "dat",
+          "type" : "T"
+         }
+        ],
+        "endline" : 2633,
+        "endchar" : 2
+       },
+       {
+        "name" : "put",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 2635,
+        "char" : 7,
+        "type" : "shared nothrow @trusted void(T dat)",
+        "parameters" : [
+         {
+          "name" : "dat",
+          "type" : "T"
+         }
+        ],
+        "endline" : 2642,
+        "endchar" : 2
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 2644,
+        "char" : 7,
+        "name" : "put",
+        "parameters" : [
+         {
+          "name" : "Range",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "isInputRange!Range && is(ForeachType!Range : T)",
+        "members" : [
+         {
+          "name" : "put",
+          "kind" : "function",
+          "line" : 2644,
+          "char" : 7,
+          "type" : "nothrow void(Range src)",
+          "parameters" : [
+           {
+            "name" : "src",
+            "type" : "Range"
+           }
+          ],
+          "endline" : 2653,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 2655,
+        "char" : 7,
+        "name" : "put",
+        "parameters" : [
+         {
+          "name" : "Range",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "isInputRange!Range && is(ForeachType!Range : T)",
+        "members" : [
+         {
+          "name" : "put",
+          "kind" : "function",
+          "line" : 2655,
+          "char" : 7,
+          "type" : "shared nothrow @trusted void(Range src)",
+          "parameters" : [
+           {
+            "name" : "src",
+            "type" : "Range"
+           }
+          ],
+          "endline" : 2663,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "name" : "consume",
+        "kind" : "function",
+        "comment" : " 消費\n",
+        "line" : 2668,
+        "char" : 4,
+        "type" : "nothrow T()",
+        "endline" : 2676,
+        "endchar" : 2
+       },
+       {
+        "name" : "consume",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 2678,
+        "char" : 4,
+        "type" : "shared nothrow @trusted T()",
+        "endline" : 2685,
+        "endchar" : 2
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 2687,
+        "char" : 7,
+        "name" : "consumeAll",
+        "parameters" : [
+         {
+          "name" : "OutputRange",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "isOutputRange!(OutputRange, T)",
+        "members" : [
+         {
+          "name" : "consumeAll",
+          "kind" : "function",
+          "line" : 2687,
+          "char" : 7,
+          "type" : "nothrow void(ref OutputRange dst)",
+          "parameters" : [
+           {
+            "name" : "dst",
+            "type" : "OutputRange",
+            "storageClass" : [
+             "ref"
+            ]
+           }
+          ],
+          "endline" : 2696,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 2698,
+        "char" : 7,
+        "name" : "consumeAll",
+        "parameters" : [
+         {
+          "name" : "OutputRange",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "isOutputRange!(OutputRange, T)",
+        "members" : [
+         {
+          "name" : "consumeAll",
+          "kind" : "function",
+          "line" : 2698,
+          "char" : 7,
+          "type" : "shared nothrow @trusted void(ref OutputRange dst)",
+          "parameters" : [
+           {
+            "name" : "dst",
+            "type" : "OutputRange",
+            "storageClass" : [
+             "ref"
+            ]
+           }
+          ],
+          "endline" : 2706,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "name" : "tryConsume",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 2708,
+        "char" : 7,
+        "type" : "nothrow bool(ref T dst, Duration timeout = 0.msecs)",
+        "parameters" : [
+         {
+          "name" : "dst",
+          "type" : "T",
+          "storageClass" : [
+           "ref"
+          ]
+         },
+         {
+          "name" : "timeout",
+          "type" : "Duration",
+          "default" : "0.msecs"
+         }
+        ],
+        "endline" : 2724,
+        "endchar" : 2
+       },
+       {
+        "name" : "tryConsume",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 2726,
+        "char" : 7,
+        "type" : "shared nothrow @trusted bool(ref T dst, Duration timeout = 0.msecs)",
+        "parameters" : [
+         {
+          "name" : "dst",
+          "type" : "T",
+          "storageClass" : [
+           "ref"
+          ]
+         },
+         {
+          "name" : "timeout",
+          "type" : "Duration",
+          "default" : "0.msecs"
+         }
+        ],
+        "endline" : 2733,
+        "endchar" : 2
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 2735,
+        "char" : 7,
+        "name" : "tryConsumeAll",
+        "parameters" : [
+         {
+          "name" : "OutputRange",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "isOutputRange!(OutputRange, T)",
+        "members" : [
+         {
+          "name" : "tryConsumeAll",
+          "kind" : "function",
+          "line" : 2735,
+          "char" : 7,
+          "type" : "nothrow bool(ref OutputRange dst, Duration timeout = 0.msecs)",
+          "parameters" : [
+           {
+            "name" : "dst",
+            "type" : "OutputRange",
+            "storageClass" : [
+             "ref"
+            ]
+           },
+           {
+            "name" : "timeout",
+            "type" : "Duration",
+            "default" : "0.msecs"
+           }
+          ],
+          "endline" : 2747,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 2749,
+        "char" : 7,
+        "name" : "tryConsumeAll",
+        "parameters" : [
+         {
+          "name" : "OutputRange",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "isOutputRange!(OutputRange, T)",
+        "members" : [
+         {
+          "name" : "tryConsumeAll",
+          "kind" : "function",
+          "line" : 2749,
+          "char" : 7,
+          "type" : "shared nothrow @trusted bool(ref OutputRange dst, Duration timeout = 0.msecs)",
+          "parameters" : [
+           {
+            "name" : "dst",
+            "type" : "OutputRange",
+            "storageClass" : [
+             "ref"
+            ]
+           },
+           {
+            "name" : "timeout",
+            "type" : "Duration",
+            "default" : "0.msecs"
+           }
+          ],
+          "endline" : 2757,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "name" : "waitForData",
+        "kind" : "function",
+        "comment" : " データ供給待ち\n",
+        "line" : 2762,
+        "char" : 7,
+        "type" : "nothrow bool()",
+        "endline" : 2767,
+        "endchar" : 2
+       },
+       {
+        "name" : "waitForData",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 2769,
+        "char" : 7,
+        "type" : "shared nothrow @trusted bool()",
+        "endline" : 2776,
+        "endchar" : 2
+       },
+       {
+        "name" : "waitForData",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 2778,
+        "char" : 7,
+        "type" : "nothrow bool(Duration timeout)",
+        "parameters" : [
+         {
+          "name" : "timeout",
+          "type" : "Duration"
+         }
+        ],
+        "endline" : 2783,
+        "endchar" : 2
+       },
+       {
+        "name" : "waitForData",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 2785,
+        "char" : 7,
+        "type" : "shared nothrow @trusted bool(Duration timeout)",
+        "parameters" : [
+         {
+          "name" : "timeout",
+          "type" : "Duration"
+         }
+        ],
+        "endline" : 2792,
+        "endchar" : 2
+       },
+       {
+        "name" : "length",
+        "kind" : "function",
+        "comment" : " 現在の待ち行列の長さ\n",
+        "line" : 2797,
+        "char" : 9,
+        "type" : "const nothrow @property @trusted size_t()",
+        "endline" : 2800,
+        "endchar" : 2
+       },
+       {
+        "name" : "length",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 2802,
+        "char" : 9,
+        "type" : "shared const nothrow @property @trusted size_t()",
+        "endline" : 2806,
+        "endchar" : 2
+       },
+       {
+        "name" : "close",
+        "kind" : "function",
+        "comment" : " とじる\n",
+        "line" : 2811,
+        "char" : 7,
+        "type" : "nothrow void()",
+        "endline" : 2817,
+        "endchar" : 2
+       },
+       {
+        "name" : "close",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 2819,
+        "char" : 7,
+        "type" : "shared nothrow @trusted void()",
+        "endline" : 2826,
+        "endchar" : 2
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L2830_C9",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 2830,
+    "char" : 9,
+    "storageClass" : [
+     "@system"
+    ],
+    "endline" : 2874,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "\n",
+    "line" : 2874,
+    "char" : 1,
+    "name" : "MessageBox",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "Key",
+      "kind" : "type",
+      "default" : "string"
+     }
+    ],
+    "constraint" : "!hasUnsharedAliasing!T",
+    "members" : [
+     {
+      "name" : "MessageBox",
+      "kind" : "class",
+      "protection" : "public",
+      "line" : 2874,
+      "char" : 1,
+      "members" : [
+       {
+        "name" : "core.lifetime",
+        "kind" : "import",
+        "line" : 2879,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "move"
+        ]
+       },
+       {
+        "name" : "core.time",
+        "kind" : "import",
+        "line" : 2880,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "Duration",
+         "msecs"
+        ]
+       },
+       {
+        "name" : "std.container.dlist",
+        "kind" : "import",
+        "line" : 2881,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "DList"
+        ]
+       },
+       {
+        "name" : "std.range",
+        "kind" : "import",
+        "line" : 2882,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "put",
+         "isInputRange",
+         "isOutputRange"
+        ]
+       },
+       {
+        "name" : "std.exception",
+        "kind" : "import",
+        "line" : 2883,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "collectException"
+        ]
+       },
+       {
+        "name" : "vibe.core.core",
+        "kind" : "import",
+        "line" : 2886,
+        "char" : 10,
+        "protection" : "private",
+        "selective" : [
+         "Task"
+        ]
+       },
+       {
+        "name" : "_isVibeTask",
+        "kind" : "variable",
+        "line" : 2887,
+        "char" : 13,
+        "storageClass" : [
+         "enum"
+        ],
+        "deco" : "b",
+        "init" : "is(Key == Task)"
+       },
+       {
+        "name" : "std.concurrency",
+        "kind" : "import",
+        "line" : 2893,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "Tid",
+         "thisTid"
+        ]
+       },
+       {
+        "name" : "_isTid",
+        "kind" : "variable",
+        "line" : 2894,
+        "char" : 12,
+        "storageClass" : [
+         "enum"
+        ],
+        "deco" : "b",
+        "init" : "is(Key == Tid)"
+       },
+       {
+        "name" : "core.thread",
+        "kind" : "import",
+        "line" : 2895,
+        "char" : 9,
+        "protection" : "private",
+        "selective" : [
+         "Thread",
+         "ThreadID",
+         "Fiber"
+        ]
+       },
+       {
+        "name" : "_isFiber",
+        "kind" : "variable",
+        "line" : 2896,
+        "char" : 12,
+        "storageClass" : [
+         "enum"
+        ],
+        "deco" : "b",
+        "init" : "is(Key == Fiber)"
+       },
+       {
+        "name" : "_isThread",
+        "kind" : "variable",
+        "line" : 2897,
+        "char" : 12,
+        "storageClass" : [
+         "enum"
+        ],
+        "deco" : "b",
+        "init" : "is(Key == Thread)"
+       },
+       {
+        "name" : "MapKey",
+        "kind" : "alias",
+        "line" : 2900,
+        "char" : 3,
+        "type" : "Fiber"
+       },
+       {
+        "name" : "_hasDefaultKey",
+        "kind" : "variable",
+        "line" : 2901,
+        "char" : 13,
+        "storageClass" : [
+         "enum"
+        ],
+        "deco" : "b",
+        "init" : "true"
+       },
+       {
+        "name" : "_mapkey",
+        "kind" : "function",
+        "line" : 2902,
+        "char" : 38,
+        "storageClass" : [
+         "static"
+        ],
+        "type" : "MapKey(Key k)",
+        "parameters" : [
+         {
+          "name" : "k",
+          "type" : "Key"
+         }
+        ],
+        "endline" : 2902,
+        "endchar" : 73
+       },
+       {
+        "name" : "_defaultKey",
+        "kind" : "function",
+        "line" : 2903,
+        "char" : 35,
+        "storageClass" : [
+         "static"
+        ],
+        "type" : "Key()",
+        "endline" : 2903,
+        "endchar" : 72
+       },
+       {
+        "name" : "Queue",
+        "kind" : "alias",
+        "line" : 2933,
+        "char" : 2,
+        "type" : "shared(MessageQueue!T)"
+       },
+       {
+        "name" : "_map",
+        "kind" : "variable",
+        "line" : 2934,
+        "char" : 39,
+        "storageClass" : [
+         "shared"
+        ],
+        "type" : "ManagedShared!(Queue[MapKey])"
+       },
+       {
+        "name" : "_reqQueue",
+        "kind" : "function",
+        "line" : 2936,
+        "char" : 29,
+        "type" : "nothrow @trusted Queue(Key k)",
+        "parameters" : [
+         {
+          "name" : "k",
+          "type" : "Key"
+         }
+        ],
+        "endline" : 2945,
+        "endchar" : 2
+       },
+       {
+        "name" : "_reqQueue",
+        "kind" : "function",
+        "line" : 2946,
+        "char" : 29,
+        "type" : "shared nothrow @trusted Queue(Key k)",
+        "parameters" : [
+         {
+          "name" : "k",
+          "type" : "Key"
+         }
+        ],
+        "endline" : 2946,
+        "endchar" : 106
+       },
+       {
+        "name" : "_removeQueue",
+        "kind" : "function",
+        "line" : 2947,
+        "char" : 28,
+        "type" : "nothrow @trusted void(Key k)",
+        "parameters" : [
+         {
+          "name" : "k",
+          "type" : "Key"
+         }
+        ],
+        "endline" : 2956,
+        "endchar" : 2
+       },
+       {
+        "name" : "_removeQueue",
+        "kind" : "function",
+        "line" : 2957,
+        "char" : 28,
+        "type" : "shared nothrow @trusted void(Key k)",
+        "parameters" : [
+         {
+          "name" : "k",
+          "type" : "Key"
+         }
+        ],
+        "endline" : 2957,
+        "endchar" : 111
+       },
+       {
+        "name" : "_allQueue",
+        "kind" : "function",
+        "line" : 2958,
+        "char" : 31,
+        "type" : "nothrow @trusted Queue[]()",
+        "endline" : 2970,
+        "endchar" : 2
+       },
+       {
+        "name" : "_allQueue",
+        "kind" : "function",
+        "line" : 2971,
+        "char" : 31,
+        "type" : "shared nothrow @trusted Queue[]()",
+        "endline" : 2971,
+        "endchar" : 102
+       },
+       {
+        "name" : "_clearQueue",
+        "kind" : "function",
+        "line" : 2972,
+        "char" : 28,
+        "type" : "nothrow @trusted void()",
+        "endline" : 2981,
+        "endchar" : 2
+       },
+       {
+        "name" : "_clearQueue",
+        "kind" : "function",
+        "line" : 2982,
+        "char" : 28,
+        "type" : "shared nothrow @trusted void()",
+        "endline" : 2982,
+        "endchar" : 103
+       },
+       {
+        "name" : "this",
+        "kind" : "constructor",
+        "comment" : " コンストラクタ\n",
+        "line" : 2988,
+        "char" : 2,
+        "type" : "shared ()",
+        "endline" : 2991,
+        "endchar" : 2
+       },
+       {
+        "name" : "this",
+        "kind" : "constructor",
+        "comment" : "ditto\n",
+        "line" : 2993,
+        "char" : 2,
+        "type" : "@system ()",
+        "endline" : 2996,
+        "endchar" : 2
+       },
+       {
+        "name" : "put",
+        "kind" : "function",
+        "comment" : " 供給\n",
+        "line" : 3001,
+        "char" : 7,
+        "type" : "shared nothrow void(Key key, T dat)",
+        "parameters" : [
+         {
+          "name" : "key",
+          "type" : "Key"
+         },
+         {
+          "name" : "dat",
+          "type" : "T"
+         }
+        ],
+        "endline" : 3004,
+        "endchar" : 2
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3006,
+        "char" : 7,
+        "name" : "put",
+        "parameters" : [],
+        "constraint" : "_hasDefaultKey",
+        "members" : [
+         {
+          "name" : "put",
+          "kind" : "function",
+          "line" : 3006,
+          "char" : 7,
+          "type" : "shared nothrow void(T dat)",
+          "parameters" : [
+           {
+            "name" : "dat",
+            "type" : "T"
+           }
+          ],
+          "endline" : 3010,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3012,
+        "char" : 7,
+        "name" : "put",
+        "parameters" : [
+         {
+          "name" : "Range",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "isInputRange!Range && is(ForeachType!Range : T)",
+        "members" : [
+         {
+          "name" : "put",
+          "kind" : "function",
+          "line" : 3012,
+          "char" : 7,
+          "type" : "shared nothrow void(Key key, Range dat)",
+          "parameters" : [
+           {
+            "name" : "key",
+            "type" : "Key"
+           },
+           {
+            "name" : "dat",
+            "type" : "Range"
+           }
+          ],
+          "endline" : 3016,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3018,
+        "char" : 7,
+        "name" : "put",
+        "parameters" : [
+         {
+          "name" : "Range",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "_hasDefaultKey && isInputRange!Range && is(ForeachType!Range : T)",
+        "members" : [
+         {
+          "name" : "put",
+          "kind" : "function",
+          "line" : 3018,
+          "char" : 7,
+          "type" : "shared nothrow void(Range src)",
+          "parameters" : [
+           {
+            "name" : "src",
+            "type" : "Range"
+           }
+          ],
+          "endline" : 3022,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "name" : "consume",
+        "kind" : "function",
+        "comment" : " 消費\n",
+        "line" : 3027,
+        "char" : 4,
+        "type" : "shared nothrow T(Key key)",
+        "parameters" : [
+         {
+          "name" : "key",
+          "type" : "Key"
+         }
+        ],
+        "endline" : 3030,
+        "endchar" : 2
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3032,
+        "char" : 4,
+        "name" : "consume",
+        "parameters" : [],
+        "constraint" : "_hasDefaultKey",
+        "members" : [
+         {
+          "name" : "consume",
+          "kind" : "function",
+          "line" : 3032,
+          "char" : 4,
+          "type" : "shared nothrow T()",
+          "endline" : 3036,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3038,
+        "char" : 7,
+        "name" : "consumeAll",
+        "parameters" : [
+         {
+          "name" : "OutputRange",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "isOutputRange!(OutputRange, T)",
+        "members" : [
+         {
+          "name" : "consumeAll",
+          "kind" : "function",
+          "line" : 3038,
+          "char" : 7,
+          "type" : "shared nothrow void(Key key, ref OutputRange dst)",
+          "parameters" : [
+           {
+            "name" : "key",
+            "type" : "Key"
+           },
+           {
+            "name" : "dst",
+            "type" : "OutputRange",
+            "storageClass" : [
+             "ref"
+            ]
+           }
+          ],
+          "endline" : 3042,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3044,
+        "char" : 7,
+        "name" : "consumeAll",
+        "parameters" : [
+         {
+          "name" : "OutputRange",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "_hasDefaultKey && isOutputRange!(OutputRange, T)",
+        "members" : [
+         {
+          "name" : "consumeAll",
+          "kind" : "function",
+          "line" : 3044,
+          "char" : 7,
+          "type" : "shared nothrow void(ref OutputRange dst)",
+          "parameters" : [
+           {
+            "name" : "dst",
+            "type" : "OutputRange",
+            "storageClass" : [
+             "ref"
+            ]
+           }
+          ],
+          "endline" : 3048,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "name" : "tryConsume",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 3050,
+        "char" : 7,
+        "type" : "shared nothrow bool(Key key, ref T dst, Duration timeout = 0.msecs)",
+        "parameters" : [
+         {
+          "name" : "key",
+          "type" : "Key"
+         },
+         {
+          "name" : "dst",
+          "type" : "T",
+          "storageClass" : [
+           "ref"
+          ]
+         },
+         {
+          "name" : "timeout",
+          "type" : "Duration",
+          "default" : "0.msecs"
+         }
+        ],
+        "endline" : 3053,
+        "endchar" : 2
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3055,
+        "char" : 7,
+        "name" : "tryConsume",
+        "parameters" : [],
+        "constraint" : "_hasDefaultKey",
+        "members" : [
+         {
+          "name" : "tryConsume",
+          "kind" : "function",
+          "line" : 3055,
+          "char" : 7,
+          "type" : "shared nothrow bool(ref T dst, Duration timeout = 0.msecs)",
+          "parameters" : [
+           {
+            "name" : "dst",
+            "type" : "T",
+            "storageClass" : [
+             "ref"
+            ]
+           },
+           {
+            "name" : "timeout",
+            "type" : "Duration",
+            "default" : "0.msecs"
+           }
+          ],
+          "endline" : 3059,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3061,
+        "char" : 7,
+        "name" : "tryConsumeAll",
+        "parameters" : [
+         {
+          "name" : "OutputRange",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "isOutputRange!(OutputRange, T)",
+        "members" : [
+         {
+          "name" : "tryConsumeAll",
+          "kind" : "function",
+          "line" : 3061,
+          "char" : 7,
+          "type" : "shared nothrow bool(Key key, ref OutputRange dst, Duration timeout = 0.msecs)",
+          "parameters" : [
+           {
+            "name" : "key",
+            "type" : "Key"
+           },
+           {
+            "name" : "dst",
+            "type" : "OutputRange",
+            "storageClass" : [
+             "ref"
+            ]
+           },
+           {
+            "name" : "timeout",
+            "type" : "Duration",
+            "default" : "0.msecs"
+           }
+          ],
+          "endline" : 3065,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3067,
+        "char" : 7,
+        "name" : "tryConsumeAll",
+        "parameters" : [
+         {
+          "name" : "OutputRange",
+          "kind" : "type"
+         }
+        ],
+        "constraint" : "_hasDefaultKey && isOutputRange!(OutputRange, T)",
+        "members" : [
+         {
+          "name" : "tryConsumeAll",
+          "kind" : "function",
+          "line" : 3067,
+          "char" : 7,
+          "type" : "shared nothrow bool(ref OutputRange dst, Duration timeout = 0.msecs)",
+          "parameters" : [
+           {
+            "name" : "dst",
+            "type" : "OutputRange",
+            "storageClass" : [
+             "ref"
+            ]
+           },
+           {
+            "name" : "timeout",
+            "type" : "Duration",
+            "default" : "0.msecs"
+           }
+          ],
+          "endline" : 3071,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "name" : "waitForData",
+        "kind" : "function",
+        "comment" : " データ供給待ち\n",
+        "line" : 3076,
+        "char" : 7,
+        "type" : "shared nothrow bool(Key key)",
+        "parameters" : [
+         {
+          "name" : "key",
+          "type" : "Key"
+         }
+        ],
+        "endline" : 3079,
+        "endchar" : 2
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3081,
+        "char" : 7,
+        "name" : "waitForData",
+        "parameters" : [],
+        "constraint" : "_hasDefaultKey",
+        "members" : [
+         {
+          "name" : "waitForData",
+          "kind" : "function",
+          "line" : 3081,
+          "char" : 7,
+          "type" : "shared nothrow bool()",
+          "endline" : 3085,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "name" : "waitForData",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 3087,
+        "char" : 7,
+        "type" : "shared nothrow bool(Key key, Duration timeout)",
+        "parameters" : [
+         {
+          "name" : "key",
+          "type" : "Key"
+         },
+         {
+          "name" : "timeout",
+          "type" : "Duration"
+         }
+        ],
+        "endline" : 3090,
+        "endchar" : 2
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3092,
+        "char" : 7,
+        "name" : "waitForData",
+        "parameters" : [],
+        "constraint" : "_hasDefaultKey",
+        "members" : [
+         {
+          "name" : "waitForData",
+          "kind" : "function",
+          "line" : 3092,
+          "char" : 7,
+          "type" : "shared nothrow bool(Duration timeout)",
+          "parameters" : [
+           {
+            "name" : "timeout",
+            "type" : "Duration"
+           }
+          ],
+          "endline" : 3096,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "name" : "close",
+        "kind" : "function",
+        "comment" : " とじる\n",
+        "line" : 3102,
+        "char" : 7,
+        "type" : "shared nothrow void(Key key)",
+        "parameters" : [
+         {
+          "name" : "key",
+          "type" : "Key"
+         }
+        ],
+        "endline" : 3106,
+        "endchar" : 2
+       },
+       {
+        "kind" : "template",
+        "comment" : "ditto\n",
+        "line" : 3108,
+        "char" : 7,
+        "name" : "close",
+        "parameters" : [],
+        "constraint" : "_hasDefaultKey",
+        "members" : [
+         {
+          "name" : "close",
+          "kind" : "function",
+          "line" : 3108,
+          "char" : 7,
+          "type" : "shared nothrow void(Key key)",
+          "parameters" : [
+           {
+            "name" : "key",
+            "type" : "Key"
+           }
+          ],
+          "endline" : 3112,
+          "endchar" : 2
+         }
+        ]
+       },
+       {
+        "name" : "closeAll",
+        "kind" : "function",
+        "comment" : "ditto\n",
+        "line" : 3114,
+        "char" : 7,
+        "type" : "shared nothrow void()",
+        "endline" : 3119,
+        "endchar" : 2
+       },
+       {
+        "name" : "opIndex",
+        "kind" : "function",
+        "comment" : " Queueにアクセス\n",
+        "line" : 3124,
+        "char" : 8,
+        "type" : "shared nothrow Queue(Key key)",
+        "parameters" : [
+         {
+          "name" : "key",
+          "type" : "Key"
+         }
+        ],
+        "endline" : 3127,
+        "endchar" : 2
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L3130_C9",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 3130,
+    "char" : 9,
+    "storageClass" : [
+     "@system"
+    ],
+    "endline" : 3170,
     "endchar" : 1
    }
   ]
