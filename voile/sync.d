@@ -2808,21 +2808,21 @@ public:
 	/***************************************************************************
 	 * とじる
 	 */
-	void close() nothrow
+	void close(bool waitForConsume = false) nothrow
 	{
-		if (!_list.empty)
+		if (waitForConsume && !_list.empty)
 			_wait();
 		_length = 0;
 		_notify();
 	}
 	/// ditto
-	void close() @trusted shared nothrow
+	void close(bool waitForConsume = false) @trusted shared nothrow
 	{
 		auto m = _mutex;
 		m.lock_nothrow();
 		scope (exit)
 			m.unlock_nothrow();
-		(cast()this).close();
+		(cast()this).close(waitForConsume);
 	}
 }
 
@@ -2944,6 +2944,17 @@ private:
 			assert(0);
 	}
 	pragma(inline, true) Queue _reqQueue(Key k) shared @trusted nothrow { return (cast()this)._reqQueue(k); }
+	pragma(inline, true) Queue _getQueue(Key k) @trusted nothrow
+	{
+		try
+		{
+			synchronized (_map)
+				return _map.asUnshared.get(_mapkey(k), null);
+		}
+		catch (Exception)
+			return null;
+	}
+	pragma(inline, true) Queue _getQueue(Key k) shared @trusted nothrow { return (cast()this)._getQueue(k); }
 	pragma(inline, true) void _removeQueue(Key k) @trusted nothrow
 	{
 		try
@@ -3099,22 +3110,22 @@ public:
 	/***************************************************************************
 	 * とじる
 	 */
-	void close(Key key) nothrow shared
+	void close(Key key, bool waitForConsume = false) nothrow shared
 	{
 		_reqQueue(key).close();
 		_removeQueue(key);
 	}
 	/// ditto
-	void close()(Key key) nothrow shared
+	void close()(bool waitForConsume = false) nothrow shared
 	if (_hasDefaultKey)
 	{
-		close(_defaultKey());
+		close(_defaultKey(), waitForConsume);
 	}
 	/// ditto
-	void closeAll() nothrow shared
+	void closeAll(bool waitForConsume = false) nothrow shared
 	{
 		foreach (q; _allQueue)
-			q.close();
+			q.close(waitForConsume);
 		_clearQueue();
 	}
 	
@@ -3125,6 +3136,11 @@ public:
 	{
 		return _reqQueue(key);
 	}
+	/// ditto
+	Queue opBinaryRight(string op: "in")(Key key) nothrow shared
+	{
+		return _getQueue(key);
+	}
 }
 
 @system unittest
@@ -3132,38 +3148,41 @@ public:
 	import core.thread;
 	import core.sync.barrier;
 	auto tg = new ThreadGroup;
-	auto channels = new shared MessageBox!string;
+	auto msgbox = new shared MessageBox!string;
 	auto b = new Barrier(2);
 	string[] test;
 	// producer
 	tg.create({
 		b.wait();
-		channels["1"].put("aaa");
-		channels.put("2", "bbb");
-		channels["3"].put(["ccc", "ddd"]);
+		msgbox["1"].put("aaa");
+		msgbox.put("2", "bbb");
+		msgbox["3"].put(["ccc", "ddd"]);
 		b.wait();
-		channels.put("1", ["eee", "fff"]);
+		msgbox.put("1", ["eee", "fff"]);
 		b.wait();
 	});
 	// consumer
 	tg.create({
 		b.wait();
-		test ~= channels.consume("1");
+		test ~= msgbox.consume("1");
 		string tmp;
-		auto tryres = channels["2"].tryConsume(tmp, 100.msecs);
+		auto tryres = msgbox["2"].tryConsume(tmp, 100.msecs);
 		assert(tryres);
 		test ~= tmp;
 		import std.array;
 		auto app = appender!(string[]);
-		channels.consumeAll("3", app);
+		msgbox.consumeAll("3", app);
 		b.wait();
-		tryres = channels["1"].tryConsumeAll(app, 100.msecs);
+		tryres = msgbox["1"].tryConsumeAll(app, 100.msecs);
 		assert(tryres);
 		test ~= app.data;
 		b.wait();
 	});
 	
 	tg.joinAll();
-	channels.closeAll();
+	assert("1" in msgbox);
+	assert("x" !in msgbox);
+	msgbox.closeAll();
+	assert("1" !in msgbox);
 	assert(test == ["aaa", "bbb", "ccc", "ddd", "eee", "fff"]);
 }
