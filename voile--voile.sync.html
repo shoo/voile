@@ -810,9 +810,9 @@ shared nothrow @trusted bool <code class="ddoc_psymbol">waitForData</code>(Durat
 shared const nothrow @property @trusted size_t <code class="ddoc_psymbol">length</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">現在の待ち行列の長さ</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageQueue.close"></span><div class="quickindex" id="quickindex.MessageQueue.close"></div>nothrow void <code class="ddoc_psymbol">close</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageQueue.close"></span><div class="quickindex" id="quickindex.MessageQueue.close"></div>nothrow void <code class="ddoc_psymbol">close</code>(bool <span class="ddoc_param">waitForConsume</span> = false);
 <br>
-shared nothrow @trusted void <code class="ddoc_psymbol">close</code>();
+shared nothrow @trusted void <code class="ddoc_psymbol">close</code>(bool <span class="ddoc_param">waitForConsume</span> = false);
 <br></div></dt>
 <dd><div class="ddoc_summary">とじる</div></dd>
 </div></dl>
@@ -860,14 +860,16 @@ shared nothrow bool <code class="ddoc_psymbol">waitForData</code>(Key <span clas
 shared nothrow bool <code class="ddoc_psymbol">waitForData</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Duration <span class="ddoc_param">timeout</span>)<br><span class="ddoc_constraint">if(_hasDefaultKey)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">データ供給待ち</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageBox.close"></span><div class="quickindex" id="quickindex.MessageBox.close"></div>shared nothrow void <code class="ddoc_psymbol">close</code>(Key <span class="ddoc_param">key</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageBox.close"></span><div class="quickindex" id="quickindex.MessageBox.close"></div>shared nothrow void <code class="ddoc_psymbol">close</code>(Key <span class="ddoc_param">key</span>, bool <span class="ddoc_param">waitForConsume</span> = false);
 <br>
-shared nothrow void <code class="ddoc_psymbol">close</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Key <span class="ddoc_param">key</span>)<br><span class="ddoc_constraint">if(_hasDefaultKey)</span>;
+shared nothrow void <code class="ddoc_psymbol">close</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(bool <span class="ddoc_param">waitForConsume</span> = false)<br><span class="ddoc_constraint">if(_hasDefaultKey)</span>;
 <br>
-<span class="def-anchor" id=".MessageBox.closeAll"></span><div class="quickindex" id="quickindex.MessageBox.closeAll"></div>shared nothrow void <code class="ddoc_psymbol">closeAll</code>();
+<span class="def-anchor" id=".MessageBox.closeAll"></span><div class="quickindex" id="quickindex.MessageBox.closeAll"></div>shared nothrow void <code class="ddoc_psymbol">closeAll</code>(bool <span class="ddoc_param">waitForConsume</span> = false);
 <br></div></dt>
 <dd><div class="ddoc_summary">とじる</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".MessageBox.opIndex"></span><div class="quickindex" id="quickindex.MessageBox.opIndex"></div>shared nothrow Queue <code class="ddoc_psymbol">opIndex</code>(Key <span class="ddoc_param">key</span>);
+<br>
+<span class="def-anchor" id=".MessageBox.opBinaryRight"></span><div class="quickindex" id="quickindex.MessageBox.opBinaryRight"></div>shared nothrow Queue <code class="ddoc_psymbol">opBinaryRight</code><span class="ddoc_template_param_list" title="Template parameter list">(string op : "in")</span>(Key <span class="ddoc_param">key</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">Queueにアクセス</div></dd>
 </div></dl>
