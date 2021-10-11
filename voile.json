@@ -12103,7 +12103,7 @@
       "kind" : "function",
       "line" : 13,
       "char" : 11,
-      "type" : "@property JSONValue(auto ref const T[] x)",
+      "type" : "@property JSONValue(auto const ref T[] x)",
       "parameters" : [
        {
         "name" : "x",
@@ -12153,7 +12153,7 @@
       "kind" : "function",
       "line" : 37,
       "char" : 11,
-      "type" : "@property JSONValue(auto ref const T x)",
+      "type" : "@property JSONValue(auto const ref T x)",
       "parameters" : [
        {
         "name" : "x",
@@ -12216,7 +12216,7 @@
       "kind" : "function",
       "line" : 83,
       "char" : 11,
-      "type" : "@property JSONValue(auto ref const T x)",
+      "type" : "@property JSONValue(auto const ref T x)",
       "parameters" : [
        {
         "name" : "x",
@@ -12266,7 +12266,7 @@
       "kind" : "function",
       "line" : 102,
       "char" : 11,
-      "type" : "@property JSONValue(auto ref const T[] ary)",
+      "type" : "@property JSONValue(auto const ref T[] ary)",
       "parameters" : [
        {
         "name" : "ary",
@@ -12346,7 +12346,7 @@
       "kind" : "function",
       "line" : 171,
       "char" : 11,
-      "type" : "@property JSONValue(auto ref const Value[Key] aa)",
+      "type" : "@property JSONValue(auto const ref Value[Key] aa)",
       "parameters" : [
        {
         "name" : "aa",
@@ -12396,7 +12396,7 @@
       "kind" : "function",
       "line" : 198,
       "char" : 11,
-      "type" : "@property JSONValue(auto ref const JV v)",
+      "type" : "@property JSONValue(auto const ref JV v)",
       "parameters" : [
        {
         "name" : "v",
@@ -22519,7 +22519,7 @@
       "storageClass" : [
        "auto"
       ],
-      "type" : "ref (auto ref inout MU dat)",
+      "type" : "ref (auto inout ref MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -22563,7 +22563,7 @@
       "storageClass" : [
        "auto"
       ],
-      "type" : "ref (auto ref inout MU dat)",
+      "type" : "ref (auto inout ref MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -23831,7 +23831,7 @@
         "storageClass" : [
          "auto"
         ],
-        "type" : "ref (ref inout MU dat)",
+        "type" : "ref (inout ref MU dat)",
         "parameters" : [
          {
           "name" : "dat",
@@ -23853,7 +23853,7 @@
         "storageClass" : [
          "auto"
         ],
-        "type" : "ref (ref inout MU dat)",
+        "type" : "ref (inout ref MU dat)",
         "parameters" : [
          {
           "name" : "dat",
@@ -26283,7 +26283,7 @@
       "kind" : "function",
       "line" : 633,
       "char" : 29,
-      "type" : "pure nothrow ref inout(T)(ref inout RefCounted!T rc)",
+      "type" : "pure nothrow ref inout(T)(inout ref RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
@@ -26331,7 +26331,7 @@
       "kind" : "function",
       "line" : 650,
       "char" : 26,
-      "type" : "pure nothrow inout(T)*(ref inout RefCounted!T rc)",
+      "type" : "pure nothrow inout(T)*(inout ref RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
@@ -26727,7 +26727,7 @@
       "kind" : "function",
       "line" : 825,
       "char" : 34,
-      "type" : "pure nothrow @nogc @property ref @safe inout(CountedData!T)(ref inout RefCounted!T rc)",
+      "type" : "pure nothrow @nogc @property ref @safe inout(CountedData!T)(inout ref RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
@@ -26763,7 +26763,7 @@
       "kind" : "function",
       "line" : 842,
       "char" : 16,
-      "type" : "pure nothrow @nogc @property @system inout(ubyte)[](ref inout RefCounted!T rc)",
+      "type" : "pure nothrow @nogc @property @system inout(ubyte)[](inout ref RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
@@ -26812,7 +26812,7 @@
       "kind" : "function",
       "line" : 866,
       "char" : 16,
-      "type" : "pure nothrow @nogc @property @system inout(ubyte)[](ref inout RefCounted!T rc)",
+      "type" : "pure nothrow @nogc @property @system inout(ubyte)[](inout ref RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",

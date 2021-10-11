@@ -63,21 +63,21 @@
                 <div class="quickindex" id="quickindex"></div>
                 
                 
-<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".json"></span><div class="quickindex" id="quickindex.json"></div>@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T[] <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isSomeString!(T[]))</span>;
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".json"></span><div class="quickindex" id="quickindex.json"></div>@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T[] <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isSomeString!(T[]))</span>;
 <br>
-@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isIntegral!T &amp;&amp; !is(T == enum) || isFloatingPoint!T || is(Unqual!T == bool))</span>;
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isIntegral!T &amp;&amp; !is(T == enum) || isFloatingPoint!T || is(Unqual!T == bool))</span>;
 <br>
-@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(is(T == enum))</span>;
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(is(T == enum))</span>;
 <br>
-@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T[] <span class="ddoc_param">ary</span>)<br><span class="ddoc_constraint">if(!isSomeString!(T[]) &amp;&amp; isArray!(T[]))</span>;
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T[] <span class="ddoc_param">ary</span>)<br><span class="ddoc_constraint">if(!isSomeString!(T[]) &amp;&amp; isArray!(T[]))</span>;
 <br>
-@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(Value, Key)</span>(auto ref const Value[Key] <span class="ddoc_param">aa</span>)<br><span class="ddoc_constraint">if(isSomeString!Key &amp;&amp; is(typeof(()
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(Value, Key)</span>(auto const ref Value[Key] <span class="ddoc_param">aa</span>)<br><span class="ddoc_constraint">if(isSomeString!Key &amp;&amp; is(typeof(()
 {
 auto v = Value.init.<code class="ddoc_psymbol">json</code>;
 }
 )))</span>;
 <br>
-@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(JV)</span>(auto ref const JV <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(JV : const(JSONValue)))</span>;
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(JV)</span>(auto const ref JV <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(JV : const(JSONValue)))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">JSONValueデータを得る</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate">dstring dstr = <span class="d_string">"あいうえお"</span>;

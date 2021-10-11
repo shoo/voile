@@ -297,7 +297,7 @@ dat2.<span class="d_psymbol">attach</span>(<span class="d_keyword">new</span> C(
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".deref"></span><div class="quickindex" id="quickindex.deref"></div>pure nothrow ref inout<span class="ddoc_template_param_list" title="Template parameter list">(T)</span> <code class="ddoc_psymbol">deref</code>(T)(ref inout RefCounted!T <span class="ddoc_param">rc</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".deref"></span><div class="quickindex" id="quickindex.deref"></div>pure nothrow ref inout<span class="ddoc_template_param_list" title="Template parameter list">(T)</span> <code class="ddoc_psymbol">deref</code>(T)(inout ref RefCounted!T <span class="ddoc_param">rc</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">参照外し</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">auto</span> x = createRefCounted!<span class="d_keyword">int</span>(1);
@@ -307,7 +307,7 @@ x.<span class="d_psymbol">deref</span> = 2;
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ptr"></span><div class="quickindex" id="quickindex.ptr"></div>pure nothrow inout<span class="ddoc_template_param_list" title="Template parameter list">(T)</span>* <code class="ddoc_psymbol">ptr</code>(T)(ref inout RefCounted!T <span class="ddoc_param">rc</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".ptr"></span><div class="quickindex" id="quickindex.ptr"></div>pure nothrow inout<span class="ddoc_template_param_list" title="Template parameter list">(T)</span>* <code class="ddoc_psymbol">ptr</code>(T)(inout ref RefCounted!T <span class="ddoc_param">rc</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">ポインタを得る</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">auto</span> x = createRefCounted!<span class="d_keyword">int</span>(1);
@@ -397,7 +397,7 @@ x.<span class="d_psymbol">deref</span> = 2;
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".attachRefCounted"></span><div class="quickindex" id="quickindex.attachRefCounted"></div>RefCounted!T <code class="ddoc_psymbol">attachRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(RefType!T <span class="ddoc_param">newRefData</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">参照カウンタを追加せずにRefCountedを得る</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".buffer"></span><div class="quickindex" id="quickindex.buffer"></div>pure nothrow @nogc @property @system inout(ubyte)[] <code class="ddoc_psymbol">buffer</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref inout RefCounted!T <span class="ddoc_param">rc</span>)<br><span class="ddoc_constraint">if(!isCountedData!T || isInstanceOf!(CountedData, T))</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".buffer"></span><div class="quickindex" id="quickindex.buffer"></div>pure nothrow @nogc @property @system inout(ubyte)[] <code class="ddoc_psymbol">buffer</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(inout ref RefCounted!T <span class="ddoc_param">rc</span>)<br><span class="ddoc_constraint">if(!isCountedData!T || isInstanceOf!(CountedData, T))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">バッファ領域へアクセス
 </div><div class="ddoc_description">バッファ領域は、Tのインスタンスと拡張領域のメモリ領域全体を指す。
@@ -413,7 +413,7 @@ release後に触れた場合、ダングリングポインタへのアクセス�
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".extraBuffer"></span><div class="quickindex" id="quickindex.extraBuffer"></div>pure nothrow @nogc @property @system inout(ubyte)[] <code class="ddoc_psymbol">extraBuffer</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref inout RefCounted!T <span class="ddoc_param">rc</span>)<br><span class="ddoc_constraint">if(!isCountedData!T || isInstanceOf!(CountedData, T))</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".extraBuffer"></span><div class="quickindex" id="quickindex.extraBuffer"></div>pure nothrow @nogc @property @system inout(ubyte)[] <code class="ddoc_psymbol">extraBuffer</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(inout ref RefCounted!T <span class="ddoc_param">rc</span>)<br><span class="ddoc_constraint">if(!isCountedData!T || isInstanceOf!(CountedData, T))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">拡張データ領域へアクセス
 </div><div class="ddoc_description">初期化時にTのインスタンスより大きなバッファを与えることで、拡張データ領域を持つことができる。
