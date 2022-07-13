@@ -1773,3 +1773,319 @@ JSONValue deepCopy(in JSONValue v) @property
 	assert(jv2["a"][0].str == "XXX");
 	assert(jv3["a"][0].str == "A");
 }
+
+/*******************************************************************************
+ * JWT
+ */
+struct JWTValue
+{
+private:
+	import std.digest.hmac;
+	import std.digest.sha;
+	import std.exception: enforce;
+	import std.string: representation;
+	immutable(ubyte)[] _key;
+	JSONValue _payload;
+public:
+	/***************************************************************************
+	 * 
+	 */
+	enum Algorithm
+	{
+		HS256, HS384, HS512
+	}
+	/// ditto
+	Algorithm algorithm = Algorithm.HS256;
+	
+	
+	/***************************************************************************
+	 * 
+	 */
+	this(const(char)[] jwt, const(ubyte)[] key)
+	{
+		import std.base64;
+		alias B64 = Base64Impl!('+', '/', Base64.NoPadding);
+		auto jwtElms = split(jwt, '.');
+		enforce(jwtElms.length == 3, "Unknown format");
+		auto header = parseJSON(cast(const(char)[])B64.decode(jwtElms[0]));
+		enforce(header.getValue("typ", string.init) == "JWT", "Unknown format");
+		switch (header.getValue("alg", string.init))
+		{
+		case "HS256":
+			algorithm = Algorithm.HS256;
+			break;
+		case "HS384":
+			algorithm = Algorithm.HS384;
+			break;
+		case "HS512":
+			algorithm = Algorithm.HS512;
+			break;
+		default:
+			enforce(false, "Unsupported algorithm");
+		}
+		
+		static immutable verrmsg = "JWT verification is failed";
+		final switch (algorithm)
+		{
+		case Algorithm.HS256:
+			enforce(B64.encode((jwtElms[0] ~ "." ~ jwtElms[1]).representation.hmac!SHA256(key)) == jwtElms[2], verrmsg);
+			break;
+		case Algorithm.HS384:
+			enforce(B64.encode((jwtElms[0] ~ "." ~ jwtElms[1]).representation.hmac!SHA384(key)) == jwtElms[2], verrmsg);
+			break;
+		case Algorithm.HS512:
+			enforce(B64.encode((jwtElms[0] ~ "." ~ jwtElms[1]).representation.hmac!SHA512(key)) == jwtElms[2], verrmsg);
+			break;
+		}
+		
+		_key = key.idup;
+		_payload = parseJSON(cast(const(char)[])B64.decode(jwtElms[1]));
+	}
+	
+	/// ditto
+	this(const(char)[] jwt, const(char)[] key)
+	{
+		this(jwt, key.representation);
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(ubyte)[] key)
+	{
+		algorithm = algo;
+		_key = key.idup;
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(ubyte)[] key, JSONValue payload)
+	{
+		algorithm = algo;
+		_key = key.idup;
+		_payload = payload;
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(ubyte)[] key, JSONValue[string] payload)
+	{
+		algorithm = algo;
+		_key = key.idup;
+		_payload = JSONValue(payload);
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(char)[] key)
+	{
+		algorithm = algo;
+		_key = key.representation;
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(char)[] key, JSONValue payload)
+	{
+		algorithm = algo;
+		_key = key.representation;
+		_payload = payload;
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(char)[] key, JSONValue[string] payload)
+	{
+		algorithm = algo;
+		_key = key.representation;
+		_payload = JSONValue(payload);
+	}
+	
+	
+	/***************************************************************************
+	 * 
+	 */
+	void key(string key)
+	{
+		_key = key.representation;
+	}
+	/// dittp
+	void key(const(ubyte)[] key)
+	{
+		_key = key.idup;
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	ref inout(JSONValue) opIndex(string name) return inout
+	{
+		return _payload[name];
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	void opIndexAssign(T)(auto ref T value, string name) return
+	{
+		_payload[name] = value;
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	ref inout(JSONValue) payload() return inout
+	{
+		return _payload;
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	string toString() const
+	{
+		string ret;
+		import std.conv: text;
+		import std.base64;
+		alias B64 = Base64Impl!('+', '/', Base64.NoPadding);
+		
+		ret ~= B64.encode(text(`{"alg":"`, algorithm, `","typ":"JWT"}`).representation);
+		ret ~= ".";
+		ret ~= B64.encode(_payload.toString().representation);
+		
+		final switch (algorithm)
+		{
+		case Algorithm.HS256:
+			return ret ~ "." ~ cast(string)B64.encode(ret.representation.hmac!SHA256(_key));
+		case Algorithm.HS384:
+			return ret ~ "." ~ cast(string)B64.encode(ret.representation.hmac!SHA384(_key));
+		case Algorithm.HS512:
+			return ret ~ "." ~ cast(string)B64.encode(ret.representation.hmac!SHA512(_key));
+		}
+	}
+}
+
+/// ditto
+@system unittest
+{
+	import std.exception;
+	static immutable testjwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+		~".eyJ0ZXN0a2V5IjoidGVzdHZhbHVlIn0"
+		~".AXHSKa2ubvg6jMckkYaWgCXluhOamfFDk8y163X4DPs";
+	
+	auto jwt = JWTValue(JWTValue.Algorithm.HS256, "testsecret");
+	jwt["testkey"] = "testvalue";
+	assert(jwt.toString() == testjwt);
+	
+	auto jwt2 = JWTValue(testjwt, "testsecret");
+	assert(jwt2["testkey"].str == "testvalue");
+	assert(jwt2.toString() == jwt.toString());
+	
+	assertThrown(JWTValue(testjwt, "testsecret2"));
+}
+
+/*******************************************************************************
+ * 
+ */
+void setValue(T)(ref JWTValue dat, string name, T val)
+{
+	dat._payload.setValue(name, val);
+}
+
+/*******************************************************************************
+ * 
+ */
+T getValue(T)(in ref JWTValue dat, string name, lazy T defaultVal)
+{
+	return dat._payload.getValue(name, defaultVal);
+}
+
+
+/*******************************************************************************
+ * シリアライズ/デシリアライズ
+ */
+JWTValue serializeToJwt(T)(in T data, JWTValue.Algorithm algo, const(ubyte)[] key)
+{
+	auto ret = JWTValue(algo, key);
+	ret._payload = serializeToJson(data);
+	return ret;
+}
+
+/// ditto
+JWTValue serializeToJwt(T)(in T data, JWTValue.Algorithm algo, const(char)[] key)
+{
+	import std.string: representation;
+	return serializeToJwt(data, algo, key.representation);
+}
+
+/// ditto
+JWTValue serializeToJwt(T)(in T data, const(ubyte)[] key)
+{
+	return serializeToJwt(data, JWTValue.Algorithm.HS256, key);
+}
+
+/// ditto
+JWTValue serializeToJwt(T)(in T data, const(char)[] key)
+{
+	import std.string: representation;
+	return serializeToJwt(data, key.representation);
+}
+
+/// ditto
+string serializeToJwtString(T)(in T data, JWTValue.Algorithm algo, const(ubyte)[] key)
+{
+	return serializeToJwt(data, algo, key).toString();
+}
+
+/// ditto
+string serializeToJwtString(T)(in T data, JWTValue.Algorithm algo, const(char)[] key)
+{
+	import std.string: representation;
+	return serializeToJwtString(data, algo, key.representation);
+}
+
+/// ditto
+string serializeToJwtString(T)(in T data, const(ubyte)[] key)
+{
+	return serializeToJwtString(data, JWTValue.Algorithm.HS256, key);
+}
+
+/// ditto
+string serializeToJwtString(T)(in T data, const(char)[] key)
+{
+	import std.string: representation;
+	return serializeToJwtString(data, key.representation);
+}
+
+/// ditto
+void deserializeFromJwt(T)(ref T data, JWTValue jwt)
+{
+	deserializeFromJson(data, jwt._payload);
+}
+
+/// ditto
+void deserializeFromJwtString(T)(ref T data, const(char)[] jwt, const(char)[] key)
+{
+	deserializeFromJson(data, JWTValue(jwt, key)._payload);
+}
+
+
+/// ditto
+@system unittest
+{
+	import std.exception;
+	static immutable testjwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+		~".eyJ0ZXN0a2V5IjoidGVzdHZhbHVlIn0"
+		~".AXHSKa2ubvg6jMckkYaWgCXluhOamfFDk8y163X4DPs";
+	
+	struct Dat { string testkey; }
+	auto dat = Dat("testvalue");
+	
+	auto jwt1 = serializeToJwt(dat, JWTValue.Algorithm.HS256, "testsecret");
+	assert(jwt1.toString() == testjwt);
+	auto jwt2 = serializeToJwt(dat, "testsecret");
+	assert(jwt2.toString() == testjwt);
+	assert(serializeToJwtString(dat, JWTValue.Algorithm.HS256, "testsecret") == testjwt);
+	assert(serializeToJwtString(dat, "testsecret") == testjwt);
+	
+	Dat dat2;
+	dat2.deserializeFromJwt(jwt1);
+	assert(dat2 == dat);
+	
+	Dat dat3;
+	dat3.deserializeFromJwtString(testjwt, "testsecret");
+	assert(dat3 == dat);
+}
