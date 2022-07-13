@@ -313,78 +313,91 @@ T <code class="ddoc_psymbol">deserializeFromBinDat</code><span class="ddoc_templ
 <br></div></dt>
 <dd><div class="ddoc_summary">バイナリのデシリアライズ</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  基本型と列挙値
-<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<pre class="d_code notranslate"><span class="d_comment">//ubyte[] bin(ubyte[] dat...) { return dat; }
+</span><span class="d_keyword">template</span> bin(args...) {
+	<span class="d_keyword">ubyte</span>[args.length] inst = [args[]];
+	<span class="d_keyword">ubyte</span>[] bin() { <span class="d_keyword">return</span> inst[]; }
+}
 <span class="d_keyword">ubyte</span> a;
-a.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(10));
+a.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin!(10));
 <span class="d_keyword">assert</span>(a == 10);
 
 <span class="d_keyword">uint</span> b;
-b.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(bin(0, 0, 0, 10));
+b.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(bin!(0, 0, 0, 10));
 <span class="d_keyword">assert</span>(b == 10);
 
 <span class="d_keyword">version</span> (LittleEndian)
-	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(10, 0, 0, 0));
+	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(10, 0, 0, 0));
 <span class="d_keyword">version</span> (BigEndian)
-	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 0, 0, 10));
+	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0, 0, 0, 10));
 <span class="d_keyword">assert</span>(b == 10);
 
 <span class="d_keyword">enum</span> E { a, b }
 E e;
-e.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(0, 0, 0, 0));
+e.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin!(0, 0, 0, 0));
 <span class="d_keyword">assert</span>(e == E.a);
-e.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(1, 0, 0, 0));
+e.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin!(1, 0, 0, 0));
 <span class="d_keyword">assert</span>(e == E.b);
-e.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(bin(0, 0, 0, 1));
+e.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(bin!(0, 0, 0, 1));
 <span class="d_keyword">assert</span>(e == E.b);
 </pre>
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  配列
-<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<pre class="d_code notranslate"><span class="d_keyword">template</span> bin(args...) {
+	<span class="d_keyword">ubyte</span>[args.length] inst = [args[]];
+	<span class="d_keyword">ubyte</span>[] bin() { <span class="d_keyword">return</span> inst[]; }
+}
 <span class="d_keyword">ubyte</span>[] a = <span class="d_keyword">new</span> <span class="d_keyword">ubyte</span>[2];
-a.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(10, 20));
+a.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin!(10, 20));
 <span class="d_keyword">assert</span>(a == [10, 20]);
 <span class="d_keyword">uint</span>[] b = <span class="d_keyword">new</span> <span class="d_keyword">uint</span>[2];
-b.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(bin(0, 0, 0, 10, 0, 0, 0, 20));
+b.<span class="d_psymbol">deserializeFromBinDat</span>!bigEndian(bin!(0, 0, 0, 10, 0, 0, 0, 20));
 <span class="d_keyword">assert</span>(b == [10, 20]);
 
 <span class="d_keyword">version</span> (LittleEndian)
-	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(10, 0, 0, 0, 20, 0, 0, 0));
+	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(10, 0, 0, 0, 20, 0, 0, 0));
 <span class="d_keyword">version</span> (BigEndian)
-	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 0, 0, 10, 0, 0, 0, 20));
+	b.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0, 0, 0, 10, 0, 0, 0, 20));
 <span class="d_keyword">assert</span>(b == [10, 20]);
 
 <span class="d_keyword">uint</span>[2] c;
-c.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin(1, 0, 0, 0, 2, 0, 0, 0));
+c.<span class="d_psymbol">deserializeFromBinDat</span>!littleEndian(bin!(1, 0, 0, 0, 2, 0, 0, 0));
 <span class="d_keyword">assert</span>(c == [1, 2]);
 
 <span class="d_keyword">ubyte</span>[8] d;
-d.<span class="d_psymbol">deserializeFromBinDat</span>(bin(1, 0, 0, 0, 2, 0, 0, 0));
+d.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(1, 0, 0, 0, 2, 0, 0, 0));
 <span class="d_keyword">assert</span>(d == [1, 0, 0, 0, 2, 0, 0, 0]);
 </pre>
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  エンディアン変換
-<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<pre class="d_code notranslate"><span class="d_keyword">template</span> bin(args...) {
+	<span class="d_keyword">ubyte</span>[args.length] inst = [args[]];
+	<span class="d_keyword">ubyte</span>[] bin() { <span class="d_keyword">return</span> inst[]; }
+}
 <span class="d_keyword">struct</span> A
 {
 	@bigEndian <span class="d_keyword">ushort</span> a;
 	@littleEndian <span class="d_keyword">ushort</span> b;
 }
 A a;
-a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 10, 20, 0));
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0, 10, 20, 0));
 <span class="d_keyword">assert</span>(a == A(10, 20));
 </pre>
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  構造体
-<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<pre class="d_code notranslate"><span class="d_keyword">template</span> bin(args...) {
+	<span class="d_keyword">ubyte</span>[args.length] inst = [args[]];
+	<span class="d_keyword">ubyte</span>[] bin() { <span class="d_keyword">return</span> inst[]; }
+}
 <span class="d_keyword">struct</span> A
 {
 	@preLength!<span class="d_keyword">ushort</span> @bigEndian <span class="d_keyword">ubyte</span>[] data;
 }
 A a;
-a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 2, 10, 20));
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0, 2, 10, 20));
 <span class="d_keyword">assert</span> (a == A([10, 20]));
 
 <span class="d_keyword">struct</span> B
@@ -393,7 +406,7 @@ a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 2, 10, 20));
 	@arrayLength!<span class="d_string">"length"</span> @littleEndian <span class="d_keyword">ushort</span>[] data;
 }
 B b;
-b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 0, 0, 2, 10, 0, 20, 0));
+b.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0, 0, 0, 2, 10, 0, 20, 0));
 <span class="d_keyword">assert</span>(b == B(2, [10, 20]));
 
 <span class="d_keyword">struct</span> C
@@ -403,7 +416,7 @@ b.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0, 0, 0, 2, 10, 0, 20
 	B b;
 }
 C c;
-c.<span class="d_psymbol">deserializeFromBinDat</span>(bin(
+c.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(
 	0, 2, 10, 20,
 	0,1, 0,2, 0,3, 0,4,
 	0, 0, 0, 2, 10, 0, 20, 0));
@@ -412,26 +425,32 @@ c.<span class="d_psymbol">deserializeFromBinDat</span>(bin(
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  Endata
-<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<pre class="d_code notranslate"><span class="d_keyword">template</span> bin(args...) {
+	<span class="d_keyword">ubyte</span>[args.length] inst = [args[]];
+	<span class="d_keyword">ubyte</span>[] bin() { <span class="d_keyword">return</span> inst[]; }
+}
 @littleEndian <span class="d_keyword">enum</span> A: <span class="d_keyword">short</span>
 {
 	@bigEndian    @data!<span class="d_keyword">int</span> a,
 	@littleEndian @data!<span class="d_keyword">short</span> b
 }
 Endata!A a;
-a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0x00, 0x00, 0x00, 0x00, 0x00, 0x0a));
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0x00, 0x00, 0x00, 0x00, 0x00, 0x0a));
 Endata!A tmp;
 tmp.a = 10;
 <span class="d_keyword">assert</span>(a == tmp);
 
-a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(0x01, 0x00, 0x0b, 0x00));
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0x01, 0x00, 0x0b, 0x00));
 tmp.b = 11;
 <span class="d_keyword">assert</span>(a == tmp);
 </pre>
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  Proxy
-<pre class="d_code notranslate"><span class="d_keyword">ubyte</span>[] bin(<span class="d_keyword">ubyte</span>[] dat...) { <span class="d_keyword">return</span> dat; }
+<pre class="d_code notranslate"><span class="d_keyword">template</span> bin(args...) {
+	<span class="d_keyword">ubyte</span>[args.length] inst = [args[]];
+	<span class="d_keyword">ubyte</span>[] bin() { <span class="d_keyword">return</span> inst[]; }
+}
 <span class="d_keyword">struct</span> A
 {
 	<span class="d_keyword">int</span> a;
@@ -448,7 +467,7 @@ tmp.b = 11;
 	}
 }
 A a;
-a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(90));
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(90));
 <span class="d_keyword">assert</span>(a == A(-10));
 
 <span class="d_keyword">import</span> std.datetime;
@@ -485,7 +504,7 @@ a.<span class="d_psymbol">deserializeFromBinDat</span>(bin(90));
 	@convBy!Proxy DateTime dt;
 }
 B b;
-b.<span class="d_psymbol">deserializeFromBinDat</span>(bin([0x07, 0xE4, 12, 25, 0, 0, 0]));
+b.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0x07, 0xE4, 12, 25, 0, 0, 0));
 <span class="d_keyword">assert</span>(b == B(DateTime(2020, 12, 25)));
 </pre>
 </div>

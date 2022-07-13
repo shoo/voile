@@ -4205,85 +4205,85 @@
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 869,
+    "endline" : 873,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L869_C7",
+    "name" : "__unittest_L873_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "配列\n",
-    "line" : 869,
+    "line" : 873,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 895,
+    "endline" : 902,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L895_C7",
+    "name" : "__unittest_L902_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "エンディアン変換\n",
-    "line" : 895,
+    "line" : 902,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 909,
+    "endline" : 919,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L909_C7",
+    "name" : "__unittest_L919_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "構造体\n",
-    "line" : 909,
+    "line" : 919,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 944,
+    "endline" : 957,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L944_C7",
+    "name" : "__unittest_L957_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "Endata\n",
-    "line" : 944,
+    "line" : 957,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 964,
+    "endline" : 980,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L964_C7",
+    "name" : "__unittest_L980_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "Proxy\n",
-    "line" : 964,
+    "line" : 980,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1043,
+    "endline" : 1062,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1043_C7",
+    "name" : "__unittest_L1062_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : " バイナリの解析\n\n - [0-2] タグタイプ\n   - if [0-2]が 0x0001\n     - [2-4] 長さ\n     - [4-X] ペイロード\n   - if [0-2]が 0x0002\n     - [2] コマンド種別\n       - if [2] が 0x01\n         - [3-5] 付与データ\n       - if [2] が 0x02\n         - (なし)\n       - if [2] が 0x03\n         - [3.0]     フラグ1\n         - [3.1-3.3] フラグ2\n         - [3.3-3.6] reserved\n         - [3.7]     フラグ8\n",
-    "line" : 1043,
+    "line" : 1062,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1100,
+    "endline" : 1119,
     "endchar" : 1
    }
   ]
@@ -9508,7 +9508,7 @@
             "storageClass" : [
              "enum"
             ],
-            "init" : "\"\\x0a\\x09\\x09\\x09\\x09auto fp = cast(F) &this;\\x0a\\x09\\x09\\x09\\x09return fp(args, null);\\x0a\\x09\\x09\\x09\""
+            "init" : "\"\\n\\t\\t\\t\\tauto fp = cast(F) &this;\\n\\t\\t\\t\\treturn fp(args, null);\\n\\t\\t\\t\""
            }
           ]
          }
@@ -11100,7 +11100,7 @@
               "storageClass" : [
                "enum"
               ],
-              "init" : "\"\\x0a\\x09\\x09\\x09\\x09\\x09static if (is(_exFuncInfo.RT: bool))\\x0a\\x09\\x09\\x09\\x09\\x09\\x09return _exFuncInfo.RT.init;\\x0a\\x09\\x09\\x09\\x09\""
+              "init" : "\"\\n\\t\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t\\t\\treturn _exFuncInfo.RT.init;\\n\\t\\t\\t\\t\""
              }
             ]
            }
@@ -11142,7 +11142,7 @@
             "storageClass" : [
              "enum"
             ],
-            "init" : "\"\\x0a\\x09\\x09\\x09\\x09alias FnTy = SetFunctionAttributes!(typeof((*cast(Unique!ProcList*)&_procs)[].front),\\x0a\\x09\\x09\\x09\\x09                                    _exFuncInfo.linkage, _exFuncInfo.attrib);\\x0a\\x09\\x09\\x09\\x09static if (is(_exFuncInfo.RT: bool))\\x0a\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09if ((*cast(Unique!ProcList*)&_procs).isEmpty())\\x0a\\x09\\x09\\x09\\x09\\x09\\x09return _exFuncInfo.RT.init;\\x0a\\x09\\x09\\x09\\x09\\x09_exFuncInfo.RT ret;\\x0a\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09else\\x0a\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09if ((*cast(Unique!ProcList*)&_procs).isEmpty())\\x0a\\x09\\x09\\x09\\x09\\x09\\x09return;\\x0a\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09static if (_exFuncInfo.attrib & FunctionAttribute.nothrow_)\\x0a\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09try\\x0a\\x09\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09\\x09foreach (FnTy proc; (*cast(Unique!ProcList*)&_procs).capture)\\x0a\\x09\\x09\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09static if (is(_exFuncInfo.RT: bool))\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09\\x09ret = proc(args);\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09\\x09if (!ret)\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09\\x09\\x09return ret;\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09else\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09\\x09proc(args);\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09\\x09catch (Throwable)\\x0a\\x09\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09else\\x0a\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09foreach (proc; (*cast(Unique!ProcList*)&_procs).capture)\\x0a\\x09\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09\\x09static if (is(_exFuncInfo.RT: bool))\\x0a\\x09\\x09\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09ret = proc(args);\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09if (!ret)\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09\\x09return ret;\\x0a\\x09\\x09\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09\\x09\\x09else\\x0a\\x09\\x09\\x09\\x09\\x09\\x09{\\x0a\\x09\\x09\\x09\\x09\\x09\\x09\\x09proc(args);\\x0a\\x09\\x09\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09}\\x0a\\x09\\x09\\x09\\x09static if (is(_exFuncInfo.RT: bool))\\x0a\\x09\\x09\\x09\\x09\\x09return ret;\\x0a\\x09\\x09\\x09\""
+            "init" : "\"\\n\\t\\t\\t\\talias FnTy = SetFunctionAttributes!(typeof((*cast(Unique!ProcList*)&_procs)[].front),\\n\\t\\t\\t\\t                                    _exFuncInfo.linkage, _exFuncInfo.attrib);\\n\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\tif ((*cast(Unique!ProcList*)&_procs).isEmpty())\\n\\t\\t\\t\\t\\t\\treturn _exFuncInfo.RT.init;\\n\\t\\t\\t\\t\\t_exFuncInfo.RT ret;\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\tif ((*cast(Unique!ProcList*)&_procs).isEmpty())\\n\\t\\t\\t\\t\\t\\treturn;\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tstatic if (_exFuncInfo.attrib & FunctionAttribute.nothrow_)\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\ttry\\n\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\tforeach (FnTy proc; (*cast(Unique!ProcList*)&_procs).capture)\\n\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\t\\tret = proc(args);\\n\\t\\t\\t\\t\\t\\t\\t\\tif (!ret)\\n\\t\\t\\t\\t\\t\\t\\t\\t\\treturn ret;\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\t\\tproc(args);\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\tcatch (Throwable)\\n\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\tforeach (proc; (*cast(Unique!ProcList*)&_procs).capture)\\n\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\tret = proc(args);\\n\\t\\t\\t\\t\\t\\t\\tif (!ret)\\n\\t\\t\\t\\t\\t\\t\\t\\treturn ret;\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\tproc(args);\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t\\treturn ret;\\n\\t\\t\\t\""
            }
           ]
          }
@@ -15298,7 +15298,7 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "xFNaNbNfZAxS5voile3log7LogData",
+      "deco" : "xFNaNbNiNfZAxS5voile3log7LogData",
       "originalType" : "const pure nothrow @safe ()",
       "endline" : 235,
       "endchar" : 2
@@ -15313,7 +15313,7 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "xFNaNbNfmmZAxS5voile3log7LogData",
+      "deco" : "xFNaNbNiNfmmZAxS5voile3log7LogData",
       "originalType" : "const pure nothrow @safe (size_t begin, size_t end)",
       "parameters" : [
        {
@@ -15498,7 +15498,7 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "xFNaNbNfZAxS5voile3log7LogData",
+      "deco" : "xFNaNbNiNfZAxS5voile3log7LogData",
       "originalType" : "const pure nothrow @safe ()",
       "endline" : 323,
       "endchar" : 2
@@ -15513,7 +15513,7 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "xFNaNbNfmmZAxS5voile3log7LogData",
+      "deco" : "xFNaNbNiNfmmZAxS5voile3log7LogData",
       "originalType" : "const pure nothrow @safe (size_t begin, size_t end)",
       "parameters" : [
        {
@@ -18676,7 +18676,7 @@
       "kind" : "function",
       "line" : 833,
       "char" : 3,
-      "type" : "S(S s, S indentStr = \"\\x09\")",
+      "type" : "S(S s, S indentStr = \"\\t\")",
       "parameters" : [
        {
         "name" : "s",
@@ -18685,7 +18685,7 @@
        {
         "name" : "indentStr",
         "type" : "S",
-        "default" : "\"\\x09\""
+        "default" : "\"\\t\""
        }
       ],
       "endline" : 842,
@@ -23831,14 +23831,15 @@
         "storageClass" : [
          "auto"
         ],
-        "type" : "ref (inout ref MU dat)",
+        "type" : "ref (return ref inout MU dat)",
         "parameters" : [
          {
           "name" : "dat",
           "type" : "MU",
           "storageClass" : [
            "inout",
-           "ref"
+           "ref",
+           "return"
           ]
          }
         ],
