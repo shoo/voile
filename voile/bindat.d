@@ -840,81 +840,94 @@ if (isInputBinary!InputRange)
 /// 基本型と列挙値
 @safe unittest
 {
-	ubyte[] bin(ubyte[] dat...) { return dat; }
+	//ubyte[] bin(ubyte[] dat...) { return dat; }
+	template bin(args...) {
+		ubyte[args.length] inst = [args[]];
+		ubyte[] bin() { return inst[]; }
+	}
 	ubyte a;
-	a.deserializeFromBinDat!littleEndian(bin(10));
+	a.deserializeFromBinDat!littleEndian(bin!(10));
 	assert(a == 10);
 	
 	uint b;
-	b.deserializeFromBinDat!bigEndian(bin(0, 0, 0, 10));
+	b.deserializeFromBinDat!bigEndian(bin!(0, 0, 0, 10));
 	assert(b == 10);
 	
 	version (LittleEndian)
-		b.deserializeFromBinDat(bin(10, 0, 0, 0));
+		b.deserializeFromBinDat(bin!(10, 0, 0, 0));
 	version (BigEndian)
-		b.deserializeFromBinDat(bin(0, 0, 0, 10));
+		b.deserializeFromBinDat(bin!(0, 0, 0, 10));
 	assert(b == 10);
 	
 	enum E { a, b }
 	E e;
-	e.deserializeFromBinDat!littleEndian(bin(0, 0, 0, 0));
+	e.deserializeFromBinDat!littleEndian(bin!(0, 0, 0, 0));
 	assert(e == E.a);
-	e.deserializeFromBinDat!littleEndian(bin(1, 0, 0, 0));
+	e.deserializeFromBinDat!littleEndian(bin!(1, 0, 0, 0));
 	assert(e == E.b);
-	e.deserializeFromBinDat!bigEndian(bin(0, 0, 0, 1));
+	e.deserializeFromBinDat!bigEndian(bin!(0, 0, 0, 1));
 	assert(e == E.b);
 }
 
 /// 配列
 @safe unittest
 {
-	ubyte[] bin(ubyte[] dat...) { return dat; }
+	template bin(args...) {
+		ubyte[args.length] inst = [args[]];
+		ubyte[] bin() { return inst[]; }
+	}
 	ubyte[] a = new ubyte[2];
-	a.deserializeFromBinDat!littleEndian(bin(10, 20));
+	a.deserializeFromBinDat!littleEndian(bin!(10, 20));
 	assert(a == [10, 20]);
 	uint[] b = new uint[2];
-	b.deserializeFromBinDat!bigEndian(bin(0, 0, 0, 10, 0, 0, 0, 20));
+	b.deserializeFromBinDat!bigEndian(bin!(0, 0, 0, 10, 0, 0, 0, 20));
 	assert(b == [10, 20]);
 	
 	version (LittleEndian)
-		b.deserializeFromBinDat(bin(10, 0, 0, 0, 20, 0, 0, 0));
+		b.deserializeFromBinDat(bin!(10, 0, 0, 0, 20, 0, 0, 0));
 	version (BigEndian)
-		b.deserializeFromBinDat(bin(0, 0, 0, 10, 0, 0, 0, 20));
+		b.deserializeFromBinDat(bin!(0, 0, 0, 10, 0, 0, 0, 20));
 	assert(b == [10, 20]);
 	
 	uint[2] c;
-	c.deserializeFromBinDat!littleEndian(bin(1, 0, 0, 0, 2, 0, 0, 0));
+	c.deserializeFromBinDat!littleEndian(bin!(1, 0, 0, 0, 2, 0, 0, 0));
 	assert(c == [1, 2]);
 	
 	ubyte[8] d;
-	d.deserializeFromBinDat(bin(1, 0, 0, 0, 2, 0, 0, 0));
+	d.deserializeFromBinDat(bin!(1, 0, 0, 0, 2, 0, 0, 0));
 	assert(d == [1, 0, 0, 0, 2, 0, 0, 0]);
 }
 
 /// エンディアン変換
 @safe unittest
 {
-	ubyte[] bin(ubyte[] dat...) { return dat; }
+	template bin(args...) {
+		ubyte[args.length] inst = [args[]];
+		ubyte[] bin() { return inst[]; }
+	}
 	struct A
 	{
 		@bigEndian ushort a;
 		@littleEndian ushort b;
 	}
 	A a;
-	a.deserializeFromBinDat(bin(0, 10, 20, 0));
+	a.deserializeFromBinDat(bin!(0, 10, 20, 0));
 	assert(a == A(10, 20));
 }
 
 /// 構造体
 @safe unittest
 {
-	ubyte[] bin(ubyte[] dat...) { return dat; }
+	template bin(args...) {
+		ubyte[args.length] inst = [args[]];
+		ubyte[] bin() { return inst[]; }
+	}
 	struct A
 	{
 		@preLength!ushort @bigEndian ubyte[] data;
 	}
 	A a;
-	a.deserializeFromBinDat(bin(0, 2, 10, 20));
+	a.deserializeFromBinDat(bin!(0, 2, 10, 20));
 	assert (a == A([10, 20]));
 	
 	struct B
@@ -923,7 +936,7 @@ if (isInputBinary!InputRange)
 		@arrayLength!"length" @littleEndian ushort[] data;
 	}
 	B b;
-	b.deserializeFromBinDat(bin(0, 0, 0, 2, 10, 0, 20, 0));
+	b.deserializeFromBinDat(bin!(0, 0, 0, 2, 10, 0, 20, 0));
 	assert(b == B(2, [10, 20]));
 	
 	struct C
@@ -933,7 +946,7 @@ if (isInputBinary!InputRange)
 		B b;
 	}
 	C c;
-	c.deserializeFromBinDat(bin(
+	c.deserializeFromBinDat(bin!(
 		0, 2, 10, 20,
 		0,1, 0,2, 0,3, 0,4,
 		0, 0, 0, 2, 10, 0, 20, 0));
@@ -943,19 +956,22 @@ if (isInputBinary!InputRange)
 /// Endata
 @safe unittest
 {
-	ubyte[] bin(ubyte[] dat...) { return dat; }
+	template bin(args...) {
+		ubyte[args.length] inst = [args[]];
+		ubyte[] bin() { return inst[]; }
+	}
 	@littleEndian enum A: short
 	{
 		@bigEndian    @data!int a,
 		@littleEndian @data!short b
 	}
 	Endata!A a;
-	a.deserializeFromBinDat(bin(0x00, 0x00, 0x00, 0x00, 0x00, 0x0a));
+	a.deserializeFromBinDat(bin!(0x00, 0x00, 0x00, 0x00, 0x00, 0x0a));
 	Endata!A tmp;
 	tmp.a = 10;
 	assert(a == tmp);
 	
-	a.deserializeFromBinDat(bin(0x01, 0x00, 0x0b, 0x00));
+	a.deserializeFromBinDat(bin!(0x01, 0x00, 0x0b, 0x00));
 	tmp.b = 11;
 	assert(a == tmp);
 }
@@ -963,7 +979,10 @@ if (isInputBinary!InputRange)
 /// Proxy
 @safe unittest
 {
-	ubyte[] bin(ubyte[] dat...) { return dat; }
+	template bin(args...) {
+		ubyte[args.length] inst = [args[]];
+		ubyte[] bin() { return inst[]; }
+	}
 	struct A
 	{
 		int a;
@@ -980,7 +999,7 @@ if (isInputBinary!InputRange)
 		}
 	}
 	A a;
-	a.deserializeFromBinDat(bin(90));
+	a.deserializeFromBinDat(bin!(90));
 	assert(a == A(-10));
 	
 	import std.datetime;
@@ -1017,7 +1036,7 @@ if (isInputBinary!InputRange)
 		@convBy!Proxy DateTime dt;
 	}
 	B b;
-	b.deserializeFromBinDat(bin([0x07, 0xE4, 12, 25, 0, 0, 0]));
+	b.deserializeFromBinDat(bin!(0x07, 0xE4, 12, 25, 0, 0, 0));
 	assert(b == B(DateTime(2020, 12, 25)));
 }
 

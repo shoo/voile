@@ -2028,7 +2028,7 @@ template match(Funcs...)
 		alias minfo = matchInfo!(MU, Funcs);
 		
 		// 関数本体
-		pragma(inline) auto ref matchImpl(inout ref MU dat)
+		pragma(inline) auto ref matchImpl(inout return ref MU dat)
 		{
 			static if (minfo.hasDefault)
 			{
