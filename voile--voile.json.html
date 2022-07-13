@@ -622,6 +622,130 @@ datMap2.<span class="d_psymbol">deserializeFromJsonFile</span>(<span class="d_st
 <br></div></dt>
 <dd>
 </dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue"></span><div class="quickindex" id="quickindex.JWTValue"></div>struct <code class="ddoc_psymbol">JWTValue</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">JWT</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">import</span> std.exception;
+<span class="d_keyword">static</span> <span class="d_keyword">immutable</span> testjwt = <span class="d_string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"</span>
+	~<span class="d_string">".eyJ0ZXN0a2V5IjoidGVzdHZhbHVlIn0"</span>
+	~<span class="d_string">".AXHSKa2ubvg6jMckkYaWgCXluhOamfFDk8y163X4DPs"</span>;
+
+<span class="d_keyword">auto</span> jwt = <span class="d_psymbol">JWTValue</span>(<span class="d_psymbol">JWTValue</span>.Algorithm.HS256, <span class="d_string">"testsecret"</span>);
+jwt[<span class="d_string">"testkey"</span>] = <span class="d_string">"testvalue"</span>;
+<span class="d_keyword">assert</span>(jwt.toString() == testjwt);
+
+<span class="d_keyword">auto</span> jwt2 = <span class="d_psymbol">JWTValue</span>(testjwt, <span class="d_string">"testsecret"</span>);
+<span class="d_keyword">assert</span>(jwt2[<span class="d_string">"testkey"</span>].str == <span class="d_string">"testvalue"</span>);
+<span class="d_keyword">assert</span>(jwt2.toString() == jwt.toString());
+
+assertThrown(<span class="d_psymbol">JWTValue</span>(testjwt, <span class="d_string">"testsecret2"</span>));
+</pre>
+</div>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.Algorithm"></span><div class="quickindex" id="quickindex.JWTValue.Algorithm"></div>enum <code class="ddoc_psymbol">Algorithm</code>: <span class="ddoc_enum_basetype">int</span>;
+<br>
+<span class="def-anchor" id=".JWTValue.algorithm"></span><div class="quickindex" id="quickindex.JWTValue.algorithm"></div>Algorithm <code class="ddoc_psymbol">algorithm</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.this"></span><div class="quickindex" id="quickindex.JWTValue.this"></div>this(const(char)[] <span class="ddoc_param">jwt</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
+<br>
+this(const(char)[] <span class="ddoc_param">jwt</span>, const(char)[] <span class="ddoc_param">key</span>);
+<br>
+this(Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
+<br>
+this(Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>, JSONValue <span class="ddoc_param">payload</span>);
+<br>
+this(Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>, JSONValue[string] <span class="ddoc_param">payload</span>);
+<br>
+this(Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>);
+<br>
+this(Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>, JSONValue <span class="ddoc_param">payload</span>);
+<br>
+this(Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>, JSONValue[string] <span class="ddoc_param">payload</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.key"></span><div class="quickindex" id="quickindex.JWTValue.key"></div>void <code class="ddoc_psymbol">key</code>(string <code class="ddoc_psymbol">key</code>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.key.2"></span><div class="quickindex" id="quickindex.JWTValue.key.2"></div>void <code class="ddoc_psymbol">key</code>(const(ubyte)[] <code class="ddoc_psymbol">key</code>);
+<br></div></dt>
+<dd><div class="ddoc_summary">dittp</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.opIndex"></span><div class="quickindex" id="quickindex.JWTValue.opIndex"></div>inout ref inout(JSONValue) <code class="ddoc_psymbol">opIndex</code>(string <span class="ddoc_param">name</span>) return;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.opIndexAssign"></span><div class="quickindex" id="quickindex.JWTValue.opIndexAssign"></div>void <code class="ddoc_psymbol">opIndexAssign</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref T <span class="ddoc_param">value</span>, string <span class="ddoc_param">name</span>) return;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.payload"></span><div class="quickindex" id="quickindex.JWTValue.payload"></div>inout ref inout(JSONValue) <code class="ddoc_psymbol">payload</code>() return;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.toString"></span><div class="quickindex" id="quickindex.JWTValue.toString"></div>const string <code class="ddoc_psymbol">toString</code>();
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".setValue.2"></span><div class="quickindex" id="quickindex.setValue.2"></div>void <code class="ddoc_psymbol">setValue</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref JWTValue <span class="ddoc_param">dat</span>, string <span class="ddoc_param">name</span>, T <span class="ddoc_param">val</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getValue.2"></span><div class="quickindex" id="quickindex.getValue.2"></div>T <code class="ddoc_psymbol">getValue</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in ref JWTValue <span class="ddoc_param">dat</span>, string <span class="ddoc_param">name</span>, lazy T <span class="ddoc_param">defaultVal</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".serializeToJwt"></span><div class="quickindex" id="quickindex.serializeToJwt"></div>JWTValue <code class="ddoc_psymbol">serializeToJwt</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, JWTValue.Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
+<br>
+JWTValue <code class="ddoc_psymbol">serializeToJwt</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, JWTValue.Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>);
+<br>
+JWTValue <code class="ddoc_psymbol">serializeToJwt</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
+<br>
+JWTValue <code class="ddoc_psymbol">serializeToJwt</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, const(char)[] <span class="ddoc_param">key</span>);
+<br>
+<span class="def-anchor" id=".serializeToJwtString"></span><div class="quickindex" id="quickindex.serializeToJwtString"></div>string <code class="ddoc_psymbol">serializeToJwtString</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, JWTValue.Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
+<br>
+string <code class="ddoc_psymbol">serializeToJwtString</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, JWTValue.Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>);
+<br>
+string <code class="ddoc_psymbol">serializeToJwtString</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
+<br>
+string <code class="ddoc_psymbol">serializeToJwtString</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, const(char)[] <span class="ddoc_param">key</span>);
+<br>
+<span class="def-anchor" id=".deserializeFromJwt"></span><div class="quickindex" id="quickindex.deserializeFromJwt"></div>void <code class="ddoc_psymbol">deserializeFromJwt</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">data</span>, JWTValue <span class="ddoc_param">jwt</span>);
+<br>
+<span class="def-anchor" id=".deserializeFromJwtString"></span><div class="quickindex" id="quickindex.deserializeFromJwtString"></div>void <code class="ddoc_psymbol">deserializeFromJwtString</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">data</span>, const(char)[] <span class="ddoc_param">jwt</span>, const(char)[] <span class="ddoc_param">key</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">シリアライズ/デシリアライズ</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">import</span> std.exception;
+<span class="d_keyword">static</span> <span class="d_keyword">immutable</span> testjwt = <span class="d_string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"</span>
+	~<span class="d_string">".eyJ0ZXN0a2V5IjoidGVzdHZhbHVlIn0"</span>
+	~<span class="d_string">".AXHSKa2ubvg6jMckkYaWgCXluhOamfFDk8y163X4DPs"</span>;
+
+<span class="d_keyword">struct</span> Dat { string testkey; }
+<span class="d_keyword">auto</span> dat = Dat(<span class="d_string">"testvalue"</span>);
+
+<span class="d_keyword">auto</span> jwt1 = <span class="d_psymbol">serializeToJwt</span>(dat, JWTValue.Algorithm.HS256, <span class="d_string">"testsecret"</span>);
+<span class="d_keyword">assert</span>(jwt1.toString() == testjwt);
+<span class="d_keyword">auto</span> jwt2 = <span class="d_psymbol">serializeToJwt</span>(dat, <span class="d_string">"testsecret"</span>);
+<span class="d_keyword">assert</span>(jwt2.toString() == testjwt);
+<span class="d_keyword">assert</span>(<span class="d_psymbol">serializeToJwtString</span>(dat, JWTValue.Algorithm.HS256, <span class="d_string">"testsecret"</span>) == testjwt);
+<span class="d_keyword">assert</span>(<span class="d_psymbol">serializeToJwtString</span>(dat, <span class="d_string">"testsecret"</span>) == testjwt);
+
+Dat dat2;
+dat2.<span class="d_psymbol">deserializeFromJwt</span>(jwt1);
+<span class="d_keyword">assert</span>(dat2 == dat);
+
+Dat dat3;
+dat3.<span class="d_psymbol">deserializeFromJwtString</span>(testjwt, <span class="d_string">"testsecret"</span>);
+<span class="d_keyword">assert</span>(dat3 == dat);
+</pre>
+</div>
+</dd>
 </div></dl>
 
                 

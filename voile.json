@@ -14252,7 +14252,933 @@
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1776,
+    "endline" : 1780,
+    "endchar" : 1
+   },
+   {
+    "name" : "JWTValue",
+    "kind" : "struct",
+    "protection" : "public",
+    "comment" : " JWT\n",
+    "line" : 1780,
+    "char" : 1,
+    "members" : [
+     {
+      "name" : "std.digest.hmac",
+      "kind" : "import",
+      "line" : 1783,
+      "char" : 9,
+      "protection" : "private"
+     },
+     {
+      "name" : "std.digest.sha",
+      "kind" : "import",
+      "line" : 1784,
+      "char" : 9,
+      "protection" : "private"
+     },
+     {
+      "name" : "std.exception",
+      "kind" : "import",
+      "line" : 1785,
+      "char" : 9,
+      "protection" : "private",
+      "selective" : [
+       "enforce"
+      ]
+     },
+     {
+      "name" : "std.string",
+      "kind" : "import",
+      "line" : 1786,
+      "char" : 9,
+      "protection" : "private",
+      "selective" : [
+       "representation"
+      ]
+     },
+     {
+      "name" : "_key",
+      "kind" : "variable",
+      "protection" : "private",
+      "line" : 1787,
+      "char" : 21,
+      "deco" : "Ayh",
+      "offset" : 0
+     },
+     {
+      "name" : "_payload",
+      "kind" : "variable",
+      "protection" : "private",
+      "line" : 1788,
+      "char" : 12,
+      "deco" : "S3std4json9JSONValue",
+      "offset" : 16
+     },
+     {
+      "name" : "Algorithm",
+      "kind" : "enum",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1793,
+      "char" : 2,
+      "baseDeco" : "i",
+      "members" : [
+       {
+        "name" : "HS256",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "0",
+        "line" : 1795,
+        "char" : 3
+       },
+       {
+        "name" : "HS384",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "1",
+        "line" : 1795,
+        "char" : 10
+       },
+       {
+        "name" : "HS512",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "2",
+        "line" : 1795,
+        "char" : 17
+       }
+      ]
+     },
+     {
+      "name" : "algorithm",
+      "kind" : "variable",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 1798,
+      "char" : 12,
+      "deco" : "E5voile4json8JWTValue9Algorithm",
+      "init" : "Algorithm.HS256",
+      "offset" : 40
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1804,
+      "char" : 2,
+      "deco" : "FNcAxaAxhZS5voile4json8JWTValue",
+      "originalType" : "ref (const(char)[] jwt, const(ubyte)[] key)",
+      "parameters" : [
+       {
+        "name" : "jwt",
+        "deco" : "Axa"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axh"
+       }
+      ],
+      "endline" : 1843,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 1846,
+      "char" : 2,
+      "deco" : "FNcAxaQdZS5voile4json8JWTValue",
+      "originalType" : "ref (const(char)[] jwt, const(char)[] key)",
+      "parameters" : [
+       {
+        "name" : "jwt",
+        "deco" : "Axa"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axa"
+       }
+      ],
+      "endline" : 1849,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 1852,
+      "char" : 2,
+      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxhZSQBjQBgQBe",
+      "originalType" : "ref (Algorithm algo, const(ubyte)[] key)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axh"
+       }
+      ],
+      "endline" : 1856,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 1859,
+      "char" : 2,
+      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxhS3stdQBg9JSONValueZSQCbQByQBw",
+      "originalType" : "ref (Algorithm algo, const(ubyte)[] key, JSONValue payload)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axh"
+       },
+       {
+        "name" : "payload",
+        "deco" : "S3std4json9JSONValue"
+       }
+      ],
+      "endline" : 1864,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 1867,
+      "char" : 2,
+      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxhHAyaS3stdQBk9JSONValueZSQCfQCcQCa",
+      "originalType" : "ref (Algorithm algo, const(ubyte)[] key, JSONValue[string] payload)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axh"
+       },
+       {
+        "name" : "payload",
+        "deco" : "HAyaS3std4json9JSONValue"
+       }
+      ],
+      "endline" : 1872,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 1875,
+      "char" : 2,
+      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxaZSQBjQBgQBe",
+      "originalType" : "ref (Algorithm algo, const(char)[] key)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axa"
+       }
+      ],
+      "endline" : 1879,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 1882,
+      "char" : 2,
+      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxaS3stdQBg9JSONValueZSQCbQByQBw",
+      "originalType" : "ref (Algorithm algo, const(char)[] key, JSONValue payload)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axa"
+       },
+       {
+        "name" : "payload",
+        "deco" : "S3std4json9JSONValue"
+       }
+      ],
+      "endline" : 1887,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 1890,
+      "char" : 2,
+      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxaHAyaS3stdQBk9JSONValueZSQCfQCcQCa",
+      "originalType" : "ref (Algorithm algo, const(char)[] key, JSONValue[string] payload)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axa"
+       },
+       {
+        "name" : "payload",
+        "deco" : "HAyaS3std4json9JSONValue"
+       }
+      ],
+      "endline" : 1895,
+      "endchar" : 2
+     },
+     {
+      "name" : "key",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1901,
+      "char" : 7,
+      "deco" : "FAyaZv",
+      "parameters" : [
+       {
+        "name" : "key",
+        "deco" : "Aya"
+       }
+      ],
+      "endline" : 1904,
+      "endchar" : 2
+     },
+     {
+      "name" : "key",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "dittp\n",
+      "line" : 1906,
+      "char" : 7,
+      "deco" : "FAxhZv",
+      "parameters" : [
+       {
+        "name" : "key",
+        "deco" : "Axh"
+       }
+      ],
+      "endline" : 1909,
+      "endchar" : 2
+     },
+     {
+      "name" : "opIndex",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1914,
+      "char" : 23,
+      "deco" : "NgFNcNjAyaZNgS3std4json9JSONValue",
+      "parameters" : [
+       {
+        "name" : "name",
+        "deco" : "Aya"
+       }
+      ],
+      "endline" : 1917,
+      "endchar" : 2
+     },
+     {
+      "kind" : "template",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1922,
+      "char" : 7,
+      "name" : "opIndexAssign",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "opIndexAssign",
+        "kind" : "function",
+        "line" : 1922,
+        "char" : 7,
+        "type" : "void(auto ref T value, string name) return",
+        "parameters" : [
+         {
+          "name" : "value",
+          "type" : "T",
+          "storageClass" : [
+           "auto",
+           "ref"
+          ]
+         },
+         {
+          "name" : "name",
+          "type" : "string"
+         }
+        ],
+        "endline" : 1925,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
+      "name" : "payload",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1930,
+      "char" : 23,
+      "deco" : "NgFNcNjZNgS3std4json9JSONValue",
+      "endline" : 1933,
+      "endchar" : 2
+     },
+     {
+      "name" : "toString",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1938,
+      "char" : 9,
+      "deco" : "xFZAya",
+      "endline" : 1958,
+      "endchar" : 2
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1962_C9",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 1962,
+    "char" : 9,
+    "storageClass" : [
+     "@system"
+    ],
+    "endline" : 1983,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "\n",
+    "line" : 1983,
+    "char" : 6,
+    "name" : "setValue",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "setValue",
+      "kind" : "function",
+      "line" : 1983,
+      "char" : 6,
+      "type" : "void(ref JWTValue dat, string name, T val)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "JWTValue",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "name",
+        "type" : "string"
+       },
+       {
+        "name" : "val",
+        "type" : "T"
+       }
+      ],
+      "endline" : 1986,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "\n",
+    "line" : 1991,
+    "char" : 3,
+    "name" : "getValue",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "getValue",
+      "kind" : "function",
+      "line" : 1991,
+      "char" : 3,
+      "type" : "T(in ref JWTValue dat, string name, lazy T defaultVal)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "JWTValue",
+        "storageClass" : [
+         "in",
+         "ref"
+        ]
+       },
+       {
+        "name" : "name",
+        "type" : "string"
+       },
+       {
+        "name" : "defaultVal",
+        "type" : "T",
+        "storageClass" : [
+         "lazy"
+        ]
+       }
+      ],
+      "endline" : 1994,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : " シリアライズ/デシリアライズ\n",
+    "line" : 2000,
+    "char" : 10,
+    "name" : "serializeToJwt",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "serializeToJwt",
+      "kind" : "function",
+      "line" : 2000,
+      "char" : 10,
+      "type" : "JWTValue(in T data, JWTValue.Algorithm algo, const(ubyte)[] key)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       },
+       {
+        "name" : "algo",
+        "type" : "JWTValue.Algorithm"
+       },
+       {
+        "name" : "key",
+        "type" : "const(ubyte)[]"
+       }
+      ],
+      "endline" : 2005,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2008,
+    "char" : 10,
+    "name" : "serializeToJwt",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "serializeToJwt",
+      "kind" : "function",
+      "line" : 2008,
+      "char" : 10,
+      "type" : "JWTValue(in T data, JWTValue.Algorithm algo, const(char)[] key)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       },
+       {
+        "name" : "algo",
+        "type" : "JWTValue.Algorithm"
+       },
+       {
+        "name" : "key",
+        "type" : "const(char)[]"
+       }
+      ],
+      "endline" : 2012,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2015,
+    "char" : 10,
+    "name" : "serializeToJwt",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "serializeToJwt",
+      "kind" : "function",
+      "line" : 2015,
+      "char" : 10,
+      "type" : "JWTValue(in T data, const(ubyte)[] key)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       },
+       {
+        "name" : "key",
+        "type" : "const(ubyte)[]"
+       }
+      ],
+      "endline" : 2018,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2021,
+    "char" : 10,
+    "name" : "serializeToJwt",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "serializeToJwt",
+      "kind" : "function",
+      "line" : 2021,
+      "char" : 10,
+      "type" : "JWTValue(in T data, const(char)[] key)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       },
+       {
+        "name" : "key",
+        "type" : "const(char)[]"
+       }
+      ],
+      "endline" : 2025,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2028,
+    "char" : 8,
+    "name" : "serializeToJwtString",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "serializeToJwtString",
+      "kind" : "function",
+      "line" : 2028,
+      "char" : 8,
+      "type" : "string(in T data, JWTValue.Algorithm algo, const(ubyte)[] key)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       },
+       {
+        "name" : "algo",
+        "type" : "JWTValue.Algorithm"
+       },
+       {
+        "name" : "key",
+        "type" : "const(ubyte)[]"
+       }
+      ],
+      "endline" : 2031,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2034,
+    "char" : 8,
+    "name" : "serializeToJwtString",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "serializeToJwtString",
+      "kind" : "function",
+      "line" : 2034,
+      "char" : 8,
+      "type" : "string(in T data, JWTValue.Algorithm algo, const(char)[] key)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       },
+       {
+        "name" : "algo",
+        "type" : "JWTValue.Algorithm"
+       },
+       {
+        "name" : "key",
+        "type" : "const(char)[]"
+       }
+      ],
+      "endline" : 2038,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2041,
+    "char" : 8,
+    "name" : "serializeToJwtString",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "serializeToJwtString",
+      "kind" : "function",
+      "line" : 2041,
+      "char" : 8,
+      "type" : "string(in T data, const(ubyte)[] key)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       },
+       {
+        "name" : "key",
+        "type" : "const(ubyte)[]"
+       }
+      ],
+      "endline" : 2044,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2047,
+    "char" : 8,
+    "name" : "serializeToJwtString",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "serializeToJwtString",
+      "kind" : "function",
+      "line" : 2047,
+      "char" : 8,
+      "type" : "string(in T data, const(char)[] key)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "in"
+        ]
+       },
+       {
+        "name" : "key",
+        "type" : "const(char)[]"
+       }
+      ],
+      "endline" : 2051,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2054,
+    "char" : 6,
+    "name" : "deserializeFromJwt",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "deserializeFromJwt",
+      "kind" : "function",
+      "line" : 2054,
+      "char" : 6,
+      "type" : "void(ref T data, JWTValue jwt)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "jwt",
+        "type" : "JWTValue"
+       }
+      ],
+      "endline" : 2057,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2060,
+    "char" : 6,
+    "name" : "deserializeFromJwtString",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "deserializeFromJwtString",
+      "kind" : "function",
+      "line" : 2060,
+      "char" : 6,
+      "type" : "void(ref T data, const(char)[] jwt, const(char)[] key)",
+      "parameters" : [
+       {
+        "name" : "data",
+        "type" : "T",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "jwt",
+        "type" : "const(char)[]"
+       },
+       {
+        "name" : "key",
+        "type" : "const(char)[]"
+       }
+      ],
+      "endline" : 2063,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L2067_C9",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2067,
+    "char" : 9,
+    "storageClass" : [
+     "@system"
+    ],
+    "endline" : 2092,
     "endchar" : 1
    }
   ]
