@@ -1864,6 +1864,14 @@ public:
 	}
 	
 	/// ditto
+	this(Algorithm algo, const(ubyte)[] key, JSONValue[string] payload)
+	{
+		algorithm = algo;
+		_key = key.idup;
+		_payload = JSONValue(payload);
+	}
+	
+	/// ditto
 	this(Algorithm algo, const(char)[] key)
 	{
 		algorithm = algo;
@@ -1876,6 +1884,14 @@ public:
 		algorithm = algo;
 		_key = key.representation;
 		_payload = payload;
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(char)[] key, JSONValue[string] payload)
+	{
+		algorithm = algo;
+		_key = key.representation;
+		_payload = JSONValue(payload);
 	}
 	
 	
@@ -1895,23 +1911,7 @@ public:
 	/***************************************************************************
 	 * 
 	 */
-	void setValue(T)(string name, T val)
-	{
-		_payload.setValue(name, val);
-	}
-	
-	/***************************************************************************
-	 * 
-	 */
-	inout(T) getValue(T)(string name, lazy T defaultVal) inout
-	{
-		return _payload.getValue(name, defaultVal);
-	}
-	
-	/***************************************************************************
-	 * 
-	 */
-	inout(JSONValue) opIndex(string name) inout
+	ref inout(JSONValue) opIndex(string name) return inout
 	{
 		return _payload[name];
 	}
@@ -1919,7 +1919,15 @@ public:
 	/***************************************************************************
 	 * 
 	 */
-	ref inout(JSONValue) payload() inout
+	void opIndexAssign(T)(auto ref T value, string name) return
+	{
+		_payload[name] = value;
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	ref inout(JSONValue) payload() return inout
 	{
 		return _payload;
 	}
@@ -1930,14 +1938,11 @@ public:
 	string toString() const
 	{
 		string ret;
-		
+		import std.conv: text;
 		import std.base64;
 		alias B64 = Base64Impl!('+', '/', Base64.NoPadding);
 		
-		JSONValue header;
-		header.setValue("alg", algorithm);
-		header.setValue("typ", "JWT");
-		ret ~= B64.encode(header.toString().representation);
+		ret ~= B64.encode(text(`{"alg":"`, algorithm, `","typ":"JWT"}`).representation);
 		ret ~= ".";
 		ret ~= B64.encode(_payload.toString().representation);
 		
@@ -1962,16 +1967,32 @@ public:
 		~".AXHSKa2ubvg6jMckkYaWgCXluhOamfFDk8y163X4DPs";
 	
 	auto jwt = JWTValue(JWTValue.Algorithm.HS256, "testsecret");
-	jwt.setValue("testkey", "testvalue");
-	
+	jwt["testkey"] = "testvalue";
 	assert(jwt.toString() == testjwt);
 	
 	auto jwt2 = JWTValue(testjwt, "testsecret");
-	assert(jwt2.getValue("testkey", string.init) == "testvalue");
+	assert(jwt2["testkey"].str == "testvalue");
 	assert(jwt2.toString() == jwt.toString());
 	
 	assertThrown(JWTValue(testjwt, "testsecret2"));
 }
+
+/*******************************************************************************
+ * 
+ */
+void setValue(T)(ref JWTValue dat, string name, T val)
+{
+	dat._payload.setValue(name, val);
+}
+
+/*******************************************************************************
+ * 
+ */
+T getValue(T)(in ref JWTValue dat, string name, lazy T defaultVal)
+{
+	return dat._payload.getValue(name, defaultVal);
+}
+
 
 /*******************************************************************************
  * シリアライズ/デシリアライズ
