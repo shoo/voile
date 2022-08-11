@@ -30,19 +30,19 @@
 
 	<li><a title="Binary data serializer/deserializer" href="voile--voile.bindat.html"><span >bindat</span></a></li>
 
-	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+	<li><a title="データ形式向けのバイナリ操作" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
 
-	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+	<li><a title="ファイルシステムヘルパー" href="voile--voile.fs.html"><span >fs</span></a></li>
 
 	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
 
-	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+	<li><a title="JSONValueのヘルパー、シリアライズ・デシリアライズ" href="voile--voile.json.html"><span >json</span></a></li>
 
 	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
 
 	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
 
-	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+	<li><a title="便利関数" href="voile--voile.misc.html"><span >misc</span></a></li>
 
 	<li><a title="管理された共用体を提供する" href="voile--voile.munion.html"><span >munion</span></a></li>
 
@@ -62,19 +62,7 @@
                 
                 <div class="quickindex" id="quickindex"></div>
                 
-                <div class="ddoc_summary">judgement モジュール
-</div><div class="ddoc_description">複数の要素でチェックを行いたい場合に使用することのできる Judgement が利用可能
-
-</div>
-<div class="ddoc_date"><span class="ddoc_date_header">Date:</span>
- September 07, 2011
-</div>
-<div class="ddoc_authors"><span class="ddoc_authors_header">Authors:</span>
- P.Knowledge, SHOO
-</div>
-<div class="ddoc_license"><span class="ddoc_license_header">License:</span>
- NYSL ( <a href="http://www.kmonos.net/nysl/">http://www.kmonos.net/nysl/</a> )</div>
-<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DataWriter"></span><div class="quickindex" id="quickindex.DataWriter"></div>struct <code class="ddoc_psymbol">DataWriter</code>(Range, Endian rangeEndian = Endian.littleEndian) if (isOutputRange!(Range, const(ubyte)[]) || isOutputRange!(Range, ubyte) || isOutputRange!(Range, const(void)[]));
+                <div class="ddoc_summary">データ形式向けのバイナリ操作</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DataWriter"></span><div class="quickindex" id="quickindex.DataWriter"></div>struct <code class="ddoc_psymbol">DataWriter</code>(Range, Endian rangeEndian = Endian.littleEndian) if (isOutputRange!(Range, const(ubyte)[]) || isOutputRange!(Range, ubyte) || isOutputRange!(Range, const(void)[]));
 <br></div></dt>
 <dd>
 <dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DataWriter.put"></span><div class="quickindex" id="quickindex.DataWriter.put"></div>void <code class="ddoc_psymbol">put</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(Unqual!T == ubyte) || is(Unqual!T == char) || is(Unqual!T == byte))</span>;

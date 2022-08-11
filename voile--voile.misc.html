@@ -30,19 +30,19 @@
 
 	<li><a title="Binary data serializer/deserializer" href="voile--voile.bindat.html"><span >bindat</span></a></li>
 
-	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+	<li><a title="データ形式向けのバイナリ操作" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
 
-	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+	<li><a title="ファイルシステムヘルパー" href="voile--voile.fs.html"><span >fs</span></a></li>
 
 	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
 
-	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+	<li><a title="JSONValueのヘルパー、シリアライズ・デシリアライズ" href="voile--voile.json.html"><span >json</span></a></li>
 
 	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
 
 	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
 
-	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+	<li><a title="便利関数" href="voile--voile.misc.html"><span >misc</span></a></li>
 
 	<li><a title="管理された共用体を提供する" href="voile--voile.munion.html"><span >munion</span></a></li>
 
@@ -62,8 +62,7 @@
                 
                 <div class="quickindex" id="quickindex"></div>
                 
-                
-<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumeAttr"></span><div class="quickindex" id="quickindex.assumeAttr"></div>ref auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, alias attrs, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isFunction!fn)</span>;
+                <div class="ddoc_summary">便利関数</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".assumeAttr"></span><div class="quickindex" id="quickindex.assumeAttr"></div>ref auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, alias attrs, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isFunction!fn)</span>;
 <br>
 ref auto <code class="ddoc_psymbol">assumeAttr</code><span class="ddoc_template_param_list" title="Template parameter list">(alias fn, alias attrs, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(__traits(isTemplate, fn) &amp;&amp; isCallable!(fn!Args))</span>;
 <br>
@@ -179,6 +178,60 @@ T <code class="ddoc_psymbol">expandVariable</code><span class="ddoc_template_par
 </div><div class="ddoc_description"><code class="d_inlinecode donthyphenate notranslate">aaa%VAR%bbb</code>のVAR変数を展開します。変数が存在しない場合は何もしません。
  VARがxxxであれば、<code class="d_inlinecode donthyphenate notranslate">aaaxxxbbb</code>となります。
  VARが存在しなければ、<code class="d_inlinecode donthyphenate notranslate">aaa%VAR%bbb</code>のままです。</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RotationSerial"></span><div class="quickindex" id="quickindex.RotationSerial"></div>struct <code class="ddoc_psymbol">RotationSerial</code>(T, T start = T.min + 1, T end = T.max) if (isIntegral!T &amp;&amp; isUnsigned!T);
+<br></div></dt>
+<dd><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_comment">// シリアル値。範囲は10～249の間で、ローテーションする
+</span><span class="d_keyword">alias</span> SerialNum = <span class="d_psymbol">RotationSerial</span>!(<span class="d_keyword">ubyte</span>, 10, 250);
+
+<span class="d_comment">// シリアル値はインクリメントで値が増加する
+</span><span class="d_keyword">auto</span> ser = SerialNum(10);
+++ser;
+<span class="d_keyword">assert</span>(ser &gt; SerialNum(10));
+<span class="d_keyword">assert</span>(ser == SerialNum(11));
+
+<span class="d_comment">// 値の範囲の終端まで行くとローテーションする
+</span><span class="d_comment">// ローテーションしても、ローテーション前の値よりは大きくなるという判定を行う。
+</span>ser = SerialNum(249);
+++ser;
+<span class="d_keyword">assert</span>(ser &gt; SerialNum(249));
+<span class="d_keyword">assert</span>(ser == SerialNum(10));
+</pre>
+</div>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".RotationSerial.min"></span><div class="quickindex" id="quickindex.RotationSerial.min"></div>enum auto <code class="ddoc_psymbol">min</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RotationSerial.max"></span><div class="quickindex" id="quickindex.RotationSerial.max"></div>enum auto <code class="ddoc_psymbol">max</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RotationSerial.this"></span><div class="quickindex" id="quickindex.RotationSerial.this"></div>this(T <span class="ddoc_param">val</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RotationSerial.isUninitialized"></span><div class="quickindex" id="quickindex.RotationSerial.isUninitialized"></div>const bool <code class="ddoc_psymbol">isUninitialized</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RotationSerial.isValid"></span><div class="quickindex" id="quickindex.RotationSerial.isValid"></div>const bool <code class="ddoc_psymbol">isValid</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RotationSerial.value"></span><div class="quickindex" id="quickindex.RotationSerial.value"></div>const T <code class="ddoc_psymbol">value</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RotationSerial.opUnary"></span><div class="quickindex" id="quickindex.RotationSerial.opUnary"></div>ref RotationSerial <code class="ddoc_psymbol">opUnary</code><span class="ddoc_template_param_list" title="Template parameter list">(string op)</span>()<br><span class="ddoc_constraint">if(op == "++")</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".RotationSerial.opCmp"></span><div class="quickindex" id="quickindex.RotationSerial.opCmp"></div>const int <code class="ddoc_psymbol">opCmp</code>(RotationSerial <span class="ddoc_param">rhs</span>);
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
 </dd>
 </div></dl>
 

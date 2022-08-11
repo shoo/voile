@@ -30,19 +30,19 @@
 
 	<li><a title="Binary data serializer/deserializer" href="voile--voile.bindat.html"><span >bindat</span></a></li>
 
-	<li><a title="judgement モジュール" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+	<li><a title="データ形式向けのバイナリ操作" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
 
-	<li><a title="" href="voile--voile.fs.html"><span >fs</span></a></li>
+	<li><a title="ファイルシステムヘルパー" href="voile--voile.fs.html"><span >fs</span></a></li>
 
 	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
 
-	<li><a title="" href="voile--voile.json.html"><span >json</span></a></li>
+	<li><a title="JSONValueのヘルパー、シリアライズ・デシリアライズ" href="voile--voile.json.html"><span >json</span></a></li>
 
 	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
 
 	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
 
-	<li><a title="" href="voile--voile.misc.html"><span >misc</span></a></li>
+	<li><a title="便利関数" href="voile--voile.misc.html"><span >misc</span></a></li>
 
 	<li><a title="管理された共用体を提供する" href="voile--voile.munion.html"><span >munion</span></a></li>
 
@@ -62,8 +62,7 @@
                 
                 <div class="quickindex" id="quickindex"></div>
                 
-                
-<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".json"></span><div class="quickindex" id="quickindex.json"></div>@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T[] <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isSomeString!(T[]))</span>;
+                <div class="ddoc_summary">JSONValueのヘルパー、シリアライズ・デシリアライズ</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".json"></span><div class="quickindex" id="quickindex.json"></div>@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T[] <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isSomeString!(T[]))</span>;
 <br>
 @property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isIntegral!T &amp;&amp; !is(T == enum) || isFloatingPoint!T || is(Unqual!T == bool))</span>;
 <br>
@@ -272,7 +271,7 @@ bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_
 bool <code class="ddoc_psymbol">fromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(Value, Key)</span>(in ref JSONValue <span class="ddoc_param">src</span>, ref Value[Key] <span class="ddoc_param">dst</span>)<br><span class="ddoc_constraint">if(isSomeString!Key &amp;&amp; is(typeof(()
 {
 JSONValue val;
-<code class="ddoc_psymbol">fromJson</code>(val, <span class="ddoc_param">dst</span>[Key.init]);
+cast(void)<code class="ddoc_psymbol">fromJson</code>(val, <span class="ddoc_param">dst</span>[Key.init]);
 }
 )))</span>;
 <br>
