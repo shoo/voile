@@ -2,7 +2,7 @@
 
 import std.json, std.traits, std.meta, std.conv, std.array;
 import std.typecons: Rebindable;
-import voile.misc;
+import voile.misc: assumePure;
 import voile.munion;
 import voile.attr;
 
@@ -1804,7 +1804,7 @@ public:
 	this(const(char)[] jwt, const(ubyte)[] key)
 	{
 		import std.base64;
-		alias B64 = Base64Impl!('+', '/', Base64.NoPadding);
+		alias B64 = Base64URLNoPadding;
 		auto jwtElms = split(jwt, '.');
 		enforce(jwtElms.length == 3, "Unknown format");
 		auto header = parseJSON(cast(const(char)[])B64.decode(jwtElms[0]));
