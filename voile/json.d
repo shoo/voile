@@ -518,7 +518,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 
 /// ditto
 bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
-	if (isSomeString!Key && is(typeof({ JSONValue val; fromJson(val, dst[Key.init]); })))
+	if (isSomeString!Key && is(typeof({ JSONValue val; cast(void)fromJson(val, dst[Key.init]); })))
 {
 	if (src.type == JSONType.object)
 	{
@@ -840,7 +840,7 @@ AttrConverter!T converter(T)(T function(in JSONValue) from, JSONValue function(i
 private enum isJSONizableRaw(T) = is(typeof({
 	T val;
 	JSONValue jv= val.json;
-	fromJson(jv, val);
+	cast(void)fromJson(jv, val);
 }));
 
 
@@ -1474,7 +1474,7 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 {
 	static if (isJSONizableRaw!T)
 	{
-		fromJson(json, data);
+		cast(void)fromJson(json, data);
 	}
 	else static if (__traits(compiles, _deserializeFromJsonImpl(data, json)))
 	{
@@ -1550,7 +1550,7 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 				{
 					static if (hasEssential!member)
 					{
-						fromJson(json[fieldName], data.tupleof[memberIdx]);
+						cast(void)fromJson(json[fieldName], data.tupleof[memberIdx]);
 					}
 					else
 					{
