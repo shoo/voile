@@ -1424,3 +1424,175 @@ private T expandVariableImpl(T, alias func)(in T str)
 	}}
 }
 
+
+/*******************************************************************************
+ * 
+ */
+struct RotationSerial(T, T start = T.min + 1, T end = T.max)
+if (isIntegral!T && isUnsigned!T)
+{
+@safe pure nothrow @nogc:
+	/***************************************************************************
+	 * 
+	 */
+	enum min = RotationSerial(start);
+	
+	/***************************************************************************
+	 * 
+	 */
+	enum max = RotationSerial(end - 1);
+	
+private:
+	T _value;
+	
+	static T add(T a, T b)
+	{
+		enum maxv = max._value;
+		enum minv = min._value;
+		auto c = cast(T)(a + b);
+		if (c < a)
+			return cast(T)(minv + ((T.max - maxv) + c));
+		if (c < end)
+			return c;
+		return cast(T)(minv + (c - end));
+	}
+public:
+	
+	/***************************************************************************
+	 * 
+	 */
+	this(T val)
+	{
+		_value = val;
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	bool isUninitialized() const
+	{
+		return _value == RotationSerial.init._value;
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	bool isValid() const
+	{
+		return start <= _value && _value < end;
+	}
+	
+	
+	/***************************************************************************
+	 * 
+	 */
+	T value() const
+	{
+		return value;
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	ref RotationSerial opUnary(string op)()
+	if (op == "++")
+	{
+		if (_value < max._value)
+		{
+			++_value;
+		}
+		else
+		{
+			_value = min._value;
+		}
+		return this;
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	int opCmp(RotationSerial rhs) const
+	{
+		enum center = cast(T)((max._value - min._value) / 2);
+		if (rhs._value == _value)
+			return 0;
+		auto pod = add(_value, center);
+		
+		if (_value < pod)
+		{
+			// l   p   r  :  r < l ... 1
+			if (pod < rhs._value)
+				return +1;
+			// l   r   p  :  l < r ... -1
+			// r   l   p  :  r < l ... 1
+			return _value < rhs._value ? -1 : +1;
+		}
+		else
+		{
+			// r   p   l  :  l < r ... -1
+			if (rhs._value < pod)
+				return -1;
+			// p   l   r  :  l < r ... -1
+			// p   r   l  :  r < l ... 1
+			return _value < rhs._value ? -1 : +1;
+		}
+	}
+	
+}
+
+///
+@safe unittest
+{
+	// シリアル値。範囲は10～249の間で、ローテーションする
+	alias SerialNum = RotationSerial!(ubyte, 10, 250);
+	
+	// シリアル値はインクリメントで値が増加する
+	auto ser = SerialNum(10);
+	++ser;
+	assert(ser > SerialNum(10));
+	assert(ser == SerialNum(11));
+	
+	// 値の範囲の終端まで行くとローテーションする
+	// ローテーションしても、ローテーション前の値よりは大きくなるという判定を行う。
+	ser = SerialNum(249);
+	++ser;
+	assert(ser > SerialNum(249));
+	assert(ser == SerialNum(10));
+}
+
+@safe unittest
+{
+	alias Ser = RotationSerial!(ubyte, 10, 250);
+	assert(Ser.add(150, 200) == 110);
+	assert(Ser.add(150, 99) == 249);
+	assert(Ser.add(150, 100) == 10);
+	assert(Ser.add(150, 101) == 11);
+	assert(Ser.add(150, 102) == 12);
+	assert(Ser.add(150, 103) == 13);
+	assert(Ser.add(150, 104) == 14);
+	assert(Ser.add(150, 105) == 15);
+	assert(Ser.add(150, 106) == 16);
+	
+	auto x1 = Ser(10);
+	auto x2 = Ser(50);
+	auto x3 = Ser(128);
+	auto x4 = Ser(129);
+	auto x5 = Ser(130);
+	auto x6 = Ser(200);
+	auto x7 = Ser(249);
+	assert(x1 == x1);
+	assert(x1 < x2);
+	assert(x1 < x3);
+	assert(x1 < x4);
+	assert(x1 > x5);
+	assert(x1 > x6);
+	assert(x1 > x7);
+	
+	assert(x7 < x1);
+	assert(x7 < x2);
+	assert(x7 > x3);
+	assert(x7 > x4);
+	assert(x7 > x5);
+	assert(x7 > x6);
+	assert(x7 == x7);
+}
