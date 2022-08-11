@@ -1,14 +1,5 @@
 ﻿/*******************************************************************************
- * judgement モジュール
- * 
- * 複数の要素でチェックを行いたい場合に使用することのできる Judgement が利用可能
- * 
- * Date: September 07, 2011
- * Authors:
- *     P.Knowledge, SHOO
- * License:
- *     NYSL ( http://www.kmonos.net/nysl/ )
- * 
+ * データ形式向けのバイナリ操作
  */
 module voile.dataformatter;
 

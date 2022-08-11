@@ -1,4 +1,7 @@
-﻿module voile.fs;
+﻿/*******************************************************************************
+ * ファイルシステムヘルパー
+ */
+module voile.fs;
 
 import std.file, std.path, std.exception, std.stdio, std.datetime, std.regex, std.json;
 import std.process;

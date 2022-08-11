@@ -1,4 +1,7 @@
-﻿module voile.json;
+﻿/*******************************************************************************
+ * JSONValueのヘルパー、シリアライズ・デシリアライズ
+ */
+module voile.json;
 
 import std.json, std.traits, std.meta, std.conv, std.array;
 import std.typecons: Rebindable;
