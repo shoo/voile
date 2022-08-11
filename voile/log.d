@@ -1063,7 +1063,7 @@ public:
 	/***************************************************************************
 	 * 
 	 */
-	void addFilter(Filter filter)
+	void addFilter(Filter filter) @safe
 	{
 		_filters ~= filter;
 	}
@@ -1114,7 +1114,7 @@ mixin template Logging(loggerAlias...)
 	private import std.string: format;
 	static if (loggerAlias.length == 1 && is(typeof(loggerAlias[0]): Logger))
 	{
-		private pragma(inline) typeof(loggerAlias[0]) logger() const
+		private pragma(inline) typeof(loggerAlias[0]) logger() @trusted const
 		{
 			return cast()loggerAlias[0];
 		}
@@ -1122,7 +1122,7 @@ mixin template Logging(loggerAlias...)
 	else
 	{
 		private Logger _logger;
-		private pragma(inline) Logger logger() const
+		private pragma(inline) Logger logger() @trusted const
 		{
 			return cast()_logger;
 		}
@@ -1208,89 +1208,117 @@ mixin template Logging(loggerAlias...)
 	private pragma(inline) void warning(string fmt = null, int line = __LINE__, string file = __FILE__,
 		string funcName = __FUNCTION__,
 		string prettyFuncName = __PRETTY_FUNCTION__,
-		string moduleName = __MODULE__, Args...)(Args args) const
+		string moduleName = __MODULE__, Args...)(Args args) const nothrow
 	{
 		static assert(Args.length != 0);
-		static if (fmt is null)
+		try
 		{
-			static if (Args.length > 1)
+			static if (fmt is null)
 			{
-				logger.log!(line, file, funcName, prettyFuncName, moduleName)(LogLevel.warning, args);
+				static if (Args.length > 1)
+				{
+					logger.log!(line, file, funcName, prettyFuncName, moduleName)(LogLevel.warning, args);
+				}
+				else
+				{
+					logger.log!(Args[0])(LogLevel.warning, args, line, file, funcName, prettyFuncName, moduleName);
+				}
 			}
 			else
 			{
-				logger.log!(Args[0])(LogLevel.warning, args, line, file, funcName, prettyFuncName, moduleName);
+				logger.log!string(LogLevel.warning, format!fmt(args), line, file, funcName, prettyFuncName, moduleName);
 			}
 		}
-		else
+		catch (Exception)
 		{
-			logger.log!string(LogLevel.warning, format!fmt(args), line, file, funcName, prettyFuncName, moduleName);
+			// なにもしない
 		}
 	}
 	private pragma(inline) void error(string fmt = null, int line = __LINE__, string file = __FILE__,
 		string funcName = __FUNCTION__,
 		string prettyFuncName = __PRETTY_FUNCTION__,
-		string moduleName = __MODULE__, Args...)(Args args) const
+		string moduleName = __MODULE__, Args...)(Args args) const nothrow
 	{
 		static assert(Args.length != 0);
-		static if (fmt is null)
+		try
 		{
-			static if (Args.length > 1)
+			static if (fmt is null)
 			{
-				logger.log!(line, file, funcName, prettyFuncName, moduleName)(LogLevel.error, args);
+				static if (Args.length > 1)
+				{
+					logger.log!(line, file, funcName, prettyFuncName, moduleName)(LogLevel.error, args);
+				}
+				else
+				{
+					logger.log!(Args[0])(LogLevel.error, args, line, file, funcName, prettyFuncName, moduleName);
+				}
 			}
 			else
 			{
-				logger.log!(Args[0])(LogLevel.error, args, line, file, funcName, prettyFuncName, moduleName);
+				logger.log!string(LogLevel.error, format!fmt(args), line, file, funcName, prettyFuncName, moduleName);
 			}
 		}
-		else
+		catch (Exception)
 		{
-			logger.log!string(LogLevel.error, format!fmt(args), line, file, funcName, prettyFuncName, moduleName);
+			// なにもしない
 		}
 	}
 	private pragma(inline) void fatal(string fmt = null, int line = __LINE__, string file = __FILE__,
 		string funcName = __FUNCTION__,
 		string prettyFuncName = __PRETTY_FUNCTION__,
-		string moduleName = __MODULE__, Args...)(Args args) const
+		string moduleName = __MODULE__, Args...)(Args args) const nothrow
 	{
 		static assert(Args.length != 0);
-		static if (fmt is null)
+		try
 		{
-			static if (Args.length > 1)
+			static if (fmt is null)
 			{
-				logger.log!(line, file, funcName, prettyFuncName, moduleName)(LogLevel.fatal, args);
+				static if (Args.length > 1)
+				{
+					logger.log!(line, file, funcName, prettyFuncName, moduleName)(LogLevel.fatal, args);
+				}
+				else
+				{
+					logger.log!(Args[0])(LogLevel.fatal, args, line, file, funcName, prettyFuncName, moduleName);
+				}
 			}
 			else
 			{
-				logger.log!(Args[0])(LogLevel.fatal, args, line, file, funcName, prettyFuncName, moduleName);
+				logger.log!string(LogLevel.fatal, format!fmt(args), line, file, funcName, prettyFuncName, moduleName);
 			}
 		}
-		else
+		catch (Exception)
 		{
-			logger.log!string(LogLevel.fatal, format!fmt(args), line, file, funcName, prettyFuncName, moduleName);
+			// なにもしない
 		}
 	}
 	private pragma(inline) void critical(string fmt = null, int line = __LINE__, string file = __FILE__,
 		string funcName = __FUNCTION__,
 		string prettyFuncName = __PRETTY_FUNCTION__,
-		string moduleName = __MODULE__, Args...)(Args args) const
+		string moduleName = __MODULE__, Args...)(Args args) const nothrow
 	{
 		static assert(Args.length != 0);
-		static if (fmt is null)
+		try
 		{
-			static if (Args.length > 1)
+			static if (fmt is null)
 			{
-				logger.log!(line, file, funcName, prettyFuncName, moduleName)(LogLevel.critical, args);
+				static if (Args.length > 1)
+				{
+					logger.log!(line, file, funcName, prettyFuncName, moduleName)(LogLevel.critical, args);
+				}
+				else
+				{
+					logger.log!(Args[0])(LogLevel.critical, args, line, file, funcName, prettyFuncName, moduleName);
+				}
 			}
 			else
 			{
-				logger.log!(Args[0])(LogLevel.critical, args, line, file, funcName, prettyFuncName, moduleName);
+				logger.log!string(LogLevel.critical, format!fmt(args), line, file, funcName, prettyFuncName, moduleName);
 			}
 		}
-		else
+		catch (Exception)
 		{
-			logger.log!string(LogLevel.critical, format!fmt(args), line, file, funcName, prettyFuncName, moduleName);
+			// なにもしない
 		}
 	}
 }
