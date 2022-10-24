@@ -772,15 +772,15 @@ Req required() pure nothrow @nogc @safe
 }
 
 ///
-OptShort optShort(string[] str...) pure nothrow @nogc @safe
+OptShort optShort(string[] str...) pure nothrow @safe
 {
-	return OptShort(str);
+	return OptShort(str.dup);
 }
 
 ///
-OptLong optLong(string[] str...) pure nothrow @nogc @safe
+OptLong optLong(string[] str...) pure nothrow @safe
 {
-	return OptLong(str);
+	return OptLong(str.dup);
 }
 
 ///

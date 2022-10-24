@@ -7,6 +7,7 @@ module voile.refcnt;
 
 import std.traits;
 import std.functional: toDelegate;
+import voile.handler: DelegateTypeOf;
 
 
 /*******************************************************************************
@@ -29,14 +30,7 @@ alias Deallocator = void delegate(CountedInstance* instance) pure nothrow @nogc;
 template isAllocator(T...)
 if (T.length > 0 && isCallable!(T[0]))
 {
-	static if (isFunction!(T[0]))
-	{
-		enum bool isAllocator = isAssignable!(Allocator, typeof(toDelegate(typeof(&T[0]).init)));
-	}
-	else
-	{
-		enum bool isAllocator = isAssignable!(Allocator, typeof(toDelegate(T.init)));
-	}
+	enum bool isAllocator = isAssignable!(Allocator, DelegateTypeOf!(T[0]));
 }
 ///
 @system unittest

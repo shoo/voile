@@ -886,6 +886,80 @@ public:
 }
 
 ///
+template DelegateTypeOf(F)
+if (isCallable!F)
+{
+	static if (is(F == delegate))
+	{
+		alias DelegateTypeOf = F;
+	}
+	else static if (is(typeof(*F) == function))
+	{
+		alias Base = ReturnType!F delegate(Parameters!F);
+		alias DelegateTypeOf = SetFunctionAttributes!(Base, functionLinkage!F, functionAttributes!F);
+	}
+	else static if (isAggregateType!F && is(typeof(F.opCall)))
+	{
+		alias Base = ReturnType!F delegate(Parameters!(F.opCall));
+		alias DelegateTypeOf = SetFunctionAttributes!(Base, functionLinkage!(F.opCall), functionAttributes!(F.opCall));
+	}
+	else static if (isAggregateType!F && is(typeof(F.opCall)))
+	{
+		alias Base = ReturnType!F delegate(Parameters!(F.opCall));
+		alias DelegateTypeOf = SetFunctionAttributes!(Base, functionLinkage!(F.opCall), functionAttributes!(F.opCall));
+	}
+	else static if (isFunction!F)
+	{
+	pragma(msg, F);
+		alias Base = ReturnType!F delegate(Parameters!F);
+		alias DelegateTypeOf = SetFunctionAttributes!(Base, functionLinkage!F, functionAttributes!F);
+	}
+}
+unittest
+{
+	static assert(is(DelegateTypeOf!(void delegate() pure @safe) == void delegate() pure @safe));
+	static assert(is(DelegateTypeOf!(void function() nothrow @nogc) == void delegate() nothrow @nogc));
+	
+	struct S            { void opCall() {} }
+	struct SConst       { void opCall() const {} }
+	struct SImmutable   { void opCall() immutable {} }
+	struct SShared      { void opCall() shared {} }
+	struct SSharedConst { void opCall() shared const {} }
+	static assert(is(DelegateTypeOf!S == void delegate()));
+	static assert(is(DelegateTypeOf!SConst == void delegate() const));
+	static assert(is(DelegateTypeOf!SImmutable == void delegate() immutable));
+	static assert(is(DelegateTypeOf!SShared == void delegate() shared));
+	static assert(is(DelegateTypeOf!SSharedConst == void delegate() shared const));
+	
+	class C            { void opCall() {} }
+	class CConst       { void opCall() const {} }
+	class CImmutable   { void opCall() immutable {} }
+	class CShared      { void opCall() shared {} }
+	class CSharedConst { void opCall() shared const {} }
+	static assert(is(DelegateTypeOf!C == void delegate()));
+	static assert(is(DelegateTypeOf!CConst == void delegate() const));
+	static assert(is(DelegateTypeOf!CImmutable == void delegate() immutable));
+	static assert(is(DelegateTypeOf!CShared == void delegate() shared));
+	static assert(is(DelegateTypeOf!CSharedConst == void delegate() shared const));
+}
+
+///
+template DelegateTypeOf(alias F)
+if (isCallable!F)
+{
+	static if (isFunction!F)
+	{
+		alias Base = ReturnType!F delegate(Parameters!F);
+		alias DelegateTypeOf = SetFunctionAttributes!(Base, functionLinkage!F, functionAttributes!F);
+	}
+	else
+	{
+		alias Base = ReturnType!(typeof(F)) delegate(Parameters!(typeof(F)));
+		alias DelegateTypeOf = SetFunctionAttributes!(Base, functionLinkage!(typeof(F)), functionAttributes!(typeof(F)));
+	}
+}
+
+///
 template isCastableDelegate(aFunc, bFunc)
 {
 	alias STC = ParameterStorageClass;
@@ -976,12 +1050,47 @@ template isCastableDelegate(aFunc, bFunc)
 /*******************************************************************************
  * Generic Handler
  * 
+ * 複数のコールバックを登録し、同じ引数でまとめて呼び出すことのできる構造体です。
+ * コールバックには以下の種類のデータを使用できます。
+ * - 関数ポインタ
+ * - デリゲート
+ * - opCallを持つ集合型(class, struct, union, interface)のインスタンス
+ * - core.thread.Fiber
+ * - std.concurrency.Tid
+ * - OutputRange
  * 
- * $(__123 a, bbb) = xxx
+ * 基本的な流れは、接続(connect)でコールバックを追加して、実行(emit)でコールバックを呼び出して、
+ * コールバックが不要になったら切断(disconnect)します。
+ * - 接続：connect関数または `~=` 演算子にて、コールバックを追加することができます。
+ *   - connect関数の戻り値はハンドラ内部でコールバックを管理しているプロシージャIDです。
+ *   - singleShotConnectで、一度だけ実行した後に自動で切断することも可能です。
+ *   - connectした順番で呼び出しが行われます。
+ * - 切断：disconnect関数によって、コールバックを削除することができます。
+ *   - プロシージャIDを指定して切断することも可能です。
+ *   - 一度切断されたコールバックのプロシージャIDは使用できません。
+ * - 実行：emit関数または `()` 演算子にて、コールバックを一斉に呼び出すことができます。
+ *   - 関数ポインタを接続した場合、関数ポインタを呼び出します。
+ *   - デリゲートを接続した場合、デリゲートを呼び出します。
+ *   - 集合型のインスタンスを接続した場合、インスタンスのopCallを呼び出します。
+ *   - Fiberを接続した場合、Fiberのcallを呼び出します。Fが `void delegate()` の場合だけ有効です。
+ *   - OutputRangeを接続した場合、OutputRangeのputを呼び出します。Fが `void delegate(T)` のとき、
+ *     `isOutputRange!(Range, T)`の場合だけ有効です。
  * 
- * Macros:
- *     bbb  = cccccc
- *     _123 = [$1 ::: $($2)]
+ * Note:
+ * - 実行中に接続・切断ができますが、そのとき実行時にコールバックのリストを複製してから呼び出しているため、
+ *   途中操作での接続・切断は反映されません。
+ * - ハンドラは複製することができません。複製したい場合は、スライスでコールバックへアクセスすることができますので、
+ *   明示的にディープコピーを行ってください。その際には、オブジェクトの寿命管理には注意して下さい。
+ * - ハンドラでコールバックを保持し続ける限り、コールバックに関連するデータ(例えばデリゲートのコンテキスト)は
+ *   GCで解放されなくなります。
+ * - 一方でコールバックに関連するデータを手動で破棄した場合には、ハンドラの呼び出しで破棄済みのデータにアクセスする
+ *   恐れがあります。ハンドラからの切断を行ってからデータを破棄してください。
+ * - emit関数は、ハンドラのテンプレートパラメータで指定したFの型により、属性を指定できます。
+ *   例えば `Handler!(void delegate() nothrow)` とすると、emit関数にもnothrow属性がつきます。
+ * - emit関数の戻り値は、ハンドラのテンプレートパラメータで指定したFの戻り値と同じです。ただし、以下の型限定です。
+ *   - void: 戻り値を返しません。
+ *   - bool: コールバックすべてがtrueを返した場合に、emit関数もtrueを返します。
+ *           コールバックが一つでもfalseを返した場合、それ以降コールバック呼び出しを行わず、emit関数もfalseを返します。
  */
 struct Handler(F)
 	if (isCallable!F && (is(ReturnType!(F) == void) || is(ReturnType!(F) : bool)))
@@ -1023,8 +1132,8 @@ private:
 			import std.conv;
 			enum generateFunctionBody =
 			q{
-				alias FnTy = SetFunctionAttributes!(typeof((*cast(Unique!ProcList*)&_procs)[].front),
-				                                    _exFuncInfo.linkage, _exFuncInfo.attrib);
+				import std.traits: SetFunctionAttributes;
+				alias FnTy = SetFunctionAttributes!(DelegateTypeOf!Proc, _exFuncInfo.linkage, _exFuncInfo.attrib);
 				static if (is(_exFuncInfo.RT: bool))
 				{
 					if ((*cast(Unique!ProcList*)&_procs).isEmpty())
@@ -1107,9 +1216,9 @@ public:
 	private Unique!ProcList _procs;
 	
 	///
-	static Proc toConnectable(Func)(Func fn)
-		if (is(typeof( toDelegate(fn) ))
-		 && isCastableDelegate!(Proc, typeof(toDelegate(fn))))
+	static Proc toConnectable(Func)(auto ref Func fn)
+	if (is(typeof( toDelegate(fn) ))
+	 && isCastableDelegate!(Proc, DelegateTypeOf!Func))
 	{
 		return cast(Proc)toDelegate(fn);
 	}
@@ -1172,7 +1281,7 @@ public:
 	 *     fn = delegate, function, Tid, Object( has opCall ), Fiber,
 	 *          OutputRange(class or interface or T*, and has empty method)
 	 */
-	HandlerProcId connect(Func)(Func fn)
+	HandlerProcId connect(Func)(auto ref Func fn)
 		if (is(typeof( toConnectable(fn) )))
 	{
 		if (_procs.isEmpty())
@@ -1503,13 +1612,17 @@ debug (workaround)
 		struct SImmutable   { void opCall() immutable {} }
 		struct SShared      { void opCall() shared {} }
 		struct SSharedConst { void opCall() shared const {} }
-		auto idConst = hndConst.connect(SConst.init);
+		const SConst sc;
+		immutable SImmutable si;
+		shared SShared ss;
+		shared const SSharedConst ssc;
+		auto idConst = hndConst.connect(sc);
 		hndConst.disconnect(idConst);
-		auto idImmutable = hndImmutable.connect(cast(immutable)SImmutable.init);
+		auto idImmutable = hndImmutable.connect(si);
 		hndImmutable.disconnect(idImmutable);
-		auto idShared = hndShared.connect(cast(shared)SShared.init);
+		auto idShared = hndShared.connect(ss);
 		hndShared.disconnect(idShared);
-		auto idSharedConst = hndSharedConst.connect(cast(shared)SSharedConst.init);
+		auto idSharedConst = hndSharedConst.connect(ssc);
 		hndSharedConst.disconnect(idSharedConst);
 	}
 

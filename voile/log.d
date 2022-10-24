@@ -1327,10 +1327,10 @@ mixin template Logging(loggerAlias...)
 /*******************************************************************************
  * 名前からロガーを取得する
  */
-Logger getLogger(string name, Logger defaultLogger = sharedLog) @safe
+Logger getLogger(string name, Logger defaultLogger = cast()sharedLog) @trusted
 {
 	import std.experimental.logger;
-	auto logger = cast(NamedLogger)sharedLog;
+	auto logger = cast(NamedLogger)cast()sharedLog;
 	if (!logger)
 		return defaultLogger;
 	auto named = logger.getLogger(name);
