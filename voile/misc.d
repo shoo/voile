@@ -1596,3 +1596,104 @@ public:
 	assert(x7 > x6);
 	assert(x7 == x7);
 }
+
+private import std.range: isInputRange, ElementType;
+/*******************************************************************************
+ * Create combinations matrix from specified lists of conditional patterns
+ * 
+ * Params:
+ *      matrix   = Matrix of conditional patterns. $(BR)
+ *                 ex; Input   `[["1", "2"], ["A", "B"]]` $(BR)
+ *                     Results `[["1", "A"], ["1", "B"], ["2", "A"], ["2", "B"]]`
+ *      matrixAA = Matrix of conditional patterns. For each column, the name is represented by an associative array key. $(BR)
+ *                 ex; Input   `["P1": ["1", "2"], "P2": ["A", "B"]]` $(BR)
+ *                     Results `[["P1": "1", "P2": "A"], ["P1": "1", "P2": "B"], ["P1": "2", "P2": "A"], ["P1": "2", "P2": "B"]]`
+ * Returns:
+ *      Matrix of combination
+ */
+auto combinationMatrix(R)(R matrix)
+if (isInputRange!R && isInputRange!(ElementType!R))
+{
+	import std.algorithm: cartesianProduct, map;
+	import std.typecons: tuple;
+	import std.array: empty, front, popFront, array;
+	
+	if (matrix.empty)
+		return null;
+	auto ary = matrix.front.map!(a=>[a]).array;
+	matrix.popFront();
+	foreach (elm; matrix)
+		ary = cartesianProduct(ary, elm).map!(a => a[0] ~ [a[1]]).array;
+	
+	return ary;
+}
+
+///
+@safe unittest
+{
+	import std.algorithm: equal;
+	assert(combinationMatrix([["a", "b"], ["A", "B", "C"], ["1", "2"]]).equal([
+		["a", "A", "1"],
+		["a", "A", "2"],
+		["a", "B", "1"],
+		["a", "B", "2"],
+		["a", "C", "1"],
+		["a", "C", "2"],
+		["b", "A", "1"],
+		["b", "A", "2"],
+		["b", "B", "1"],
+		["b", "B", "2"],
+		["b", "C", "1"],
+		["b", "C", "2"],
+	]));
+}
+
+private import std.range: isInputRange;
+/// ditto
+auto combinationMatrix(K,R)(R[K] matrixAA)
+if (isInputRange!R)
+{
+	import std.algorithm: map;
+	import std.typecons: tuple;
+	import std.array: array, assocArray;
+	
+	return matrixAA.byKeyValue
+		.map!(vPair => vPair.value.map!(v => tuple(vPair.key, v)))
+		.combinationMatrix.map!(a => assocArray(a));
+}
+///
+@safe unittest
+{
+	import std.algorithm: equal;
+	assert(combinationMatrix(["P1": ["a", "b"], "P2": ["A", "B", "C"], "P3": ["1", "2"]]).equal([
+		["P1": "a", "P2": "A", "P3": "1"],
+		["P1": "a", "P2": "A", "P3": "2"],
+		["P1": "a", "P2": "B", "P3": "1"],
+		["P1": "a", "P2": "B", "P3": "2"],
+		["P1": "a", "P2": "C", "P3": "1"],
+		["P1": "a", "P2": "C", "P3": "2"],
+		["P1": "b", "P2": "A", "P3": "1"],
+		["P1": "b", "P2": "A", "P3": "2"],
+		["P1": "b", "P2": "B", "P3": "1"],
+		["P1": "b", "P2": "B", "P3": "2"],
+		["P1": "b", "P2": "C", "P3": "1"],
+		["P1": "b", "P2": "C", "P3": "2"],
+	]));
+}
+
+
+private import std.range: isRandomAccessRange;
+/*******************************************************************************
+ * Shuffle elements of specified range
+ */
+auto shuffle(R)(R ary)
+if (isRandomAccessRange!R)
+{
+	import std.random: uniform;
+	import std.range: iota, indexed, array;
+	import std.algorithm: swap;
+	auto idx = iota(0, ary.length).array;
+	foreach (i; 0..ary.length)
+		swap(idx[i], idx[uniform(i, ary.length)]);
+	return indexed(ary, idx);
+}

@@ -1878,7 +1878,7 @@ FileSystem createDisposableDir(string basePath = tempDir, string prefix = "voile
 	(() @trusted => fs.onDestroyed ~= (string dir)
 	{
 		if (.exists(dir))
-			FileSystem(dir).removeFiles(".", true, retrycnt);
+			cast(void)FileSystem(dir).removeFiles(".", true, retrycnt);
 	})();
 	return fs.move();
 }
