@@ -233,6 +233,64 @@ T <code class="ddoc_psymbol">expandVariable</code><span class="ddoc_template_par
 </dd>
 </div></dl>
 </dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".combinationMatrix"></span><div class="quickindex" id="quickindex.combinationMatrix"></div>auto <code class="ddoc_psymbol">combinationMatrix</code><span class="ddoc_template_param_list" title="Template parameter list">(R)</span>(R <span class="ddoc_param">matrix</span>)<br><span class="ddoc_constraint">if(isInputRange!R &amp;&amp; isInputRange!(ElementType!R))</span>;
+<br>
+auto <code class="ddoc_psymbol">combinationMatrix</code><span class="ddoc_template_param_list" title="Template parameter list">(K, R)</span>(R[K] <span class="ddoc_param">matrixAA</span>)<br><span class="ddoc_constraint">if(isInputRange!R)</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Create combinations <span class="ddoc_param">matrix</span> from specified lists of conditional patterns
+</div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">R <span class="ddoc_param">matrix</span></td>
+<td class="ddoc_param_desc">Matrix of conditional patterns. <br>
+                 ex; Input   <code class="d_inlinecode donthyphenate notranslate">[["1", "2"], ["A", "B"]]</code> <br>
+                     Results <code class="d_inlinecode donthyphenate notranslate">[["1", "A"], ["1", "B"], ["2", "A"], ["2", "B"]]</code></td></tr>
+<tr class="ddoc_param_row"><td class="ddoc_param_id">R[K] <span class="ddoc_param">matrixAA</span></td>
+<td class="ddoc_param_desc">Matrix of conditional patterns. For each column, the name is represented by an associative array key. <br>
+                 ex; Input   <code class="d_inlinecode donthyphenate notranslate">["P1": ["1", "2"], "P2": ["A", "B"]]</code> <br>
+                     Results <code class="d_inlinecode donthyphenate notranslate">[["P1": "1", "P2": "A"], ["P1": "1", "P2": "B"], ["P1": "2", "P2": "A"], ["P1": "2", "P2": "B"]]</code></td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ Matrix of combination</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.algorithm: equal;
+<span class="d_keyword">assert</span>(<span class="d_psymbol">combinationMatrix</span>([[<span class="d_string">"a"</span>, <span class="d_string">"b"</span>], [<span class="d_string">"A"</span>, <span class="d_string">"B"</span>, <span class="d_string">"C"</span>], [<span class="d_string">"1"</span>, <span class="d_string">"2"</span>]]).equal([
+	[<span class="d_string">"a"</span>, <span class="d_string">"A"</span>, <span class="d_string">"1"</span>],
+	[<span class="d_string">"a"</span>, <span class="d_string">"A"</span>, <span class="d_string">"2"</span>],
+	[<span class="d_string">"a"</span>, <span class="d_string">"B"</span>, <span class="d_string">"1"</span>],
+	[<span class="d_string">"a"</span>, <span class="d_string">"B"</span>, <span class="d_string">"2"</span>],
+	[<span class="d_string">"a"</span>, <span class="d_string">"C"</span>, <span class="d_string">"1"</span>],
+	[<span class="d_string">"a"</span>, <span class="d_string">"C"</span>, <span class="d_string">"2"</span>],
+	[<span class="d_string">"b"</span>, <span class="d_string">"A"</span>, <span class="d_string">"1"</span>],
+	[<span class="d_string">"b"</span>, <span class="d_string">"A"</span>, <span class="d_string">"2"</span>],
+	[<span class="d_string">"b"</span>, <span class="d_string">"B"</span>, <span class="d_string">"1"</span>],
+	[<span class="d_string">"b"</span>, <span class="d_string">"B"</span>, <span class="d_string">"2"</span>],
+	[<span class="d_string">"b"</span>, <span class="d_string">"C"</span>, <span class="d_string">"1"</span>],
+	[<span class="d_string">"b"</span>, <span class="d_string">"C"</span>, <span class="d_string">"2"</span>],
+]));
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.algorithm: equal;
+<span class="d_keyword">assert</span>(<span class="d_psymbol">combinationMatrix</span>([<span class="d_string">"P1"</span>: [<span class="d_string">"a"</span>, <span class="d_string">"b"</span>], <span class="d_string">"P2"</span>: [<span class="d_string">"A"</span>, <span class="d_string">"B"</span>, <span class="d_string">"C"</span>], <span class="d_string">"P3"</span>: [<span class="d_string">"1"</span>, <span class="d_string">"2"</span>]]).equal([
+	[<span class="d_string">"P1"</span>: <span class="d_string">"a"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"A"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"1"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"a"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"A"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"2"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"a"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"B"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"1"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"a"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"B"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"2"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"a"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"C"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"1"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"a"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"C"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"2"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"b"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"A"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"1"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"b"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"A"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"2"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"b"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"B"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"1"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"b"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"B"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"2"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"b"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"C"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"1"</span>],
+	[<span class="d_string">"P1"</span>: <span class="d_string">"b"</span>, <span class="d_string">"P2"</span>: <span class="d_string">"C"</span>, <span class="d_string">"P3"</span>: <span class="d_string">"2"</span>],
+]));
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".shuffle"></span><div class="quickindex" id="quickindex.shuffle"></div>auto <code class="ddoc_psymbol">shuffle</code><span class="ddoc_template_param_list" title="Template parameter list">(R)</span>(R <span class="ddoc_param">ary</span>)<br><span class="ddoc_constraint">if(isRandomAccessRange!R)</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Shuffle elements of specified range</div></dd>
 </div></dl>
 
                 

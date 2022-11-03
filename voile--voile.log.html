@@ -471,7 +471,7 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Logging"></span><div class="quickindex" id="quickindex.Logging"></div>template <code class="ddoc_psymbol">Logging</code>(loggerAlias...)<br></div></dt>
 <dd><div class="ddoc_summary">クラス内で使用するロガーを切り替えるためのミックスインテンプレート</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getLogger"></span><div class="quickindex" id="quickindex.getLogger"></div>@safe Logger <code class="ddoc_psymbol">getLogger</code>(string <span class="ddoc_param">name</span>, Logger <span class="ddoc_param">defaultLogger</span> = sharedLog);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".getLogger"></span><div class="quickindex" id="quickindex.getLogger"></div>@trusted Logger <code class="ddoc_psymbol">getLogger</code>(string <span class="ddoc_param">name</span>, Logger <span class="ddoc_param">defaultLogger</span> = cast()sharedLog);
 <br></div></dt>
 <dd><div class="ddoc_summary">名前からロガーを取得する</div></dd>
 </div></dl>

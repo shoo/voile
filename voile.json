@@ -10745,6 +10745,70 @@
     "comment" : "\n",
     "line" : 889,
     "char" : 1,
+    "name" : "DelegateTypeOf",
+    "parameters" : [
+     {
+      "name" : "F",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isCallable!F",
+    "members" : [
+     {
+      "name" : "DelegateTypeOf",
+      "kind" : "alias",
+      "line" : 894,
+      "char" : 3,
+      "type" : "F"
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L918_C1",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 918,
+    "char" : 1,
+    "endline" : 947,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "\n",
+    "line" : 947,
+    "char" : 1,
+    "name" : "DelegateTypeOf",
+    "parameters" : [
+     {
+      "name" : "F",
+      "kind" : "alias"
+     }
+    ],
+    "constraint" : "isCallable!F",
+    "members" : [
+     {
+      "name" : "Base",
+      "kind" : "alias",
+      "line" : 952,
+      "char" : 3,
+      "type" : "ReturnType!F delegate(Parameters!F)"
+     },
+     {
+      "name" : "DelegateTypeOf",
+      "kind" : "alias",
+      "line" : 953,
+      "char" : 3,
+      "type" : "SetFunctionAttributes!(Base, functionLinkage!F, functionAttributes!F)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "\n",
+    "line" : 963,
+    "char" : 1,
     "name" : "isCastableDelegate",
     "parameters" : [
      {
@@ -10760,13 +10824,13 @@
      {
       "name" : "STC",
       "kind" : "alias",
-      "line" : 891,
+      "line" : 965,
       "char" : 2,
       "type" : "ParameterStorageClass"
      },
      {
       "kind" : "template",
-      "line" : 892,
+      "line" : 966,
       "char" : 2,
       "name" : "funcInfo",
       "parameters" : [
@@ -10779,42 +10843,42 @@
        {
         "name" : "stcs",
         "kind" : "alias",
-        "line" : 894,
+        "line" : 968,
         "char" : 3,
         "type" : "ParameterStorageClassTuple!func"
        },
        {
         "name" : "params",
         "kind" : "alias",
-        "line" : 895,
+        "line" : 969,
         "char" : 3,
         "type" : "ParameterTypeTuple!func"
        },
        {
         "name" : "ret",
         "kind" : "alias",
-        "line" : 896,
+        "line" : 970,
         "char" : 3,
         "type" : "ReturnType!func"
        },
        {
         "name" : "valiadic",
         "kind" : "alias",
-        "line" : 897,
+        "line" : 971,
         "char" : 3,
         "type" : "variadicFunctionStyle!func"
        },
        {
         "name" : "attrib",
         "kind" : "alias",
-        "line" : 898,
+        "line" : 972,
         "char" : 3,
         "type" : "functionAttributes!func"
        },
        {
         "name" : "linkage",
         "kind" : "alias",
-        "line" : 899,
+        "line" : 973,
         "char" : 3,
         "type" : "functionLinkage!func"
        }
@@ -10822,7 +10886,7 @@
      },
      {
       "kind" : "template",
-      "line" : 901,
+      "line" : 975,
       "char" : 2,
       "name" : "isStcsConvertible",
       "parameters" : [
@@ -10835,21 +10899,21 @@
        {
         "name" : "aStcs",
         "kind" : "alias",
-        "line" : 905,
+        "line" : 979,
         "char" : 4,
         "type" : "Args[0 .. Args.length / 2]"
        },
        {
         "name" : "bStcs",
         "kind" : "alias",
-        "line" : 906,
+        "line" : 980,
         "char" : 4,
         "type" : "Args[Args.length / 2 .. __dollar]"
        },
        {
         "name" : "isStcsConvertible",
         "kind" : "variable",
-        "line" : 907,
+        "line" : 981,
         "char" : 14,
         "storageClass" : [
          "enum"
@@ -10861,7 +10925,7 @@
      },
      {
       "kind" : "template",
-      "line" : 915,
+      "line" : 989,
       "char" : 2,
       "name" : "isParamsConvertible",
       "parameters" : [
@@ -10874,21 +10938,21 @@
        {
         "name" : "aParams",
         "kind" : "alias",
-        "line" : 919,
+        "line" : 993,
         "char" : 4,
         "type" : "Args[0 .. Args.length / 2]"
        },
        {
         "name" : "bParams",
         "kind" : "alias",
-        "line" : 920,
+        "line" : 994,
         "char" : 4,
         "type" : "Args[Args.length / 2 .. __dollar]"
        },
        {
         "name" : "isParamsConvertible",
         "kind" : "variable",
-        "line" : 921,
+        "line" : 995,
         "char" : 14,
         "storageClass" : [
          "enum"
@@ -10901,42 +10965,42 @@
      {
       "name" : "aInfo",
       "kind" : "alias",
-      "line" : 930,
+      "line" : 1004,
       "char" : 2,
       "type" : "funcInfo!aFunc"
      },
      {
       "name" : "bInfo",
       "kind" : "alias",
-      "line" : 931,
+      "line" : 1005,
       "char" : 2,
       "type" : "funcInfo!bFunc"
      },
      {
       "name" : "nonParamDgA",
       "kind" : "alias",
-      "line" : 934,
+      "line" : 1008,
       "char" : 2,
       "type" : "SetFunctionAttributes!(aInfo.ret delegate(), aInfo.linkage, aInfo.attrib)"
      },
      {
       "name" : "nonParamDgB",
       "kind" : "alias",
-      "line" : 935,
+      "line" : 1009,
       "char" : 2,
       "type" : "SetFunctionAttributes!(bInfo.ret delegate(), bInfo.linkage, bInfo.attrib & (aInfo.attrib & FunctionAttribute.nothrow_ ? ~0 : ~FunctionAttribute.nothrow_) & (aInfo.attrib & FunctionAttribute.pure_ ? ~0 : ~FunctionAttribute.pure_) & (aInfo.attrib & FunctionAttribute.nogc ? ~0 : ~FunctionAttribute.nogc) & (aInfo.attrib & (FunctionAttribute.safe | FunctionAttribute.trusted) ? ~0 : ~(FunctionAttribute.safe | FunctionAttribute.trusted)))"
      },
      {
       "name" : "std.string",
       "kind" : "import",
-      "line" : 942,
+      "line" : 1016,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "isCastableDelegate",
       "kind" : "variable",
-      "line" : 945,
+      "line" : 1019,
       "char" : 13,
       "storageClass" : [
        "enum"
@@ -10947,22 +11011,22 @@
     ]
    },
    {
-    "name" : "__unittest_L955_C9",
+    "name" : "__unittest_L1029_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 955,
+    "line" : 1029,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 986,
+    "endline" : 1095,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
-    "comment" : " Generic Handler\n\n\n $(__123 a, bbb) = xxx\n\n Macros:\n     bbb  = cccccc\n     _123 = [$1 ::: $($2)]\n",
-    "line" : 986,
+    "comment" : " Generic Handler\n\n 複数のコールバックを登録し、同じ引数でまとめて呼び出すことのできる構造体です。\n コールバックには以下の種類のデータを使用できます。\n - 関数ポインタ\n - デリゲート\n - opCallを持つ集合型(class, struct, union, interface)のインスタンス\n - core.thread.Fiber\n - std.concurrency.Tid\n - OutputRange\n\n 基本的な流れは、接続(connect)でコールバックを追加して、実行(emit)でコールバックを呼び出して、\n コールバックが不要になったら切断(disconnect)します。\n - 接続：connect関数または `~=` 演算子にて、コールバックを追加することができます。\n   - connect関数の戻り値はハンドラ内部でコールバックを管理しているプロシージャIDです。\n   - singleShotConnectで、一度だけ実行した後に自動で切断することも可能です。\n   - connectした順番で呼び出しが行われます。\n - 切断：disconnect関数によって、コールバックを削除することができます。\n   - プロシージャIDを指定して切断することも可能です。\n   - 一度切断されたコールバックのプロシージャIDは使用できません。\n - 実行：emit関数または `()` 演算子にて、コールバックを一斉に呼び出すことができます。\n   - 関数ポインタを接続した場合、関数ポインタを呼び出します。\n   - デリゲートを接続した場合、デリゲートを呼び出します。\n   - 集合型のインスタンスを接続した場合、インスタンスのopCallを呼び出します。\n   - Fiberを接続した場合、Fiberのcallを呼び出します。Fが `void delegate()` の場合だけ有効です。\n   - OutputRangeを接続した場合、OutputRangeのputを呼び出します。Fが `void delegate(T)` のとき、\n     `isOutputRange!(Range, T)`の場合だけ有効です。\n\n Note:\n - 実行中に接続・切断ができますが、そのとき実行時にコールバックのリストを複製してから呼び出しているため、\n   途中操作での接続・切断は反映されません。\n - ハンドラは複製することができません。複製したい場合は、スライスでコールバックへアクセスすることができますので、\n   明示的にディープコピーを行ってください。その際には、オブジェクトの寿命管理には注意して下さい。\n - ハンドラでコールバックを保持し続ける限り、コールバックに関連するデータ(例えばデリゲートのコンテキスト)は\n   GCで解放されなくなります。\n - 一方でコールバックに関連するデータを手動で破棄した場合には、ハンドラの呼び出しで破棄済みのデータにアクセスする\n   恐れがあります。ハンドラからの切断を行ってからデータを破棄してください。\n - emit関数は、ハンドラのテンプレートパラメータで指定したFの型により、属性を指定できます。\n   例えば `Handler!(void delegate() nothrow)` とすると、emit関数にもnothrow属性がつきます。\n - emit関数の戻り値は、ハンドラのテンプレートパラメータで指定したFの戻り値と同じです。ただし、以下の型限定です。\n   - void: 戻り値を返しません。\n   - bool: コールバックすべてがtrueを返した場合に、emit関数もtrueを返します。\n           コールバックが一つでもfalseを返した場合、それ以降コールバック呼び出しを行わず、emit関数もfalseを返します。\n",
+    "line" : 1095,
     "char" : 1,
     "name" : "Handler",
     "parameters" : [
@@ -10977,12 +11041,12 @@
       "name" : "Handler",
       "kind" : "struct",
       "protection" : "public",
-      "line" : 986,
+      "line" : 1095,
       "char" : 1,
       "members" : [
        {
         "kind" : "template",
-        "line" : 990,
+        "line" : 1099,
         "char" : 2,
         "name" : "_ExFuncInfo",
         "parameters" : [
@@ -10995,42 +11059,42 @@
          {
           "name" : "FuncType",
           "kind" : "alias",
-          "line" : 992,
+          "line" : 1101,
           "char" : 3,
           "type" : "FunctionTypeOf!Func"
          },
          {
           "name" : "RT",
           "kind" : "alias",
-          "line" : 993,
+          "line" : 1102,
           "char" : 3,
           "type" : "ReturnType!Func"
          },
          {
           "name" : "PT",
           "kind" : "alias",
-          "line" : 994,
+          "line" : 1103,
           "char" : 3,
           "type" : "ParameterTypeTuple!Func"
          },
          {
           "name" : "stcs",
           "kind" : "alias",
-          "line" : 995,
+          "line" : 1104,
           "char" : 3,
           "type" : "ParameterStorageClassTuple!Func"
          },
          {
           "name" : "valiadic",
           "kind" : "alias",
-          "line" : 996,
+          "line" : 1105,
           "char" : 3,
           "type" : "variadicFunctionStyle!Func"
          },
          {
           "name" : "attrib",
           "kind" : "variable",
-          "line" : 997,
+          "line" : 1106,
           "char" : 9,
           "storageClass" : [
            "enum"
@@ -11040,21 +11104,21 @@
          {
           "name" : "linkage",
           "kind" : "alias",
-          "line" : 998,
+          "line" : 1107,
           "char" : 3,
           "type" : "functionLinkage!Func"
          },
          {
           "name" : "abst",
           "kind" : "alias",
-          "line" : 999,
+          "line" : 1108,
           "char" : 3,
           "type" : "isAbstractFunction!Func"
          },
          {
           "name" : "virt",
           "kind" : "alias",
-          "line" : 1000,
+          "line" : 1109,
           "char" : 3,
           "type" : "isVirtualMethod!F"
          }
@@ -11063,7 +11127,7 @@
        {
         "name" : "_exFuncInfo",
         "kind" : "alias",
-        "line" : 1002,
+        "line" : 1111,
         "char" : 2,
         "type" : "_ExFuncInfo!F"
        },
@@ -11071,19 +11135,19 @@
         "name" : "DummyData",
         "kind" : "struct",
         "protection" : "public",
-        "line" : 1003,
+        "line" : 1112,
         "char" : 9,
         "members" : [
          {
           "kind" : "template",
-          "line" : 1005,
+          "line" : 1114,
           "char" : 3,
           "name" : "_EmitGeneratingPolicy",
           "parameters" : [],
           "members" : [
            {
             "kind" : "template",
-            "line" : 1007,
+            "line" : 1116,
             "char" : 4,
             "name" : "generateFunctionBody",
             "parameters" : [
@@ -11096,7 +11160,7 @@
              {
               "name" : "generateFunctionBody",
               "kind" : "variable",
-              "line" : 1009,
+              "line" : 1118,
               "char" : 10,
               "storageClass" : [
                "enum"
@@ -11111,14 +11175,14 @@
        },
        {
         "kind" : "template",
-        "line" : 1019,
+        "line" : 1128,
         "char" : 2,
         "name" : "_EmitGeneratingPolicy",
         "parameters" : [],
         "members" : [
          {
           "kind" : "template",
-          "line" : 1021,
+          "line" : 1130,
           "char" : 3,
           "name" : "generateFunctionBody",
           "parameters" : [
@@ -11131,19 +11195,19 @@
            {
             "name" : "std.conv",
             "kind" : "import",
-            "line" : 1023,
+            "line" : 1132,
             "char" : 11,
             "protection" : "private"
            },
            {
             "name" : "generateFunctionBody",
             "kind" : "variable",
-            "line" : 1024,
+            "line" : 1133,
             "char" : 9,
             "storageClass" : [
              "enum"
             ],
-            "init" : "\"\\n\\t\\t\\t\\talias FnTy = SetFunctionAttributes!(typeof((*cast(Unique!ProcList*)&_procs)[].front),\\n\\t\\t\\t\\t                                    _exFuncInfo.linkage, _exFuncInfo.attrib);\\n\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\tif ((*cast(Unique!ProcList*)&_procs).isEmpty())\\n\\t\\t\\t\\t\\t\\treturn _exFuncInfo.RT.init;\\n\\t\\t\\t\\t\\t_exFuncInfo.RT ret;\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\tif ((*cast(Unique!ProcList*)&_procs).isEmpty())\\n\\t\\t\\t\\t\\t\\treturn;\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tstatic if (_exFuncInfo.attrib & FunctionAttribute.nothrow_)\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\ttry\\n\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\tforeach (FnTy proc; (*cast(Unique!ProcList*)&_procs).capture)\\n\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\t\\tret = proc(args);\\n\\t\\t\\t\\t\\t\\t\\t\\tif (!ret)\\n\\t\\t\\t\\t\\t\\t\\t\\t\\treturn ret;\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\t\\tproc(args);\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\tcatch (Throwable)\\n\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\tforeach (proc; (*cast(Unique!ProcList*)&_procs).capture)\\n\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\tret = proc(args);\\n\\t\\t\\t\\t\\t\\t\\tif (!ret)\\n\\t\\t\\t\\t\\t\\t\\t\\treturn ret;\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\tproc(args);\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t\\treturn ret;\\n\\t\\t\\t\""
+            "init" : "\"\\n\\t\\t\\t\\timport std.traits: SetFunctionAttributes;\\n\\t\\t\\t\\talias FnTy = SetFunctionAttributes!(DelegateTypeOf!Proc, _exFuncInfo.linkage, _exFuncInfo.attrib);\\n\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\tif ((*cast(Unique!ProcList*)&_procs).isEmpty())\\n\\t\\t\\t\\t\\t\\treturn _exFuncInfo.RT.init;\\n\\t\\t\\t\\t\\t_exFuncInfo.RT ret;\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\tif ((*cast(Unique!ProcList*)&_procs).isEmpty())\\n\\t\\t\\t\\t\\t\\treturn;\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tstatic if (_exFuncInfo.attrib & FunctionAttribute.nothrow_)\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\ttry\\n\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\tforeach (FnTy proc; (*cast(Unique!ProcList*)&_procs).capture)\\n\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\t\\tret = proc(args);\\n\\t\\t\\t\\t\\t\\t\\t\\tif (!ret)\\n\\t\\t\\t\\t\\t\\t\\t\\t\\treturn ret;\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\t\\tproc(args);\\n\\t\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\tcatch (Throwable)\\n\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\telse\\n\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\tforeach (proc; (*cast(Unique!ProcList*)&_procs).capture)\\n\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\tret = proc(args);\\n\\t\\t\\t\\t\\t\\t\\tif (!ret)\\n\\t\\t\\t\\t\\t\\t\\t\\treturn ret;\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t\\telse\\n\\t\\t\\t\\t\\t\\t{\\n\\t\\t\\t\\t\\t\\t\\tproc(args);\\n\\t\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tstatic if (is(_exFuncInfo.RT: bool))\\n\\t\\t\\t\\t\\treturn ret;\\n\\t\\t\\t\""
            }
           ]
          }
@@ -11153,7 +11217,7 @@
         "name" : "emit",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 1089,
+        "line" : 1198,
         "char" : 11,
         "type" : "RetType(Args args)",
         "parameters" : [
@@ -11167,7 +11231,7 @@
         "name" : "emit",
         "kind" : "function",
         "comment" : "ditto\n\n\n",
-        "line" : 1091,
+        "line" : 1200,
         "char" : 11,
         "type" : "const RetType(Args args)",
         "parameters" : [
@@ -11181,7 +11245,7 @@
         "name" : "emit",
         "kind" : "function",
         "comment" : "ditto\n\n\n",
-        "line" : 1093,
+        "line" : 1202,
         "char" : 11,
         "type" : "shared const RetType(Args args)",
         "parameters" : [
@@ -11195,56 +11259,56 @@
         "name" : "opCall",
         "kind" : "alias",
         "comment" : "ditto\n",
-        "line" : 1101,
+        "line" : 1210,
         "char" : 2,
         "type" : "emit"
        },
        {
         "name" : "Proc",
         "kind" : "alias",
-        "line" : 1102,
+        "line" : 1211,
         "char" : 2,
         "type" : "F"
        },
        {
         "name" : "Args",
         "kind" : "alias",
-        "line" : 1103,
+        "line" : 1212,
         "char" : 2,
         "type" : "_exFuncInfo.PT"
        },
        {
         "name" : "RetType",
         "kind" : "alias",
-        "line" : 1104,
+        "line" : 1213,
         "char" : 2,
         "type" : "_exFuncInfo.RT"
        },
        {
         "name" : "ProcList",
         "kind" : "alias",
-        "line" : 1105,
+        "line" : 1214,
         "char" : 2,
         "type" : "List!Proc"
        },
        {
         "name" : "voile.unique",
         "kind" : "import",
-        "line" : 1106,
+        "line" : 1215,
         "char" : 9,
         "protection" : "private"
        },
        {
         "name" : "_procs",
         "kind" : "variable",
-        "line" : 1107,
+        "line" : 1216,
         "char" : 26,
         "type" : "Unique!ProcList"
        },
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 1110,
+        "line" : 1219,
         "char" : 14,
         "name" : "toConnectable",
         "parameters" : [
@@ -11253,21 +11317,25 @@
           "kind" : "type"
          }
         ],
-        "constraint" : "is(typeof(toDelegate(fn))) && isCastableDelegate!(Proc, typeof(toDelegate(fn)))",
+        "constraint" : "is(typeof(toDelegate(fn))) && isCastableDelegate!(Proc, DelegateTypeOf!Func)",
         "members" : [
          {
           "name" : "toConnectable",
           "kind" : "function",
-          "line" : 1110,
+          "line" : 1219,
           "char" : 14,
-          "type" : "Proc(Func fn)",
+          "type" : "Proc(auto ref Func fn)",
           "parameters" : [
            {
             "name" : "fn",
-            "type" : "Func"
+            "type" : "Func",
+            "storageClass" : [
+             "auto",
+             "ref"
+            ]
            }
           ],
-          "endline" : 1115,
+          "endline" : 1224,
           "endchar" : 2
          }
         ]
@@ -11275,7 +11343,7 @@
        {
         "name" : "_TidCaller",
         "kind" : "function",
-        "line" : 1120,
+        "line" : 1229,
         "char" : 23,
         "storageClass" : [
          "static"
@@ -11291,13 +11359,13 @@
           "type" : "Tid*"
          }
         ],
-        "endline" : 1123,
+        "endline" : 1232,
         "endchar" : 3
        },
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 1125,
+        "line" : 1234,
         "char" : 15,
         "name" : "toConnectable",
         "parameters" : [
@@ -11311,7 +11379,7 @@
          {
           "name" : "toConnectable",
           "kind" : "function",
-          "line" : 1125,
+          "line" : 1234,
           "char" : 15,
           "type" : "Proc(Func tid)",
           "parameters" : [
@@ -11320,14 +11388,14 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1129,
+          "endline" : 1238,
           "endchar" : 3
          }
         ]
        },
        {
         "kind" : "template",
-        "line" : 1131,
+        "line" : 1240,
         "char" : 23,
         "name" : "_RangeOutputter",
         "parameters" : [
@@ -11340,7 +11408,7 @@
          {
           "name" : "_RangeOutputter",
           "kind" : "function",
-          "line" : 1131,
+          "line" : 1240,
           "char" : 23,
           "type" : "void(Args args, Range r)",
           "parameters" : [
@@ -11353,7 +11421,7 @@
             "type" : "Range"
            }
           ],
-          "endline" : 1135,
+          "endline" : 1244,
           "endchar" : 3
          }
         ]
@@ -11361,7 +11429,7 @@
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 1137,
+        "line" : 1246,
         "char" : 15,
         "name" : "toConnectable",
         "parameters" : [
@@ -11375,7 +11443,7 @@
          {
           "name" : "toConnectable",
           "kind" : "function",
-          "line" : 1137,
+          "line" : 1246,
           "char" : 15,
           "type" : "Proc(Range r)",
           "parameters" : [
@@ -11384,7 +11452,7 @@
             "type" : "Range"
            }
           ],
-          "endline" : 1147,
+          "endline" : 1256,
           "endchar" : 3
          }
         ]
@@ -11392,7 +11460,7 @@
        {
         "name" : "_FiberCaller",
         "kind" : "function",
-        "line" : 1151,
+        "line" : 1260,
         "char" : 23,
         "storageClass" : [
          "static"
@@ -11404,13 +11472,13 @@
           "type" : "Fiber"
          }
         ],
-        "endline" : 1154,
+        "endline" : 1263,
         "endchar" : 3
        },
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 1156,
+        "line" : 1265,
         "char" : 15,
         "name" : "toConnectable",
         "parameters" : [
@@ -11424,7 +11492,7 @@
          {
           "name" : "toConnectable",
           "kind" : "function",
-          "line" : 1156,
+          "line" : 1265,
           "char" : 15,
           "type" : "Proc(Func fib)",
           "parameters" : [
@@ -11433,7 +11501,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1160,
+          "endline" : 1269,
           "endchar" : 3
          }
         ]
@@ -11442,14 +11510,14 @@
         "name" : "HandlerProcId",
         "kind" : "alias",
         "comment" : "\n",
-        "line" : 1166,
+        "line" : 1275,
         "char" : 2,
         "type" : "ProcList.Iterator"
        },
        {
         "kind" : "template",
         "comment" : " Connect\n\n Params:\n     fn = delegate, function, Tid, Object( has opCall ), Fiber,\n          OutputRange(class or interface or T*, and has empty method)\n",
-        "line" : 1175,
+        "line" : 1284,
         "char" : 16,
         "name" : "connect",
         "parameters" : [
@@ -11463,16 +11531,20 @@
          {
           "name" : "connect",
           "kind" : "function",
-          "line" : 1175,
+          "line" : 1284,
           "char" : 16,
-          "type" : "HandlerProcId(Func fn)",
+          "type" : "HandlerProcId(auto ref Func fn)",
           "parameters" : [
            {
             "name" : "fn",
-            "type" : "Func"
+            "type" : "Func",
+            "storageClass" : [
+             "auto",
+             "ref"
+            ]
            }
           ],
-          "endline" : 1185,
+          "endline" : 1294,
           "endchar" : 2
          }
         ]
@@ -11480,7 +11552,7 @@
        {
         "kind" : "template",
         "comment" : " 一度だけ実行するハンドラを接続する\n",
-        "line" : 1191,
+        "line" : 1300,
         "char" : 16,
         "name" : "singleShotConnect",
         "parameters" : [
@@ -11494,7 +11566,7 @@
          {
           "name" : "singleShotConnect",
           "kind" : "function",
-          "line" : 1191,
+          "line" : 1300,
           "char" : 16,
           "type" : "HandlerProcId(Func fn)",
           "parameters" : [
@@ -11503,7 +11575,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1224,
+          "endline" : 1333,
           "endchar" : 2
          }
         ]
@@ -11511,7 +11583,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 1227,
+        "line" : 1336,
         "char" : 7,
         "name" : "opOpAssign",
         "parameters" : [
@@ -11530,7 +11602,7 @@
          {
           "name" : "opOpAssign",
           "kind" : "function",
-          "line" : 1227,
+          "line" : 1336,
           "char" : 7,
           "type" : "void(Func dg)",
           "parameters" : [
@@ -11539,7 +11611,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1230,
+          "endline" : 1339,
           "endchar" : 2
          }
         ]
@@ -11548,14 +11620,14 @@
         "name" : "put",
         "kind" : "alias",
         "comment" : "ditto\n",
-        "line" : 1234,
+        "line" : 1343,
         "char" : 2,
         "type" : "connect"
        },
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 1240,
+        "line" : 1349,
         "char" : 16,
         "name" : "connectedId",
         "parameters" : [
@@ -11569,7 +11641,7 @@
          {
           "name" : "connectedId",
           "kind" : "function",
-          "line" : 1240,
+          "line" : 1349,
           "char" : 16,
           "type" : "HandlerProcId(Func fn)",
           "parameters" : [
@@ -11578,7 +11650,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1253,
+          "endline" : 1362,
           "endchar" : 2
          }
         ]
@@ -11586,7 +11658,7 @@
        {
         "kind" : "template",
         "comment" : " Concut\n\n Params:\n     procs = other Handler\n",
-        "line" : 1262,
+        "line" : 1371,
         "char" : 7,
         "name" : "opOpAssign",
         "parameters" : [
@@ -11605,7 +11677,7 @@
          {
           "name" : "opOpAssign",
           "kind" : "function",
-          "line" : 1262,
+          "line" : 1371,
           "char" : 7,
           "type" : "void(auto ref ProcContainer procs)",
           "parameters" : [
@@ -11618,7 +11690,7 @@
             ]
            }
           ],
-          "endline" : 1271,
+          "endline" : 1380,
           "endchar" : 2
          }
         ]
@@ -11627,19 +11699,19 @@
         "name" : "opSlice",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 1278,
+        "line" : 1387,
         "char" : 7,
         "storageClass" : [
          "auto"
         ],
         "type" : "()",
-        "endline" : 1283,
+        "endline" : 1392,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 1289,
+        "line" : 1398,
         "char" : 7,
         "name" : "opCast",
         "parameters" : [
@@ -11653,10 +11725,10 @@
          {
           "name" : "opCast",
           "kind" : "function",
-          "line" : 1289,
+          "line" : 1398,
           "char" : 7,
           "type" : "const pure nothrow bool()",
-          "endline" : 1293,
+          "endline" : 1402,
           "endchar" : 2
          }
         ]
@@ -11664,7 +11736,7 @@
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 1299,
+        "line" : 1408,
         "char" : 7,
         "name" : "disconnect",
         "parameters" : [
@@ -11678,7 +11750,7 @@
          {
           "name" : "disconnect",
           "kind" : "function",
-          "line" : 1299,
+          "line" : 1408,
           "char" : 7,
           "type" : "void(Func fn)",
           "parameters" : [
@@ -11687,7 +11759,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1303,
+          "endline" : 1412,
           "endchar" : 2
          }
         ]
@@ -11695,7 +11767,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 1306,
+        "line" : 1415,
         "char" : 7,
         "name" : "disconnect",
         "parameters" : [
@@ -11709,7 +11781,7 @@
          {
           "name" : "disconnect",
           "kind" : "function",
-          "line" : 1306,
+          "line" : 1415,
           "char" : 7,
           "type" : "void(Func id)",
           "parameters" : [
@@ -11718,7 +11790,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1312,
+          "endline" : 1421,
           "endchar" : 2
          }
         ]
@@ -11726,7 +11798,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 1315,
+        "line" : 1424,
         "char" : 7,
         "name" : "disconnect",
         "parameters" : [
@@ -11740,7 +11812,7 @@
          {
           "name" : "disconnect",
           "kind" : "function",
-          "line" : 1315,
+          "line" : 1424,
           "char" : 7,
           "type" : "void(Func hnd)",
           "parameters" : [
@@ -11749,7 +11821,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1322,
+          "endline" : 1431,
           "endchar" : 2
          }
         ]
@@ -11758,14 +11830,14 @@
         "name" : "remove",
         "kind" : "alias",
         "comment" : "ditto\n",
-        "line" : 1325,
+        "line" : 1434,
         "char" : 2,
         "type" : "disconnect"
        },
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 1330,
+        "line" : 1439,
         "char" : 7,
         "name" : "insertAfter",
         "parameters" : [
@@ -11779,7 +11851,7 @@
          {
           "name" : "insertAfter",
           "kind" : "function",
-          "line" : 1330,
+          "line" : 1439,
           "char" : 7,
           "type" : "void(ProcList.Range r, Func fn)",
           "parameters" : [
@@ -11792,7 +11864,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1337,
+          "endline" : 1446,
           "endchar" : 2
          }
         ]
@@ -11800,7 +11872,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 1340,
+        "line" : 1449,
         "char" : 7,
         "name" : "insertAfter",
         "parameters" : [
@@ -11814,7 +11886,7 @@
          {
           "name" : "insertAfter",
           "kind" : "function",
-          "line" : 1340,
+          "line" : 1449,
           "char" : 7,
           "type" : "void(HandlerProcId needleid, Func fn)",
           "parameters" : [
@@ -11827,7 +11899,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1347,
+          "endline" : 1456,
           "endchar" : 2
          }
         ]
@@ -11835,7 +11907,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 1350,
+        "line" : 1459,
         "char" : 7,
         "name" : "insertAfter",
         "parameters" : [
@@ -11849,7 +11921,7 @@
          {
           "name" : "insertAfter",
           "kind" : "function",
-          "line" : 1350,
+          "line" : 1459,
           "char" : 7,
           "type" : "void(Func needle, Func fn)",
           "parameters" : [
@@ -11862,7 +11934,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1358,
+          "endline" : 1467,
           "endchar" : 2
          }
         ]
@@ -11870,7 +11942,7 @@
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 1363,
+        "line" : 1472,
         "char" : 7,
         "name" : "insertBefore",
         "parameters" : [
@@ -11884,7 +11956,7 @@
          {
           "name" : "insertBefore",
           "kind" : "function",
-          "line" : 1363,
+          "line" : 1472,
           "char" : 7,
           "type" : "void(ProcList.Range r, Func fn)",
           "parameters" : [
@@ -11897,7 +11969,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1370,
+          "endline" : 1479,
           "endchar" : 2
          }
         ]
@@ -11905,7 +11977,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 1373,
+        "line" : 1482,
         "char" : 7,
         "name" : "insertBefore",
         "parameters" : [
@@ -11919,7 +11991,7 @@
          {
           "name" : "insertBefore",
           "kind" : "function",
-          "line" : 1373,
+          "line" : 1482,
           "char" : 7,
           "type" : "void(HandlerProcId needleid, Func fn)",
           "parameters" : [
@@ -11932,7 +12004,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1380,
+          "endline" : 1489,
           "endchar" : 2
          }
         ]
@@ -11940,7 +12012,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 1383,
+        "line" : 1492,
         "char" : 7,
         "name" : "insertBefore",
         "parameters" : [
@@ -11954,7 +12026,7 @@
          {
           "name" : "insertBefore",
           "kind" : "function",
-          "line" : 1383,
+          "line" : 1492,
           "char" : 7,
           "type" : "void(Func needle, Func fn)",
           "parameters" : [
@@ -11967,7 +12039,7 @@
             "type" : "Func"
            }
           ],
-          "endline" : 1391,
+          "endline" : 1500,
           "endchar" : 2
          }
         ]
@@ -11976,10 +12048,10 @@
         "name" : "clear",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 1396,
+        "line" : 1505,
         "char" : 7,
         "type" : "pure void()",
-        "endline" : 1401,
+        "endline" : 1510,
         "endchar" : 2
        }
       ]
@@ -11987,28 +12059,28 @@
     ]
    },
    {
-    "name" : "__unittest_L1467_C9",
+    "name" : "__unittest_L1576_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1467,
+    "line" : 1576,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1519,
+    "endline" : 1632,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1519_C9",
+    "name" : "__unittest_L1632_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "コピー禁止・ムーブ可\n",
-    "line" : 1519,
+    "line" : 1632,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1527,
+    "endline" : 1640,
     "endchar" : 1
    }
   ]
@@ -18657,8 +18729,8 @@
     "comment" : " 名前からロガーを取得する\n",
     "line" : 1330,
     "char" : 8,
-    "deco" : "FNfAyaC3std12experimental6logger4core6LoggerZQBn",
-    "originalType" : "@safe Logger(string name, Logger defaultLogger = sharedLog)",
+    "deco" : "FNeAyaC3std12experimental6logger4core6LoggerZQBn",
+    "originalType" : "@trusted Logger(string name, Logger defaultLogger = cast()sharedLog)",
     "parameters" : [
      {
       "name" : "name",
@@ -20406,8 +20478,174 @@
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1599,
+    "endline" : 1600,
     "endchar" : 1
+   },
+   {
+    "name" : "std.range",
+    "kind" : "import",
+    "line" : 1600,
+    "char" : 16,
+    "protection" : "private",
+    "selective" : [
+     "isInputRange",
+     "ElementType"
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : " Create combinations matrix from specified lists of conditional patterns\n\n Params:\n      matrix   = Matrix of conditional patterns. $(BR)\n                 ex; Input   `[[\"1\", \"2\"], [\"A\", \"B\"]]` $(BR)\n                     Results `[[\"1\", \"A\"], [\"1\", \"B\"], [\"2\", \"A\"], [\"2\", \"B\"]]`\n      matrixAA = Matrix of conditional patterns. For each column, the name is represented by an associative array key. $(BR)\n                 ex; Input   `[\"P1\": [\"1\", \"2\"], \"P2\": [\"A\", \"B\"]]` $(BR)\n                     Results `[[\"P1\": \"1\", \"P2\": \"A\"], [\"P1\": \"1\", \"P2\": \"B\"], [\"P1\": \"2\", \"P2\": \"A\"], [\"P1\": \"2\", \"P2\": \"B\"]]`\n Returns:\n      Matrix of combination\n",
+    "line" : 1614,
+    "char" : 6,
+    "name" : "combinationMatrix",
+    "parameters" : [
+     {
+      "name" : "R",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputRange!R && isInputRange!(ElementType!R)",
+    "members" : [
+     {
+      "name" : "combinationMatrix",
+      "kind" : "function",
+      "line" : 1614,
+      "char" : 6,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "(R matrix)",
+      "parameters" : [
+       {
+        "name" : "matrix",
+        "type" : "R"
+       }
+      ],
+      "endline" : 1629,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1632_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "\n",
+    "line" : 1632,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1651,
+    "endchar" : 1
+   },
+   {
+    "name" : "std.range",
+    "kind" : "import",
+    "line" : 1651,
+    "char" : 16,
+    "protection" : "private",
+    "selective" : [
+     "isInputRange"
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 1653,
+    "char" : 6,
+    "name" : "combinationMatrix",
+    "parameters" : [
+     {
+      "name" : "K",
+      "kind" : "type"
+     },
+     {
+      "name" : "R",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isInputRange!R",
+    "members" : [
+     {
+      "name" : "combinationMatrix",
+      "kind" : "function",
+      "line" : 1653,
+      "char" : 6,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "(R[K] matrixAA)",
+      "parameters" : [
+       {
+        "name" : "matrixAA",
+        "type" : "R[K]"
+       }
+      ],
+      "endline" : 1663,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1665_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "\n",
+    "line" : 1665,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1685,
+    "endchar" : 1
+   },
+   {
+    "name" : "std.range",
+    "kind" : "import",
+    "line" : 1685,
+    "char" : 16,
+    "protection" : "private",
+    "selective" : [
+     "isRandomAccessRange"
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : " Shuffle elements of specified range\n",
+    "line" : 1689,
+    "char" : 6,
+    "name" : "shuffle",
+    "parameters" : [
+     {
+      "name" : "R",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isRandomAccessRange!R",
+    "members" : [
+     {
+      "name" : "shuffle",
+      "kind" : "function",
+      "line" : 1689,
+      "char" : 6,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "(R ary)",
+      "parameters" : [
+       {
+        "name" : "ary",
+        "type" : "R"
+       }
+      ],
+      "endline" : 1699,
+      "endchar" : 1
+     }
+    ]
    }
   ]
  },
@@ -26022,7 +26260,7 @@
     "comment" : "\n",
     "line" : 775,
     "char" : 10,
-    "deco" : "FNaNbNiNfAAyaXS5voile8parseopt8OptShort",
+    "deco" : "FNaNbNfAAyaXS5voile8parseopt8OptShort",
     "parameters" : [
      {
       "name" : "str",
@@ -26039,7 +26277,7 @@
     "comment" : "\n",
     "line" : 781,
     "char" : 9,
-    "deco" : "FNaNbNiNfAAyaXS5voile8parseopt7OptLong",
+    "deco" : "FNaNbNfAAyaXS5voile8parseopt7OptLong",
     "parameters" : [
      {
       "name" : "str",
@@ -26506,11 +26744,21 @@
     ]
    },
    {
+    "name" : "voile.handler",
+    "kind" : "import",
+    "line" : 10,
+    "char" : 8,
+    "protection" : "private",
+    "selective" : [
+     "DelegateTypeOf"
+    ]
+   },
+   {
     "name" : "Allocator",
     "kind" : "alias",
     "protection" : "public",
     "comment" : " アロケータ\n\n CountedDataを作成する際、メモリを割り当てる関数の型。\n",
-    "line" : 17,
+    "line" : 18,
     "char" : 1,
     "deco" : "DFNaNbZPS5voile6refcnt15CountedInstance"
    },
@@ -26519,7 +26767,7 @@
     "kind" : "alias",
     "protection" : "public",
     "comment" : " デアロケータ\n\n CountedDataを解放する際、メモリを解放する関数の型。\n",
-    "line" : 24,
+    "line" : 25,
     "char" : 1,
     "deco" : "DFNaNbNiPS5voile6refcnt15CountedInstanceZv"
    },
@@ -26527,7 +26775,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " アロケータかどうかを判定する\n",
-    "line" : 29,
+    "line" : 30,
     "char" : 1,
     "name" : "isAllocator",
     "parameters" : [
@@ -26541,34 +26789,34 @@
      {
       "name" : "isAllocator",
       "kind" : "variable",
-      "line" : 34,
-      "char" : 13,
+      "line" : 33,
+      "char" : 12,
       "storageClass" : [
        "enum"
       ],
       "deco" : "b",
-      "init" : "isAssignable!(Allocator, typeof(toDelegate((typeof(&T[0])).init)))"
+      "init" : "isAssignable!(Allocator, DelegateTypeOf!(T[0]))"
      }
     ]
    },
    {
-    "name" : "__unittest_L42_C9",
+    "name" : "__unittest_L36_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 42,
+    "line" : 36,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 60,
+    "endline" : 54,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " デアロケータかどうかを判定する\n",
-    "line" : 60,
+    "line" : 54,
     "char" : 1,
     "name" : "isDeallocator",
     "parameters" : [
@@ -26582,7 +26830,7 @@
      {
       "name" : "isDeallocator",
       "kind" : "variable",
-      "line" : 65,
+      "line" : 59,
       "char" : 13,
       "storageClass" : [
        "enum"
@@ -26593,16 +26841,16 @@
     ]
    },
    {
-    "name" : "__unittest_L73_C9",
+    "name" : "__unittest_L67_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 73,
+    "line" : 67,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 90,
+    "endline" : 84,
     "endchar" : 1
    },
    {
@@ -26610,7 +26858,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " malloc/freeによるアロケータ\n",
-    "line" : 90,
+    "line" : 84,
     "char" : 6,
     "storageClass" : [
      "auto"
@@ -26624,7 +26872,7 @@
       "default" : "0LU"
      }
     ],
-    "endline" : 126,
+    "endline" : 120,
     "endchar" : 1
    },
    {
@@ -26632,7 +26880,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " GCによるアロケータ\n",
-    "line" : 131,
+    "line" : 125,
     "char" : 6,
     "storageClass" : [
      "auto"
@@ -26646,7 +26894,7 @@
       "default" : "0LU"
      }
     ],
-    "endline" : 151,
+    "endline" : 145,
     "endchar" : 1
    },
    {
@@ -26654,7 +26902,7 @@
     "kind" : "struct",
     "protection" : "public",
     "comment" : " 参照カウンタ用のデータを作成する\n",
-    "line" : 156,
+    "line" : 150,
     "char" : 1,
     "members" : [
      {
@@ -26662,7 +26910,7 @@
       "kind" : "variable",
       "protection" : "public",
       "comment" : "参照カウンタ\n",
-      "line" : 159,
+      "line" : 153,
       "char" : 10,
       "deco" : "i",
       "offset" : 0
@@ -26672,7 +26920,7 @@
       "kind" : "variable",
       "protection" : "public",
       "comment" : "生データ(データのインスタンスと拡張領域を含むメモリ領域全体)\n",
-      "line" : 161,
+      "line" : 155,
       "char" : 10,
       "deco" : "Ah",
       "offset" : 8
@@ -26682,7 +26930,7 @@
       "kind" : "variable",
       "protection" : "public",
       "comment" : "解放時に呼び出すためのコールバック\n",
-      "line" : 163,
+      "line" : 157,
       "char" : 14,
       "deco" : "DFNaNbNiPS5voile6refcnt15CountedInstanceZv",
       "originalType" : "Deallocator",
@@ -26694,7 +26942,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタ用のデータを作成するmixinテンプレート\n",
-    "line" : 169,
+    "line" : 163,
     "char" : 7,
     "name" : "CountedImpl",
     "parameters" : [
@@ -26707,7 +26955,7 @@
      {
       "name" : "_instance",
       "kind" : "variable",
-      "line" : 171,
+      "line" : 165,
       "char" : 27,
       "type" : "CountedInstance*"
      },
@@ -26715,37 +26963,37 @@
       "name" : "buffer",
       "kind" : "function",
       "comment" : " 生データ(データのインスタンスと拡張領域を含むメモリ領域全体)\n",
-      "line" : 176,
+      "line" : 170,
       "char" : 17,
       "type" : "inout pure nothrow @nogc @property @safe inout(ubyte)[]()",
-      "endline" : 180,
+      "endline" : 174,
       "endchar" : 2
      },
      {
       "name" : "data",
       "kind" : "function",
       "comment" : " データのインスタンス\n",
-      "line" : 185,
+      "line" : 179,
       "char" : 15,
       "type" : "inout pure nothrow @nogc @property ref @trusted inout(T)()",
-      "endline" : 190,
+      "endline" : 184,
       "endchar" : 2
      },
      {
       "name" : "extra",
       "kind" : "function",
       "comment" : " 拡張データ領域\n",
-      "line" : 195,
+      "line" : 189,
       "char" : 17,
       "type" : "inout pure nothrow @nogc @property @safe inout(ubyte)[]()",
-      "endline" : 200,
+      "endline" : 194,
       "endchar" : 2
      },
      {
       "name" : "initializeCountedInstance",
       "kind" : "function",
       "comment" : " 初期化する\n\n Note:\n      本関数を呼び出して初期化した場合、正しくrelease(CountedInstanceのdeallocatorの呼び出し)をしなければ\n      メモリリークする\n",
-      "line" : 209,
+      "line" : 203,
       "char" : 7,
       "type" : "pure @nogc @system void(ubyte[] refbuf)",
       "parameters" : [
@@ -26754,14 +27002,14 @@
         "type" : "ubyte[]"
        }
       ],
-      "endline" : 213,
+      "endline" : 207,
       "endchar" : 2
      },
      {
       "name" : "initializeCountedInstance",
       "kind" : "function",
       "comment" : "ditto\n",
-      "line" : 215,
+      "line" : 209,
       "char" : 7,
       "type" : "pure @nogc @system void(size_t bufSize = T.sizeof)",
       "parameters" : [
@@ -26771,13 +27019,13 @@
         "default" : "T.sizeof"
        }
       ],
-      "endline" : 218,
+      "endline" : 212,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "comment" : "ditto\n",
-      "line" : 220,
+      "line" : 214,
       "char" : 7,
       "name" : "initializeCountedInstance",
       "parameters" : [
@@ -26790,7 +27038,7 @@
        {
         "name" : "initializeCountedInstance",
         "kind" : "function",
-        "line" : 220,
+        "line" : 214,
         "char" : 7,
         "type" : "void(scope Alloc alloc)",
         "parameters" : [
@@ -26802,7 +27050,7 @@
           ]
          }
         ],
-        "endline" : 231,
+        "endline" : 225,
         "endchar" : 2
        }
       ]
@@ -26810,7 +27058,7 @@
      {
       "kind" : "template",
       "comment" : " キャスト\n",
-      "line" : 236,
+      "line" : 230,
       "char" : 7,
       "name" : "opCast",
       "parameters" : [
@@ -26824,10 +27072,10 @@
        {
         "name" : "opCast",
         "kind" : "function",
-        "line" : 236,
+        "line" : 230,
         "char" : 7,
         "type" : "const pure nothrow @nogc @safe bool()",
-        "endline" : 240,
+        "endline" : 234,
         "endchar" : 2
        }
       ]
@@ -26836,20 +27084,20 @@
       "name" : "addRef",
       "kind" : "function",
       "comment" : " 参照カウンタ加算\n",
-      "line" : 245,
+      "line" : 239,
       "char" : 6,
       "type" : "pure @nogc @system int()",
-      "endline" : 249,
+      "endline" : 243,
       "endchar" : 2
      },
      {
       "name" : "release",
       "kind" : "function",
       "comment" : " 参照カウンタ減算と解放\n",
-      "line" : 254,
+      "line" : 248,
       "char" : 6,
       "type" : "pure @system int()",
-      "endline" : 269,
+      "endline" : 263,
       "endchar" : 2
      }
     ]
@@ -26858,7 +27106,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウントを持つを形成する(RefCounted専用)\n\n CountedImplを実装しており、isCountedData!Tでtrueを返す型です。\n ただし、メソッドはすべてモジュール内ローカルとなっており、アクセスは許されません。\n かならずRefCountedを通してアクセスしてください。\n",
-    "line" : 280,
+    "line" : 274,
     "char" : 1,
     "name" : "CountedData",
     "parameters" : [
@@ -26872,14 +27120,14 @@
       "name" : "CountedData",
       "kind" : "struct",
       "protection" : "public",
-      "line" : 280,
+      "line" : 274,
       "char" : 1,
       "members" : [
        {
         "name" : "CountedImpl!T",
         "kind" : "mixin",
         "protection" : "public",
-        "line" : 283,
+        "line" : 277,
         "char" : 2
        }
       ]
@@ -26889,7 +27137,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 286,
+    "line" : 280,
     "char" : 19,
     "name" : "isRef",
     "parameters" : [
@@ -26902,7 +27150,7 @@
      {
       "name" : "isRef",
       "kind" : "variable",
-      "line" : 286,
+      "line" : 280,
       "char" : 19,
       "storageClass" : [
        "enum"
@@ -26916,7 +27164,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " RefCountedにできるデータか検証する\n\n RefCountedに直接対応可能な型は以下の特徴を備えています。\n  - 参照型か、ポインタのサイズと同じサイズ\n  - releaseまたはRelease関数を備えていて、それらは整数を返す\n  - addRefまたはAddRef関数を備えていて、それらは整数を返す\n\n 上記に該当しない場合、RefCounted!Tとすると、自動的に上記特徴を備えたCountedData!Tが内部的に使用されます。\n\n Params:\n      T = 調べたい型\n See_Also:\n      $(LINK2 #.CountedData, CountedData)\n",
-    "line" : 303,
+    "line" : 297,
     "char" : 1,
     "name" : "isCountedData",
     "parameters" : [
@@ -26929,7 +27177,7 @@
      {
       "name" : "isCountedData",
       "kind" : "variable",
-      "line" : 311,
+      "line" : 305,
       "char" : 8,
       "storageClass" : [
        "enum"
@@ -26939,22 +27187,22 @@
     ]
    },
    {
-    "name" : "__unittest_L320_C9",
+    "name" : "__unittest_L314_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 320,
+    "line" : 314,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 341,
+    "endline" : 335,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 341,
+    "line" : 335,
     "char" : 9,
     "name" : "uniqueMemberName",
     "parameters" : [
@@ -26979,14 +27227,14 @@
      {
       "name" : "std.conv",
       "kind" : "import",
-      "line" : 343,
+      "line" : 337,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "candidate",
       "kind" : "variable",
-      "line" : 344,
+      "line" : 338,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -26997,7 +27245,7 @@
      {
       "name" : "uniqueMemberName",
       "kind" : "variable",
-      "line" : 347,
+      "line" : 341,
       "char" : 15,
       "storageClass" : [
        "enum"
@@ -27010,7 +27258,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 356,
+    "line" : 350,
     "char" : 9,
     "name" : "RefType",
     "parameters" : [
@@ -27023,7 +27271,7 @@
      {
       "name" : "RefType",
       "kind" : "alias",
-      "line" : 360,
+      "line" : 354,
       "char" : 3,
       "type" : "T"
      }
@@ -27033,7 +27281,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタのあるデータを管理する\n\n isCountedDataなデータの参照カウントをコピーの発生や寿命の終了で自動的に増減させる。\n\n Params:\n      T = isCountedDataなclass/interface/structのポインタ/size_tと同サイズのstruct、およびCountedDataのインスタンス\n See_Also:\n      $(LINK2 #.isCountedData, isCountedData)\n",
-    "line" : 382,
+    "line" : 376,
     "char" : 1,
     "name" : "RefCounted",
     "parameters" : [
@@ -27047,13 +27295,13 @@
       "name" : "RefCounted",
       "kind" : "struct",
       "protection" : "public",
-      "line" : 382,
+      "line" : 376,
       "char" : 1,
       "members" : [
        {
         "kind" : "template",
         "comment" : " 参照カウンタを保持してアタッチ＆加算する\n",
-        "line" : 412,
+        "line" : 406,
         "char" : 2,
         "name" : "this",
         "parameters" : [
@@ -27067,7 +27315,7 @@
          {
           "name" : "this",
           "kind" : "constructor",
-          "line" : 412,
+          "line" : 406,
           "char" : 2,
           "type" : "@trusted (U newRefData)",
           "parameters" : [
@@ -27076,7 +27324,7 @@
             "type" : "U"
            }
           ],
-          "endline" : 425,
+          "endline" : 419,
           "endchar" : 2
          }
         ]
@@ -27085,18 +27333,18 @@
         "name" : "~this",
         "kind" : "destructor",
         "comment" : " 参照カウンタを減算し、カウンタが0になったら開放する\n",
-        "line" : 445,
+        "line" : 439,
         "char" : 2,
         "storageClass" : [
          "@trusted"
         ],
-        "endline" : 462,
+        "endline" : 456,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : " 参照カウンタを保持してアタッチ＆加算する\n",
-        "line" : 467,
+        "line" : 461,
         "char" : 7,
         "name" : "opAssign",
         "parameters" : [
@@ -27110,7 +27358,7 @@
          {
           "name" : "opAssign",
           "kind" : "function",
-          "line" : 467,
+          "line" : 461,
           "char" : 7,
           "type" : "void(U newRefData)",
           "parameters" : [
@@ -27119,7 +27367,7 @@
             "type" : "U"
            }
           ],
-          "endline" : 493,
+          "endline" : 487,
           "endchar" : 2
          }
         ]
@@ -27127,7 +27375,7 @@
        {
         "kind" : "template",
         "comment" : " 参照外し\n",
-        "line" : 498,
+        "line" : 492,
         "char" : 11,
         "name" : "opUnary",
         "parameters" : [
@@ -27142,13 +27390,13 @@
          {
           "name" : "opUnary",
           "kind" : "function",
-          "line" : 498,
+          "line" : 492,
           "char" : 11,
           "storageClass" : [
            "auto"
           ],
           "type" : "ref ()",
-          "endline" : 501,
+          "endline" : 495,
           "endchar" : 2
          }
         ]
@@ -27158,23 +27406,23 @@
     ]
    },
    {
-    "name" : "__unittest_L507_C7",
+    "name" : "__unittest_L501_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 507,
+    "line" : 501,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 534,
+    "endline" : 528,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタかどうか確認します\n",
-    "line" : 534,
+    "line" : 528,
     "char" : 6,
     "name" : "isRefCounted",
     "parameters" : [
@@ -27187,7 +27435,7 @@
      {
       "name" : "isRefCounted",
       "kind" : "variable",
-      "line" : 534,
+      "line" : 528,
       "char" : 6,
       "storageClass" : [
        "enum"
@@ -27197,23 +27445,23 @@
     ]
    },
    {
-    "name" : "__unittest_L536_C7",
+    "name" : "__unittest_L530_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 536,
+    "line" : 530,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 545,
+    "endline" : 539,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタの元データの型を得ます\n",
-    "line" : 545,
+    "line" : 539,
     "char" : 1,
     "name" : "RefCountedTypeOf",
     "parameters" : [
@@ -27227,30 +27475,30 @@
      {
       "name" : "RefCountedTypeOf",
       "kind" : "alias",
-      "line" : 548,
+      "line" : 542,
       "char" : 2,
       "type" : "TemplateArgsOf!T[0]"
      }
     ]
    },
    {
-    "name" : "__unittest_L551_C7",
+    "name" : "__unittest_L545_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 551,
+    "line" : 545,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 559,
+    "endline" : 553,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照が初期化されているか確認する\n",
-    "line" : 559,
+    "line" : 553,
     "char" : 6,
     "name" : "isInitialized",
     "parameters" : [
@@ -27263,7 +27511,7 @@
      {
       "name" : "isInitialized",
       "kind" : "function",
-      "line" : 559,
+      "line" : 553,
       "char" : 6,
       "type" : "bool(in ref RefCounted!T dat)",
       "parameters" : [
@@ -27276,7 +27524,7 @@
         ]
        }
       ],
-      "endline" : 577,
+      "endline" : 571,
       "endchar" : 1
      }
     ]
@@ -27285,7 +27533,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 579,
+    "line" : 573,
     "char" : 6,
     "name" : "isEmpty",
     "parameters" : [
@@ -27298,7 +27546,7 @@
      {
       "name" : "isEmpty",
       "kind" : "function",
-      "line" : 579,
+      "line" : 573,
       "char" : 6,
       "type" : "bool(in ref RefCounted!T dat)",
       "parameters" : [
@@ -27311,7 +27559,7 @@
         ]
        }
       ],
-      "endline" : 582,
+      "endline" : 576,
       "endchar" : 1
      }
     ]
@@ -27321,28 +27569,28 @@
     "kind" : "alias",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 584,
+    "line" : 578,
     "char" : 1,
     "originalType" : "isEmpty"
    },
    {
-    "name" : "__unittest_L586_C7",
+    "name" : "__unittest_L580_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 586,
+    "line" : 580,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 601,
+    "endline" : 595,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタ加算せずにアタッチする\n",
-    "line" : 601,
+    "line" : 595,
     "char" : 6,
     "name" : "attach",
     "parameters" : [
@@ -27360,7 +27608,7 @@
      {
       "name" : "attach",
       "kind" : "function",
-      "line" : 601,
+      "line" : 595,
       "char" : 6,
       "type" : "pure nothrow @property void(ref RefCounted!T rc, auto ref U newRefData)",
       "parameters" : [
@@ -27380,29 +27628,29 @@
         ]
        }
       ],
-      "endline" : 607,
+      "endline" : 601,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L609_C7",
+    "name" : "__unittest_L603_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 609,
+    "line" : 603,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 633,
+    "endline" : 627,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照外し\n",
-    "line" : 633,
+    "line" : 627,
     "char" : 29,
     "name" : "deref",
     "parameters" : [
@@ -27415,7 +27663,7 @@
      {
       "name" : "deref",
       "kind" : "function",
-      "line" : 633,
+      "line" : 627,
       "char" : 29,
       "type" : "pure nothrow ref inout(T)(inout ref RefCounted!T rc)",
       "parameters" : [
@@ -27428,29 +27676,29 @@
         ]
        }
       ],
-      "endline" : 636,
+      "endline" : 630,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L638_C7",
+    "name" : "__unittest_L632_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 638,
+    "line" : 632,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 650,
+    "endline" : 644,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " ポインタを得る\n",
-    "line" : 650,
+    "line" : 644,
     "char" : 26,
     "name" : "ptr",
     "parameters" : [
@@ -27463,7 +27711,7 @@
      {
       "name" : "ptr",
       "kind" : "function",
-      "line" : 650,
+      "line" : 644,
       "char" : 26,
       "type" : "pure nothrow inout(T)*(inout ref RefCounted!T rc)",
       "parameters" : [
@@ -27476,29 +27724,29 @@
         ]
        }
       ],
-      "endline" : 653,
+      "endline" : 647,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L655_C7",
+    "name" : "__unittest_L649_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 655,
+    "line" : 649,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 668,
+    "endline" : 662,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタを生成\n",
-    "line" : 668,
+    "line" : 662,
     "char" : 6,
     "name" : "createRefCounted",
     "parameters" : [
@@ -27512,6 +27760,49 @@
      }
     ],
     "constraint" : "isRefCounted!T",
+    "members" : [
+     {
+      "name" : "createRefCounted",
+      "kind" : "function",
+      "line" : 662,
+      "char" : 6,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "@trusted (auto ref Args args)",
+      "parameters" : [
+       {
+        "name" : "args",
+        "type" : "Args",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 666,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 668,
+    "char" : 6,
+    "name" : "createRefCounted",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "Args",
+      "kind" : "tuple"
+     }
+    ],
+    "constraint" : "is(T == class) && isCountedData!T",
     "members" : [
      {
       "name" : "createRefCounted",
@@ -27554,7 +27845,7 @@
       "kind" : "tuple"
      }
     ],
-    "constraint" : "is(T == class) && isCountedData!T",
+    "constraint" : "!isPointer!T && (is(T == struct) || is(T == union)) && isCountedData!T",
     "members" : [
      {
       "name" : "createRefCounted",
@@ -27597,7 +27888,7 @@
       "kind" : "tuple"
      }
     ],
-    "constraint" : "!isPointer!T && (is(T == struct) || is(T == union)) && isCountedData!T",
+    "constraint" : "isPointer!T && (is(PointerTarget!T == struct) || is(PointerTarget!T == union)) && isCountedData!T",
     "members" : [
      {
       "name" : "createRefCounted",
@@ -27618,7 +27909,7 @@
         ]
        }
       ],
-      "endline" : 684,
+      "endline" : 685,
       "endchar" : 1
      }
     ]
@@ -27627,50 +27918,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 686,
-    "char" : 6,
-    "name" : "createRefCounted",
-    "parameters" : [
-     {
-      "name" : "T",
-      "kind" : "type"
-     },
-     {
-      "name" : "Args",
-      "kind" : "tuple"
-     }
-    ],
-    "constraint" : "isPointer!T && (is(PointerTarget!T == struct) || is(PointerTarget!T == union)) && isCountedData!T",
-    "members" : [
-     {
-      "name" : "createRefCounted",
-      "kind" : "function",
-      "line" : 686,
-      "char" : 6,
-      "storageClass" : [
-       "auto"
-      ],
-      "type" : "@trusted (auto ref Args args)",
-      "parameters" : [
-       {
-        "name" : "args",
-        "type" : "Args",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 691,
-      "endchar" : 1
-     }
-    ]
-   },
-   {
-    "kind" : "template",
-    "protection" : "public",
-    "comment" : "ditto\n",
-    "line" : 693,
+    "line" : 687,
     "char" : 6,
     "name" : "createRefCounted",
     "parameters" : [
@@ -27688,7 +27936,7 @@
      {
       "name" : "createRefCounted",
       "kind" : "function",
-      "line" : 693,
+      "line" : 687,
       "char" : 6,
       "storageClass" : [
        "auto"
@@ -27704,7 +27952,7 @@
         ]
        }
       ],
-      "endline" : 702,
+      "endline" : 696,
       "endchar" : 1
      }
     ]
@@ -27713,7 +27961,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 704,
+    "line" : 698,
     "char" : 6,
     "name" : "createRefCounted",
     "parameters" : [
@@ -27735,7 +27983,7 @@
      {
       "name" : "createRefCounted",
       "kind" : "function",
-      "line" : 704,
+      "line" : 698,
       "char" : 6,
       "storageClass" : [
        "auto"
@@ -27751,29 +27999,29 @@
         ]
        }
       ],
-      "endline" : 710,
+      "endline" : 704,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L713_C9",
+    "name" : "__unittest_L707_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 713,
+    "line" : 707,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 780,
+    "endline" : 774,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタを追加せずにRefCountedを得る\n",
-    "line" : 780,
+    "line" : 774,
     "char" : 14,
     "name" : "attachRefCounted",
     "parameters" : [
@@ -27786,7 +28034,7 @@
      {
       "name" : "attachRefCounted",
       "kind" : "function",
-      "line" : 780,
+      "line" : 774,
       "char" : 14,
       "type" : "RefCounted!T(RefType!T newRefData)",
       "parameters" : [
@@ -27795,7 +28043,7 @@
         "type" : "RefType!T"
        }
       ],
-      "endline" : 784,
+      "endline" : 778,
       "endchar" : 1
      }
     ]
@@ -27803,7 +28051,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 785,
+    "line" : 779,
     "char" : 22,
     "name" : "attachRefCountedImpl",
     "parameters" : [
@@ -27816,7 +28064,7 @@
      {
       "name" : "attachRefCountedImpl",
       "kind" : "function",
-      "line" : 785,
+      "line" : 779,
       "char" : 22,
       "type" : "RefCounted!T(RefType!T newRefData)",
       "parameters" : [
@@ -27825,27 +28073,27 @@
         "type" : "RefType!T"
        }
       ],
-      "endline" : 789,
+      "endline" : 783,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L799_C9",
+    "name" : "__unittest_L793_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 799,
+    "line" : 793,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 825,
+    "endline" : 819,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 825,
+    "line" : 819,
     "char" : 34,
     "name" : "getCountedData",
     "parameters" : [
@@ -27859,7 +28107,7 @@
      {
       "name" : "getCountedData",
       "kind" : "function",
-      "line" : 825,
+      "line" : 819,
       "char" : 34,
       "type" : "pure nothrow @nogc @property ref @safe inout(CountedData!T)(inout ref RefCounted!T rc)",
       "parameters" : [
@@ -27872,7 +28120,7 @@
         ]
        }
       ],
-      "endline" : 830,
+      "endline" : 824,
       "endchar" : 1
      }
     ]
@@ -27881,7 +28129,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " バッファ領域へアクセス\n\n バッファ領域は、Tのインスタンスと拡張領域のメモリ領域全体を指す。\n\n Note:\n      release後に触れた場合、ダングリングポインタへのアクセスの可能性がある。\n      また、書き換えた場合、本来RefCountedで管理しているデータが損失する可能性がある。\n",
-    "line" : 842,
+    "line" : 836,
     "char" : 16,
     "name" : "buffer",
     "parameters" : [
@@ -27895,7 +28143,7 @@
      {
       "name" : "buffer",
       "kind" : "function",
-      "line" : 842,
+      "line" : 836,
       "char" : 16,
       "type" : "pure nothrow @nogc @property @system inout(ubyte)[](inout ref RefCounted!T rc)",
       "parameters" : [
@@ -27908,29 +28156,29 @@
         ]
        }
       ],
-      "endline" : 847,
+      "endline" : 841,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L849_C9",
+    "name" : "__unittest_L843_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 849,
+    "line" : 843,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 866,
+    "endline" : 860,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 拡張データ領域へアクセス\n\n 初期化時にTのインスタンスより大きなバッファを与えることで、拡張データ領域を持つことができる。\n この関数は拡張データ領域へのアクセス手段を提供する。\n\n Note:\n      release後に触れた場合、ダングリングポインタへのアクセスの可能性がある。\n      また、書き換えた場合、本来RefCountedで管理しているデータが損失する可能性がある。\n",
-    "line" : 866,
+    "line" : 860,
     "char" : 16,
     "name" : "extraBuffer",
     "parameters" : [
@@ -27944,7 +28192,7 @@
      {
       "name" : "extraBuffer",
       "kind" : "function",
-      "line" : 866,
+      "line" : 860,
       "char" : 16,
       "type" : "pure nothrow @nogc @property @system inout(ubyte)[](inout ref RefCounted!T rc)",
       "parameters" : [
@@ -27957,29 +28205,29 @@
         ]
        }
       ],
-      "endline" : 872,
+      "endline" : 866,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L874_C9",
+    "name" : "__unittest_L868_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 874,
+    "line" : 868,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 884,
+    "endline" : 878,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " カウント値を得る\n",
-    "line" : 884,
+    "line" : 878,
     "char" : 5,
     "name" : "counter",
     "parameters" : [
@@ -27993,7 +28241,7 @@
      {
       "name" : "counter",
       "kind" : "function",
-      "line" : 884,
+      "line" : 878,
       "char" : 5,
       "type" : "pure nothrow @nogc @property @safe int(in ref RefCounted!T rc)",
       "parameters" : [
@@ -28006,22 +28254,22 @@
         ]
        }
       ],
-      "endline" : 890,
+      "endline" : 884,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L892_C9",
+    "name" : "__unittest_L886_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 892,
+    "line" : 886,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 902,
+    "endline" : 896,
     "endchar" : 1
    }
   ]

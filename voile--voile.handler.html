@@ -62,15 +62,68 @@
                 
                 <div class="quickindex" id="quickindex"></div>
                 
-                <div class="ddoc_summary">Common Handler type</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".isCastableDelegate"></span><div class="quickindex" id="quickindex.isCastableDelegate"></div>template <code class="ddoc_psymbol">isCastableDelegate</code>(aFunc, bFunc)<br></div></dt>
+                <div class="ddoc_summary">Common Handler type</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DelegateTypeOf"></span><div class="quickindex" id="quickindex.DelegateTypeOf"></div>template <code class="ddoc_psymbol">DelegateTypeOf</code>(F) if (isCallable!F)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DelegateTypeOf.2"></span><div class="quickindex" id="quickindex.DelegateTypeOf.2"></div>template <code class="ddoc_psymbol">DelegateTypeOf</code>(alias F) if (isCallable!F)<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isCastableDelegate"></span><div class="quickindex" id="quickindex.isCastableDelegate"></div>template <code class="ddoc_psymbol">isCastableDelegate</code>(aFunc, bFunc)<br></div></dt>
 <dd>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler"></span><div class="quickindex" id="quickindex.Handler"></div>struct <code class="ddoc_psymbol">Handler</code>(F) if (isCallable!F &amp;&amp; (is(ReturnType!F == void) || is(ReturnType!F : bool)));
 <br></div></dt>
 <dd><div class="ddoc_summary">Generic <code class="ddoc_psymbol">Handler</code>
-</div><div class="ddoc_description">$(_123 a, bbb) = xxx
-
+</div><div class="ddoc_description">複数のコールバックを登録し、同じ引数でまとめて呼び出すことのできる構造体です。
+ コールバックには以下の種類のデータを使用できます。
+<ul><li>関数ポインタ</li>
+<li>デリゲート</li>
+<li>opCallを持つ集合型(class, struct, union, interface)のインスタンス</li>
+<li>core.thread.Fiber</li>
+<li>std.concurrency.Tid</li>
+<li>OutputRange
+</li>
+</ul>
+ 基本的な流れは、接続(connect)でコールバックを追加して、実行(emit)でコールバックを呼び出して、
+ コールバックが不要になったら切断(disconnect)します。
+<ul><li>接続：connect関数または <code class="d_inlinecode donthyphenate notranslate">~=</code> 演算子にて、コールバックを追加することができます。
+<ul><li>connect関数の戻り値はハンドラ内部でコールバックを管理しているプロシージャIDです。</li>
+<li>singleShotConnectで、一度だけ実行した後に自動で切断することも可能です。</li>
+<li>connectした順番で呼び出しが行われます。</li>
+</ul></li>
+<li>切断：disconnect関数によって、コールバックを削除することができます。
+<ul><li>プロシージャIDを指定して切断することも可能です。</li>
+<li>一度切断されたコールバックのプロシージャIDは使用できません。</li>
+</ul></li>
+<li>実行：emit関数または <code class="d_inlinecode donthyphenate notranslate">()</code> 演算子にて、コールバックを一斉に呼び出すことができます。
+<ul><li>関数ポインタを接続した場合、関数ポインタを呼び出します。</li>
+<li>デリゲートを接続した場合、デリゲートを呼び出します。</li>
+<li>集合型のインスタンスを接続した場合、インスタンスのopCallを呼び出します。</li>
+<li>Fiberを接続した場合、Fiberのcallを呼び出します。Fが <code class="d_inlinecode donthyphenate notranslate">void delegate()</code> の場合だけ有効です。</li>
+<li>OutputRangeを接続した場合、OutputRangeのputを呼び出します。Fが <code class="d_inlinecode donthyphenate notranslate">void delegate(T)</code> のとき、
+     <code class="d_inlinecode donthyphenate notranslate">isOutputRange!(Range, T)</code>の場合だけ有効です。
+</li>
+</ul></li>
+</ul>
 </div>
+<div class="ddoc_section_nonstandard"><span class="ddoc_section_nonstandard_header">Note:</span>
+
+<ul><li>実行中に接続・切断ができますが、そのとき実行時にコールバックのリストを複製してから呼び出しているため、
+   途中操作での接続・切断は反映されません。</li>
+<li>ハンドラは複製することができません。複製したい場合は、スライスでコールバックへアクセスすることができますので、
+   明示的にディープコピーを行ってください。その際には、オブジェクトの寿命管理には注意して下さい。</li>
+<li>ハンドラでコールバックを保持し続ける限り、コールバックに関連するデータ(例えばデリゲートのコンテキスト)は
+   GCで解放されなくなります。</li>
+<li>一方でコールバックに関連するデータを手動で破棄した場合には、ハンドラの呼び出しで破棄済みのデータにアクセスする
+   恐れがあります。ハンドラからの切断を行ってからデータを破棄してください。</li>
+<li>emit関数は、ハンドラのテンプレートパラメータで指定したFの型により、属性を指定できます。
+   例えば <code class="d_inlinecode donthyphenate notranslate"><code class="ddoc_psymbol">Handler</code>!(void delegate() nothrow)</code> とすると、emit関数にもnothrow属性がつきます。</li>
+<li>emit関数の戻り値は、ハンドラのテンプレートパラメータで指定したFの戻り値と同じです。ただし、以下の型限定です。
+<ul><li>void: 戻り値を返しません。</li>
+<li>bool: コールバックすべてがtrueを返した場合に、emit関数もtrueを返します。
+           コールバックが一つでもfalseを返した場合、それ以降コールバック呼び出しを行わず、emit関数もfalseを返します。</li>
+</ul></li>
+</ul></div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  コピー禁止・ムーブ可
 <pre class="d_code notranslate"><span class="d_keyword">import</span> std.algorithm: move;
@@ -90,7 +143,7 @@ shared const RetType <code class="ddoc_psymbol">emit</code>(Args <span class="dd
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.toConnectable"></span><div class="quickindex" id="quickindex.Handler.toConnectable"></div>Proc <code class="ddoc_psymbol">toConnectable</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toDelegate(<span class="ddoc_param">fn</span>))) &amp;&amp; isCastableDelegate!(Proc, typeof(toDelegate(<span class="ddoc_param">fn</span>))))</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.toConnectable"></span><div class="quickindex" id="quickindex.Handler.toConnectable"></div>Proc <code class="ddoc_psymbol">toConnectable</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(auto ref Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toDelegate(<span class="ddoc_param">fn</span>))) &amp;&amp; isCastableDelegate!(Proc, DelegateTypeOf!Func))</span>;
 <br></div></dt>
 <dd>
 </dd>
@@ -117,7 +170,7 @@ if (!tmp.empty)
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.connect"></span><div class="quickindex" id="quickindex.Handler.connect"></div>HandlerProcId <code class="ddoc_psymbol">connect</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.connect"></span><div class="quickindex" id="quickindex.Handler.connect"></div>HandlerProcId <code class="ddoc_psymbol">connect</code><span class="ddoc_template_param_list" title="Template parameter list">(Func)</span>(auto ref Func <span class="ddoc_param">fn</span>)<br><span class="ddoc_constraint">if(is(typeof(toConnectable(<span class="ddoc_param">fn</span>))))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">Connect
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
