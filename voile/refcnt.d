@@ -349,13 +349,9 @@ private template uniqueMemberName(T, string name = "_uniqueMemberName", uint num
 // 参照の型
 private template RefType(T)
 {
-	static if (isRef!T && isCountedData!T)
+	static if (isCountedData!T)
 	{
 		alias RefType = T;
-	}
-	else static if (isCountedData!T)
-	{
-		alias RefType = T*;
 	}
 	else
 	{
@@ -378,18 +374,11 @@ struct RefCounted(T)
 private:
 	mixin(`RefType!T ` ~ uniqueMemberName!(T, "_data") ~ `;`);
 public:
-	static if (isCountedData!T && isRef!T)
+	static if (isCountedData!T)
 	{
 		mixin(`ref inout(T) ` ~ uniqueMemberName!(T, "_refData") ~ `() pure nothrow @nogc @safe inout @property
 		{
 			return ` ~ uniqueMemberName!(T, "_data") ~ `;
-		}`);
-	}
-	else static if (isCountedData!T)
-	{
-		mixin(`ref inout(T) ` ~ uniqueMemberName!(T, "_refData") ~ `() pure nothrow @nogc @safe inout @property
-		{
-			return *` ~ uniqueMemberName!(T, "_data") ~ `;
 		}`);
 	}
 	else
@@ -659,32 +648,32 @@ pragma(inline) inout(T)* ptr(T)(inout ref RefCounted!T rc) pure nothrow
 /*******************************************************************************
  * 参照カウンタを生成
  */
-auto createRefCounted(T, Args...)(auto ref Args args) @trusted
+RefCounted!T createRefCounted(T, Args...)(auto ref Args args) @trusted
 if (isRefCounted!T)
 {
 	return createRefCounted!(RefCountedTypeOf!T)(args);
 }
 /// ditto
-auto createRefCounted(T, Args...)(auto ref Args args) @trusted
+RefCounted!T createRefCounted(T, Args...)(auto ref Args args) @trusted
 if (is(T == class) && isCountedData!T)
 {
 	return attachRefCounted!T(new T(args));
 }
 /// ditto
-auto createRefCounted(T, Args...)(auto ref Args args) @trusted
+RefCounted!T createRefCounted(T, Args...)(auto ref Args args) @trusted
 if (!isPointer!T && (is(T == struct) || is(T == union)) && isCountedData!T)
 {
-	return attachRefCounted!T(new T(args));
+	return attachRefCounted!T(T(args));
 }
 /// ditto
-auto createRefCounted(T, Args...)(auto ref Args args) @trusted
+RefCounted!T createRefCounted(T, Args...)(auto ref Args args) @trusted
 if (isPointer!T && (is(PointerTarget!T == struct) || is(PointerTarget!T == union)) && isCountedData!T)
 {
 	alias Inst = PointerTarget!T;
 	return attachRefCounted!T(new Inst(args));
 }
 /// ditto
-auto createRefCounted(T, Args...)(auto ref Args args) @trusted
+RefCounted!T createRefCounted(T, Args...)(auto ref Args args) @trusted
 if (!isCountedData!T)
 {
 	import std.conv: emplace;
@@ -695,7 +684,7 @@ if (!isCountedData!T)
 	return ret.attachRefCounted!T();
 }
 /// ditto
-auto createRefCounted(T, alias allocator, Args...)(auto ref Args args) @trusted
+RefCounted!T createRefCounted(T, alias allocator, Args...)(auto ref Args args) @trusted
 if (!isCountedData!T && isAllocator!allocator)
 {
 	CountedData!T ret;
@@ -771,15 +760,23 @@ if (!isCountedData!T && isAllocator!allocator)
 /*******************************************************************************
  * 参照カウンタを追加せずにRefCountedを得る
  */
-RefCounted!T attachRefCounted(T)(RefType!T newRefData)
+RefCounted!T attachRefCounted(T)(T newRefData)
+if (isCountedData!T)
 {
 	import voile.misc: assumeNogc;
-	return assumeNogc!(attachRefCountedImpl!T)(newRefData);
+	return assumeNogc!(attachRefCountedImpl!T)(&newRefData);
 }
-private RefCounted!T attachRefCountedImpl(T)(RefType!T newRefData)
+/// ditto
+RefCounted!T attachRefCounted(T)(RefType!T newRefData)
+if (!isCountedData!T)
+{
+	import voile.misc: assumeNogc;
+	return assumeNogc!(attachRefCountedImpl!T)(&newRefData);
+}
+private RefCounted!T attachRefCountedImpl(T)(void* newRefData)
 {
 	import std.algorithm: move;
-	return move(*cast(RefCounted!T*)&newRefData);
+	return move(*cast(RefCounted!T*)newRefData);
 }
 
 version (Windows) @system unittest
