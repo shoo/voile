@@ -319,17 +319,17 @@ x.<span class="d_psymbol">deref</span> = 2;
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".createRefCounted"></span><div class="quickindex" id="quickindex.createRefCounted"></div>@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isRefCounted!T)</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".createRefCounted"></span><div class="quickindex" id="quickindex.createRefCounted"></div>@trusted RefCounted!T <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isRefCounted!T)</span>;
 <br>
-@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(is(T == class) &amp;&amp; isCountedData!T)</span>;
+@trusted RefCounted!T <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(is(T == class) &amp;&amp; isCountedData!T)</span>;
 <br>
-@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!isPointer!T &amp;&amp; (is(T == struct) || is(T == union)) &amp;&amp; isCountedData!T)</span>;
+@trusted RefCounted!T <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!isPointer!T &amp;&amp; (is(T == struct) || is(T == union)) &amp;&amp; isCountedData!T)</span>;
 <br>
-@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isPointer!T &amp;&amp; (is(PointerTarget!T == struct) || is(PointerTarget!T == union)) &amp;&amp; isCountedData!T)</span>;
+@trusted RefCounted!T <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isPointer!T &amp;&amp; (is(PointerTarget!T == struct) || is(PointerTarget!T == union)) &amp;&amp; isCountedData!T)</span>;
 <br>
-@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!isCountedData!T)</span>;
+@trusted RefCounted!T <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!isCountedData!T)</span>;
 <br>
-@trusted auto <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, alias allocator, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!isCountedData!T &amp;&amp; isAllocator!allocator)</span>;
+@trusted RefCounted!T <code class="ddoc_psymbol">createRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T, alias allocator, Args...)</span>(auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(!isCountedData!T &amp;&amp; isAllocator!allocator)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">参照カウンタを生成</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">enum</span> <span class="d_keyword">short</span> initCnt = 1;
@@ -394,7 +394,9 @@ x.<span class="d_psymbol">deref</span> = 2;
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".attachRefCounted"></span><div class="quickindex" id="quickindex.attachRefCounted"></div>RefCounted!T <code class="ddoc_psymbol">attachRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(RefType!T <span class="ddoc_param">newRefData</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".attachRefCounted"></span><div class="quickindex" id="quickindex.attachRefCounted"></div>RefCounted!T <code class="ddoc_psymbol">attachRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">newRefData</span>)<br><span class="ddoc_constraint">if(isCountedData!T)</span>;
+<br>
+RefCounted!T <code class="ddoc_psymbol">attachRefCounted</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(RefType!T <span class="ddoc_param">newRefData</span>)<br><span class="ddoc_constraint">if(!isCountedData!T)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">参照カウンタを追加せずにRefCountedを得る</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".buffer"></span><div class="quickindex" id="quickindex.buffer"></div>pure nothrow @nogc @property @system inout(ubyte)[] <code class="ddoc_psymbol">buffer</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(inout ref RefCounted!T <span class="ddoc_param">rc</span>)<br><span class="ddoc_constraint">if(!isCountedData!T || isInstanceOf!(CountedData, T))</span>;

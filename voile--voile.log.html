@@ -210,7 +210,7 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 </dd>
 </div></dl>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageLogger"></span><div class="quickindex" id="quickindex.LogStorageLogger"></div>class <code class="ddoc_psymbol">LogStorageLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.core.Logger</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageLogger"></span><div class="quickindex" id="quickindex.LogStorageLogger"></div>class <code class="ddoc_psymbol">LogStorageLogger</code>: <span class="ddoc_psuper_symbol">std.logger.core.Logger</span>;
 <br></div></dt>
 <dd>
 <dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageLogger.this"></span><div class="quickindex" id="quickindex.LogStorageLogger.this"></div>@safe this(LogStorageOutput <span class="ddoc_param">logDst</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
@@ -264,7 +264,7 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 </dd>
 </div></dl>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TextFileLogger"></span><div class="quickindex" id="quickindex.TextFileLogger"></div>class <code class="ddoc_psymbol">TextFileLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.filelogger.FileLogger</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TextFileLogger"></span><div class="quickindex" id="quickindex.TextFileLogger"></div>class <code class="ddoc_psymbol">TextFileLogger</code>: <span class="ddoc_psuper_symbol">std.logger.filelogger.FileLogger</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">テキストファイルのロガー</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".TextFileLogger.this"></span><div class="quickindex" id="quickindex.TextFileLogger.this"></div>@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
 <br>
@@ -288,7 +288,7 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 </dd>
 </div></dl>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JsonFileLogger"></span><div class="quickindex" id="quickindex.JsonFileLogger"></div>class <code class="ddoc_psymbol">JsonFileLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.core.Logger</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JsonFileLogger"></span><div class="quickindex" id="quickindex.JsonFileLogger"></div>class <code class="ddoc_psymbol">JsonFileLogger</code>: <span class="ddoc_psuper_symbol">std.logger.core.Logger</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">JSONファイルのロガー</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".JsonFileLogger.this"></span><div class="quickindex" id="quickindex.JsonFileLogger.this"></div>@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
 <br>
@@ -312,7 +312,7 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 </dd>
 </div></dl>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".XmlFileLogger"></span><div class="quickindex" id="quickindex.XmlFileLogger"></div>class <code class="ddoc_psymbol">XmlFileLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.core.Logger</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".XmlFileLogger"></span><div class="quickindex" id="quickindex.XmlFileLogger"></div>class <code class="ddoc_psymbol">XmlFileLogger</code>: <span class="ddoc_psuper_symbol">std.logger.core.Logger</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">XMLファイルのロガー</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".XmlFileLogger.this"></span><div class="quickindex" id="quickindex.XmlFileLogger.this"></div>@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
 <br>
@@ -332,7 +332,7 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 </dd>
 </div></dl>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CsvFileLogger"></span><div class="quickindex" id="quickindex.CsvFileLogger"></div>class <code class="ddoc_psymbol">CsvFileLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.core.Logger</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CsvFileLogger"></span><div class="quickindex" id="quickindex.CsvFileLogger"></div>class <code class="ddoc_psymbol">CsvFileLogger</code>: <span class="ddoc_psuper_symbol">std.logger.core.Logger</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">CSVファイルのロガー</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".CsvFileLogger.this"></span><div class="quickindex" id="quickindex.CsvFileLogger.this"></div>@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
 <br>
@@ -352,7 +352,7 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 </dd>
 </div></dl>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TsvFileLogger"></span><div class="quickindex" id="quickindex.TsvFileLogger"></div>class <code class="ddoc_psymbol">TsvFileLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.core.Logger</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TsvFileLogger"></span><div class="quickindex" id="quickindex.TsvFileLogger"></div>class <code class="ddoc_psymbol">TsvFileLogger</code>: <span class="ddoc_psuper_symbol">std.logger.core.Logger</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">TSVファイルのロガー</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".TsvFileLogger.this"></span><div class="quickindex" id="quickindex.TsvFileLogger.this"></div>@safe this(in string <span class="ddoc_param">fn</span>, const LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
 <br>
@@ -372,7 +372,7 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 </dd>
 </div></dl>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedLogger"></span><div class="quickindex" id="quickindex.NamedLogger"></div>class <code class="ddoc_psymbol">NamedLogger</code>: <span class="ddoc_psuper_symbol">std.experimental.logger.multilogger.MultiLogger</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedLogger"></span><div class="quickindex" id="quickindex.NamedLogger"></div>class <code class="ddoc_psymbol">NamedLogger</code>: <span class="ddoc_psuper_symbol">std.logger.multilogger.MultiLogger</span>;
 <br></div></dt>
 <dd>
 <dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".NamedLogger.getLogger"></span><div class="quickindex" id="quickindex.NamedLogger.getLogger"></div>@safe Logger <code class="ddoc_psymbol">getLogger</code>(string <span class="ddoc_param">name</span>);

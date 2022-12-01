@@ -6782,7 +6782,7 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "FE3std4file8SpanModebZSQvQt11DirIterator",
+      "deco" : "FE3std4file8SpanModebZSQvQt__T12_DirIteratorVbi0ZQt",
       "originalType" : "(SpanMode mode, bool followSymlink = true)",
       "parameters" : [
        {
@@ -6808,12 +6808,15 @@
       "storageClass" : [
        "auto"
       ],
-      "deco" : "FAyaE3std4file8SpanModebZSQv9algorithm9iteration__T12FilterResultS_DQClQCk10dirEntriesFQDiQDlQDlbZ1fMFNaNbNfSQEaQDz8DirEntryZbTSQEtQEs11DirIteratorZQDt",
+      "deco" : "FAyaE3std4file8SpanModebZSQv9algorithm9iteration__T12FilterResultS_DQClQCk__T10dirEntriesVbi0ZQrFQDsQDvQDvbZ1fMFNaNbNfSQEkQEj8DirEntryZbTSQFdQFc__T12_DirIteratorVbi0ZQtZQEo",
       "originalType" : "(string pattern, SpanMode mode = SpanMode.shallow, bool followSymlink = true)",
       "parameters" : [
        {
         "name" : "pattern",
-        "deco" : "Aya"
+        "deco" : "Aya",
+        "storageClass" : [
+         "scope"
+        ]
        },
        {
         "name" : "mode",
@@ -8783,7 +8786,10 @@
       "parameters" : [
        {
         "name" : "args",
-        "deco" : "AAya"
+        "deco" : "AAya",
+        "storageClass" : [
+         "scope"
+        ]
        },
        {
         "name" : "env",
@@ -8814,7 +8820,10 @@
       "parameters" : [
        {
         "name" : "args",
-        "deco" : "AAya"
+        "deco" : "AAya",
+        "storageClass" : [
+         "scope"
+        ]
        },
        {
         "name" : "fin",
@@ -8857,7 +8866,10 @@
       "parameters" : [
        {
         "name" : "args",
-        "deco" : "AAya"
+        "deco" : "AAya",
+        "storageClass" : [
+         "scope"
+        ]
        },
        {
         "name" : "pin",
@@ -8900,7 +8912,10 @@
       "parameters" : [
        {
         "name" : "args",
-        "deco" : "AAya"
+        "deco" : "AAya",
+        "storageClass" : [
+         "scope"
+        ]
        },
        {
         "name" : "env",
@@ -8931,7 +8946,10 @@
       "parameters" : [
        {
         "name" : "args",
-        "deco" : "AAya"
+        "deco" : "AAya",
+        "storageClass" : [
+         "scope"
+        ]
        },
        {
         "name" : "env",
@@ -15846,7 +15864,7 @@
       "comment" : "\n",
       "line" : 23,
       "char" : 11,
-      "deco" : "E3std12experimental6logger4core8LogLevel",
+      "deco" : "E3std6logger4core8LogLevel",
       "offset" : 8
      },
      {
@@ -16349,7 +16367,7 @@
     "comment" : "\n",
     "line" : 259,
     "char" : 1,
-    "base" : "std.experimental.logger.core.Logger",
+    "base" : "std.logger.core.Logger",
     "members" : [
      {
       "name" : "std.experimental.logger",
@@ -16388,7 +16406,7 @@
       "comment" : "\n",
       "line" : 268,
       "char" : 2,
-      "deco" : "FNfC5voile3log16LogStorageOutputE3std12experimental6logger4core8LogLevelZCQCsQCp16LogStorageLogger",
+      "deco" : "FNfC5voile3log16LogStorageOutputE3std6logger4core8LogLevelZCQCeQCb16LogStorageLogger",
       "originalType" : "@safe (LogStorageOutput logDst, LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -16397,7 +16415,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "E3std12experimental6logger4core8LogLevel",
+        "deco" : "E3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -16414,11 +16432,11 @@
       "storageClass" : [
        "override"
       ],
-      "deco" : "FNeKS3std12experimental6logger4core6Logger8LogEntryZv",
+      "deco" : "FNeKS3std6logger4core6Logger8LogEntryZv",
       "parameters" : [
        {
         "name" : "payload",
-        "deco" : "S3std12experimental6logger4core6Logger8LogEntry",
+        "deco" : "S3std6logger4core6Logger8LogEntry",
         "storageClass" : [
          "ref"
         ]
@@ -16427,7 +16445,7 @@
       "endline" : 290,
       "endchar" : 2,
       "overrides" : [
-       "std.experimental.logger.core.Logger.writeLogMsg"
+       "std.logger.core.Logger.writeLogMsg"
       ]
      }
     ]
@@ -16468,12 +16486,12 @@
       "comment" : "\n",
       "line" : 307,
       "char" : 2,
-      "deco" : "FNfE3std12experimental6logger4core8LogLevelZC5voile3log14InMemoryLogger",
+      "deco" : "FNfE3std6logger4core8LogLevelZC5voile3log14InMemoryLogger",
       "originalType" : "@safe (LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
         "name" : "lv",
-        "deco" : "E3std12experimental6logger4core8LogLevel",
+        "deco" : "E3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -16553,7 +16571,7 @@
     "comment" : " テキストファイルのロガー\n",
     "line" : 362,
     "char" : 1,
-    "base" : "std.experimental.logger.filelogger.FileLogger",
+    "base" : "std.logger.filelogger.FileLogger",
     "members" : [
      {
       "name" : "std.experimental.logger",
@@ -16603,7 +16621,7 @@
       "comment" : "\n",
       "line" : 370,
       "char" : 2,
-      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelZC5voile3log14TextFileLogger",
+      "deco" : "FNfIAyaxE3std6logger4core8LogLevelZC5voile3log14TextFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -16615,7 +16633,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel",
+        "deco" : "xE3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -16629,7 +16647,7 @@
       "comment" : "ditto\n",
       "line" : 375,
       "char" : 2,
-      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log14TextFileLogger",
+      "deco" : "FNfIAyaxE3std6logger4core8LogLevelEQBa8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log14TextFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv, CreateFolder createFileNameFolder)",
       "parameters" : [
        {
@@ -16641,7 +16659,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel"
+        "deco" : "xE3std6logger4core8LogLevel"
        },
        {
         "name" : "createFileNameFolder",
@@ -16658,7 +16676,7 @@
       "comment" : "ditto\n",
       "line" : 380,
       "char" : 2,
-      "deco" : "FNfS3std5stdio4FilexEQr12experimental6logger4core8LogLevelZC5voile3log14TextFileLogger",
+      "deco" : "FNfS3std5stdio4FilexEQr6logger4core8LogLevelZC5voile3log14TextFileLogger",
       "originalType" : "@safe (File file, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -16667,7 +16685,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel",
+        "deco" : "xE3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -16684,7 +16702,7 @@
       "storageClass" : [
        "override"
       ],
-      "deco" : "FNfAyaiQeQgQiE3std12experimental6logger4core8LogLevelSQBo11concurrency3TidSQCj8datetime7systime7SysTimeCQDmQDlQDaQCw6LoggerZv",
+      "deco" : "FNfAyaiQeQgQiE3std6logger4core8LogLevelSQBa11concurrency3TidSQBv8datetime7systime7SysTimeCQCyQCxQCt6LoggerZv",
       "parameters" : [
        {
         "name" : "file",
@@ -16708,7 +16726,7 @@
        },
        {
         "name" : "logLevel",
-        "deco" : "E3std12experimental6logger4core8LogLevel"
+        "deco" : "E3std6logger4core8LogLevel"
        },
        {
         "name" : "threadId",
@@ -16720,13 +16738,13 @@
        },
        {
         "name" : "logger",
-        "deco" : "C3std12experimental6logger4core6Logger"
+        "deco" : "C3std6logger4core6Logger"
        }
       ],
       "endline" : 399,
       "endchar" : 2,
       "overrides" : [
-       "std.experimental.logger.filelogger.FileLogger.beginLogMsg"
+       "std.logger.filelogger.FileLogger.beginLogMsg"
       ]
      },
      {
@@ -16753,7 +16771,7 @@
       "endline" : 406,
       "endchar" : 2,
       "overrides" : [
-       "std.experimental.logger.filelogger.FileLogger.logMsgPart"
+       "std.logger.filelogger.FileLogger.logMsgPart"
       ]
      },
      {
@@ -16771,7 +16789,7 @@
       "endline" : 413,
       "endchar" : 2,
       "overrides" : [
-       "std.experimental.logger.filelogger.FileLogger.finishLogMsg"
+       "std.logger.filelogger.FileLogger.finishLogMsg"
       ]
      }
     ]
@@ -16783,7 +16801,7 @@
     "comment" : " JSONファイルのロガー\n",
     "line" : 419,
     "char" : 1,
-    "base" : "std.experimental.logger.core.Logger",
+    "base" : "std.logger.core.Logger",
     "members" : [
      {
       "name" : "std.experimental.logger",
@@ -16851,7 +16869,7 @@
       "comment" : "\n",
       "line" : 430,
       "char" : 2,
-      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelZC5voile3log14JsonFileLogger",
+      "deco" : "FNfIAyaxE3std6logger4core8LogLevelZC5voile3log14JsonFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -16863,7 +16881,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel",
+        "deco" : "xE3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -16877,7 +16895,7 @@
       "comment" : "ditto\n",
       "line" : 435,
       "char" : 2,
-      "deco" : "FNeIAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log14JsonFileLogger",
+      "deco" : "FNeIAyaxE3std6logger4core8LogLevelEQBa8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log14JsonFileLogger",
       "originalType" : "@trusted (in string fn, const LogLevel lv, CreateFolder createFileNameFolder)",
       "parameters" : [
        {
@@ -16889,7 +16907,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel"
+        "deco" : "xE3std6logger4core8LogLevel"
        },
        {
         "name" : "createFileNameFolder",
@@ -16906,7 +16924,7 @@
       "comment" : "ditto\n",
       "line" : 466,
       "char" : 2,
-      "deco" : "FNfS3std5stdio4FilexEQr12experimental6logger4core8LogLevelZC5voile3log14JsonFileLogger",
+      "deco" : "FNfS3std5stdio4FilexEQr6logger4core8LogLevelZC5voile3log14JsonFileLogger",
       "originalType" : "@safe (File file, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -16915,7 +16933,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel",
+        "deco" : "xE3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -16932,11 +16950,11 @@
       "storageClass" : [
        "override"
       ],
-      "deco" : "FNeKS3std12experimental6logger4core6Logger8LogEntryZv",
+      "deco" : "FNeKS3std6logger4core6Logger8LogEntryZv",
       "parameters" : [
        {
         "name" : "payload",
-        "deco" : "S3std12experimental6logger4core6Logger8LogEntry",
+        "deco" : "S3std6logger4core6Logger8LogEntry",
         "storageClass" : [
          "ref"
         ]
@@ -16945,7 +16963,7 @@
       "endline" : 517,
       "endchar" : 2,
       "overrides" : [
-       "std.experimental.logger.core.Logger.writeLogMsg"
+       "std.logger.core.Logger.writeLogMsg"
       ]
      },
      {
@@ -16985,7 +17003,10 @@
       "protection" : "public",
       "line" : 419,
       "char" : 1,
-      "deco" : "FNeZv"
+      "storageClass" : [
+       "scope"
+      ],
+      "deco" : "FNlNeZv"
      },
      {
       "name" : "__xdtor",
@@ -17013,7 +17034,7 @@
     "comment" : " XMLファイルのロガー\n",
     "line" : 610,
     "char" : 1,
-    "base" : "std.experimental.logger.core.Logger",
+    "base" : "std.logger.core.Logger",
     "members" : [
      {
       "name" : "std.experimental.logger",
@@ -17081,7 +17102,7 @@
       "comment" : "\n",
       "line" : 621,
       "char" : 2,
-      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelZC5voile3log13XmlFileLogger",
+      "deco" : "FNfIAyaxE3std6logger4core8LogLevelZC5voile3log13XmlFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -17093,7 +17114,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel",
+        "deco" : "xE3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -17107,7 +17128,7 @@
       "comment" : "ditto\n",
       "line" : 626,
       "char" : 2,
-      "deco" : "FNeIAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13XmlFileLogger",
+      "deco" : "FNeIAyaxE3std6logger4core8LogLevelEQBa8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13XmlFileLogger",
       "originalType" : "@trusted (in string fn, const LogLevel lv, CreateFolder createFileNameFolder)",
       "parameters" : [
        {
@@ -17119,7 +17140,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel"
+        "deco" : "xE3std6logger4core8LogLevel"
        },
        {
         "name" : "createFileNameFolder",
@@ -17136,7 +17157,7 @@
       "comment" : "ditto\n",
       "line" : 657,
       "char" : 2,
-      "deco" : "FNfS3std5stdio4FilexEQr12experimental6logger4core8LogLevelZC5voile3log13XmlFileLogger",
+      "deco" : "FNfS3std5stdio4FilexEQr6logger4core8LogLevelZC5voile3log13XmlFileLogger",
       "originalType" : "@safe (File file, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -17145,7 +17166,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel",
+        "deco" : "xE3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -17162,11 +17183,11 @@
       "storageClass" : [
        "override"
       ],
-      "deco" : "FNeKS3std12experimental6logger4core6Logger8LogEntryZv",
+      "deco" : "FNeKS3std6logger4core6Logger8LogEntryZv",
       "parameters" : [
        {
         "name" : "payload",
-        "deco" : "S3std12experimental6logger4core6Logger8LogEntry",
+        "deco" : "S3std6logger4core6Logger8LogEntry",
         "storageClass" : [
          "ref"
         ]
@@ -17175,7 +17196,7 @@
       "endline" : 703,
       "endchar" : 2,
       "overrides" : [
-       "std.experimental.logger.core.Logger.writeLogMsg"
+       "std.logger.core.Logger.writeLogMsg"
       ]
      },
      {
@@ -17195,7 +17216,10 @@
       "protection" : "public",
       "line" : 610,
       "char" : 1,
-      "deco" : "FNeZv"
+      "storageClass" : [
+       "scope"
+      ],
+      "deco" : "FNlNeZv"
      },
      {
       "name" : "__xdtor",
@@ -17211,7 +17235,7 @@
     "comment" : " CSVファイルのロガー\n",
     "line" : 716,
     "char" : 1,
-    "base" : "std.experimental.logger.core.Logger",
+    "base" : "std.logger.core.Logger",
     "members" : [
      {
       "name" : "std.experimental.logger",
@@ -17279,7 +17303,7 @@
       "comment" : "\n",
       "line" : 727,
       "char" : 2,
-      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelZC5voile3log13CsvFileLogger",
+      "deco" : "FNfIAyaxE3std6logger4core8LogLevelZC5voile3log13CsvFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -17291,7 +17315,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel",
+        "deco" : "xE3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -17305,7 +17329,7 @@
       "comment" : "ditto\n",
       "line" : 732,
       "char" : 2,
-      "deco" : "FNeIAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13CsvFileLogger",
+      "deco" : "FNeIAyaxE3std6logger4core8LogLevelEQBa8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13CsvFileLogger",
       "originalType" : "@trusted (in string fn, const LogLevel lv, CreateFolder createFileNameFolder)",
       "parameters" : [
        {
@@ -17317,7 +17341,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel"
+        "deco" : "xE3std6logger4core8LogLevel"
        },
        {
         "name" : "createFileNameFolder",
@@ -17334,7 +17358,7 @@
       "comment" : "ditto\n",
       "line" : 751,
       "char" : 2,
-      "deco" : "FNfS3std5stdio4FilexEQr12experimental6logger4core8LogLevelZC5voile3log13CsvFileLogger",
+      "deco" : "FNfS3std5stdio4FilexEQr6logger4core8LogLevelZC5voile3log13CsvFileLogger",
       "originalType" : "@safe (File file, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -17343,7 +17367,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel",
+        "deco" : "xE3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -17360,11 +17384,11 @@
       "storageClass" : [
        "override"
       ],
-      "deco" : "FNeKS3std12experimental6logger4core6Logger8LogEntryZv",
+      "deco" : "FNeKS3std6logger4core6Logger8LogEntryZv",
       "parameters" : [
        {
         "name" : "payload",
-        "deco" : "S3std12experimental6logger4core6Logger8LogEntry",
+        "deco" : "S3std6logger4core6Logger8LogEntry",
         "storageClass" : [
          "ref"
         ]
@@ -17373,7 +17397,7 @@
       "endline" : 785,
       "endchar" : 2,
       "overrides" : [
-       "std.experimental.logger.core.Logger.writeLogMsg"
+       "std.logger.core.Logger.writeLogMsg"
       ]
      },
      {
@@ -17393,7 +17417,10 @@
       "protection" : "public",
       "line" : 716,
       "char" : 1,
-      "deco" : "FNeZv"
+      "storageClass" : [
+       "scope"
+      ],
+      "deco" : "FNlNeZv"
      },
      {
       "name" : "__xdtor",
@@ -17409,7 +17436,7 @@
     "comment" : " TSVファイルのロガー\n",
     "line" : 797,
     "char" : 1,
-    "base" : "std.experimental.logger.core.Logger",
+    "base" : "std.logger.core.Logger",
     "members" : [
      {
       "name" : "std.experimental.logger",
@@ -17477,7 +17504,7 @@
       "comment" : "\n",
       "line" : 808,
       "char" : 2,
-      "deco" : "FNfIAyaxE3std12experimental6logger4core8LogLevelZC5voile3log13TsvFileLogger",
+      "deco" : "FNfIAyaxE3std6logger4core8LogLevelZC5voile3log13TsvFileLogger",
       "originalType" : "@safe (in string fn, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -17489,7 +17516,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel",
+        "deco" : "xE3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -17503,7 +17530,7 @@
       "comment" : "ditto\n",
       "line" : 813,
       "char" : 2,
-      "deco" : "FNeIAyaxE3std12experimental6logger4core8LogLevelEQBo8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13TsvFileLogger",
+      "deco" : "FNeIAyaxE3std6logger4core8LogLevelEQBa8typecons__T4FlagVAyaa12_437265617465466f6c646572ZQBmZC5voile3log13TsvFileLogger",
       "originalType" : "@trusted (in string fn, const LogLevel lv, CreateFolder createFileNameFolder)",
       "parameters" : [
        {
@@ -17515,7 +17542,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel"
+        "deco" : "xE3std6logger4core8LogLevel"
        },
        {
         "name" : "createFileNameFolder",
@@ -17532,7 +17559,7 @@
       "comment" : "ditto\n",
       "line" : 832,
       "char" : 2,
-      "deco" : "FNfS3std5stdio4FilexEQr12experimental6logger4core8LogLevelZC5voile3log13TsvFileLogger",
+      "deco" : "FNfS3std5stdio4FilexEQr6logger4core8LogLevelZC5voile3log13TsvFileLogger",
       "originalType" : "@safe (File file, const LogLevel lv = LogLevel.all)",
       "parameters" : [
        {
@@ -17541,7 +17568,7 @@
        },
        {
         "name" : "lv",
-        "deco" : "xE3std12experimental6logger4core8LogLevel",
+        "deco" : "xE3std6logger4core8LogLevel",
         "default" : "LogLevel.all"
        }
       ],
@@ -17558,11 +17585,11 @@
       "storageClass" : [
        "override"
       ],
-      "deco" : "FNeKS3std12experimental6logger4core6Logger8LogEntryZv",
+      "deco" : "FNeKS3std6logger4core6Logger8LogEntryZv",
       "parameters" : [
        {
         "name" : "payload",
-        "deco" : "S3std12experimental6logger4core6Logger8LogEntry",
+        "deco" : "S3std6logger4core6Logger8LogEntry",
         "storageClass" : [
          "ref"
         ]
@@ -17571,7 +17598,7 @@
       "endline" : 864,
       "endchar" : 2,
       "overrides" : [
-       "std.experimental.logger.core.Logger.writeLogMsg"
+       "std.logger.core.Logger.writeLogMsg"
       ]
      },
      {
@@ -17591,7 +17618,10 @@
       "protection" : "public",
       "line" : 797,
       "char" : 1,
-      "deco" : "FNeZv"
+      "storageClass" : [
+       "scope"
+      ],
+      "deco" : "FNlNeZv"
      },
      {
       "name" : "__xdtor",
@@ -17607,7 +17637,7 @@
     "comment" : "\n",
     "line" : 878,
     "char" : 1,
-    "base" : "std.experimental.logger.multilogger.MultiLogger",
+    "base" : "std.logger.multilogger.MultiLogger",
     "members" : [
      {
       "name" : "getLogger",
@@ -17616,7 +17646,7 @@
       "comment" : " ロガーを取得する\n",
       "line" : 884,
       "char" : 9,
-      "deco" : "FNfAyaZC3std12experimental6logger4core6Logger",
+      "deco" : "FNfAyaZC3std6logger4core6Logger",
       "parameters" : [
        {
         "name" : "name",
@@ -17636,7 +17666,7 @@
       "storageClass" : [
        "override"
       ],
-      "deco" : "FNfAyaC3std12experimental6logger4core6LoggerZv",
+      "deco" : "FNfAyaC3std6logger4core6LoggerZv",
       "parameters" : [
        {
         "name" : "name",
@@ -17644,13 +17674,13 @@
        },
        {
         "name" : "l",
-        "deco" : "C3std12experimental6logger4core6Logger"
+        "deco" : "C3std6logger4core6Logger"
        }
       ],
       "endline" : 901,
       "endchar" : 2,
       "overrides" : [
-       "std.experimental.logger.multilogger.MultiLogger.insertLogger"
+       "std.logger.multilogger.MultiLogger.insertLogger"
       ]
      },
      {
@@ -17789,7 +17819,7 @@
         "comment" : "\n",
         "line" : 935,
         "char" : 14,
-        "deco" : "E3std12experimental6logger4core8LogLevel",
+        "deco" : "E3std6logger4core8LogLevel",
         "init" : "LogLevel.all",
         "offset" : 872
        },
@@ -18135,7 +18165,7 @@
         "comment" : "\n",
         "line" : 1049,
         "char" : 12,
-        "deco" : "xFNdNfZE3std12experimental6logger4core8LogLevel",
+        "deco" : "xFNdNfZE3std6logger4core8LogLevel",
         "endline" : 1052,
         "endchar" : 3
        },
@@ -18146,11 +18176,11 @@
         "comment" : "ditto\n",
         "line" : 1054,
         "char" : 8,
-        "deco" : "FNdNfE3std12experimental6logger4core8LogLevelZv",
+        "deco" : "FNdNfE3std6logger4core8LogLevelZv",
         "parameters" : [
          {
           "name" : "lv",
-          "deco" : "E3std12experimental6logger4core8LogLevel"
+          "deco" : "E3std6logger4core8LogLevel"
          }
         ],
         "endline" : 1057,
@@ -18194,11 +18224,11 @@
       "storageClass" : [
        "override"
       ],
-      "deco" : "FNfKS3std12experimental6logger4core6Logger8LogEntryZv",
+      "deco" : "FNfKS3std6logger4core6Logger8LogEntryZv",
       "parameters" : [
        {
         "name" : "payload",
-        "deco" : "S3std12experimental6logger4core6Logger8LogEntry",
+        "deco" : "S3std6logger4core6Logger8LogEntry",
         "storageClass" : [
          "ref"
         ]
@@ -18207,7 +18237,7 @@
       "endline" : 1104,
       "endchar" : 2,
       "overrides" : [
-       "std.experimental.logger.multilogger.MultiLogger.writeLogMsg"
+       "std.logger.multilogger.MultiLogger.writeLogMsg"
       ]
      },
      {
@@ -18729,7 +18759,7 @@
     "comment" : " 名前からロガーを取得する\n",
     "line" : 1330,
     "char" : 8,
-    "deco" : "FNeAyaC3std12experimental6logger4core6LoggerZQBn",
+    "deco" : "FNeAyaC3std6logger4core6LoggerZQz",
     "originalType" : "@trusted Logger(string name, Logger defaultLogger = cast()sharedLog)",
     "parameters" : [
      {
@@ -18738,7 +18768,7 @@
      },
      {
       "name" : "defaultLogger",
-      "deco" : "C3std12experimental6logger4core6Logger",
+      "deco" : "C3std6logger4core6Logger",
       "default" : "sharedLog()"
      }
     ],
@@ -26264,7 +26294,10 @@
     "parameters" : [
      {
       "name" : "str",
-      "deco" : "AAya"
+      "deco" : "AAya",
+      "storageClass" : [
+       "scope"
+      ]
      }
     ],
     "endline" : 778,
@@ -26281,7 +26314,10 @@
     "parameters" : [
      {
       "name" : "str",
-      "deco" : "AAya"
+      "deco" : "AAya",
+      "storageClass" : [
+       "scope"
+      ]
      }
     ],
     "endline" : 784,
@@ -27281,7 +27317,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタのあるデータを管理する\n\n isCountedDataなデータの参照カウントをコピーの発生や寿命の終了で自動的に増減させる。\n\n Params:\n      T = isCountedDataなclass/interface/structのポインタ/size_tと同サイズのstruct、およびCountedDataのインスタンス\n See_Also:\n      $(LINK2 #.isCountedData, isCountedData)\n",
-    "line" : 376,
+    "line" : 372,
     "char" : 1,
     "name" : "RefCounted",
     "parameters" : [
@@ -27295,13 +27331,13 @@
       "name" : "RefCounted",
       "kind" : "struct",
       "protection" : "public",
-      "line" : 376,
+      "line" : 372,
       "char" : 1,
       "members" : [
        {
         "kind" : "template",
         "comment" : " 参照カウンタを保持してアタッチ＆加算する\n",
-        "line" : 406,
+        "line" : 395,
         "char" : 2,
         "name" : "this",
         "parameters" : [
@@ -27315,7 +27351,7 @@
          {
           "name" : "this",
           "kind" : "constructor",
-          "line" : 406,
+          "line" : 395,
           "char" : 2,
           "type" : "@trusted (U newRefData)",
           "parameters" : [
@@ -27324,7 +27360,7 @@
             "type" : "U"
            }
           ],
-          "endline" : 419,
+          "endline" : 408,
           "endchar" : 2
          }
         ]
@@ -27333,18 +27369,18 @@
         "name" : "~this",
         "kind" : "destructor",
         "comment" : " 参照カウンタを減算し、カウンタが0になったら開放する\n",
-        "line" : 439,
+        "line" : 428,
         "char" : 2,
         "storageClass" : [
          "@trusted"
         ],
-        "endline" : 456,
+        "endline" : 445,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : " 参照カウンタを保持してアタッチ＆加算する\n",
-        "line" : 461,
+        "line" : 450,
         "char" : 7,
         "name" : "opAssign",
         "parameters" : [
@@ -27358,7 +27394,7 @@
          {
           "name" : "opAssign",
           "kind" : "function",
-          "line" : 461,
+          "line" : 450,
           "char" : 7,
           "type" : "void(U newRefData)",
           "parameters" : [
@@ -27367,7 +27403,7 @@
             "type" : "U"
            }
           ],
-          "endline" : 487,
+          "endline" : 476,
           "endchar" : 2
          }
         ]
@@ -27375,7 +27411,7 @@
        {
         "kind" : "template",
         "comment" : " 参照外し\n",
-        "line" : 492,
+        "line" : 481,
         "char" : 11,
         "name" : "opUnary",
         "parameters" : [
@@ -27390,13 +27426,13 @@
          {
           "name" : "opUnary",
           "kind" : "function",
-          "line" : 492,
+          "line" : 481,
           "char" : 11,
           "storageClass" : [
            "auto"
           ],
           "type" : "ref ()",
-          "endline" : 495,
+          "endline" : 484,
           "endchar" : 2
          }
         ]
@@ -27406,23 +27442,23 @@
     ]
    },
    {
-    "name" : "__unittest_L501_C7",
+    "name" : "__unittest_L490_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 501,
+    "line" : 490,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 528,
+    "endline" : 517,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタかどうか確認します\n",
-    "line" : 528,
+    "line" : 517,
     "char" : 6,
     "name" : "isRefCounted",
     "parameters" : [
@@ -27435,7 +27471,7 @@
      {
       "name" : "isRefCounted",
       "kind" : "variable",
-      "line" : 528,
+      "line" : 517,
       "char" : 6,
       "storageClass" : [
        "enum"
@@ -27445,23 +27481,23 @@
     ]
    },
    {
-    "name" : "__unittest_L530_C7",
+    "name" : "__unittest_L519_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 530,
+    "line" : 519,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 539,
+    "endline" : 528,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタの元データの型を得ます\n",
-    "line" : 539,
+    "line" : 528,
     "char" : 1,
     "name" : "RefCountedTypeOf",
     "parameters" : [
@@ -27475,30 +27511,30 @@
      {
       "name" : "RefCountedTypeOf",
       "kind" : "alias",
-      "line" : 542,
+      "line" : 531,
       "char" : 2,
       "type" : "TemplateArgsOf!T[0]"
      }
     ]
    },
    {
-    "name" : "__unittest_L545_C7",
+    "name" : "__unittest_L534_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 545,
+    "line" : 534,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 553,
+    "endline" : 542,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照が初期化されているか確認する\n",
-    "line" : 553,
+    "line" : 542,
     "char" : 6,
     "name" : "isInitialized",
     "parameters" : [
@@ -27511,7 +27547,7 @@
      {
       "name" : "isInitialized",
       "kind" : "function",
-      "line" : 553,
+      "line" : 542,
       "char" : 6,
       "type" : "bool(in ref RefCounted!T dat)",
       "parameters" : [
@@ -27524,7 +27560,7 @@
         ]
        }
       ],
-      "endline" : 571,
+      "endline" : 560,
       "endchar" : 1
      }
     ]
@@ -27533,7 +27569,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 573,
+    "line" : 562,
     "char" : 6,
     "name" : "isEmpty",
     "parameters" : [
@@ -27546,7 +27582,7 @@
      {
       "name" : "isEmpty",
       "kind" : "function",
-      "line" : 573,
+      "line" : 562,
       "char" : 6,
       "type" : "bool(in ref RefCounted!T dat)",
       "parameters" : [
@@ -27559,7 +27595,7 @@
         ]
        }
       ],
-      "endline" : 576,
+      "endline" : 565,
       "endchar" : 1
      }
     ]
@@ -27569,28 +27605,28 @@
     "kind" : "alias",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 578,
+    "line" : 567,
     "char" : 1,
     "originalType" : "isEmpty"
    },
    {
-    "name" : "__unittest_L580_C7",
+    "name" : "__unittest_L569_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 580,
+    "line" : 569,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 595,
+    "endline" : 584,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタ加算せずにアタッチする\n",
-    "line" : 595,
+    "line" : 584,
     "char" : 6,
     "name" : "attach",
     "parameters" : [
@@ -27608,7 +27644,7 @@
      {
       "name" : "attach",
       "kind" : "function",
-      "line" : 595,
+      "line" : 584,
       "char" : 6,
       "type" : "pure nothrow @property void(ref RefCounted!T rc, auto ref U newRefData)",
       "parameters" : [
@@ -27628,29 +27664,29 @@
         ]
        }
       ],
-      "endline" : 601,
+      "endline" : 590,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L603_C7",
+    "name" : "__unittest_L592_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 603,
+    "line" : 592,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 627,
+    "endline" : 616,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照外し\n",
-    "line" : 627,
+    "line" : 616,
     "char" : 29,
     "name" : "deref",
     "parameters" : [
@@ -27663,7 +27699,7 @@
      {
       "name" : "deref",
       "kind" : "function",
-      "line" : 627,
+      "line" : 616,
       "char" : 29,
       "type" : "pure nothrow ref inout(T)(inout ref RefCounted!T rc)",
       "parameters" : [
@@ -27676,29 +27712,29 @@
         ]
        }
       ],
-      "endline" : 630,
+      "endline" : 619,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L632_C7",
+    "name" : "__unittest_L621_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 632,
+    "line" : 621,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 644,
+    "endline" : 633,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " ポインタを得る\n",
-    "line" : 644,
+    "line" : 633,
     "char" : 26,
     "name" : "ptr",
     "parameters" : [
@@ -27711,7 +27747,7 @@
      {
       "name" : "ptr",
       "kind" : "function",
-      "line" : 644,
+      "line" : 633,
       "char" : 26,
       "type" : "pure nothrow inout(T)*(inout ref RefCounted!T rc)",
       "parameters" : [
@@ -27724,30 +27760,30 @@
         ]
        }
       ],
-      "endline" : 647,
+      "endline" : 636,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L649_C7",
+    "name" : "__unittest_L638_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 649,
+    "line" : 638,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 662,
+    "endline" : 651,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタを生成\n",
-    "line" : 662,
-    "char" : 6,
+    "line" : 651,
+    "char" : 14,
     "name" : "createRefCounted",
     "parameters" : [
      {
@@ -27764,12 +27800,9 @@
      {
       "name" : "createRefCounted",
       "kind" : "function",
-      "line" : 662,
-      "char" : 6,
-      "storageClass" : [
-       "auto"
-      ],
-      "type" : "@trusted (auto ref Args args)",
+      "line" : 651,
+      "char" : 14,
+      "type" : "@trusted RefCounted!T(auto ref Args args)",
       "parameters" : [
        {
         "name" : "args",
@@ -27780,7 +27813,7 @@
         ]
        }
       ],
-      "endline" : 666,
+      "endline" : 655,
       "endchar" : 1
      }
     ]
@@ -27789,8 +27822,8 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 668,
-    "char" : 6,
+    "line" : 657,
+    "char" : 14,
     "name" : "createRefCounted",
     "parameters" : [
      {
@@ -27807,12 +27840,9 @@
      {
       "name" : "createRefCounted",
       "kind" : "function",
-      "line" : 668,
-      "char" : 6,
-      "storageClass" : [
-       "auto"
-      ],
-      "type" : "@trusted (auto ref Args args)",
+      "line" : 657,
+      "char" : 14,
+      "type" : "@trusted RefCounted!T(auto ref Args args)",
       "parameters" : [
        {
         "name" : "args",
@@ -27823,7 +27853,7 @@
         ]
        }
       ],
-      "endline" : 672,
+      "endline" : 661,
       "endchar" : 1
      }
     ]
@@ -27832,8 +27862,8 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 674,
-    "char" : 6,
+    "line" : 663,
+    "char" : 14,
     "name" : "createRefCounted",
     "parameters" : [
      {
@@ -27850,12 +27880,9 @@
      {
       "name" : "createRefCounted",
       "kind" : "function",
-      "line" : 674,
-      "char" : 6,
-      "storageClass" : [
-       "auto"
-      ],
-      "type" : "@trusted (auto ref Args args)",
+      "line" : 663,
+      "char" : 14,
+      "type" : "@trusted RefCounted!T(auto ref Args args)",
       "parameters" : [
        {
         "name" : "args",
@@ -27866,7 +27893,7 @@
         ]
        }
       ],
-      "endline" : 678,
+      "endline" : 667,
       "endchar" : 1
      }
     ]
@@ -27875,8 +27902,8 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 680,
-    "char" : 6,
+    "line" : 669,
+    "char" : 14,
     "name" : "createRefCounted",
     "parameters" : [
      {
@@ -27893,12 +27920,49 @@
      {
       "name" : "createRefCounted",
       "kind" : "function",
-      "line" : 680,
-      "char" : 6,
-      "storageClass" : [
-       "auto"
+      "line" : 669,
+      "char" : 14,
+      "type" : "@trusted RefCounted!T(auto ref Args args)",
+      "parameters" : [
+       {
+        "name" : "args",
+        "type" : "Args",
+        "storageClass" : [
+         "auto",
+         "ref"
+        ]
+       }
       ],
-      "type" : "@trusted (auto ref Args args)",
+      "endline" : 674,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 676,
+    "char" : 14,
+    "name" : "createRefCounted",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "Args",
+      "kind" : "tuple"
+     }
+    ],
+    "constraint" : "!isCountedData!T",
+    "members" : [
+     {
+      "name" : "createRefCounted",
+      "kind" : "function",
+      "line" : 676,
+      "char" : 14,
+      "type" : "@trusted RefCounted!T(auto ref Args args)",
       "parameters" : [
        {
         "name" : "args",
@@ -27919,50 +27983,7 @@
     "protection" : "public",
     "comment" : "ditto\n",
     "line" : 687,
-    "char" : 6,
-    "name" : "createRefCounted",
-    "parameters" : [
-     {
-      "name" : "T",
-      "kind" : "type"
-     },
-     {
-      "name" : "Args",
-      "kind" : "tuple"
-     }
-    ],
-    "constraint" : "!isCountedData!T",
-    "members" : [
-     {
-      "name" : "createRefCounted",
-      "kind" : "function",
-      "line" : 687,
-      "char" : 6,
-      "storageClass" : [
-       "auto"
-      ],
-      "type" : "@trusted (auto ref Args args)",
-      "parameters" : [
-       {
-        "name" : "args",
-        "type" : "Args",
-        "storageClass" : [
-         "auto",
-         "ref"
-        ]
-       }
-      ],
-      "endline" : 696,
-      "endchar" : 1
-     }
-    ]
-   },
-   {
-    "kind" : "template",
-    "protection" : "public",
-    "comment" : "ditto\n",
-    "line" : 698,
-    "char" : 6,
+    "char" : 14,
     "name" : "createRefCounted",
     "parameters" : [
      {
@@ -27983,12 +28004,9 @@
      {
       "name" : "createRefCounted",
       "kind" : "function",
-      "line" : 698,
-      "char" : 6,
-      "storageClass" : [
-       "auto"
-      ],
-      "type" : "@trusted (auto ref Args args)",
+      "line" : 687,
+      "char" : 14,
+      "type" : "@trusted RefCounted!T(auto ref Args args)",
       "parameters" : [
        {
         "name" : "args",
@@ -27999,29 +28017,29 @@
         ]
        }
       ],
-      "endline" : 704,
+      "endline" : 693,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L707_C9",
+    "name" : "__unittest_L696_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 707,
+    "line" : 696,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 774,
+    "endline" : 763,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 参照カウンタを追加せずにRefCountedを得る\n",
-    "line" : 774,
+    "line" : 763,
     "char" : 14,
     "name" : "attachRefCounted",
     "parameters" : [
@@ -28030,11 +28048,44 @@
       "kind" : "type"
      }
     ],
+    "constraint" : "isCountedData!T",
     "members" : [
      {
       "name" : "attachRefCounted",
       "kind" : "function",
-      "line" : 774,
+      "line" : 763,
+      "char" : 14,
+      "type" : "RefCounted!T(T newRefData)",
+      "parameters" : [
+       {
+        "name" : "newRefData",
+        "type" : "T"
+       }
+      ],
+      "endline" : 768,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 770,
+    "char" : 14,
+    "name" : "attachRefCounted",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "!isCountedData!T",
+    "members" : [
+     {
+      "name" : "attachRefCounted",
+      "kind" : "function",
+      "line" : 770,
       "char" : 14,
       "type" : "RefCounted!T(RefType!T newRefData)",
       "parameters" : [
@@ -28043,7 +28094,7 @@
         "type" : "RefType!T"
        }
       ],
-      "endline" : 778,
+      "endline" : 775,
       "endchar" : 1
      }
     ]
@@ -28051,7 +28102,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 779,
+    "line" : 776,
     "char" : 22,
     "name" : "attachRefCountedImpl",
     "parameters" : [
@@ -28064,36 +28115,36 @@
      {
       "name" : "attachRefCountedImpl",
       "kind" : "function",
-      "line" : 779,
+      "line" : 776,
       "char" : 22,
-      "type" : "RefCounted!T(RefType!T newRefData)",
+      "type" : "RefCounted!T(void* newRefData)",
       "parameters" : [
        {
         "name" : "newRefData",
-        "type" : "RefType!T"
+        "type" : "void*"
        }
       ],
-      "endline" : 783,
+      "endline" : 780,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L793_C9",
+    "name" : "__unittest_L790_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 793,
+    "line" : 790,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 819,
+    "endline" : 816,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 819,
+    "line" : 816,
     "char" : 34,
     "name" : "getCountedData",
     "parameters" : [
@@ -28107,7 +28158,7 @@
      {
       "name" : "getCountedData",
       "kind" : "function",
-      "line" : 819,
+      "line" : 816,
       "char" : 34,
       "type" : "pure nothrow @nogc @property ref @safe inout(CountedData!T)(inout ref RefCounted!T rc)",
       "parameters" : [
@@ -28120,7 +28171,7 @@
         ]
        }
       ],
-      "endline" : 824,
+      "endline" : 821,
       "endchar" : 1
      }
     ]
@@ -28129,7 +28180,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " バッファ領域へアクセス\n\n バッファ領域は、Tのインスタンスと拡張領域のメモリ領域全体を指す。\n\n Note:\n      release後に触れた場合、ダングリングポインタへのアクセスの可能性がある。\n      また、書き換えた場合、本来RefCountedで管理しているデータが損失する可能性がある。\n",
-    "line" : 836,
+    "line" : 833,
     "char" : 16,
     "name" : "buffer",
     "parameters" : [
@@ -28143,7 +28194,7 @@
      {
       "name" : "buffer",
       "kind" : "function",
-      "line" : 836,
+      "line" : 833,
       "char" : 16,
       "type" : "pure nothrow @nogc @property @system inout(ubyte)[](inout ref RefCounted!T rc)",
       "parameters" : [
@@ -28156,29 +28207,29 @@
         ]
        }
       ],
-      "endline" : 841,
+      "endline" : 838,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L843_C9",
+    "name" : "__unittest_L840_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 843,
+    "line" : 840,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 860,
+    "endline" : 857,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 拡張データ領域へアクセス\n\n 初期化時にTのインスタンスより大きなバッファを与えることで、拡張データ領域を持つことができる。\n この関数は拡張データ領域へのアクセス手段を提供する。\n\n Note:\n      release後に触れた場合、ダングリングポインタへのアクセスの可能性がある。\n      また、書き換えた場合、本来RefCountedで管理しているデータが損失する可能性がある。\n",
-    "line" : 860,
+    "line" : 857,
     "char" : 16,
     "name" : "extraBuffer",
     "parameters" : [
@@ -28192,7 +28243,7 @@
      {
       "name" : "extraBuffer",
       "kind" : "function",
-      "line" : 860,
+      "line" : 857,
       "char" : 16,
       "type" : "pure nothrow @nogc @property @system inout(ubyte)[](inout ref RefCounted!T rc)",
       "parameters" : [
@@ -28205,29 +28256,29 @@
         ]
        }
       ],
-      "endline" : 866,
+      "endline" : 863,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L868_C9",
+    "name" : "__unittest_L865_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 868,
+    "line" : 865,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 878,
+    "endline" : 875,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " カウント値を得る\n",
-    "line" : 878,
+    "line" : 875,
     "char" : 5,
     "name" : "counter",
     "parameters" : [
@@ -28241,7 +28292,7 @@
      {
       "name" : "counter",
       "kind" : "function",
-      "line" : 878,
+      "line" : 875,
       "char" : 5,
       "type" : "pure nothrow @nogc @property @safe int(in ref RefCounted!T rc)",
       "parameters" : [
@@ -28254,22 +28305,22 @@
         ]
        }
       ],
-      "endline" : 884,
+      "endline" : 881,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L886_C9",
+    "name" : "__unittest_L883_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 886,
+    "line" : 883,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 896,
+    "endline" : 893,
     "endchar" : 1
    }
   ]
@@ -28634,7 +28685,10 @@
       "comment" : " デストラクタ\n\n 名前付きミューテックスの削除を行う\n",
       "line" : 454,
       "char" : 2,
-      "deco" : "FNbNiZv",
+      "storageClass" : [
+       "scope"
+      ],
+      "deco" : "FNbNiNlZv",
       "endline" : 466,
       "endchar" : 2
      },
