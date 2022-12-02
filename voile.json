@@ -30687,24 +30687,42 @@
         "endchar" : 2
        },
        {
-        "name" : "this",
-        "kind" : "constructor",
+        "kind" : "template",
         "comment" : " コンストラクタ\n\n sharedのコンストラクタを呼んだ場合の初期状態は共有資源(unlockされた状態)\n 非sharedのコンストラクタを呼んだ場合の初期状態は非共有資源(lockされた状態)\n",
         "line" : 1616,
         "char" : 2,
-        "type" : "pure @trusted ()",
-        "endline" : 1620,
-        "endchar" : 2
+        "name" : "this",
+        "parameters" : [],
+        "members" : [
+         {
+          "name" : "this",
+          "kind" : "constructor",
+          "line" : 1616,
+          "char" : 2,
+          "type" : "@trusted ()",
+          "endline" : 1620,
+          "endchar" : 2
+         }
+        ]
        },
        {
-        "name" : "this",
-        "kind" : "constructor",
+        "kind" : "template",
         "comment" : "ditto\n",
         "line" : 1623,
         "char" : 2,
-        "type" : "shared pure @trusted ()",
-        "endline" : 1626,
-        "endchar" : 2
+        "name" : "this",
+        "parameters" : [],
+        "members" : [
+         {
+          "name" : "this",
+          "kind" : "constructor",
+          "line" : 1623,
+          "char" : 2,
+          "type" : "shared @trusted ()",
+          "endline" : 1626,
+          "endchar" : 2
+         }
+        ]
        },
        {
         "name" : "mutex",
