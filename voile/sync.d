@@ -1613,14 +1613,14 @@ public:
 	 * sharedのコンストラクタを呼んだ場合の初期状態は共有資源(unlockされた状態)
 	 * 非sharedのコンストラクタを呼んだ場合の初期状態は非共有資源(lockされた状態)
 	 */
-	this() pure @trusted
+	this()() @trusted
 	{
 		// これはひどい
 		(cast(void delegate(bool) pure)&_initData)(true);
 	}
 	
 	/// ditto
-	this() pure @trusted shared
+	this()() @trusted shared
 	{
 		(cast(void delegate(bool) pure)(&(cast()this)._initData))(false);
 	}
