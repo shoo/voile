@@ -965,11 +965,13 @@ public:
 			}
 			if (callbackFailed)
 				callbackFailed(e);
+			_execTaskOnFailed(future, e);
 		});
 	}
 	private void _addListenerFatalWithNewFeature(Ret2)(CallbackFatalType callbackFatal, Future!Ret2 future)
 	{
-		addListenerFatal(cast(CallbackFatalType)(Throwable e){
+		addListenerFatal(cast(CallbackFatalType)(Throwable e)
+		{
 			scope (exit)
 				future._evStart.signaled = true;
 			synchronized (future)
@@ -979,6 +981,7 @@ public:
 			}
 			if (callbackFatal)
 				callbackFatal(e);
+			_execTaskOnFatal(future, e);
 		});
 	}
 	
