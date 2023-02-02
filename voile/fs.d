@@ -114,6 +114,16 @@ else
 }
 
 
+version (Windows)
+{
+	enum SYMBOLIC_LINK_FLAG_DIRECTORY = 0x00000001;
+	enum SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x00000002;
+	extern (Windows) imported!"core.sys.windows.windows".BOOL CreateSymbolicLinkW(
+		imported!"core.sys.windows.windows".LPCWSTR,
+		imported!"core.sys.windows.windows".LPCWSTR,
+		imported!"core.sys.windows.windows".DWORD);
+}
+
 /*******************************************************************************
  * ファイルシステムの操作に関するヘルパ
  */
@@ -1510,6 +1520,122 @@ struct FileSystem
 		return moveFilesImpl!true(src, dst, force, retrycnt);
 	}
 	
+	/*******************************************************************************
+	 * シンボリックリンクを作成する
+	 */
+	void symlink(in char[] target, in char[] link)
+	{
+		auto isAbs = isAbsolute(cast(immutable)target);
+		auto linkPath = absolutePath(cast(immutable)link);
+		auto targetPath = isAbs
+			? buildNormalizedNativePath(cast(immutable)target)
+			: .relativePath(absolutePath(cast(immutable)target), linkPath.dirName);
+		version (Windows)
+		{
+			import core.sys.windows.windows;
+			import core.sys.windows.winbase;
+			import std.utf: toUTF16z;
+			import std.windows.syserror;
+			immutable flg = SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE
+				| (isDir(cast(immutable)target) ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0);
+			CreateSymbolicLinkW(toUTF16z(r"\\?\" ~ linkPath),
+				toUTF16z(isAbs ? r"\\?\" ~ targetPath : targetPath), flg)
+				.enforce(GetLastError().sysErrorString());
+		}
+		else
+		{
+			std.file.symlink(targetPath, linkPath);
+		}
+	}
+	@system unittest
+	{
+		auto fs = createDisposableDir("ut");
+		fs.writeText("test1.txt", "1");
+		fs.symlink("test1.txt", "test2.txt");
+		assert(fs.readText("test2.txt") == "1");
+		fs.writeText("test2.txt", "2");
+		assert(fs.readText("test1.txt") == "2");
+	}
+	
+	/*******************************************************************************
+	 * シンボリックリンクの実パスを得る
+	 */
+	string readlink(in char[] link)
+	{
+		auto linkPath = absolutePath(cast(immutable)link);
+		version (Windows)
+		{
+			import core.sys.windows.windows;
+			import std.utf: toUTF16z, toUTF8;
+			import std.string: chompPrefix;
+			import std.windows.syserror;
+			enum FILE_FLAG_OPEN_REPARSE_POINT = 0x00200000;
+			enum FILE_FLAG_BACKUP_SEMANTICS   = 0x02000000;
+			enum FSCTL_GET_REPARSE_POINT      = 0x000900A8;
+			enum IO_REPARSE_TAG_SYMLINK       = 0xA000000C;
+			struct REPARSE_DATA_BUFFER
+			{
+				ULONG  ReparseTag;
+				USHORT ReparseDataLength;
+				USHORT Reserved;
+				union
+				{
+					struct SymbolicLinkReparseBuffer
+					{
+						USHORT SubstituteNameOffset;
+						USHORT SubstituteNameLength;
+						USHORT PrintNameOffset;
+						USHORT PrintNameLength;
+						ULONG  Flags;
+						WCHAR[1] PathBuffer;
+					}
+					SymbolicLinkReparseBuffer symbolicLinkReparseBuffer;
+					struct MountPointReparseBuffer
+					{
+						USHORT SubstituteNameOffset;
+						USHORT SubstituteNameLength;
+						USHORT PrintNameOffset;
+						USHORT PrintNameLength;
+						WCHAR[1] PathBuffer;
+					}
+					MountPointReparseBuffer mountPointReparseBuffer;
+					struct GenericReparseBuffer
+					{
+						UCHAR[1] DataBuffer;
+					}
+					GenericReparseBuffer genericReparseBuffer;
+				}
+			}
+			auto hLink = CreateFileW(toUTF16z(r"\\?\" ~ linkPath), 0, 0, NULL, OPEN_EXISTING,
+				FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, NULL)
+				.enforce(GetLastError().sysErrorString());
+			scope (exit)
+				CloseHandle(hLink);
+			auto buflen = 0xffff;
+			auto buf = new ubyte[buflen];
+			DWORD pathlen;
+			DeviceIoControl(hLink, FSCTL_GET_REPARSE_POINT, NULL, 0, buf.ptr, buflen, &pathlen, NULL);
+			auto reparseData = cast(REPARSE_DATA_BUFFER*)buf.ptr;
+			if (reparseData.ReparseTag != IO_REPARSE_TAG_SYMLINK)
+				return null;
+			return toUTF8(reparseData.symbolicLinkReparseBuffer.PathBuffer.ptr[
+				0..reparseData.symbolicLinkReparseBuffer.SubstituteNameLength/wchar.sizeof]).chompPrefix(r"\\?\");
+		}
+		else
+		{
+			return std.file.readlink(linkPath);
+		}
+	}
+	@system unittest
+	{
+		auto fs = createDisposableDir("ut");
+		fs.writeText("test1.txt", "1");
+		fs.symlink("test1.txt", "test2.txt");
+		fs.symlink(fs.absolutePath("test1.txt"), "test3.txt");
+		assert(fs.readlink("test2.txt") == "test1.txt");
+		imported!"std.stdio".writeln(fs.readlink("test3.txt"));
+		assert(fs.readlink("test3.txt") == fs.absolutePath("test1.txt"));
+	}
 	
 	//--------------------------------------------------------------------------
 	// タイムスタンプ取得・設定の実装
