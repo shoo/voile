@@ -1560,7 +1560,7 @@ struct FileSystem
 	/*******************************************************************************
 	 * シンボリックリンクの実パスを得る
 	 */
-	string readlink(in char[] link)
+	string readLink(in char[] link)
 	{
 		auto linkPath = absolutePath(cast(immutable)link);
 		version (Windows)
@@ -1623,7 +1623,7 @@ struct FileSystem
 		}
 		else
 		{
-			return std.file.readlink(linkPath);
+			return std.file.readLink(linkPath);
 		}
 	}
 	@system unittest
@@ -1632,9 +1632,9 @@ struct FileSystem
 		fs.writeText("test1.txt", "1");
 		fs.symlink("test1.txt", "test2.txt");
 		fs.symlink(fs.absolutePath("test1.txt"), "test3.txt");
-		assert(fs.readlink("test2.txt") == "test1.txt");
-		imported!"std.stdio".writeln(fs.readlink("test3.txt"));
-		assert(fs.readlink("test3.txt") == fs.absolutePath("test1.txt"));
+		assert(fs.readLink("test2.txt") == "test1.txt");
+		imported!"std.stdio".writeln(fs.readLink("test3.txt"));
+		assert(fs.readLink("test3.txt") == fs.absolutePath("test1.txt"));
 	}
 	
 	//--------------------------------------------------------------------------
