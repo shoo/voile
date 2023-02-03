@@ -255,6 +255,9 @@ const @safe string <code class="ddoc_psymbol">buildPosixPath</code>();
 <span class="d_keyword">assert</span>(fs.<span class="d_psymbol">buildPosixPath</span>() == <span class="d_string">"ut/test"</span>);
 <span class="d_keyword">auto</span> posixPath = fs.<span class="d_psymbol">buildPosixPath</span>(<span class="d_string">"path\\to/file"</span>);
 <span class="d_keyword">assert</span>(posixPath == <span class="d_string">"ut/test/path/to/file"</span>);
+
+<span class="d_keyword">auto</span> absPosixPath = fs.<span class="d_psymbol">buildPosixPath</span>(<span class="d_string">"/path\\to/file"</span>);
+<span class="d_keyword">assert</span>(absPosixPath == <span class="d_string">"/path/to/file"</span>);
 </pre>
 </div>
 </dd>
@@ -523,6 +526,12 @@ fs.<span class="d_psymbol">copyFiles</span>(<span class="d_string">"a/b"</span>,
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.moveFiles"></span><div class="quickindex" id="quickindex.FileSystem.moveFiles"></div>bool <code class="ddoc_psymbol">moveFiles</code>(string <span class="ddoc_param">src</span>, string <span class="ddoc_param">dst</span>, bool <span class="ddoc_param">force</span> = true, bool <span class="ddoc_param">retrycnt</span> = true);
 <br></div></dt>
 <dd><div class="ddoc_summary">ファイルを移動する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.symlink"></span><div class="quickindex" id="quickindex.FileSystem.symlink"></div>void <code class="ddoc_psymbol">symlink</code>(in char[] <span class="ddoc_param">target</span>, in char[] <span class="ddoc_param">link</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">シンボリックリンクを作成する</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.readLink"></span><div class="quickindex" id="quickindex.FileSystem.readLink"></div>string <code class="ddoc_psymbol">readLink</code>(in char[] <span class="ddoc_param">link</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">シンボリックリンクの実パスを得る</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.setTimeStamp"></span><div class="quickindex" id="quickindex.FileSystem.setTimeStamp"></div>void <code class="ddoc_psymbol">setTimeStamp</code>(string <span class="ddoc_param">target</span>, SysTime <span class="ddoc_param">accessTime</span>, SysTime <span class="ddoc_param">modificationTime</span>);
 <br>
 void <code class="ddoc_psymbol">setTimeStamp</code>(string <span class="ddoc_param">target</span>, SysTime <span class="ddoc_param">modificationTime</span>);
