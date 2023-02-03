@@ -19,7 +19,11 @@ static string[] splitPath(string path) @safe pure
 {
 	import std.array: split;
 	import std.algorithm: remove;
-	return path.split!(a => a == '\\' || a == '/').remove!(a=>a.length == 0);
+	if (path.length == 0)
+		return null;
+	return path[0] == '/'
+		? ["/"] ~ path[1..$].split!(a => a == '\\' || a == '/').remove!(a=>a.length == 0)
+		: path.split!(a => a == '\\' || a == '/').remove!(a=>a.length == 0);
 }
 
 
@@ -56,6 +60,10 @@ static string joinWindowsPath(string[] path) @safe pure
  */
 static string joinPosixPath(string[] path) @safe pure
 {
+	if (path.length == 0)
+		return null;
+	if (path[0] == "/")
+		return path.joinPath("/")[1..$];
 	return path.joinPath("/");
 }
 
@@ -180,6 +188,10 @@ struct FileSystem
 	 */
 	string absolutePath() const @safe
 	{
+		if (workDir.length == 0)
+			return null;
+		version (Windows) if (workDir[0] == '/')
+			return workDir.buildNormalizedPath();
 		if (workDir.isAbsolute)
 			return workDir.buildNormalizedPath();
 		return .absolutePath(workDir).buildNormalizedPath();
@@ -187,6 +199,10 @@ struct FileSystem
 	/// ditto
 	string absolutePath(string target) const @safe
 	{
+		if (target.length == 0)
+			return null;
+		version (Windows) if (target[0] == '/')
+			return target.buildNormalizedPath();
 		if (target.isAbsolute)
 			return target.buildNormalizedPath();
 		return .absolutePath(target, absolutePath()).buildNormalizedPath();
@@ -199,6 +215,10 @@ struct FileSystem
 	/// ditto
 	string absolutePath(string target, string base) const @safe
 	{
+		if (target.length == 0)
+			return null;
+		version (Windows) if (target[0] == '/')
+			return target.buildNormalizedPath();
 		if (target.isAbsolute)
 			return target.buildNormalizedPath();
 		return .absolutePath(target, this.absolutePath(base)).buildNormalizedPath();
@@ -314,6 +334,13 @@ struct FileSystem
 	{
 		if (path.isAbsolute())
 			return splitPath(path);
+		version (Windows)
+		{
+			if (path.length == 0)
+				return null;
+			if (path[0] == '/')
+				return splitPath(path);
+		}
 		return splitPath(workDir) ~ splitPath(path);
 	}
 	
@@ -344,6 +371,11 @@ struct FileSystem
 		assert(pathsplitted[3] == "path");
 		assert(pathsplitted[4] == "aaa");
 		assert(pathsplitted[5] == "bbb");
+		pathsplitted = fs.buildSplittedPath("/path\\aaa/bbb");
+		assert(pathsplitted[0] == "/");
+		assert(pathsplitted[1] == "path");
+		assert(pathsplitted[2] == "aaa");
+		assert(pathsplitted[3] == "bbb");
 	}
 	
 	
@@ -378,6 +410,10 @@ struct FileSystem
 		assert(fs.buildPosixPath() == "ut/test");
 		auto posixPath = fs.buildPosixPath("path\\to/file");
 		assert(posixPath == "ut/test/path/to/file");
+		
+		auto absPosixPath = fs.buildPosixPath("/path\\to/file");
+		assert(absPosixPath == "/path/to/file");
+		
 	}
 	
 	/***************************************************************************
@@ -425,21 +461,33 @@ struct FileSystem
 	string[] buildNormalizedSplittedPath(string path) const @safe
 	{
 		import std.array;
-		return buildSplittedPath(path).buildNormalizedPath().split!(a => a == '\\' || a == '/');
+		auto splitted = buildSplittedPath(path).buildNormalizedPath().split!(a => a == '\\' || a == '/');
+		if (splitted.length == 0 || splitted[0] != "")
+			return splitted;
+		splitted[0] = "/";
+		return splitted;
 	}
 	
 	/// ditto
 	string[] buildNormalizedSplittedPath(string[] paths) const @safe
 	{
 		import std.array;
-		return buildSplittedPath(paths).buildNormalizedPath().split!(a => a == '\\' || a == '/');
+		auto splitted = buildSplittedPath(paths).buildNormalizedPath().split!(a => a == '\\' || a == '/');
+		if (splitted.length == 0 || splitted[0] != "")
+			return splitted;
+		splitted[0] = "/";
+		return splitted;
 	}
 	
 	/// ditto
 	string[] buildNormalizedSplittedPath() const @safe
 	{
 		import std.array;
-		return buildSplittedPath().buildNormalizedPath().split!(a => a == '\\' || a == '/');
+		auto splitted = buildSplittedPath().buildNormalizedPath().split!(a => a == '\\' || a == '/');
+		if (splitted.length == 0 || splitted[0] != "")
+			return splitted;
+		splitted[0] = "/";
+		return splitted;
 	}
 	
 	@safe unittest
@@ -455,6 +503,10 @@ struct FileSystem
 		assert(pathsplitted[1] == "path");
 		assert(pathsplitted[2] == "aaa");
 		assert(pathsplitted[3] == "bbb");
+		auto abspathsplitted = fs.buildNormalizedSplittedPath("/test");
+		assert(abspathsplitted.length == 2);
+		assert(abspathsplitted[0] == "/");
+		assert(abspathsplitted[1] == "test");
 	}
 	
 	/***************************************************************************
@@ -467,21 +519,30 @@ struct FileSystem
 	string buildNormalizedPosixPath(string path)
 	{
 		import std.array;
-		return buildNormalizedSplittedPath(path).join('/');
+		auto splitted = buildNormalizedSplittedPath(path);
+		if (splitted.length == 0)
+			return null;
+		return splitted.join('/')[(splitted[0] == "/" ? 1 : 0) .. $];
 	}
 	
 	/// ditto
 	string buildNormalizedPosixPath(string[] paths)
 	{
 		import std.array;
-		return buildNormalizedSplittedPath(paths).join('/');
+		auto splitted = buildNormalizedSplittedPath(paths);
+		if (splitted.length == 0)
+			return null;
+		return splitted.join('/')[(splitted[0] == "/" ? 1 : 0) .. $];
 	}
 	
 	/// ditto
 	string buildNormalizedPosixPath()
 	{
 		import std.array;
-		return buildNormalizedSplittedPath().join('/');
+		auto splitted = buildNormalizedSplittedPath();
+		if (splitted.length == 0)
+			return null;
+		return splitted.join('/')[(splitted[0] == "/" ? 1 : 0) .. $];
 	}
 	
 	/// ditto
@@ -1633,7 +1694,6 @@ struct FileSystem
 		fs.symlink("test1.txt", "test2.txt");
 		fs.symlink(fs.absolutePath("test1.txt"), "test3.txt");
 		assert(fs.readLink("test2.txt") == "test1.txt");
-		imported!"std.stdio".writeln(fs.readLink("test3.txt"));
 		assert(fs.readLink("test3.txt") == fs.absolutePath("test1.txt"));
 	}
 	
