@@ -394,7 +394,7 @@ string <code class="ddoc_psymbol">buildNormalizedWindowsPath</code>();
 <br>
 auto <code class="ddoc_psymbol">entries</code>(string <span class="ddoc_param">pattern</span>, SpanMode <span class="ddoc_param">mode</span> = SpanMode.shallow, bool <span class="ddoc_param">followSymlink</span> = true);
 <br>
-auto <code class="ddoc_psymbol">entries</code><span class="ddoc_template_param_list" title="Template parameter list">(Char)</span>(Regex!Char <span class="ddoc_param">pattern</span>, SpanMode <span class="ddoc_param">mode</span> = SpanMode.shallow, bool <span class="ddoc_param">followSymlink</span> = true);
+auto <code class="ddoc_psymbol">entries</code><span class="ddoc_template_param_list" title="Template parameter list">(RE)</span>(RE <span class="ddoc_param">pattern</span>, SpanMode <span class="ddoc_param">mode</span> = SpanMode.shallow, bool <span class="ddoc_param">followSymlink</span> = true)<br><span class="ddoc_constraint">if(is(typeof(std.regex.matchFirst("", <span class="ddoc_param">pattern</span>))))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">エントリー一覧</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">auto</span> fs = createDisposableDir(<span class="d_string">"ut"</span>);
@@ -416,6 +416,18 @@ files.sort();
 <span class="d_keyword">assert</span>(fs.relativePath(files[3]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"b"</span>, <span class="d_string">"test3.txt"</span>]);
 <span class="d_keyword">assert</span>(fs.relativePath(files[4]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"c"</span>]);
 <span class="d_keyword">assert</span>(fs.relativePath(files[5]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"c"</span>, <span class="d_string">"test2.txt"</span>]);
+
+files = <span class="d_keyword">null</span>;
+<span class="d_keyword">foreach</span> (de; fs.<span class="d_psymbol">entries</span>(regex(<span class="d_string">r"test\d.txt"</span>), SpanMode.depth))
+{
+	files ~= de.name;
+	<span class="d_keyword">assert</span>(de.name.isAbsolute);
+}
+<span class="d_keyword">assert</span>(files.length == 3);
+files.sort();
+<span class="d_keyword">assert</span>(fs.relativePath(files[0]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"b"</span>, <span class="d_string">"test1.txt"</span>]);
+<span class="d_keyword">assert</span>(fs.relativePath(files[1]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"b"</span>, <span class="d_string">"test3.txt"</span>]);
+<span class="d_keyword">assert</span>(fs.relativePath(files[2]).splitPath() == [<span class="d_string">"a"</span>, <span class="d_string">"c"</span>, <span class="d_string">"test2.txt"</span>]);
 </pre>
 </div>
 </dd>

@@ -5484,6 +5484,13 @@
     "protection" : "private"
    },
    {
+    "name" : "std.traits",
+    "kind" : "import",
+    "line" : 6,
+    "char" : 89,
+    "protection" : "private"
+   },
+   {
     "name" : "std.process",
     "kind" : "import",
     "line" : 7,
@@ -6836,29 +6843,30 @@
       "kind" : "template",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 809,
+      "line" : 808,
       "char" : 7,
       "name" : "entries",
       "parameters" : [
        {
-        "name" : "Char",
+        "name" : "RE",
         "kind" : "type"
        }
       ],
+      "constraint" : "is(typeof(std.regex.matchFirst(\"\", pattern)))",
       "members" : [
        {
         "name" : "entries",
         "kind" : "function",
-        "line" : 809,
+        "line" : 808,
         "char" : 7,
         "storageClass" : [
          "auto"
         ],
-        "type" : "(Regex!Char pattern, SpanMode mode = SpanMode.shallow, bool followSymlink = true)",
+        "type" : "(RE pattern, SpanMode mode = SpanMode.shallow, bool followSymlink = true)",
         "parameters" : [
          {
           "name" : "pattern",
-          "type" : "Regex!Char"
+          "type" : "RE"
          },
          {
           "name" : "mode",
@@ -6871,22 +6879,22 @@
           "default" : "true"
          }
         ],
-        "endline" : 814,
+        "endline" : 816,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "__unittest_L817_C10",
+      "name" : "__unittest_L819_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 817,
+      "line" : 819,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 843,
+      "endline" : 857,
       "endchar" : 2
      },
      {
@@ -6894,7 +6902,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " テキストファイルを書き出す\n",
-      "line" : 843,
+      "line" : 857,
       "char" : 7,
       "deco" : "FAyaIAaZv",
       "parameters" : [
@@ -6910,13 +6918,13 @@
         ]
        }
       ],
-      "endline" : 846,
+      "endline" : 860,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 848,
+      "line" : 862,
       "char" : 15,
       "name" : "writeTextImpl",
       "parameters" : [
@@ -6930,7 +6938,7 @@
        {
         "name" : "writeTextImpl",
         "kind" : "function",
-        "line" : 848,
+        "line" : 862,
         "char" : 15,
         "type" : "void(string filename, in char[] text)",
         "parameters" : [
@@ -6946,7 +6954,7 @@
           ]
          }
         ],
-        "endline" : 852,
+        "endline" : 866,
         "endchar" : 2
        }
       ]
@@ -6954,7 +6962,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 853,
+      "line" : 867,
       "char" : 15,
       "name" : "writeTextImpl",
       "parameters" : [
@@ -6969,7 +6977,7 @@
        {
         "name" : "writeTextImpl",
         "kind" : "function",
-        "line" : 853,
+        "line" : 867,
         "char" : 15,
         "type" : "void(string filename, in char[] text)",
         "parameters" : [
@@ -6985,22 +6993,22 @@
           ]
          }
         ],
-        "endline" : 857,
+        "endline" : 871,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "__unittest_L860_C10",
+      "name" : "__unittest_L874_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 860,
+      "line" : 874,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 873,
+      "endline" : 887,
       "endchar" : 2
      },
      {
@@ -7008,7 +7016,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " テキストファイルを読み込む\n",
-      "line" : 873,
+      "line" : 887,
       "char" : 9,
       "deco" : "FAyaZQe",
       "parameters" : [
@@ -7017,13 +7025,13 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 876,
+      "endline" : 890,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 878,
+      "line" : 892,
       "char" : 17,
       "name" : "readTextImpl",
       "parameters" : [
@@ -7037,7 +7045,7 @@
        {
         "name" : "readTextImpl",
         "kind" : "function",
-        "line" : 878,
+        "line" : 892,
         "char" : 17,
         "type" : "string(string filename)",
         "parameters" : [
@@ -7046,7 +7054,7 @@
           "type" : "string"
          }
         ],
-        "endline" : 882,
+        "endline" : 896,
         "endchar" : 2
        }
       ]
@@ -7054,7 +7062,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 883,
+      "line" : 897,
       "char" : 17,
       "name" : "readTextImpl",
       "parameters" : [
@@ -7069,7 +7077,7 @@
        {
         "name" : "readTextImpl",
         "kind" : "function",
-        "line" : 883,
+        "line" : 897,
         "char" : 17,
         "type" : "string(string filename)",
         "parameters" : [
@@ -7078,22 +7086,22 @@
           "type" : "string"
          }
         ],
-        "endline" : 888,
+        "endline" : 902,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "__unittest_L892_C10",
+      "name" : "__unittest_L906_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 892,
+      "line" : 906,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 902,
+      "endline" : 916,
       "endchar" : 2
      },
      {
@@ -7101,7 +7109,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " バイナリファイルを書き出す\n",
-      "line" : 902,
+      "line" : 916,
       "char" : 7,
       "deco" : "FAyaIAhZv",
       "parameters" : [
@@ -7117,13 +7125,13 @@
         ]
        }
       ],
-      "endline" : 905,
+      "endline" : 919,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 907,
+      "line" : 921,
       "char" : 15,
       "name" : "writeBinaryImpl",
       "parameters" : [
@@ -7137,7 +7145,7 @@
        {
         "name" : "writeBinaryImpl",
         "kind" : "function",
-        "line" : 907,
+        "line" : 921,
         "char" : 15,
         "type" : "void(string filename, in ubyte[] binary)",
         "parameters" : [
@@ -7153,7 +7161,7 @@
           ]
          }
         ],
-        "endline" : 911,
+        "endline" : 925,
         "endchar" : 2
        }
       ]
@@ -7161,7 +7169,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 912,
+      "line" : 926,
       "char" : 15,
       "name" : "writeBinaryImpl",
       "parameters" : [
@@ -7176,7 +7184,7 @@
        {
         "name" : "writeBinaryImpl",
         "kind" : "function",
-        "line" : 912,
+        "line" : 926,
         "char" : 15,
         "type" : "void(string filename, in ubyte[] binary)",
         "parameters" : [
@@ -7192,22 +7200,22 @@
           ]
          }
         ],
-        "endline" : 916,
+        "endline" : 930,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "__unittest_L919_C10",
+      "name" : "__unittest_L933_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 919,
+      "line" : 933,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 932,
+      "endline" : 946,
       "endchar" : 2
      },
      {
@@ -7215,7 +7223,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " バイナリファイルを読み込む\n",
-      "line" : 932,
+      "line" : 946,
       "char" : 21,
       "deco" : "FAyaZAyh",
       "parameters" : [
@@ -7224,13 +7232,13 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 935,
+      "endline" : 949,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 937,
+      "line" : 951,
       "char" : 29,
       "name" : "readBinaryImpl",
       "parameters" : [
@@ -7244,7 +7252,7 @@
        {
         "name" : "readBinaryImpl",
         "kind" : "function",
-        "line" : 937,
+        "line" : 951,
         "char" : 29,
         "type" : "immutable(ubyte)[](string filename)",
         "parameters" : [
@@ -7253,7 +7261,7 @@
           "type" : "string"
          }
         ],
-        "endline" : 941,
+        "endline" : 955,
         "endchar" : 2
        }
       ]
@@ -7261,7 +7269,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 942,
+      "line" : 956,
       "char" : 29,
       "name" : "readBinaryImpl",
       "parameters" : [
@@ -7276,7 +7284,7 @@
        {
         "name" : "readBinaryImpl",
         "kind" : "function",
-        "line" : 942,
+        "line" : 956,
         "char" : 29,
         "type" : "immutable(ubyte)[](string filename)",
         "parameters" : [
@@ -7285,29 +7293,29 @@
           "type" : "string"
          }
         ],
-        "endline" : 947,
+        "endline" : 961,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "__unittest_L950_C10",
+      "name" : "__unittest_L964_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 950,
+      "line" : 964,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 960,
+      "endline" : 974,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "public",
       "comment" : " JSONファイルを書き出す\n",
-      "line" : 960,
+      "line" : 974,
       "char" : 7,
       "name" : "writeJson",
       "parameters" : [
@@ -7320,7 +7328,7 @@
        {
         "name" : "writeJson",
         "kind" : "function",
-        "line" : 960,
+        "line" : 974,
         "char" : 7,
         "type" : "void(string filename, in T data, JSONOptions options = JSONOptions.none)",
         "parameters" : [
@@ -7341,7 +7349,7 @@
           "default" : "JSONOptions.none"
          }
         ],
-        "endline" : 965,
+        "endline" : 979,
         "endchar" : 2
        }
       ]
@@ -7350,7 +7358,7 @@
       "kind" : "template",
       "protection" : "public",
       "comment" : " JSONファイルを書き出す\n",
-      "line" : 970,
+      "line" : 984,
       "char" : 4,
       "name" : "readJson",
       "parameters" : [
@@ -7363,7 +7371,7 @@
        {
         "name" : "readJson",
         "kind" : "function",
-        "line" : 970,
+        "line" : 984,
         "char" : 4,
         "type" : "T(string filename)",
         "parameters" : [
@@ -7372,35 +7380,35 @@
           "type" : "string"
          }
         ],
-        "endline" : 980,
+        "endline" : 994,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "__unittest_L983_C10",
+      "name" : "__unittest_L997_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 983,
+      "line" : 997,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 991,
+      "endline" : 1005,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L991_C10",
+      "name" : "__unittest_L1005_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 991,
+      "line" : 1005,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1017,
+      "endline" : 1031,
       "endchar" : 2
      },
      {
@@ -7408,7 +7416,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " ファイルを新しく作成する\n",
-      "line" : 1017,
+      "line" : 1031,
       "char" : 7,
       "deco" : "FAyaZS3std5stdio4File",
       "parameters" : [
@@ -7417,7 +7425,7 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 1024,
+      "endline" : 1038,
       "endchar" : 2
      },
      {
@@ -7425,7 +7433,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " ファイルを開く\n\n ファイルがなければ新しく作成して開く\n",
-      "line" : 1031,
+      "line" : 1045,
       "char" : 7,
       "deco" : "FAyaQdZS3std5stdio4File",
       "parameters" : [
@@ -7439,13 +7447,13 @@
         "default" : "\"r+\""
        }
       ],
-      "endline" : 1037,
+      "endline" : 1051,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1040,
+      "line" : 1054,
       "char" : 15,
       "name" : "clearReadonlyImpl",
       "parameters" : [
@@ -7459,7 +7467,7 @@
        {
         "name" : "clearReadonlyImpl",
         "kind" : "function",
-        "line" : 1040,
+        "line" : 1054,
         "char" : 15,
         "type" : "const @safe bool(string target)",
         "parameters" : [
@@ -7468,7 +7476,7 @@
           "type" : "string"
          }
         ],
-        "endline" : 1045,
+        "endline" : 1059,
         "endchar" : 2
        }
       ]
@@ -7476,7 +7484,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1046,
+      "line" : 1060,
       "char" : 15,
       "name" : "clearReadonlyImpl",
       "parameters" : [
@@ -7491,7 +7499,7 @@
        {
         "name" : "clearReadonlyImpl",
         "kind" : "function",
-        "line" : 1046,
+        "line" : 1060,
         "char" : 15,
         "type" : "const @safe bool(string target)",
         "parameters" : [
@@ -7500,7 +7508,7 @@
           "type" : "string"
          }
         ],
-        "endline" : 1063,
+        "endline" : 1077,
         "endchar" : 2
        }
       ]
@@ -7510,7 +7518,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1068,
+      "line" : 1082,
       "char" : 7,
       "deco" : "xFAyaZb",
       "parameters" : [
@@ -7519,13 +7527,13 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 1071,
+      "endline" : 1085,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1074,
+      "line" : 1088,
       "char" : 15,
       "name" : "removeFilesImpl",
       "parameters" : [
@@ -7539,7 +7547,7 @@
        {
         "name" : "removeFilesImpl",
         "kind" : "function",
-        "line" : 1074,
+        "line" : 1088,
         "char" : 15,
         "type" : "@safe bool(string target, bool force, uint retrycnt)",
         "parameters" : [
@@ -7556,7 +7564,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1077,
+        "endline" : 1091,
         "endchar" : 2
        }
       ]
@@ -7564,7 +7572,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1078,
+      "line" : 1092,
       "char" : 15,
       "name" : "removeFilesImpl",
       "parameters" : [
@@ -7579,7 +7587,7 @@
        {
         "name" : "removeFilesImpl",
         "kind" : "function",
-        "line" : 1078,
+        "line" : 1092,
         "char" : 15,
         "type" : "@trusted bool(string target, bool force, uint retrycnt)",
         "parameters" : [
@@ -7596,7 +7604,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1137,
+        "endline" : 1151,
         "endchar" : 2
        }
       ]
@@ -7606,7 +7614,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1142,
+      "line" : 1156,
       "char" : 7,
       "deco" : "FNfAyabkZb",
       "originalType" : "@safe bool(string target, bool force = true, uint retrycnt = 5)",
@@ -7626,19 +7634,19 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1145,
+      "endline" : 1159,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1146_C10",
+      "name" : "__unittest_L1160_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1146,
+      "line" : 1160,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1174,
+      "endline" : 1188,
       "endchar" : 2
      },
      {
@@ -7646,7 +7654,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1174,
+      "line" : 1188,
       "char" : 7,
       "deco" : "FAyaQdbkZb",
       "originalType" : "bool(string targetDir, string blobFilter, bool force = true, uint retrycnt = 5)",
@@ -7670,25 +7678,25 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1196,
+      "endline" : 1210,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1197_C10",
+      "name" : "__unittest_L1211_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1197,
+      "line" : 1211,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1218,
+      "endline" : 1232,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1218,
+      "line" : 1232,
       "char" : 15,
       "name" : "copyFileImpl",
       "parameters" : [
@@ -7702,7 +7710,7 @@
        {
         "name" : "copyFileImpl",
         "kind" : "function",
-        "line" : 1218,
+        "line" : 1232,
         "char" : 15,
         "type" : "bool(string src, string target, bool force, uint retrycnt)",
         "parameters" : [
@@ -7723,7 +7731,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1224,
+        "endline" : 1238,
         "endchar" : 2
        }
       ]
@@ -7731,7 +7739,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1225,
+      "line" : 1239,
       "char" : 15,
       "name" : "copyFileImpl",
       "parameters" : [
@@ -7746,7 +7754,7 @@
        {
         "name" : "copyFileImpl",
         "kind" : "function",
-        "line" : 1225,
+        "line" : 1239,
         "char" : 15,
         "type" : "bool(string src, string target, bool force, uint retrycnt)",
         "parameters" : [
@@ -7767,7 +7775,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1271,
+        "endline" : 1285,
         "endchar" : 2
        }
       ]
@@ -7777,7 +7785,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " ファイルをコピーする\n",
-      "line" : 1276,
+      "line" : 1290,
       "char" : 7,
       "deco" : "FAyaQdbkZb",
       "originalType" : "bool(string srcFile, string targetFile, bool force = true, uint retrycnt = 5)",
@@ -7801,25 +7809,25 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1279,
+      "endline" : 1293,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1280_C10",
+      "name" : "__unittest_L1294_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1280,
+      "line" : 1294,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1289,
+      "endline" : 1303,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1289,
+      "line" : 1303,
       "char" : 15,
       "name" : "copyFilesImpl",
       "parameters" : [
@@ -7833,7 +7841,7 @@
        {
         "name" : "copyFilesImpl",
         "kind" : "function",
-        "line" : 1289,
+        "line" : 1303,
         "char" : 15,
         "type" : "bool(string srcDir, string targetDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -7854,7 +7862,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1295,
+        "endline" : 1309,
         "endchar" : 2
        }
       ]
@@ -7862,7 +7870,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1297,
+      "line" : 1311,
       "char" : 15,
       "name" : "copyFilesImpl",
       "parameters" : [
@@ -7877,7 +7885,7 @@
        {
         "name" : "copyFilesImpl",
         "kind" : "function",
-        "line" : 1297,
+        "line" : 1311,
         "char" : 15,
         "type" : "bool(string srcDir, string targetDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -7898,7 +7906,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1316,
+        "endline" : 1330,
         "endchar" : 2
        }
       ]
@@ -7906,7 +7914,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1318,
+      "line" : 1332,
       "char" : 15,
       "name" : "copyFilesImpl",
       "parameters" : [
@@ -7920,7 +7928,7 @@
        {
         "name" : "copyFilesImpl",
         "kind" : "function",
-        "line" : 1318,
+        "line" : 1332,
         "char" : 15,
         "type" : "bool(string srcDir, string blobFilter, string targetDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -7945,7 +7953,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1325,
+        "endline" : 1339,
         "endchar" : 2
        }
       ]
@@ -7953,7 +7961,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1327,
+      "line" : 1341,
       "char" : 15,
       "name" : "copyFilesImpl",
       "parameters" : [
@@ -7968,7 +7976,7 @@
        {
         "name" : "copyFilesImpl",
         "kind" : "function",
-        "line" : 1327,
+        "line" : 1341,
         "char" : 15,
         "type" : "bool(string srcDir, string blobFilter, string targetDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -7993,7 +8001,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1347,
+        "endline" : 1361,
         "endchar" : 2
        }
       ]
@@ -8003,7 +8011,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1352,
+      "line" : 1366,
       "char" : 7,
       "deco" : "FAyaQdbkZb",
       "originalType" : "bool(string src, string target, bool force = true, uint retrycnt = 5)",
@@ -8027,33 +8035,33 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1362,
+      "endline" : 1376,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1365_C10",
+      "name" : "__unittest_L1379_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1365,
+      "line" : 1379,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1374,
+      "endline" : 1388,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1374_C10",
+      "name" : "__unittest_L1388_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1374,
+      "line" : 1388,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1386,
+      "endline" : 1400,
       "endchar" : 2
      },
      {
@@ -8061,7 +8069,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1386,
+      "line" : 1400,
       "char" : 7,
       "deco" : "FAyaQdQfbkZb",
       "originalType" : "bool(string srcDir, string blobFilter, string targetDir, bool force = true, uint retrycnt = 5)",
@@ -8089,26 +8097,26 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1389,
+      "endline" : 1403,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1391_C10",
+      "name" : "__unittest_L1405_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1391,
+      "line" : 1405,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1404,
+      "endline" : 1418,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1404,
+      "line" : 1418,
       "char" : 15,
       "name" : "mirrorFilesImpl",
       "parameters" : [
@@ -8122,7 +8130,7 @@
        {
         "name" : "mirrorFilesImpl",
         "kind" : "function",
-        "line" : 1404,
+        "line" : 1418,
         "char" : 15,
         "type" : "bool(string srcDir, string dstDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -8143,7 +8151,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1410,
+        "endline" : 1424,
         "endchar" : 2
        }
       ]
@@ -8151,7 +8159,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1412,
+      "line" : 1426,
       "char" : 15,
       "name" : "mirrorFilesImpl",
       "parameters" : [
@@ -8166,7 +8174,7 @@
        {
         "name" : "mirrorFilesImpl",
         "kind" : "function",
-        "line" : 1412,
+        "line" : 1426,
         "char" : 15,
         "type" : "bool(string srcDir, string dstDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -8187,7 +8195,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1487,
+        "endline" : 1501,
         "endchar" : 2
        }
       ]
@@ -8197,7 +8205,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " ファイルをミラーリングする\n",
-      "line" : 1492,
+      "line" : 1506,
       "char" : 7,
       "deco" : "FAyaQdbkZb",
       "originalType" : "bool(string srcDir, string dstDir, bool force = true, uint retrycnt = 5)",
@@ -8221,13 +8229,13 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1495,
+      "endline" : 1509,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1501,
+      "line" : 1515,
       "char" : 15,
       "name" : "moveFilesImpl",
       "parameters" : [
@@ -8241,7 +8249,7 @@
        {
         "name" : "moveFilesImpl",
         "kind" : "function",
-        "line" : 1501,
+        "line" : 1515,
         "char" : 15,
         "type" : "bool(string src, string dst, bool force, bool retrycnt)",
         "parameters" : [
@@ -8262,7 +8270,7 @@
           "deco" : "b"
          }
         ],
-        "endline" : 1507,
+        "endline" : 1521,
         "endchar" : 2
        }
       ]
@@ -8270,7 +8278,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1509,
+      "line" : 1523,
       "char" : 15,
       "name" : "moveFilesImpl",
       "parameters" : [
@@ -8285,7 +8293,7 @@
        {
         "name" : "moveFilesImpl",
         "kind" : "function",
-        "line" : 1509,
+        "line" : 1523,
         "char" : 15,
         "type" : "bool(string src, string dst, bool force, bool retrycnt)",
         "parameters" : [
@@ -8306,7 +8314,7 @@
           "deco" : "b"
          }
         ],
-        "endline" : 1574,
+        "endline" : 1588,
         "endchar" : 2
        }
       ]
@@ -8316,7 +8324,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " ファイルを移動する\n",
-      "line" : 1579,
+      "line" : 1593,
       "char" : 7,
       "deco" : "FAyaQdbbZb",
       "parameters" : [
@@ -8339,7 +8347,7 @@
         "default" : "true"
        }
       ],
-      "endline" : 1582,
+      "endline" : 1596,
       "endchar" : 2
      },
      {
@@ -8347,7 +8355,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " シンボリックリンクを作成する\n",
-      "line" : 1587,
+      "line" : 1601,
       "char" : 7,
       "deco" : "FIAaIQdZv",
       "parameters" : [
@@ -8366,19 +8374,19 @@
         ]
        }
       ],
-      "endline" : 1610,
+      "endline" : 1624,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1611_C10",
+      "name" : "__unittest_L1625_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1611,
+      "line" : 1625,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1624,
+      "endline" : 1638,
       "endchar" : 2
      },
      {
@@ -8386,7 +8394,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " シンボリックリンクの実パスを得る\n",
-      "line" : 1624,
+      "line" : 1638,
       "char" : 9,
       "deco" : "FIAaZAya",
       "parameters" : [
@@ -8398,25 +8406,25 @@
         ]
        }
       ],
-      "endline" : 1689,
+      "endline" : 1703,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1690_C10",
+      "name" : "__unittest_L1704_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1690,
+      "line" : 1704,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1702,
+      "endline" : 1716,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1702,
+      "line" : 1716,
       "char" : 15,
       "name" : "setTimeStampImpl",
       "parameters" : [
@@ -8430,7 +8438,7 @@
        {
         "name" : "setTimeStampImpl",
         "kind" : "function",
-        "line" : 1702,
+        "line" : 1716,
         "char" : 15,
         "type" : "void(string target, SysTime accessTime, SysTime modificationTime)",
         "parameters" : [
@@ -8447,7 +8455,7 @@
           "type" : "SysTime"
          }
         ],
-        "endline" : 1705,
+        "endline" : 1719,
         "endchar" : 2
        }
       ]
@@ -8455,7 +8463,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1707,
+      "line" : 1721,
       "char" : 15,
       "name" : "setTimeStampImpl",
       "parameters" : [
@@ -8470,7 +8478,7 @@
        {
         "name" : "setTimeStampImpl",
         "kind" : "function",
-        "line" : 1707,
+        "line" : 1721,
         "char" : 15,
         "type" : "void(string target, SysTime accessTime, SysTime modificationTime)",
         "parameters" : [
@@ -8487,7 +8495,7 @@
           "type" : "SysTime"
          }
         ],
-        "endline" : 1710,
+        "endline" : 1724,
         "endchar" : 2
        }
       ]
@@ -8495,7 +8503,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1712,
+      "line" : 1726,
       "char" : 15,
       "name" : "getTimeStampImpl",
       "parameters" : [
@@ -8509,7 +8517,7 @@
        {
         "name" : "getTimeStampImpl",
         "kind" : "function",
-        "line" : 1712,
+        "line" : 1726,
         "char" : 15,
         "type" : "void(string target, out SysTime accessTime, out SysTime modificationTime)",
         "parameters" : [
@@ -8532,7 +8540,7 @@
           ]
          }
         ],
-        "endline" : 1715,
+        "endline" : 1729,
         "endchar" : 2
        }
       ]
@@ -8540,7 +8548,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1717,
+      "line" : 1731,
       "char" : 15,
       "name" : "getTimeStampImpl",
       "parameters" : [
@@ -8555,7 +8563,7 @@
        {
         "name" : "getTimeStampImpl",
         "kind" : "function",
-        "line" : 1717,
+        "line" : 1731,
         "char" : 15,
         "type" : "void(string target, out SysTime accessTime, out SysTime modificationTime)",
         "parameters" : [
@@ -8578,7 +8586,7 @@
           ]
          }
         ],
-        "endline" : 1721,
+        "endline" : 1735,
         "endchar" : 2
        }
       ]
@@ -8588,7 +8596,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " タイムスタンプを変更/取得する\n",
-      "line" : 1727,
+      "line" : 1741,
       "char" : 7,
       "deco" : "FAyaS3std8datetime7systime7SysTimeQBeZv",
       "parameters" : [
@@ -8605,7 +8613,7 @@
         "deco" : "S3std8datetime7systime7SysTime"
        }
       ],
-      "endline" : 1730,
+      "endline" : 1744,
       "endchar" : 2
      },
      {
@@ -8613,7 +8621,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1732,
+      "line" : 1746,
       "char" : 7,
       "deco" : "FAyaS3std8datetime7systime7SysTimeZv",
       "parameters" : [
@@ -8626,7 +8634,7 @@
         "deco" : "S3std8datetime7systime7SysTime"
        }
       ],
-      "endline" : 1735,
+      "endline" : 1749,
       "endchar" : 2
      },
      {
@@ -8634,7 +8642,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1737,
+      "line" : 1751,
       "char" : 7,
       "deco" : "FAyaS3std8datetime4date8DateTimeQBcZv",
       "parameters" : [
@@ -8651,7 +8659,7 @@
         "deco" : "S3std8datetime4date8DateTime"
        }
       ],
-      "endline" : 1740,
+      "endline" : 1754,
       "endchar" : 2
      },
      {
@@ -8659,7 +8667,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1742,
+      "line" : 1756,
       "char" : 7,
       "deco" : "FAyaS3std8datetime4date8DateTimeZv",
       "parameters" : [
@@ -8672,7 +8680,7 @@
         "deco" : "S3std8datetime4date8DateTime"
        }
       ],
-      "endline" : 1745,
+      "endline" : 1759,
       "endchar" : 2
      },
      {
@@ -8680,7 +8688,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1747,
+      "line" : 1761,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime7systime7SysTimeJQBfZv",
       "parameters" : [
@@ -8703,7 +8711,7 @@
         ]
        }
       ],
-      "endline" : 1750,
+      "endline" : 1764,
       "endchar" : 2
      },
      {
@@ -8711,7 +8719,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1752,
+      "line" : 1766,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime7systime7SysTimeZv",
       "parameters" : [
@@ -8727,7 +8735,7 @@
         ]
        }
       ],
-      "endline" : 1756,
+      "endline" : 1770,
       "endchar" : 2
      },
      {
@@ -8735,7 +8743,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1758,
+      "line" : 1772,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime4date8DateTimeJQBdZv",
       "parameters" : [
@@ -8758,7 +8766,7 @@
         ]
        }
       ],
-      "endline" : 1764,
+      "endline" : 1778,
       "endchar" : 2
      },
      {
@@ -8766,7 +8774,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1766,
+      "line" : 1780,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime4date8DateTimeZv",
       "parameters" : [
@@ -8782,7 +8790,7 @@
         ]
        }
       ],
-      "endline" : 1771,
+      "endline" : 1785,
       "endchar" : 2
      },
      {
@@ -8790,7 +8798,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1773,
+      "line" : 1787,
       "char" : 10,
       "deco" : "FAyaZS3std8datetime7systime7SysTime",
       "parameters" : [
@@ -8799,19 +8807,19 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 1778,
+      "endline" : 1792,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1780_C10",
+      "name" : "__unittest_L1794_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1780,
+      "line" : 1794,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1834,
+      "endline" : 1848,
       "endchar" : 2
      },
      {
@@ -8819,7 +8827,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " パスを検索する\n",
-      "line" : 1834,
+      "line" : 1848,
       "char" : 9,
       "deco" : "xFNeIAaIAAyaZAya",
       "parameters" : [
@@ -8839,7 +8847,7 @@
         "default" : "null"
        }
       ],
-      "endline" : 1874,
+      "endline" : 1888,
       "endchar" : 2
      },
      {
@@ -8847,7 +8855,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " プロセスを実行する\n",
-      "line" : 1879,
+      "line" : 1893,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -8873,7 +8881,7 @@
         "default" : "Config(Flags.none, null)"
        }
       ],
-      "endline" : 1885,
+      "endline" : 1899,
       "endchar" : 2
      },
      {
@@ -8881,7 +8889,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1888,
+      "line" : 1902,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -8919,7 +8927,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1898,
+      "endline" : 1912,
       "endchar" : 2
      },
      {
@@ -8927,7 +8935,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1901,
+      "line" : 1915,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -8965,7 +8973,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1911,
+      "endline" : 1925,
       "endchar" : 2
      },
      {
@@ -8973,7 +8981,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1914,
+      "line" : 1928,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -8999,7 +9007,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1920,
+      "endline" : 1934,
       "endchar" : 2
      },
      {
@@ -9007,7 +9015,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1923,
+      "line" : 1937,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9033,59 +9041,59 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1929,
+      "endline" : 1943,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1932_C10",
+      "name" : "__unittest_L1946_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1932,
+      "line" : 1946,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1952,
+      "endline" : 1966,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1952_C10",
+      "name" : "__unittest_L1966_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1952,
+      "line" : 1966,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1972,
+      "endline" : 1986,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1972_C10",
+      "name" : "__unittest_L1986_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1972,
+      "line" : 1986,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1993,
+      "endline" : 2007,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1993_C10",
+      "name" : "__unittest_L2007_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1993,
+      "line" : 2007,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2008,
+      "endline" : 2022,
       "endchar" : 1
      },
      {
@@ -9132,16 +9140,16 @@
     ]
    },
    {
-    "name" : "__unittest_L2010_C9",
+    "name" : "__unittest_L2024_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "コピー禁止とムーブ、インスタンス削除の例\n",
-    "line" : 2010,
+    "line" : 2024,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2028,
+    "endline" : 2042,
     "endchar" : 1
    },
    {
@@ -9149,7 +9157,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 一時ディレクトリを作成し、作成したディレクトリのFileSystemを返す\n",
-    "line" : 2028,
+    "line" : 2042,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -9170,7 +9178,7 @@
       "default" : "5u"
      }
     ],
-    "endline" : 2053,
+    "endline" : 2067,
     "endchar" : 1
    },
    {
@@ -9178,7 +9186,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 使い捨ての一時ディレクトリを作成\n\n 作成したディレクトリのFileSystemを返す。返されたFileSystemは、インスタンスの破棄時に削除される。\n",
-    "line" : 2060,
+    "line" : 2074,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -9199,20 +9207,20 @@
       "default" : "5u"
      }
     ],
-    "endline" : 2070,
+    "endline" : 2084,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L2073_C7",
+    "name" : "__unittest_L2087_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2073,
+    "line" : 2087,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 2082,
+    "endline" : 2096,
     "endchar" : 1
    }
   ]
