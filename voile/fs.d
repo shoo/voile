@@ -3,7 +3,7 @@
  */
 module voile.fs;
 
-import std.file, std.path, std.exception, std.stdio, std.datetime, std.regex, std.json;
+import std.file, std.path, std.exception, std.stdio, std.datetime, std.regex, std.json, std.traits;
 import std.process;
 import voile.handler;
 
@@ -804,12 +804,14 @@ struct FileSystem
 	{
 		return .dirEntries(absolutePath(), pattern, mode, followSymlink);
 	}
-	
 	/// ditto
-	auto entries(Char)(Regex!Char pattern, SpanMode mode = SpanMode.shallow, bool followSymlink = true)
+	auto entries(RE)(RE pattern, SpanMode mode = SpanMode.shallow, bool followSymlink = true)
+	//if (isInstanceOf!(Regex, RE))
+	if (is(typeof(std.regex.matchFirst("", pattern))))
 	{
 		import std.algorithm.iteration : filter;
-		bool f(DirEntry de) { return match(de.name, pattern); }
+		
+		bool f(DirEntry de) { return cast(bool)match(de.name, pattern); }
 		return filter!f(.dirEntries(absolutePath(), mode, followSymlink));
 	}
 	
@@ -835,6 +837,18 @@ struct FileSystem
 		assert(fs.relativePath(files[3]).splitPath() == ["a", "b", "test3.txt"]);
 		assert(fs.relativePath(files[4]).splitPath() == ["a", "c"]);
 		assert(fs.relativePath(files[5]).splitPath() == ["a", "c", "test2.txt"]);
+		
+		files = null;
+		foreach (de; fs.entries(regex(r"test\d.txt"), SpanMode.depth))
+		{
+			files ~= de.name;
+			assert(de.name.isAbsolute);
+		}
+		assert(files.length == 3);
+		files.sort();
+		assert(fs.relativePath(files[0]).splitPath() == ["a", "b", "test1.txt"]);
+		assert(fs.relativePath(files[1]).splitPath() == ["a", "b", "test3.txt"]);
+		assert(fs.relativePath(files[2]).splitPath() == ["a", "c", "test2.txt"]);
 	}
 	
 	/***************************************************************************
