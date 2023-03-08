@@ -299,7 +299,7 @@ void setValue(T)(ref JSONValue v, string name, T val) pure nothrow @trusted
 
 
 ///
-bool fromJson(T)(in ref JSONValue src, ref T dst)
+bool fromJson(T)(in JSONValue src, ref T dst)
 if (isSomeString!T)
 {
 	if (src.type == JSONType.string)
@@ -328,7 +328,7 @@ if (isSomeString!T)
 
 
 /// ditto
-bool fromJson(T)(in ref JSONValue src, ref T dst)
+bool fromJson(T)(in JSONValue src, ref T dst)
 	if (isIntegral!T && !is(T == enum))
 {
 	if (src.type == JSONType.integer)
@@ -354,7 +354,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 }
 
 /// ditto
-bool fromJson(T)(in ref JSONValue src, ref T dst)
+bool fromJson(T)(in JSONValue src, ref T dst)
 	if (isFloatingPoint!T)
 {
 	switch (src.type)
@@ -384,7 +384,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 }
 
 /// ditto
-bool fromJson(T)(in ref JSONValue src, ref T dst)
+bool fromJson(T)(in JSONValue src, ref T dst)
 if (is(T == struct)
  && !is(Unqual!T: JSONValue)
  && !isManagedUnion!T)
@@ -459,7 +459,7 @@ if (is(T == struct)
 }
 
 /// ditto
-bool fromJson(T)(in ref JSONValue src, ref T dst)
+bool fromJson(T)(in JSONValue src, ref T dst)
 if (is(T == class))
 {
 	if (src.type == JSONType.object)
@@ -473,7 +473,7 @@ if (is(T == class))
 }
 
 /// ditto
-bool fromJson(T)(in ref JSONValue src, ref T dst)
+bool fromJson(T)(in JSONValue src, ref T dst)
 	if (is(T == enum))
 {
 	if (src.type == JSONType.string)
@@ -485,7 +485,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 }
 
 /// ditto
-bool fromJson(T)(in ref JSONValue src, ref T dst)
+bool fromJson(T)(in JSONValue src, ref T dst)
 	if (is(T == bool))
 {
 	if (src.type == JSONType.true_)
@@ -502,7 +502,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 }
 
 /// ditto
-bool fromJson(T)(in ref JSONValue src, ref T dst)
+bool fromJson(T)(in JSONValue src, ref T dst)
 	if (!isSomeString!(T) && isDynamicArray!(T))
 {
 	alias E = ForeachType!T;
@@ -520,7 +520,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 }
 
 /// ditto
-bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
+bool fromJson(Value, Key)(in JSONValue src, ref Value[Key] dst)
 	if (isSomeString!Key && is(typeof({ JSONValue val; cast(void)fromJson(val, dst[Key.init]); })))
 {
 	if (src.type == JSONType.object)
@@ -548,7 +548,7 @@ bool fromJson(Value, Key)(in ref JSONValue src, ref Value[Key] dst)
 }
 
 /// ditto
-bool fromJson(T)(in ref JSONValue src, ref T dst)
+bool fromJson(T)(in JSONValue src, ref T dst)
 	if (is(Unqual!T == JSONValue))
 {
 	dst = src;
@@ -556,7 +556,7 @@ bool fromJson(T)(in ref JSONValue src, ref T dst)
 }
 
 
-private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)
+private T _getValue(T)(in JSONValue v, string name, lazy scope T defaultVal = T.init)
 {
 	if (auto x = name in v.object)
 	{
@@ -589,7 +589,7 @@ private T _getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal 
 }
 
 ///
-T getValue(T)(in ref JSONValue v, string name, lazy scope T defaultVal = T.init) nothrow pure @trusted
+T getValue(T)(in JSONValue v, string name, lazy scope T defaultVal = T.init) nothrow pure @trusted
 {
 	try
 	{
@@ -1009,7 +1009,7 @@ private alias _getKinds(T, string uk, alias tag) = aliasSeqOf!(()
 //        - kind: 型名が値となって判別する
 //        - tag:  番号が値となって判別する
 //     4. キー指定がないなら"_tag"というキー名に番号でタグをつける
-private JSONValue _serializeToJsonImpl(Types...)(in ref TypeEnum!Types dat)
+private JSONValue _serializeToJsonImpl(Types...)(in TypeEnum!Types dat)
 {
 	alias MU = TypeEnum!Types;
 	alias MemberObjs = Filter!(isAggregateType, EnumMemberTypes!MU);
@@ -1089,7 +1089,7 @@ private JSONValue _serializeToJsonImpl(Types...)(in ref TypeEnum!Types dat)
 }
 
 // - Taggedなら、{<タグ>: <データ>}のオブジェクトになる
-private JSONValue _serializeToJsonImpl(U)(in ref Tagged!U dat) @property
+private JSONValue _serializeToJsonImpl(U)(in Tagged!U dat) @property
 {
 	final switch (dat.tag)
 	{
@@ -1146,7 +1146,7 @@ private JSONValue _serializeToJsonImpl(U)(in ref Tagged!U dat) @property
 }
 
 // - Endataなら、{<タグ>: <データ>}のオブジェクトになる
-private auto ref JSONValue _serializeToJsonImpl(E)(in ref Endata!E dat) @property
+private auto ref JSONValue _serializeToJsonImpl(E)(in Endata!E dat) @property
 {
 	import std.conv;
 	switch (dat.tag)
@@ -1270,7 +1270,7 @@ void serializeToJsonFile(T)(in T data, string jsonfile, JSONOptions options = JS
 //        - kind: 型名が値となって判別する
 //        - tag:  番号が値となって判別する
 //     4. キー指定がないなら"_tag"というキー名に番号でタグをつける
-private void _deserializeFromJsonImpl(Types...)(ref TypeEnum!Types dat, in ref JSONValue json)
+private void _deserializeFromJsonImpl(Types...)(ref TypeEnum!Types dat, in JSONValue json)
 {
 	alias MU = TypeEnum!Types;
 	final switch (json.type)
@@ -1408,7 +1408,7 @@ private void _deserializeFromJsonImpl(Types...)(ref TypeEnum!Types dat, in ref J
 }
 
 // Tagged
-private void _deserializeFromJsonImpl(U)(ref Tagged!U dst, in ref JSONValue src)
+private void _deserializeFromJsonImpl(U)(ref Tagged!U dst, in JSONValue src)
 {
 	foreach (k, v; src.object)
 	{
@@ -1438,7 +1438,7 @@ private void _deserializeFromJsonImpl(U)(ref Tagged!U dst, in ref JSONValue src)
 }
 
 /// Endata
-void _deserializeFromJsonImpl(E)(ref Endata!E dst, in ref JSONValue src)
+void _deserializeFromJsonImpl(E)(ref Endata!E dst, in JSONValue src)
 {
 	foreach (k, v; src.object)
 	{
@@ -1991,7 +1991,7 @@ void setValue(T)(ref JWTValue dat, string name, T val)
 /*******************************************************************************
  * 
  */
-T getValue(T)(in ref JWTValue dat, string name, lazy T defaultVal)
+T getValue(T)(in JWTValue dat, string name, lazy T defaultVal)
 {
 	return dat._payload.getValue(name, defaultVal);
 }
