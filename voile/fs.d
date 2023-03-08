@@ -1893,8 +1893,12 @@ struct FileSystem
 	auto spawnProcess(string[] args, string[string] env = null,
 	                  std.process.Config cfg = std.process.Config.none)
 	{
+		import std.algorithm, std.array;
 		makeDir(".");
-		return .spawnProcess([searchPath(args[0])] ~ args[1..$],
+		string[] searchPaths;
+		if (auto paths = env.get("PATH", env.get("Path", env.get("path", string.init))))
+			searchPaths = std.algorithm.splitter(paths, pathSeparator).array;
+		return .spawnProcess([searchPath(args[0], searchPaths)] ~ args[1..$],
 		                      stdin, stdout, stderr, env, cfg, workDir);
 	}
 	
@@ -1903,8 +1907,12 @@ struct FileSystem
 	                  string[string] env = null,
 	                  std.process.Config cfg = std.process.Config.suppressConsole)
 	{
+		import std.algorithm, std.array;
 		makeDir(".");
-		return .spawnProcess([searchPath(args[0])] ~ args[1..$],
+		string[] searchPaths;
+		if (auto paths = env.get("PATH", env.get("Path", env.get("path", string.init))))
+			searchPaths = std.algorithm.splitter(paths, pathSeparator).array;
+		return .spawnProcess([searchPath(args[0], searchPaths)] ~ args[1..$],
 		                      fin  is File.init ? nullFile("r") : fin,
 		                      fout is File.init ? nullFile("w") : fout,
 		                      ferr is File.init ? nullFile("w") : ferr,
@@ -1916,8 +1924,12 @@ struct FileSystem
 	                  string[string] env = null,
 	                  std.process.Config cfg = std.process.Config.suppressConsole)
 	{
+		import std.algorithm, std.array;
 		makeDir(".");
-		return .spawnProcess([searchPath(args[0])] ~ args[1..$],
+		string[] searchPaths;
+		if (auto paths = env.get("PATH", env.get("Path", env.get("path", string.init))))
+			searchPaths = std.algorithm.splitter(paths, pathSeparator).array;
+		return .spawnProcess([searchPath(args[0], searchPaths)] ~ args[1..$],
 		                     pin  is Pipe.init ? nullFile("r") : pin.readEnd,
 		                     pout is Pipe.init ? nullFile("w") : pout.writeEnd,
 		                     perr is Pipe.init ? nullFile("w") : perr.writeEnd,
@@ -1928,8 +1940,12 @@ struct FileSystem
 	auto pipeProcess(string[] args, string[string] env = null,
 	                 std.process.Config cfg = std.process.Config.suppressConsole)
 	{
+		import std.algorithm, std.array;
 		makeDir(".");
-		return .pipeProcess([searchPath(args[0])] ~ args[1..$],
+		string[] searchPaths;
+		if (auto paths = env.get("PATH", env.get("Path", env.get("path", string.init))))
+			searchPaths = std.algorithm.splitter(paths, pathSeparator).array;
+		return .pipeProcess([searchPath(args[0], searchPaths)] ~ args[1..$],
 		                     Redirect.all, env, cfg, workDir);
 	}
 	
@@ -1937,8 +1953,12 @@ struct FileSystem
 	auto execute(string[] args, string[string] env = null,
 	             std.process.Config cfg = std.process.Config.suppressConsole)
 	{
+		import std.algorithm, std.array;
 		makeDir(".");
-		return .execute([searchPath(args[0])] ~ args[1..$],
+		string[] searchPaths;
+		if (auto paths = env.get("PATH", env.get("Path", env.get("path", string.init))))
+			searchPaths = std.algorithm.splitter(paths, pathSeparator).array;
+		return .execute([searchPath(args[0], searchPaths)] ~ args[1..$],
 		                 env, cfg, size_t.max, workDir);
 	}
 	
@@ -1956,7 +1976,7 @@ struct FileSystem
 		{
 			auto cmd = ["bash", "-c", "echo xxx"];
 		}
-		auto pid = fs.spawnProcess(cmd, Pipe.init, pipeo, pipeo);
+		auto pid = fs.spawnProcess(cmd, Pipe.init, pipeo, pipeo, ["Path": fs.absolutePath]);
 		pid.wait();
 		auto xxx = pipeo.readEnd().readln;
 		assert(xxx.chomp == "xxx");
@@ -1976,7 +1996,7 @@ struct FileSystem
 		{
 			auto cmd = ["bash", "-c", "echo xxx"];
 		}
-		auto pipe = fs.pipeProcess(cmd);
+		auto pipe = fs.pipeProcess(cmd, ["Path": fs.absolutePath]);
 		pipe.pid.wait();
 		auto xxx = pipe.stdout().readln;
 		assert(xxx.chomp == "xxx");
@@ -1996,7 +2016,7 @@ struct FileSystem
 		{
 			auto cmd = ["bash", "-c", "echo xxx"];
 		}
-		auto pid = fs.spawnProcess(cmd, File.init, tout, File.init);
+		auto pid = fs.spawnProcess(cmd, File.init, tout, File.init, ["Path": fs.absolutePath]);
 		pid.wait();
 		tout.close();
 		auto result = fs.readText("test.txt");
@@ -2016,7 +2036,7 @@ struct FileSystem
 		{
 			auto cmd = ["bash", "-c", "echo xxx"];
 		}
-		auto result = fs.execute(cmd);
+		auto result = fs.execute(cmd, ["Path": fs.absolutePath]);
 		assert(result.output.chomp == "xxx");
 	}
 }
