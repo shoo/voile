@@ -5,7 +5,7 @@ module voile.log;
 
 
 import std.range: isInputRange, isOutputRange, isForwardRange, hasLength, hasSlicing;
-import std.experimental.logger: Logger, FileLogger, MultiLogger, sharedLog;
+import std.logger: Logger, FileLogger, MultiLogger, sharedLog;
 
 
 
@@ -14,7 +14,7 @@ import std.experimental.logger: Logger, FileLogger, MultiLogger, sharedLog;
  */
 struct LogData
 {
-	import std.experimental.logger;
+	import std.logger;
 	import std.datetime, std.json;
 	import voile.json;
 	///
@@ -85,7 +85,7 @@ struct LogData
 
 @safe unittest
 {
-	import std.datetime, std.concurrency, core.thread, std.experimental.logger;
+	import std.datetime, std.concurrency, core.thread, std.logger;
 	LogData logData1;
 	with (logData1)
 	{
@@ -259,7 +259,7 @@ static assert(hasSlicing!(typeof(LogStorageInMemory.slice(0,0))));
 class LogStorageLogger : Logger
 {
 private:
-	import std.experimental.logger: LogLevel;
+	import std.logger: LogLevel;
 	size_t _currentId;
 	LogStorageOutput _logDst;
 public:
@@ -297,7 +297,7 @@ public:
 class InMemoryLogger: LogStorageLogger
 {
 private:
-	import std.experimental.logger: LogLevel;
+	import std.logger: LogLevel;
 	LogStorageInMemory _logStorage;
 	
 	
@@ -333,7 +333,7 @@ public:
 ///
 @system unittest
 {
-	import std.experimental.logger: LogLevel;
+	import std.logger: LogLevel;
 	auto logger = new InMemoryLogger(LogLevel.info);
 	logger.trace("TRACETEST"); // ignore
 	logger.info("INFOTEST");
@@ -361,7 +361,7 @@ public:
  */
 class TextFileLogger: FileLogger
 {
-	import std.experimental.logger: LogLevel, CreateFolder;
+	import std.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -387,7 +387,7 @@ class TextFileLogger: FileLogger
 		Tid threadId, SysTime timestamp, Logger logger)
 		@safe
 	{
-		import std.experimental.logger: systimeToISOString;
+		import std.logger: systimeToISOString;
 		import std.string : lastIndexOf;
 		import std.format: formattedWrite;
 		//ptrdiff_t fnIdx = file.lastIndexOf('/') + 1;
@@ -419,7 +419,7 @@ class TextFileLogger: FileLogger
 class JsonFileLogger: Logger
 {
 private:
-	import std.experimental.logger: LogLevel, CreateFolder;
+	import std.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -610,7 +610,7 @@ public:
 class XmlFileLogger: Logger
 {
 private:
-	import std.experimental.logger: LogLevel, CreateFolder;
+	import std.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -716,7 +716,7 @@ public:
 class CsvFileLogger: Logger
 {
 private:
-	import std.experimental.logger: LogLevel, CreateFolder;
+	import std.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -797,7 +797,7 @@ public:
 class TsvFileLogger: Logger
 {
 private:
-	import std.experimental.logger: LogLevel, CreateFolder;
+	import std.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -907,7 +907,7 @@ class NamedLogger: MultiLogger
  */
 class DispatchLogger: NamedLogger
 {
-	import std.experimental.logger: LogLevel;
+	import std.logger: LogLevel;
 	import std.regex;
 	/***************************************************************************
 	 * 
@@ -1104,13 +1104,55 @@ public:
 	}
 }
 
+/*******************************************************************************
+ * マルチスレッド同期機構を備えたLogger
+ */
+class SynchronizedLogger: Logger
+{
+private:
+	import std.logger: LogLevel;
+	Logger _logger;
+public:
+	///
+	this(Logger logger, LogLevel lv = LogLevel.all)
+	{
+		_logger = logger;
+		super(lv);
+	}
+	/// ditto
+	this(shared Logger logger, LogLevel lv = LogLevel.all)
+	{
+		_logger = cast()logger;
+		super(lv);
+	}
+	/// ditto
+	this(Logger logger, LogLevel lv = LogLevel.all) shared
+	{
+		_logger = cast(shared)logger;
+		super(lv);
+	}
+	/// ditto
+	this(shared Logger logger, LogLevel lv = LogLevel.all) shared
+	{
+		_logger = logger;
+		super(lv);
+	}
+	
+	///
+	override void writeLogMsg(ref LogEntry payload) @trusted
+	{
+		synchronized (_logger)
+			_logger.writeLogMsg(payload);
+	}
+}
+
 
 /*******************************************************************************
  * クラス内で使用するロガーを切り替えるためのミックスインテンプレート
  */
 mixin template Logging(loggerAlias...)
 {
-	private import std.experimental.logger: Logger, LogLevel;
+	private import std.logger: Logger, LogLevel;
 	private import std.string: format;
 	static if (loggerAlias.length == 1 && is(typeof(loggerAlias[0]): Logger))
 	{
@@ -1329,7 +1371,7 @@ mixin template Logging(loggerAlias...)
  */
 Logger getLogger(string name, Logger defaultLogger = cast()sharedLog) @trusted
 {
-	import std.experimental.logger;
+	import std.logger;
 	auto logger = cast(NamedLogger)cast()sharedLog;
 	if (!logger)
 		return defaultLogger;
