@@ -539,7 +539,7 @@ if (isRefCounted!T)
 /***************************************************************************
  * 参照が初期化されているか確認する
  */
-bool isInitialized(T)(in ref RefCounted!T dat)
+bool isInitialized(T)(const ref RefCounted!T dat)
 {
 	static if (__traits(compiles, __traits(getMember, dat, uniqueMemberName!(T, "_data")) ? true : false))
 	{
@@ -559,7 +559,7 @@ bool isInitialized(T)(in ref RefCounted!T dat)
 	else static assert(0);
 }
 /// ditto
-bool isEmpty(T)(in ref RefCounted!T dat)
+bool isEmpty(T)(const ref RefCounted!T dat)
 {
 	return !isInitialized(dat);
 }
@@ -872,7 +872,7 @@ in (getCountedData(rc)._instance.rawData.length >= T.sizeof)
 /***************************************************************************
  * カウント値を得る
  */
-int counter(T)(in ref RefCounted!T rc) @safe @nogc pure nothrow @property
+int counter(T)(const ref RefCounted!T rc) @safe @nogc pure nothrow @property
 if (!isCountedData!T || isInstanceOf!(CountedData, T))
 in (getCountedData(rc)._instance)
 in (getCountedData(rc)._instance.rawData.length >= T.sizeof)

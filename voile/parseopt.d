@@ -850,7 +850,7 @@ private struct ArgData
 
 // step1: 
 private ArgData[] _parseArgsStep1(string[] args,
-	in ref TypeOption typeOpt, in ref OptPrefix[] optPrefices) pure @safe
+	in TypeOption typeOpt, in OptPrefix[] optPrefices) pure @safe
 {
 	import std.algorithm, std.string;
 	ArgData[] ret;
