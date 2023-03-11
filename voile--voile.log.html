@@ -226,7 +226,7 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".InMemoryLogger"></span><div class="quickindex" id="quickindex.InMemoryLogger"></div>class <code class="ddoc_psymbol">InMemoryLogger</code>: <span class="ddoc_psuper_symbol">voile.log.LogStorageLogger</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">メモリ内のロガー</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
- <pre class="d_code notranslate"><span class="d_keyword">import</span> std.experimental.logger: LogLevel;
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.logger: LogLevel;
 <span class="d_keyword">auto</span> logger = <span class="d_keyword">new</span> <span class="d_psymbol">InMemoryLogger</span>(LogLevel.info);
 logger.trace(<span class="d_string">"TRACETEST"</span>); <span class="d_comment">// ignore
 </span>logger.info(<span class="d_string">"INFOTEST"</span>);
@@ -464,6 +464,24 @@ const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <sp
 <dd>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.writeLogMsg"></span><div class="quickindex" id="quickindex.DispatchLogger.writeLogMsg"></div>@safe void <code class="ddoc_psymbol">writeLogMsg</code>(ref LogEntry <span class="ddoc_param">payload</span>);
+<br></div></dt>
+<dd>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".SynchronizedLogger"></span><div class="quickindex" id="quickindex.SynchronizedLogger"></div>class <code class="ddoc_psymbol">SynchronizedLogger</code>: <span class="ddoc_psuper_symbol">std.logger.core.Logger</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">マルチスレッド同期機構を備えたLogger</div><dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".SynchronizedLogger.this"></span><div class="quickindex" id="quickindex.SynchronizedLogger.this"></div>this(Logger <span class="ddoc_param">logger</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br>
+this(shared Logger <span class="ddoc_param">logger</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br>
+shared this(Logger <span class="ddoc_param">logger</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br>
+shared this(shared Logger <span class="ddoc_param">logger</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".SynchronizedLogger.writeLogMsg"></span><div class="quickindex" id="quickindex.SynchronizedLogger.writeLogMsg"></div>@trusted void <code class="ddoc_psymbol">writeLogMsg</code>(ref LogEntry <span class="ddoc_param">payload</span>);
 <br></div></dt>
 <dd>
 </dd>

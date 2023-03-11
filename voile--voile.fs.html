@@ -588,7 +588,7 @@ auto <code class="ddoc_psymbol">spawnProcess</code>(string[] <span class="ddoc_p
 {
 	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"bash"</span>, <span class="d_string">"-c"</span>, <span class="d_string">"echo xxx"</span>];
 }
-<span class="d_keyword">auto</span> pid = fs.<span class="d_psymbol">spawnProcess</span>(cmd, Pipe.init, pipeo, pipeo);
+<span class="d_keyword">auto</span> pid = fs.<span class="d_psymbol">spawnProcess</span>(cmd, Pipe.init, pipeo, pipeo, [<span class="d_string">"Path"</span>: fs.absolutePath]);
 pid.wait();
 <span class="d_keyword">auto</span> xxx = pipeo.readEnd().readln;
 <span class="d_keyword">assert</span>(xxx.chomp == <span class="d_string">"xxx"</span>);
@@ -606,7 +606,7 @@ pid.wait();
 {
 	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"bash"</span>, <span class="d_string">"-c"</span>, <span class="d_string">"echo xxx"</span>];
 }
-<span class="d_keyword">auto</span> pipe = fs.<span class="d_psymbol">pipeProcess</span>(cmd);
+<span class="d_keyword">auto</span> pipe = fs.<span class="d_psymbol">pipeProcess</span>(cmd, [<span class="d_string">"Path"</span>: fs.absolutePath]);
 pipe.pid.wait();
 <span class="d_keyword">auto</span> xxx = pipe.stdout().readln;
 <span class="d_keyword">assert</span>(xxx.chomp == <span class="d_string">"xxx"</span>);
@@ -624,7 +624,7 @@ pipe.pid.wait();
 {
 	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"bash"</span>, <span class="d_string">"-c"</span>, <span class="d_string">"echo xxx"</span>];
 }
-<span class="d_keyword">auto</span> pid = fs.<span class="d_psymbol">spawnProcess</span>(cmd, File.init, tout, File.init);
+<span class="d_keyword">auto</span> pid = fs.<span class="d_psymbol">spawnProcess</span>(cmd, File.init, tout, File.init, [<span class="d_string">"Path"</span>: fs.absolutePath]);
 pid.wait();
 tout.close();
 <span class="d_keyword">auto</span> result = fs.readText(<span class="d_string">"test.txt"</span>);
@@ -642,7 +642,7 @@ tout.close();
 {
 	<span class="d_keyword">auto</span> cmd = [<span class="d_string">"bash"</span>, <span class="d_string">"-c"</span>, <span class="d_string">"echo xxx"</span>];
 }
-<span class="d_keyword">auto</span> result = fs.<span class="d_psymbol">execute</span>(cmd);
+<span class="d_keyword">auto</span> result = fs.<span class="d_psymbol">execute</span>(cmd, [<span class="d_string">"Path"</span>: fs.absolutePath]);
 <span class="d_keyword">assert</span>(result.output.chomp == <span class="d_string">"xxx"</span>);
 </pre>
 </div>
