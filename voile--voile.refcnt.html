@@ -256,11 +256,11 @@ void <code class="ddoc_psymbol">initializeCountedInstance</code><span class="ddo
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isInitialized"></span><div class="quickindex" id="quickindex.isInitialized"></div>bool <code class="ddoc_psymbol">isInitialized</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in ref RefCounted!T <span class="ddoc_param">dat</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isInitialized"></span><div class="quickindex" id="quickindex.isInitialized"></div>bool <code class="ddoc_psymbol">isInitialized</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(const ref RefCounted!T <span class="ddoc_param">dat</span>);
 <br>
-<span class="def-anchor" id=".isEmpty"></span><div class="quickindex" id="quickindex.isEmpty"></div>bool <code class="ddoc_psymbol">isEmpty</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in ref RefCounted!T <span class="ddoc_param">dat</span>);
+<span class="def-anchor" id=".isEmpty"></span><div class="quickindex" id="quickindex.isEmpty"></div>bool <code class="ddoc_psymbol">isEmpty</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(const ref RefCounted!T <span class="ddoc_param">dat</span>);
 <br>
-<span class="def-anchor" id=".isNull"></span><div class="quickindex" id="quickindex.isNull"></div>alias <code class="ddoc_psymbol">isNull</code> = isEmpty(T)(in ref RefCounted!T dat);
+<span class="def-anchor" id=".isNull"></span><div class="quickindex" id="quickindex.isNull"></div>alias <code class="ddoc_psymbol">isNull</code> = isEmpty(T)(const ref RefCounted!T dat);
 <br></div></dt>
 <dd><div class="ddoc_summary">参照が初期化されているか確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate">RefCounted!<span class="d_keyword">int</span> x;
@@ -432,7 +432,7 @@ release後に触れた場合、ダングリングポインタへのアクセス�
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".counter"></span><div class="quickindex" id="quickindex.counter"></div>pure nothrow @nogc @property @safe int <code class="ddoc_psymbol">counter</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in ref RefCounted!T <span class="ddoc_param">rc</span>)<br><span class="ddoc_constraint">if(!isCountedData!T || isInstanceOf!(CountedData, T))</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".counter"></span><div class="quickindex" id="quickindex.counter"></div>pure nothrow @nogc @property @safe int <code class="ddoc_psymbol">counter</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(const ref RefCounted!T <span class="ddoc_param">rc</span>)<br><span class="ddoc_constraint">if(!isCountedData!T || isInstanceOf!(CountedData, T))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">カウント値を得る</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">auto</span> dat1 = createRefCounted!<span class="d_keyword">int</span>(1);

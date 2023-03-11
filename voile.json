@@ -8881,7 +8881,7 @@
         "default" : "Config(Flags.none, null)"
        }
       ],
-      "endline" : 1899,
+      "endline" : 1903,
       "endchar" : 2
      },
      {
@@ -8889,7 +8889,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1902,
+      "line" : 1906,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -8927,7 +8927,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1912,
+      "endline" : 1920,
       "endchar" : 2
      },
      {
@@ -8935,7 +8935,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1915,
+      "line" : 1923,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -8973,7 +8973,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1925,
+      "endline" : 1937,
       "endchar" : 2
      },
      {
@@ -8981,7 +8981,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1928,
+      "line" : 1940,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9007,7 +9007,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1934,
+      "endline" : 1950,
       "endchar" : 2
      },
      {
@@ -9015,7 +9015,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1937,
+      "line" : 1953,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9041,20 +9041,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1943,
-      "endchar" : 2
-     },
-     {
-      "name" : "__unittest_L1946_C10",
-      "kind" : "function",
-      "protection" : "public",
-      "comment" : "\n",
-      "line" : 1946,
-      "char" : 10,
-      "storageClass" : [
-       "@system"
-      ],
-      "endline" : 1966,
+      "endline" : 1963,
       "endchar" : 2
      },
      {
@@ -9080,20 +9067,33 @@
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2007,
+      "endline" : 2006,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L2007_C10",
+      "name" : "__unittest_L2006_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2007,
+      "line" : 2006,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2022,
+      "endline" : 2027,
+      "endchar" : 2
+     },
+     {
+      "name" : "__unittest_L2027_C10",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 2027,
+      "char" : 10,
+      "storageClass" : [
+       "@system"
+      ],
+      "endline" : 2042,
       "endchar" : 1
      },
      {
@@ -9140,16 +9140,16 @@
     ]
    },
    {
-    "name" : "__unittest_L2024_C9",
+    "name" : "__unittest_L2044_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "コピー禁止とムーブ、インスタンス削除の例\n",
-    "line" : 2024,
+    "line" : 2044,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2042,
+    "endline" : 2062,
     "endchar" : 1
    },
    {
@@ -9157,7 +9157,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 一時ディレクトリを作成し、作成したディレクトリのFileSystemを返す\n",
-    "line" : 2042,
+    "line" : 2062,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -9178,7 +9178,7 @@
       "default" : "5u"
      }
     ],
-    "endline" : 2067,
+    "endline" : 2087,
     "endchar" : 1
    },
    {
@@ -9186,7 +9186,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 使い捨ての一時ディレクトリを作成\n\n 作成したディレクトリのFileSystemを返す。返されたFileSystemは、インスタンスの破棄時に削除される。\n",
-    "line" : 2074,
+    "line" : 2094,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -9207,20 +9207,20 @@
       "default" : "5u"
      }
     ],
-    "endline" : 2084,
+    "endline" : 2104,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L2087_C7",
+    "name" : "__unittest_L2107_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2087,
+    "line" : 2107,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 2096,
+    "endline" : 2116,
     "endchar" : 1
    }
   ]
@@ -12749,14 +12749,13 @@
       "kind" : "function",
       "line" : 302,
       "char" : 6,
-      "type" : "bool(in ref JSONValue src, ref T dst)",
+      "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -12805,14 +12804,13 @@
       "kind" : "function",
       "line" : 331,
       "char" : 6,
-      "type" : "bool(in ref JSONValue src, ref T dst)",
+      "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -12861,14 +12859,13 @@
       "kind" : "function",
       "line" : 357,
       "char" : 6,
-      "type" : "bool(in ref JSONValue src, ref T dst)",
+      "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -12917,14 +12914,13 @@
       "kind" : "function",
       "line" : 387,
       "char" : 6,
-      "type" : "bool(in ref JSONValue src, ref T dst)",
+      "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -12973,14 +12969,13 @@
       "kind" : "function",
       "line" : 462,
       "char" : 6,
-      "type" : "bool(in ref JSONValue src, ref T dst)",
+      "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -13016,14 +13011,13 @@
       "kind" : "function",
       "line" : 476,
       "char" : 6,
-      "type" : "bool(in ref JSONValue src, ref T dst)",
+      "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -13059,14 +13053,13 @@
       "kind" : "function",
       "line" : 488,
       "char" : 6,
-      "type" : "bool(in ref JSONValue src, ref T dst)",
+      "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -13102,14 +13095,13 @@
       "kind" : "function",
       "line" : 505,
       "char" : 6,
-      "type" : "bool(in ref JSONValue src, ref T dst)",
+      "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -13149,14 +13141,13 @@
       "kind" : "function",
       "line" : 523,
       "char" : 6,
-      "type" : "bool(in ref JSONValue src, ref Value[Key] dst)",
+      "type" : "bool(in JSONValue src, ref Value[Key] dst)",
       "parameters" : [
        {
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -13192,14 +13183,13 @@
       "kind" : "function",
       "line" : 551,
       "char" : 6,
-      "type" : "bool(in ref JSONValue src, ref T dst)",
+      "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
        {
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -13233,14 +13223,13 @@
       "kind" : "function",
       "line" : 559,
       "char" : 11,
-      "type" : "T(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)",
+      "type" : "T(in JSONValue v, string name, lazy scope T defaultVal = T.init)",
       "parameters" : [
        {
         "name" : "v",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -13281,14 +13270,13 @@
       "kind" : "function",
       "line" : 592,
       "char" : 3,
-      "type" : "pure nothrow @trusted T(in ref JSONValue v, string name, lazy scope T defaultVal = T.init)",
+      "type" : "pure nothrow @trusted T(in JSONValue v, string name, lazy scope T defaultVal = T.init)",
       "parameters" : [
        {
         "name" : "v",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -13801,14 +13789,13 @@
       "kind" : "function",
       "line" : 1012,
       "char" : 19,
-      "type" : "JSONValue(in ref TypeEnum!Types dat)",
+      "type" : "JSONValue(in TypeEnum!Types dat)",
       "parameters" : [
        {
         "name" : "dat",
         "type" : "TypeEnum!Types",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        }
       ],
@@ -13861,14 +13848,13 @@
       "kind" : "function",
       "line" : 1092,
       "char" : 19,
-      "type" : "@property JSONValue(in ref Tagged!U dat)",
+      "type" : "@property JSONValue(in Tagged!U dat)",
       "parameters" : [
        {
         "name" : "dat",
         "type" : "Tagged!U",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        }
       ],
@@ -13924,14 +13910,13 @@
       "storageClass" : [
        "auto"
       ],
-      "type" : "@property ref JSONValue(in ref Endata!E dat)",
+      "type" : "@property ref JSONValue(in Endata!E dat)",
       "parameters" : [
        {
         "name" : "dat",
         "type" : "Endata!E",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        }
       ],
@@ -14087,7 +14072,7 @@
       "kind" : "function",
       "line" : 1273,
       "char" : 14,
-      "type" : "void(ref TypeEnum!Types dat, in ref JSONValue json)",
+      "type" : "void(ref TypeEnum!Types dat, in JSONValue json)",
       "parameters" : [
        {
         "name" : "dat",
@@ -14100,8 +14085,7 @@
         "name" : "json",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        }
       ],
@@ -14141,7 +14125,7 @@
       "kind" : "function",
       "line" : 1411,
       "char" : 14,
-      "type" : "void(ref Tagged!U dst, in ref JSONValue src)",
+      "type" : "void(ref Tagged!U dst, in JSONValue src)",
       "parameters" : [
        {
         "name" : "dst",
@@ -14154,8 +14138,7 @@
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        }
       ],
@@ -14196,7 +14179,7 @@
       "kind" : "function",
       "line" : 1441,
       "char" : 6,
-      "type" : "void(ref Endata!E dst, in ref JSONValue src)",
+      "type" : "void(ref Endata!E dst, in JSONValue src)",
       "parameters" : [
        {
         "name" : "dst",
@@ -14209,8 +14192,7 @@
         "name" : "src",
         "type" : "JSONValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        }
       ],
@@ -14915,14 +14897,13 @@
       "kind" : "function",
       "line" : 1994,
       "char" : 3,
-      "type" : "T(in ref JWTValue dat, string name, lazy T defaultVal)",
+      "type" : "T(in JWTValue dat, string name, lazy T defaultVal)",
       "parameters" : [
        {
         "name" : "dat",
         "type" : "JWTValue",
         "storageClass" : [
-         "in",
-         "ref"
+         "in"
         ]
        },
        {
@@ -26655,7 +26636,7 @@
     "protection" : "private",
     "line" : 852,
     "char" : 19,
-    "deco" : "FNaNfAAyaIKS5voile8parseopt10TypeOptionIKASQBfQBc9OptPrefixZASQByQBv7ArgData",
+    "deco" : "FNaNfAAyaIS5voile8parseopt10TypeOptionIASQBeQBb9OptPrefixZASQBxQBu7ArgData",
     "parameters" : [
      {
       "name" : "args",
@@ -26665,16 +26646,14 @@
       "name" : "typeOpt",
       "deco" : "xS5voile8parseopt10TypeOption",
       "storageClass" : [
-       "in",
-       "ref"
+       "in"
       ]
      },
      {
       "name" : "optPrefices",
       "deco" : "xAS5voile8parseopt9OptPrefix",
       "storageClass" : [
-       "in",
-       "ref"
+       "in"
       ]
      }
     ],
@@ -27628,13 +27607,13 @@
       "kind" : "function",
       "line" : 542,
       "char" : 6,
-      "type" : "bool(in ref RefCounted!T dat)",
+      "type" : "bool(const ref RefCounted!T dat)",
       "parameters" : [
        {
         "name" : "dat",
         "type" : "RefCounted!T",
         "storageClass" : [
-         "in",
+         "const",
          "ref"
         ]
        }
@@ -27663,13 +27642,13 @@
       "kind" : "function",
       "line" : 562,
       "char" : 6,
-      "type" : "bool(in ref RefCounted!T dat)",
+      "type" : "bool(const ref RefCounted!T dat)",
       "parameters" : [
        {
         "name" : "dat",
         "type" : "RefCounted!T",
         "storageClass" : [
-         "in",
+         "const",
          "ref"
         ]
        }
@@ -28373,13 +28352,13 @@
       "kind" : "function",
       "line" : 875,
       "char" : 5,
-      "type" : "pure nothrow @nogc @property @safe int(in ref RefCounted!T rc)",
+      "type" : "pure nothrow @nogc @property @safe int(const ref RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
         "type" : "RefCounted!T",
         "storageClass" : [
-         "in",
+         "const",
          "ref"
         ]
        }
