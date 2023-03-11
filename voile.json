@@ -8881,7 +8881,7 @@
         "default" : "Config(Flags.none, null)"
        }
       ],
-      "endline" : 1903,
+      "endline" : 1899,
       "endchar" : 2
      },
      {
@@ -8889,7 +8889,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1906,
+      "line" : 1902,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -8927,7 +8927,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1920,
+      "endline" : 1912,
       "endchar" : 2
      },
      {
@@ -8935,7 +8935,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1923,
+      "line" : 1915,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -8973,7 +8973,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1937,
+      "endline" : 1925,
       "endchar" : 2
      },
      {
@@ -8981,7 +8981,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1940,
+      "line" : 1928,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9007,7 +9007,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1950,
+      "endline" : 1934,
       "endchar" : 2
      },
      {
@@ -9015,7 +9015,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1953,
+      "line" : 1937,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9041,7 +9041,20 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1963,
+      "endline" : 1943,
+      "endchar" : 2
+     },
+     {
+      "name" : "__unittest_L1946_C10",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1946,
+      "char" : 10,
+      "storageClass" : [
+       "@system"
+      ],
+      "endline" : 1966,
       "endchar" : 2
      },
      {
@@ -9067,33 +9080,20 @@
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2006,
+      "endline" : 2007,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L2006_C10",
+      "name" : "__unittest_L2007_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2006,
+      "line" : 2007,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2027,
-      "endchar" : 2
-     },
-     {
-      "name" : "__unittest_L2027_C10",
-      "kind" : "function",
-      "protection" : "public",
-      "comment" : "\n",
-      "line" : 2027,
-      "char" : 10,
-      "storageClass" : [
-       "@system"
-      ],
-      "endline" : 2042,
+      "endline" : 2022,
       "endchar" : 1
      },
      {
@@ -9140,16 +9140,16 @@
     ]
    },
    {
-    "name" : "__unittest_L2044_C9",
+    "name" : "__unittest_L2024_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "コピー禁止とムーブ、インスタンス削除の例\n",
-    "line" : 2044,
+    "line" : 2024,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2062,
+    "endline" : 2042,
     "endchar" : 1
    },
    {
@@ -9157,7 +9157,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 一時ディレクトリを作成し、作成したディレクトリのFileSystemを返す\n",
-    "line" : 2062,
+    "line" : 2042,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -9178,7 +9178,7 @@
       "default" : "5u"
      }
     ],
-    "endline" : 2087,
+    "endline" : 2067,
     "endchar" : 1
    },
    {
@@ -9186,7 +9186,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 使い捨ての一時ディレクトリを作成\n\n 作成したディレクトリのFileSystemを返す。返されたFileSystemは、インスタンスの破棄時に削除される。\n",
-    "line" : 2094,
+    "line" : 2074,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -9207,20 +9207,20 @@
       "default" : "5u"
      }
     ],
-    "endline" : 2104,
+    "endline" : 2084,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L2107_C7",
+    "name" : "__unittest_L2087_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2107,
+    "line" : 2087,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 2116,
+    "endline" : 2096,
     "endchar" : 1
    }
   ]
