@@ -1213,25 +1213,54 @@ JSONValue serializeToJson(T)(in T data)
 		{{
 			static if (!hasIgnore!member)
 			{
-				static if (hasName!member)
+				static if (hasIgnoreIf!member)
 				{
-					enum fieldName = getName!member;
+					if (!getPredIgnoreIf!member(data))
+					{
+						static if (hasName!member)
+						{
+							enum fieldName = getName!member;
+						}
+						else
+						{
+							enum fieldName = __traits(identifier, member);
+						}
+						static if (hasConvBy!member)
+						{
+							ret[fieldName] = convTo!(member, JSONValue)(data.tupleof[memberIdx]);
+						}
+						else static if (isJSONizableRaw!(typeof(member)))
+						{
+							ret[fieldName] = data.tupleof[memberIdx].json;
+						}
+						else
+						{
+							ret[fieldName] = serializeToJson(data.tupleof[memberIdx]);
+						}
+					}
 				}
 				else
 				{
-					enum fieldName = __traits(identifier, member);
-				}
-				static if (hasConvBy!member)
-				{
-					ret[fieldName] = convTo!(member, JSONValue)(data.tupleof[memberIdx]);
-				}
-				else static if (isJSONizableRaw!(typeof(member)))
-				{
-					ret[fieldName] = data.tupleof[memberIdx].json;
-				}
-				else
-				{
-					ret[fieldName] = serializeToJson(data.tupleof[memberIdx]);
+					static if (hasName!member)
+					{
+						enum fieldName = getName!member;
+					}
+					else
+					{
+						enum fieldName = __traits(identifier, member);
+					}
+					static if (hasConvBy!member)
+					{
+						ret[fieldName] = convTo!(member, JSONValue)(data.tupleof[memberIdx]);
+					}
+					else static if (isJSONizableRaw!(typeof(member)))
+					{
+						ret[fieldName] = data.tupleof[memberIdx].json;
+					}
+					else
+					{
+						ret[fieldName] = serializeToJson(data.tupleof[memberIdx]);
+					}
 				}
 			}
 		}}
@@ -1726,6 +1755,19 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	assert(1 in data2.map);
 	assert(2 !in data2.map);
 	assert(data2.map[1] == "1");
+}
+
+@system unittest
+{
+	static struct Data
+	{
+		string data1;
+		@ignoreIf!(dat => dat.data2.length == 0)
+		string data2;
+	}
+	Data data1 = Data("aaa", null);
+	auto jv = data1.serializeToJson();
+	assert("data2" !in jv);
 }
 
 
