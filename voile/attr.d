@@ -273,6 +273,33 @@ enum bool hasIgnore(alias value) = hasUDA!(value, Ignore);
 	static assert( hasIgnore!(a.foo));
 }
 
+private struct IgnoreIf(alias func) {}
+/*******************************************************************************
+ * Attribute marking conditional ignore data
+ */
+alias ignoreIf(alias func) = IgnoreIf!func;
+
+///
+enum bool isIgnoreIf(alias uda) = isInstanceOf!(IgnoreIf, uda);
+///
+enum bool hasIgnoreIf(alias symbol) = Filter!(isIgnoreIf, __traits(getAttributes, symbol)).length > 0;
+///
+template getPredIgnoreIf(alias value)
+{
+	static if (isIgnoreIf!value)
+	{
+		// UDAから関数を取り出す
+		alias getPredIgnoreIf = TemplateArgsOf!value[0];
+	}
+	else
+	{
+		// シンボルからUDAを取り出す
+		alias uda = Filter!(isIgnoreIf, __traits(getAttributes, value))[0];
+		// UDAから関数を取り出す
+		alias getPredIgnoreIf = TemplateArgsOf!uda[0];
+	}
+}
+
 private enum Essential {init}
 
 /*******************************************************************************
