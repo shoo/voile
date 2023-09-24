@@ -20081,15 +20081,18 @@
     "storageClass" : [
      "@system"
     ],
-    "endline" : 864,
+    "endline" : 863,
     "endchar" : 1
    },
    {
     "name" : "std.stdio",
     "kind" : "import",
-    "line" : 864,
+    "line" : 863,
     "char" : 8,
-    "protection" : "private"
+    "protection" : "private",
+    "selective" : [
+     "File"
+    ]
    },
    {
     "name" : "truncate",
@@ -20420,13 +20423,13 @@
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1103,
+    "endline" : 1106,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1103,
+    "line" : 1106,
     "char" : 16,
     "name" : "searchEnd2",
     "parameters" : [
@@ -20439,7 +20442,7 @@
      {
       "name" : "searchEnd2",
       "kind" : "function",
-      "line" : 1103,
+      "line" : 1106,
       "char" : 16,
       "type" : "size_t(const(Ch)[] str, Ch ch)",
       "parameters" : [
@@ -20452,27 +20455,27 @@
         "type" : "Ch"
        }
       ],
-      "endline" : 1153,
+      "endline" : 1156,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1154_C9",
+    "name" : "__unittest_L1157_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1154,
+    "line" : 1157,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1164,
+    "endline" : 1167,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1164,
+    "line" : 1167,
     "char" : 11,
     "name" : "expandMacroImpl",
     "parameters" : [
@@ -20490,7 +20493,7 @@
      {
       "name" : "expandMacroImpl",
       "kind" : "function",
-      "line" : 1164,
+      "line" : 1167,
       "char" : 11,
       "type" : "T(in T str)",
       "parameters" : [
@@ -20502,28 +20505,28 @@
         ]
        }
       ],
-      "endline" : 1253,
+      "endline" : 1256,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1255_C9",
+    "name" : "__unittest_L1258_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1255,
+    "line" : 1258,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1339,
+    "endline" : 1344,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " 文字列内に含まれる変数を展開します。\n\n `aaa%VAR%bbb`のVAR変数を展開します。変数が存在しない場合は何もしません。\n VARがxxxであれば、`aaaxxxbbb`となります。\n VARが存在しなければ、`aaa%VAR%bbb`のままです。\n",
-    "line" : 1339,
+    "line" : 1344,
     "char" : 3,
     "name" : "expandVariable",
     "parameters" : [
@@ -20541,7 +20544,7 @@
      {
       "name" : "expandVariable",
       "kind" : "function",
-      "line" : 1339,
+      "line" : 1344,
       "char" : 3,
       "type" : "T(in T str, MAP map)",
       "parameters" : [
@@ -20557,7 +20560,7 @@
         "type" : "MAP"
        }
       ],
-      "endline" : 1353,
+      "endline" : 1358,
       "endchar" : 1
      }
     ]
@@ -20566,7 +20569,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1355,
+    "line" : 1360,
     "char" : 3,
     "name" : "expandVariable",
     "parameters" : [
@@ -20584,7 +20587,7 @@
      {
       "name" : "expandVariable",
       "kind" : "function",
-      "line" : 1355,
+      "line" : 1360,
       "char" : 3,
       "type" : "T(in T str, Func mapFunc)",
       "parameters" : [
@@ -20600,7 +20603,7 @@
         "type" : "Func"
        }
       ],
-      "endline" : 1368,
+      "endline" : 1373,
       "endchar" : 1
      }
     ]
@@ -20608,7 +20611,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1370,
+    "line" : 1375,
     "char" : 11,
     "name" : "expandVariableImpl",
     "parameters" : [
@@ -20626,7 +20629,7 @@
      {
       "name" : "expandVariableImpl",
       "kind" : "function",
-      "line" : 1370,
+      "line" : 1375,
       "char" : 11,
       "type" : "T(in T str)",
       "parameters" : [
@@ -20638,28 +20641,28 @@
         ]
        }
       ],
-      "endline" : 1415,
+      "endline" : 1420,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1416_C9",
+    "name" : "__unittest_L1421_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1416,
+    "line" : 1421,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1431,
+    "endline" : 1436,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1431,
+    "line" : 1436,
     "char" : 1,
     "name" : "RotationSerial",
     "parameters" : [
@@ -20686,14 +20689,14 @@
       "name" : "RotationSerial",
       "kind" : "struct",
       "protection" : "public",
-      "line" : 1431,
+      "line" : 1436,
       "char" : 1,
       "members" : [
        {
         "name" : "min",
         "kind" : "variable",
         "comment" : "\n",
-        "line" : 1438,
+        "line" : 1443,
         "char" : 7,
         "storageClass" : [
          "enum"
@@ -20704,7 +20707,7 @@
         "name" : "max",
         "kind" : "variable",
         "comment" : "\n",
-        "line" : 1443,
+        "line" : 1448,
         "char" : 7,
         "storageClass" : [
          "enum"
@@ -20714,14 +20717,14 @@
        {
         "name" : "_value",
         "kind" : "variable",
-        "line" : 1446,
+        "line" : 1451,
         "char" : 4,
         "type" : "T"
        },
        {
         "name" : "add",
         "kind" : "function",
-        "line" : 1448,
+        "line" : 1453,
         "char" : 11,
         "storageClass" : [
          "static"
@@ -20737,14 +20740,14 @@
           "type" : "T"
          }
         ],
-        "endline" : 1458,
+        "endline" : 1463,
         "endchar" : 2
        },
        {
         "name" : "this",
         "kind" : "constructor",
         "comment" : "\n",
-        "line" : 1464,
+        "line" : 1469,
         "char" : 2,
         "type" : "(T val)",
         "parameters" : [
@@ -20753,43 +20756,43 @@
           "type" : "T"
          }
         ],
-        "endline" : 1467,
+        "endline" : 1472,
         "endchar" : 2
        },
        {
         "name" : "isUninitialized",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 1472,
+        "line" : 1477,
         "char" : 7,
         "type" : "const bool()",
-        "endline" : 1475,
+        "endline" : 1480,
         "endchar" : 2
        },
        {
         "name" : "isValid",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 1480,
+        "line" : 1485,
         "char" : 7,
         "type" : "const bool()",
-        "endline" : 1483,
+        "endline" : 1488,
         "endchar" : 2
        },
        {
         "name" : "value",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 1489,
+        "line" : 1494,
         "char" : 4,
         "type" : "const T()",
-        "endline" : 1492,
+        "endline" : 1497,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "\n",
-        "line" : 1497,
+        "line" : 1502,
         "char" : 21,
         "name" : "opUnary",
         "parameters" : [
@@ -20804,10 +20807,10 @@
          {
           "name" : "opUnary",
           "kind" : "function",
-          "line" : 1497,
+          "line" : 1502,
           "char" : 21,
           "type" : "ref RotationSerial()",
-          "endline" : 1509,
+          "endline" : 1514,
           "endchar" : 2
          }
         ]
@@ -20816,7 +20819,7 @@
         "name" : "opCmp",
         "kind" : "function",
         "comment" : "\n",
-        "line" : 1514,
+        "line" : 1519,
         "char" : 6,
         "type" : "const int(RotationSerial rhs)",
         "parameters" : [
@@ -20825,7 +20828,7 @@
           "type" : "RotationSerial"
          }
         ],
-        "endline" : 1539,
+        "endline" : 1544,
         "endchar" : 2
        }
       ]
@@ -20833,34 +20836,34 @@
     ]
    },
    {
-    "name" : "__unittest_L1544_C7",
+    "name" : "__unittest_L1549_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1544,
+    "line" : 1549,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1563,
+    "endline" : 1568,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1563_C7",
+    "name" : "__unittest_L1568_C7",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1563,
+    "line" : 1568,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1600,
+    "endline" : 1605,
     "endchar" : 1
    },
    {
     "name" : "std.range",
     "kind" : "import",
-    "line" : 1600,
+    "line" : 1605,
     "char" : 16,
     "protection" : "private",
     "selective" : [
@@ -20872,7 +20875,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " Create combinations matrix from specified lists of conditional patterns\n\n Params:\n      matrix   = Matrix of conditional patterns. $(BR)\n                 ex; Input   `[[\"1\", \"2\"], [\"A\", \"B\"]]` $(BR)\n                     Results `[[\"1\", \"A\"], [\"1\", \"B\"], [\"2\", \"A\"], [\"2\", \"B\"]]`\n      matrixAA = Matrix of conditional patterns. For each column, the name is represented by an associative array key. $(BR)\n                 ex; Input   `[\"P1\": [\"1\", \"2\"], \"P2\": [\"A\", \"B\"]]` $(BR)\n                     Results `[[\"P1\": \"1\", \"P2\": \"A\"], [\"P1\": \"1\", \"P2\": \"B\"], [\"P1\": \"2\", \"P2\": \"A\"], [\"P1\": \"2\", \"P2\": \"B\"]]`\n Returns:\n      Matrix of combination\n",
-    "line" : 1614,
+    "line" : 1619,
     "char" : 6,
     "name" : "combinationMatrix",
     "parameters" : [
@@ -20886,7 +20889,7 @@
      {
       "name" : "combinationMatrix",
       "kind" : "function",
-      "line" : 1614,
+      "line" : 1619,
       "char" : 6,
       "storageClass" : [
        "auto"
@@ -20898,28 +20901,28 @@
         "type" : "R"
        }
       ],
-      "endline" : 1629,
+      "endline" : 1634,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1632_C7",
+    "name" : "__unittest_L1637_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1632,
+    "line" : 1637,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1651,
+    "endline" : 1656,
     "endchar" : 1
    },
    {
     "name" : "std.range",
     "kind" : "import",
-    "line" : 1651,
+    "line" : 1656,
     "char" : 16,
     "protection" : "private",
     "selective" : [
@@ -20930,7 +20933,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1653,
+    "line" : 1658,
     "char" : 6,
     "name" : "combinationMatrix",
     "parameters" : [
@@ -20948,7 +20951,7 @@
      {
       "name" : "combinationMatrix",
       "kind" : "function",
-      "line" : 1653,
+      "line" : 1658,
       "char" : 6,
       "storageClass" : [
        "auto"
@@ -20960,28 +20963,28 @@
         "type" : "R[K]"
        }
       ],
-      "endline" : 1663,
+      "endline" : 1668,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1665_C7",
+    "name" : "__unittest_L1670_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1665,
+    "line" : 1670,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1685,
+    "endline" : 1690,
     "endchar" : 1
    },
    {
     "name" : "std.range",
     "kind" : "import",
-    "line" : 1685,
+    "line" : 1690,
     "char" : 16,
     "protection" : "private",
     "selective" : [
@@ -20992,7 +20995,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " Shuffle elements of specified range\n",
-    "line" : 1689,
+    "line" : 1694,
     "char" : 6,
     "name" : "shuffle",
     "parameters" : [
@@ -21006,7 +21009,7 @@
      {
       "name" : "shuffle",
       "kind" : "function",
-      "line" : 1689,
+      "line" : 1694,
       "char" : 6,
       "storageClass" : [
        "auto"
@@ -21018,7 +21021,7 @@
         "type" : "R"
        }
       ],
-      "endline" : 1699,
+      "endline" : 1704,
       "endchar" : 1
      }
     ]
