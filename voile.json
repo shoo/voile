@@ -1736,14 +1736,14 @@
         "kind" : "function",
         "line" : 633,
         "char" : 14,
-        "type" : "Dst(auto in ref Val v)",
+        "type" : "Dst(auto const ref Val v)",
         "parameters" : [
          {
           "name" : "v",
           "type" : "Val",
           "storageClass" : [
            "auto",
-           "in",
+           "const",
            "ref"
           ]
          }
@@ -1914,14 +1914,14 @@
         "kind" : "function",
         "line" : 766,
         "char" : 14,
-        "type" : "Val(auto in ref Src v)",
+        "type" : "Val(auto const ref Src v)",
         "parameters" : [
          {
           "name" : "v",
           "type" : "Src",
           "storageClass" : [
            "auto",
-           "in",
+           "const",
            "ref"
           ]
          }
@@ -2020,14 +2020,14 @@
         "kind" : "function",
         "line" : 868,
         "char" : 14,
-        "type" : "void(auto in ref Val src, ref Dst dst)",
+        "type" : "void(auto const ref Val src, ref Dst dst)",
         "parameters" : [
          {
           "name" : "src",
           "type" : "Val",
           "storageClass" : [
            "auto",
-           "in",
+           "const",
            "ref"
           ]
          },
@@ -2133,14 +2133,14 @@
         "kind" : "function",
         "line" : 935,
         "char" : 14,
-        "type" : "void(auto in ref Src src, ref Val dst)",
+        "type" : "void(auto const ref Src src, ref Val dst)",
         "parameters" : [
          {
           "name" : "src",
           "type" : "Src",
           "storageClass" : [
            "auto",
-           "in",
+           "const",
            "ref"
           ]
          },
@@ -2639,7 +2639,8 @@
       "comment" : "\n",
       "line" : 291,
       "char" : 15,
-      "deco" : "S4core4time12TickDuration",
+      "deco" : "S4core4time__T12MonoTimeImplVEQBdQBb9ClockTypei0ZQBj",
+      "originalType" : "MonoTime",
       "offset" : 32
      },
      {
@@ -2649,7 +2650,8 @@
       "comment" : "\n",
       "line" : 293,
       "char" : 15,
-      "deco" : "S4core4time12TickDuration",
+      "deco" : "S4core4time__T12MonoTimeImplVEQBdQBb9ClockTypei0ZQBj",
+      "originalType" : "MonoTime",
       "offset" : 40
      }
     ]
@@ -21835,7 +21837,7 @@
         "kind" : "function",
         "line" : 202,
         "char" : 7,
-        "type" : "void(auto ref Args args)",
+        "type" : "@trusted void(auto ref Args args)",
         "parameters" : [
          {
           "name" : "args",
@@ -21910,7 +21912,7 @@
         "storageClass" : [
          "auto"
         ],
-        "type" : "inout pure nothrow @nogc @property ref ()",
+        "type" : "inout pure nothrow @nogc @property ref @trusted ()",
         "endline" : 234,
         "endchar" : 2
        }
@@ -21965,7 +21967,7 @@
         "kind" : "function",
         "line" : 256,
         "char" : 7,
-        "type" : "void()",
+        "type" : "@trusted void()",
         "endline" : 275,
         "endchar" : 2
        }
@@ -22214,7 +22216,7 @@
             "kind" : "function",
             "line" : 328,
             "char" : 8,
-            "type" : "void(auto ref Args args)",
+            "type" : "@trusted void(auto ref Args args)",
             "parameters" : [
              {
               "name" : "args",
@@ -22287,7 +22289,7 @@
             "storageClass" : [
              "auto"
             ],
-            "type" : "inout pure nothrow @nogc @property ref ()",
+            "type" : "inout pure nothrow @nogc @property ref @trusted ()",
             "endline" : 363,
             "endchar" : 3
            }
@@ -22379,7 +22381,7 @@
           "kind" : "constructor",
           "line" : 388,
           "char" : 2,
-          "type" : "(auto ref T val)",
+          "type" : "@trusted (auto ref T val)",
           "parameters" : [
            {
             "name" : "val",
@@ -23924,14 +23926,14 @@
       "kind" : "function",
       "line" : 1127,
       "char" : 12,
-      "type" : "TagType!MU(auto in ref MU dat)",
+      "type" : "TagType!MU(auto const ref MU dat)",
       "parameters" : [
        {
         "name" : "dat",
         "type" : "MU",
         "storageClass" : [
          "auto",
-         "in",
+         "const",
          "ref"
         ]
        }
@@ -24378,14 +24380,14 @@
       "kind" : "function",
       "line" : 1297,
       "char" : 6,
-      "type" : "bool(auto in ref MU dat)",
+      "type" : "bool(auto const ref MU dat)",
       "parameters" : [
        {
         "name" : "dat",
         "type" : "MU",
         "storageClass" : [
          "auto",
-         "in",
+         "const",
          "ref"
         ]
        }
@@ -24419,14 +24421,14 @@
       "kind" : "function",
       "line" : 1303,
       "char" : 6,
-      "type" : "bool(auto in ref MU dat)",
+      "type" : "bool(auto const ref MU dat)",
       "parameters" : [
        {
         "name" : "dat",
         "type" : "MU",
         "storageClass" : [
          "auto",
-         "in",
+         "const",
          "ref"
         ]
        }
@@ -24553,14 +24555,14 @@
       "kind" : "function",
       "line" : 1374,
       "char" : 6,
-      "type" : "bool(auto in ref MU dat)",
+      "type" : "bool(auto const ref MU dat)",
       "parameters" : [
        {
         "name" : "dat",
         "type" : "MU",
         "storageClass" : [
          "auto",
-         "in",
+         "const",
          "ref"
         ]
        }
@@ -31518,7 +31520,7 @@
       "originalType" : "shared void(Throwable)",
       "parameters" : [
        {
-        "name" : "_param_0",
+        "name" : "__param_0",
         "deco" : "C6object9Throwable"
        }
       ],
