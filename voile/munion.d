@@ -199,7 +199,7 @@ private mixin template ManagedUnionImpl(Instance, tags...)
 	/***************************************************************************
 	 * 初期化する
 	 */
-	void initialize(TagType t, Args...)(auto ref Args args)
+	void initialize(TagType t, Args...)(auto ref Args args) @trusted
 	if (getIndex!t < memberCount)
 	{
 		static if (hasDestructor)
@@ -226,7 +226,7 @@ private mixin template ManagedUnionImpl(Instance, tags...)
 	/***************************************************************************
 	 * データを取得する
 	 */
-	auto ref get(TagType t)() nothrow pure @nogc inout @property
+	auto ref get(TagType t)() nothrow pure @nogc inout @trusted @property
 	if (getIndex!t < memberCount)
 	in (t == _tag)
 	{
@@ -253,7 +253,7 @@ private mixin template ManagedUnionImpl(Instance, tags...)
 	/***************************************************************************
 	 * データをクリアする
 	 */
-	void clear()()
+	void clear()() @trusted
 	{
 		scope (exit)
 			_tag = notfoundTag;
@@ -325,7 +325,7 @@ private union TypeEnumImpl(Types...)
 		/***********************************************************************
 		 * 初期化する
 		 */
-		void initialize(T, Args...)(auto ref Args args)
+		void initialize(T, Args...)(auto ref Args args) @trusted
 		if (hasType!T)
 		{
 			static if (hasDestructor)
@@ -354,7 +354,7 @@ private union TypeEnumImpl(Types...)
 		/***********************************************************************
 		 * データを取得する
 		 */
-		auto ref get(T)() nothrow pure @nogc inout @property
+		auto ref get(T)() nothrow pure @nogc inout @trusted @property
 		if (hasType!T)
 		in (getTag!(getAssignableIndex!T) == _tag)
 		{
@@ -385,7 +385,7 @@ if (Types.length > 0 && NoDuplicates!Types.length == Types.length)
 	/***************************************************************************
 	 * コンストラクタ
 	 */
-	this(T)(auto ref T val)
+	this(T)(auto ref T val) @trusted
 	if (_inst.isAssignable!T)
 	{
 		enum idx = _inst.getAssignableIndex!T;
@@ -1124,7 +1124,7 @@ if (isTypeEnum!MU)
 /*******************************************************************************
  * タグを確認する
  */
-TagType!MU tag(MU)(in auto ref MU dat)
+TagType!MU tag(MU)(auto const ref MU dat)
 if (isManagedUnion!MU)
 {
 	return dat.getInstance()._tag;
@@ -1294,13 +1294,13 @@ if (isTypeEnum!MU && hasType!(MU, T))
 /*******************************************************************************
  * データが入っていることを確認する
  */
-bool check(alias tag, MU)(in auto ref MU dat)
+bool check(alias tag, MU)(auto const ref MU dat)
 if (isManagedUnion!MU && isAvailableTag!(MU, tag))
 {
 	return dat.getInstance()._impl.check!tag();
 }
 /// ditto
-bool check(T, MU)(in auto ref MU dat)
+bool check(T, MU)(auto const ref MU dat)
 if (isTypeEnum!MU && hasType!(MU, T))
 {
 	return dat.getInstance()._implT.check!T();
@@ -1371,7 +1371,7 @@ if (isManagedUnion!MU)
 /*******************************************************************************
  * データがクリアされているか確認する
  */
-bool empty(MU)(in auto ref MU dat)
+bool empty(MU)(auto const ref MU dat)
 if (isManagedUnion!MU)
 {
 	return dat.getInstance()._impl.empty();
