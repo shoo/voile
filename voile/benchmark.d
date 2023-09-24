@@ -288,9 +288,9 @@ struct ProfileData
 	///
 	uint         line;
 	///
-	TickDuration time;
+	MonoTime     time;
 	///
-	TickDuration duration;
+	MonoTime     duration;
 }
 
 /+

@@ -335,8 +335,8 @@ version (Posix)
 }
 else version (Windows)
 {
-	private extern (Windows) HANDLE CreateMutexW(void*,int,in wchar*) nothrow @nogc;
-	private extern (Windows) int ReleaseMutex(in HANDLE) nothrow @nogc;
+	private extern (Windows) HANDLE CreateMutexW(void*, int, const wchar*) nothrow @nogc;
+	private extern (Windows) int ReleaseMutex(const HANDLE) nothrow @nogc;
 }
 else
 {
@@ -1288,11 +1288,11 @@ public:
 			break;
 		case FinishedType.failed:
 			if (rethrow)
-				throw _resultException;
+				throw cast()_resultException;
 			break;
 		case FinishedType.fatal:
 			if (rethrow)
-				throw _resultFatal;
+				throw cast()_resultFatal;
 			break;
 		}
 	}
@@ -1315,9 +1315,9 @@ public:
 		case FinishedType.done:
 			return _resultRaw();
 		case FinishedType.failed:
-			throw _resultException;
+			throw cast()_resultException;
 		case FinishedType.fatal:
-			throw _resultFatal;
+			throw cast()_resultFatal;
 		}
 	}
 	
@@ -1336,9 +1336,9 @@ public:
 		case FinishedType.done:
 			return _resultRaw();
 		case FinishedType.failed:
-			throw _resultException;
+			throw cast()_resultException;
 		case FinishedType.fatal:
-			throw _resultFatal;
+			throw cast()_resultFatal;
 		}
 	}
 	
@@ -1357,9 +1357,9 @@ public:
 		case FinishedType.done:
 			return _resultRaw();
 		case FinishedType.failed:
-			throw _resultException;
+			throw cast()_resultException;
 		case FinishedType.fatal:
-			throw _resultFatal;
+			throw cast()_resultFatal;
 		}
 	}
 	
