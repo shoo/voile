@@ -860,8 +860,8 @@ do
 		>`);
 }
 
+import std.stdio: File;
 
-import std.stdio;
 /***************************************************************************
  * 
  */
@@ -1083,7 +1083,7 @@ private size_t searchEnd1(Ch)(const(Ch)[] str)
 {
 	size_t i = 0;
 	import std.regex;
-	if (auto m = str.match(ctRegex!(cast(Ch[])`^[a-zA-Z_].*?\b`)))
+	if (auto m = str.matchFirst(ctRegex!(cast(Ch[])`^(?!\d)[a-zA-Z0-9_].*?\b`)))
 	{
 		return m.hit.length;
 	}
@@ -1094,8 +1094,11 @@ private size_t searchEnd1(Ch)(const(Ch)[] str)
 {
 	assert(searchEnd1("abcde-fgh") == 5);
 	assert(searchEnd1("abcde$fgh") == 5);
+	assert(searchEnd1("abc123de$fgh") == 8);
 	assert(searchEnd1("abcde_fgh") == 9);
 	assert(searchEnd1("abcde") == 5);
+	assert(searchEnd1("abcde789") == 8);
+	assert(searchEnd1("789abcde") == -1);
 	assert(searchEnd1("$abcde") == -1);
 	assert(searchEnd1("") == -1);
 }
@@ -1171,14 +1174,14 @@ private T expandMacroImpl(T, alias func)(in T str)
 	&& is(bool:      ParameterTypeTuple!func[2])
 	&& (ParameterStorageClassTuple!func[0] & ParameterStorageClass.ref_) == ParameterStorageClass.ref_)
 {
-	import std.array, std.algorithm;
+	import std.array, std.algorithm, std.string;
 	Appender!T result;
 	T rest = str[];
 	size_t idxBegin, idxEnd;
 	
 	while (1)
 	{
-		idxBegin = rest.countUntil('$');
+		idxBegin = rest.representation.countUntil('$');
 		if (idxBegin == -1 || idxBegin+1 >= rest.length)
 			return result.data ~ rest;
 		
@@ -1273,6 +1276,7 @@ private T expandMacroImpl(T, alias func)(in T str)
 			return cast(T)"ooo";
 		};
 		assert(expandMacro(cast(T)"xxx$yyy$(abc${xxx})", foo) == "xxxoooyyy");
+		assert(expandMacro(cast(T)"xxあいうえおx$yyy$(abc${xxx})", foo) == "xxあいうえおxoooyyy");
 		
 		auto bar = delegate bool(ref T arg)
 		{
@@ -1325,6 +1329,7 @@ private T expandMacroImpl(T, alias func)(in T str)
 		};
 		assert(expandMacro(cast(T)"xxx$yyy$(abc${xxx})", bar2) == "xxx$yyyyyy2");
 		assert(expandMacro(cast(T)"xxx$yyy$(abc${xxx}", bar2) == "xxx$yyy$(abc${xxx}");
+		assert(expandMacro(cast(T)"xあいうえおxx$yyy$(abc${xxx}", bar2) == "xあいうえおxx$yyy$(abc${xxx}");
 	}}
 }
 
