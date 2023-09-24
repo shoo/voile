@@ -199,7 +199,7 @@ private mixin template ManagedUnionImpl(Instance, tags...)
 	/***************************************************************************
 	 * 初期化する
 	 */
-	void initialize(TagType t, Args...)(auto ref Args args)
+	void initialize(TagType t, Args...)(auto ref Args args) @trusted
 	if (getIndex!t < memberCount)
 	{
 		static if (hasDestructor)
@@ -226,7 +226,7 @@ private mixin template ManagedUnionImpl(Instance, tags...)
 	/***************************************************************************
 	 * データを取得する
 	 */
-	auto ref get(TagType t)() nothrow pure @nogc inout @property
+	auto ref get(TagType t)() nothrow pure @nogc inout @trusted @property
 	if (getIndex!t < memberCount)
 	in (t == _tag)
 	{
