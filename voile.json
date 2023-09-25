@@ -8531,25 +8531,25 @@
         ]
        }
       ],
-      "endline" : 1703,
+      "endline" : 1706,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1704_C10",
+      "name" : "__unittest_L1707_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1704,
+      "line" : 1707,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1716,
+      "endline" : 1719,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1716,
+      "line" : 1719,
       "char" : 15,
       "name" : "setTimeStampImpl",
       "parameters" : [
@@ -8563,7 +8563,7 @@
        {
         "name" : "setTimeStampImpl",
         "kind" : "function",
-        "line" : 1716,
+        "line" : 1719,
         "char" : 15,
         "type" : "void(string target, SysTime accessTime, SysTime modificationTime)",
         "parameters" : [
@@ -8580,7 +8580,7 @@
           "type" : "SysTime"
          }
         ],
-        "endline" : 1719,
+        "endline" : 1722,
         "endchar" : 2
        }
       ]
@@ -8588,7 +8588,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1721,
+      "line" : 1724,
       "char" : 15,
       "name" : "setTimeStampImpl",
       "parameters" : [
@@ -8603,7 +8603,7 @@
        {
         "name" : "setTimeStampImpl",
         "kind" : "function",
-        "line" : 1721,
+        "line" : 1724,
         "char" : 15,
         "type" : "void(string target, SysTime accessTime, SysTime modificationTime)",
         "parameters" : [
@@ -8620,7 +8620,7 @@
           "type" : "SysTime"
          }
         ],
-        "endline" : 1724,
+        "endline" : 1727,
         "endchar" : 2
        }
       ]
@@ -8628,7 +8628,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1726,
+      "line" : 1729,
       "char" : 15,
       "name" : "getTimeStampImpl",
       "parameters" : [
@@ -8642,7 +8642,7 @@
        {
         "name" : "getTimeStampImpl",
         "kind" : "function",
-        "line" : 1726,
+        "line" : 1729,
         "char" : 15,
         "type" : "void(string target, out SysTime accessTime, out SysTime modificationTime)",
         "parameters" : [
@@ -8665,7 +8665,7 @@
           ]
          }
         ],
-        "endline" : 1729,
+        "endline" : 1732,
         "endchar" : 2
        }
       ]
@@ -8673,7 +8673,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1731,
+      "line" : 1734,
       "char" : 15,
       "name" : "getTimeStampImpl",
       "parameters" : [
@@ -8688,7 +8688,7 @@
        {
         "name" : "getTimeStampImpl",
         "kind" : "function",
-        "line" : 1731,
+        "line" : 1734,
         "char" : 15,
         "type" : "void(string target, out SysTime accessTime, out SysTime modificationTime)",
         "parameters" : [
@@ -8711,7 +8711,7 @@
           ]
          }
         ],
-        "endline" : 1735,
+        "endline" : 1738,
         "endchar" : 2
        }
       ]
@@ -8721,7 +8721,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " タイムスタンプを変更/取得する\n",
-      "line" : 1741,
+      "line" : 1744,
       "char" : 7,
       "deco" : "FAyaS3std8datetime7systime7SysTimeQBeZv",
       "parameters" : [
@@ -8738,7 +8738,7 @@
         "deco" : "S3std8datetime7systime7SysTime"
        }
       ],
-      "endline" : 1744,
+      "endline" : 1747,
       "endchar" : 2
      },
      {
@@ -8746,7 +8746,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1746,
+      "line" : 1749,
       "char" : 7,
       "deco" : "FAyaS3std8datetime7systime7SysTimeZv",
       "parameters" : [
@@ -8759,7 +8759,7 @@
         "deco" : "S3std8datetime7systime7SysTime"
        }
       ],
-      "endline" : 1749,
+      "endline" : 1752,
       "endchar" : 2
      },
      {
@@ -8767,7 +8767,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1751,
+      "line" : 1754,
       "char" : 7,
       "deco" : "FAyaS3std8datetime4date8DateTimeQBcZv",
       "parameters" : [
@@ -8784,7 +8784,7 @@
         "deco" : "S3std8datetime4date8DateTime"
        }
       ],
-      "endline" : 1754,
+      "endline" : 1757,
       "endchar" : 2
      },
      {
@@ -8792,7 +8792,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1756,
+      "line" : 1759,
       "char" : 7,
       "deco" : "FAyaS3std8datetime4date8DateTimeZv",
       "parameters" : [
@@ -8805,7 +8805,7 @@
         "deco" : "S3std8datetime4date8DateTime"
        }
       ],
-      "endline" : 1759,
+      "endline" : 1762,
       "endchar" : 2
      },
      {
@@ -8813,7 +8813,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1761,
+      "line" : 1764,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime7systime7SysTimeJQBfZv",
       "parameters" : [
@@ -8836,7 +8836,7 @@
         ]
        }
       ],
-      "endline" : 1764,
+      "endline" : 1767,
       "endchar" : 2
      },
      {
@@ -8844,7 +8844,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1766,
+      "line" : 1769,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime7systime7SysTimeZv",
       "parameters" : [
@@ -8860,7 +8860,7 @@
         ]
        }
       ],
-      "endline" : 1770,
+      "endline" : 1773,
       "endchar" : 2
      },
      {
@@ -8868,7 +8868,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1772,
+      "line" : 1775,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime4date8DateTimeJQBdZv",
       "parameters" : [
@@ -8891,7 +8891,7 @@
         ]
        }
       ],
-      "endline" : 1778,
+      "endline" : 1781,
       "endchar" : 2
      },
      {
@@ -8899,7 +8899,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1780,
+      "line" : 1783,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime4date8DateTimeZv",
       "parameters" : [
@@ -8915,7 +8915,7 @@
         ]
        }
       ],
-      "endline" : 1785,
+      "endline" : 1788,
       "endchar" : 2
      },
      {
@@ -8923,7 +8923,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1787,
+      "line" : 1790,
       "char" : 10,
       "deco" : "FAyaZS3std8datetime7systime7SysTime",
       "parameters" : [
@@ -8932,19 +8932,19 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 1792,
+      "endline" : 1795,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1794_C10",
+      "name" : "__unittest_L1797_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1794,
+      "line" : 1797,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1848,
+      "endline" : 1851,
       "endchar" : 2
      },
      {
@@ -8952,7 +8952,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " パスを検索する\n",
-      "line" : 1848,
+      "line" : 1851,
       "char" : 9,
       "deco" : "xFNeIAaIAAyaZAya",
       "parameters" : [
@@ -8972,7 +8972,7 @@
         "default" : "null"
        }
       ],
-      "endline" : 1888,
+      "endline" : 1891,
       "endchar" : 2
      },
      {
@@ -8980,7 +8980,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " プロセスを実行する\n",
-      "line" : 1893,
+      "line" : 1896,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9006,7 +9006,7 @@
         "default" : "Config(Flags.none, null)"
        }
       ],
-      "endline" : 1903,
+      "endline" : 1906,
       "endchar" : 2
      },
      {
@@ -9014,7 +9014,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1906,
+      "line" : 1909,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9052,7 +9052,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1920,
+      "endline" : 1923,
       "endchar" : 2
      },
      {
@@ -9060,7 +9060,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1923,
+      "line" : 1926,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9098,7 +9098,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1937,
+      "endline" : 1940,
       "endchar" : 2
      },
      {
@@ -9106,7 +9106,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1940,
+      "line" : 1943,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9132,7 +9132,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1950,
+      "endline" : 1953,
       "endchar" : 2
      },
      {
@@ -9140,7 +9140,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1953,
+      "line" : 1956,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9166,59 +9166,59 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1963,
+      "endline" : 1966,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1966_C10",
+      "name" : "__unittest_L1969_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1966,
+      "line" : 1969,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1986,
+      "endline" : 1989,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1986_C10",
+      "name" : "__unittest_L1989_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1986,
+      "line" : 1989,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2006,
+      "endline" : 2009,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L2006_C10",
+      "name" : "__unittest_L2009_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2006,
+      "line" : 2009,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2027,
+      "endline" : 2030,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L2027_C10",
+      "name" : "__unittest_L2030_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2027,
+      "line" : 2030,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2042,
+      "endline" : 2045,
       "endchar" : 1
      },
      {
@@ -9265,16 +9265,16 @@
     ]
    },
    {
-    "name" : "__unittest_L2044_C9",
+    "name" : "__unittest_L2047_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "コピー禁止とムーブ、インスタンス削除の例\n",
-    "line" : 2044,
+    "line" : 2047,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2062,
+    "endline" : 2065,
     "endchar" : 1
    },
    {
@@ -9282,7 +9282,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 一時ディレクトリを作成し、作成したディレクトリのFileSystemを返す\n",
-    "line" : 2062,
+    "line" : 2065,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -9303,7 +9303,7 @@
       "default" : "5u"
      }
     ],
-    "endline" : 2087,
+    "endline" : 2090,
     "endchar" : 1
    },
    {
@@ -9311,7 +9311,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 使い捨ての一時ディレクトリを作成\n\n 作成したディレクトリのFileSystemを返す。返されたFileSystemは、インスタンスの破棄時に削除される。\n",
-    "line" : 2094,
+    "line" : 2097,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -9332,20 +9332,20 @@
       "default" : "5u"
      }
     ],
-    "endline" : 2104,
+    "endline" : 2107,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L2107_C7",
+    "name" : "__unittest_L2110_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2107,
+    "line" : 2110,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 2116,
+    "endline" : 2119,
     "endchar" : 1
    }
   ]
