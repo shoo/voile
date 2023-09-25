@@ -1642,7 +1642,7 @@ struct FileSystem
 		{
 			import core.sys.windows.windows;
 			import std.utf: toUTF16z, toUTF8;
-			import std.string: chompPrefix;
+			import std.string: chompPrefix, chomp;
 			import std.windows.syserror;
 			enum FILE_FLAG_OPEN_REPARSE_POINT = 0x00200000;
 			enum FILE_FLAG_BACKUP_SEMANTICS   = 0x02000000;
@@ -1693,8 +1693,11 @@ struct FileSystem
 			auto reparseData = cast(REPARSE_DATA_BUFFER*)buf.ptr;
 			if (reparseData.ReparseTag != IO_REPARSE_TAG_SYMLINK)
 				return null;
+			
 			return toUTF8(reparseData.symbolicLinkReparseBuffer.PathBuffer.ptr[
-				0..reparseData.symbolicLinkReparseBuffer.SubstituteNameLength/wchar.sizeof]).chompPrefix(r"\\?\");
+				0..reparseData.symbolicLinkReparseBuffer.SubstituteNameLength/wchar.sizeof])
+				.chompPrefix(r"\\?\")
+				.chomp(r"\??\");
 		}
 		else
 		{
