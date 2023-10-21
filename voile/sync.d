@@ -1787,7 +1787,37 @@ ManagedShared!T managedShared(T, Args...)(Args args)
 	{
 		s.asUnshared.__ctor(args);
 	}
+	else static if (is(T == struct) && is(typeof(T(args))))
+	{
+		s.asUnshared = T(args);
+	}
 	return s;
+}
+@system unittest
+{
+	static struct TestData
+	{
+		string test;
+	}
+	static struct TestData2
+	{
+		string test;
+		this(bool x)
+		{
+			test = x ? "test true" : "test false";
+		}
+	}
+	auto s1 = managedShared(TestData("test"));
+	s1.unlock();
+	assert(s1.locked.test == "test");
+	
+	auto s2 = managedShared!TestData("test1");
+	s2.unlock();
+	assert(s2.locked.test == "test1");
+	
+	auto s3 = managedShared!TestData2(true);
+	s3.unlock();
+	assert(s3.locked.test == "test true");
 }
 
 @system unittest
