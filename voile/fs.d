@@ -6,6 +6,7 @@ module voile.fs;
 import std.file, std.path, std.exception, std.stdio, std.datetime, std.regex, std.json, std.traits;
 import std.process;
 import voile.handler;
+import core.internal.utf;
 
 
 
@@ -124,9 +125,9 @@ else
 
 version (Windows)
 {
-	enum SYMBOLIC_LINK_FLAG_DIRECTORY = 0x00000001;
-	enum SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x00000002;
-	extern (Windows) imported!"core.sys.windows.windows".BOOL CreateSymbolicLinkW(
+	private enum SYMBOLIC_LINK_FLAG_DIRECTORY = 0x00000001;
+	private enum SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x00000002;
+	private extern (Windows) imported!"core.sys.windows.windows".BOOL CreateSymbolicLinkW(
 		imported!"core.sys.windows.windows".LPCWSTR,
 		imported!"core.sys.windows.windows".LPCWSTR,
 		imported!"core.sys.windows.windows".DWORD);
@@ -160,7 +161,118 @@ struct FileSystem
 	Handler!(bool delegate(string target, Exception e))             onRemoveFailed;
 	/// インスタンスが破棄される際に呼ばれる
 	Handler!(void delegate(string target))                          onDestroyed;
+	/// ディレクトリ監視時、変化が発生した際に呼ばれる。監視用別スレッドから呼ばれる可能性がある。
+	Handler!(void delegate(string target) shared)                   onWatcherChanged;
 	
+private:
+	version (Windows)
+	{
+		imported!"voile.sync".SyncEvent _evWatcherFinish;
+		imported!"voile.sync".SyncEvent _evWatcherStart;
+		imported!"core.thread".Thread   _thWatcher;
+		void _watcherEntry() shared
+		{
+			import core.sys.windows.windows;
+			import voile.sync: SyncEvent;
+			HANDLE hEvChanged = CreateEvent(NULL, TRUE, FALSE, NULL);
+			HANDLE hDir = CreateFile(
+				(cast()workDir).toUTF16z(), // 監視先
+				FILE_LIST_DIRECTORY,
+				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+				NULL,
+				OPEN_EXISTING,
+				FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, // ReadDirectoryChangesW用
+				NULL);
+			scope (exit)
+				cast(void)CloseHandle(hDir);
+			HANDLE[2] waitfor = [(cast()_evWatcherFinish).handle, hEvChanged];
+			
+			auto buf = new ubyte[1024*8];
+			import std.array: appender;
+			auto notifiedFile = appender!(string[]);
+			while (1)
+			{
+				OVERLAPPED ovl;
+				ovl.hEvent = hEvChanged;
+				ResetEvent(hEvChanged);
+				while (ReadDirectoryChangesW(hDir,
+					buf.ptr, cast(DWORD)buf.length, TRUE,
+					FILE_NOTIFY_CHANGE_FILE_NAME |      // ファイル名の変更
+					FILE_NOTIFY_CHANGE_DIR_NAME |       // ディレクトリ名の変更
+					FILE_NOTIFY_CHANGE_ATTRIBUTES |     // 属性の変更
+					FILE_NOTIFY_CHANGE_SIZE |           // サイズの変更
+					FILE_NOTIFY_CHANGE_LAST_WRITE,      // 最終書き込み日時の変更
+					NULL, &ovl, NULL) == 0)
+				{
+					// 監視終了
+					return;
+				}
+				(cast()_evWatcherStart).signaled = true;
+				final switch (WaitForMultipleObjects(2, waitfor.ptr, FALSE, INFINITE))
+				{
+				case WAIT_OBJECT_0 + 0:
+					// 監視終了
+					CancelIo(hDir);
+					WaitForSingleObject(hEvChanged, INFINITE);
+					return;
+				case WAIT_OBJECT_0 + 1:
+					// 変化あり
+					DWORD retsize = 0;
+					if (!GetOverlappedResult(hDir, &ovl, &retsize, FALSE)) {
+						// 結果取得に失敗した場合監視終了
+						return;
+					}
+					auto pCurrData = cast(FILE_NOTIFY_INFORMATION*)buf.ptr;
+					notifiedFile.shrinkTo(0);
+					while (1)
+					{
+						auto path = pCurrData.FileName[0..pCurrData.FileNameLength/wchar.sizeof].toUTF8();
+						// 特に何もしない
+						final switch (pCurrData.Action)
+						{
+						case FILE_ACTION_ADDED:
+							break;
+						case FILE_ACTION_REMOVED:
+							break;
+						case FILE_ACTION_MODIFIED:
+							break;
+						case FILE_ACTION_RENAMED_OLD_NAME:
+							break;
+						case FILE_ACTION_RENAMED_NEW_NAME:
+							break;
+						}
+						notifiedFile ~= path;
+						if (pCurrData.NextEntryOffset == 0)
+							break;
+						pCurrData = cast(FILE_NOTIFY_INFORMATION*)((cast(ubyte*)pCurrData) + pCurrData.NextEntryOffset);
+					}
+					foreach (i; 0..notifiedFile.data.length)
+					{
+						import std.algorithm: canFind;
+						if (!notifiedFile.data[i+1..$].canFind(notifiedFile.data[i]))
+							onWatcherChanged(notifiedFile.data[i]);
+					}
+					continue;
+				case WAIT_TIMEOUT:
+					// 再度確認
+					break;
+				case WAIT_FAILED:
+					// 再度確認
+					break;
+				}
+			}
+		}
+	}
+	version (linux)
+	{
+		import core.sys.linux.sys.inotify;
+		void _watcherEntry() shared
+		{
+			
+		}
+		
+	}
+public:
 	/***************************************************************************
 	 * ムーブの後に呼ばれる
 	 */
@@ -176,6 +288,15 @@ struct FileSystem
 	{
 		if (workDir)
 			onDestroyed(workDir);
+		version (Windows)
+		{
+			if (_thWatcher !is null)
+			{
+				_evWatcherFinish.signaled = true;
+				_thWatcher.join();
+				_thWatcher = null;
+			}
+		}
 	}
 	
 	/***************************************************************************
@@ -2042,6 +2163,54 @@ struct FileSystem
 		auto result = fs.execute(cmd, ["Path": fs.absolutePath]);
 		assert(result.output.chomp == "xxx");
 	}
+	
+	/***************************************************************************
+	 * ディレクトリ監視を有効にする
+	 */
+	void enableWatcher()
+	{
+		version (Windows)
+		{
+			import core.thread;
+			import voile.sync;
+			_evWatcherStart = new SyncEvent;
+			_evWatcherFinish = new SyncEvent;
+			_thWatcher = new Thread(cast(void delegate())&((cast(shared)this)._watcherEntry));
+			_thWatcher.start();
+			_evWatcherStart.wait();
+		}
+	}
+	/// ditto
+	void disableWatcher()
+	{
+		version (Windows)
+		{
+			if (_thWatcher)
+			{
+				_evWatcherFinish.signaled = true;
+				_thWatcher.join();
+				_evWatcherStart = null;
+				_evWatcherFinish = null;
+				_thWatcher = null;
+			}
+		}
+	}
+	///
+	version (Windows) @system unittest
+	{
+		import std.string;
+		auto fs = createDisposableDir("ut");
+		shared string test;
+		fs.onWatcherChanged ~= (string path) shared
+		{
+			test = path;
+		};
+		fs.enableWatcher();
+		fs.writeText("test.txt", "aaa");
+		fs.disableWatcher();
+		assert(test == "test.txt");
+	}
+	
 }
 /// コピー禁止とムーブ、インスタンス削除の例
 @system unittest
