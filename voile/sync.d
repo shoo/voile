@@ -1767,6 +1767,15 @@ public:
 /*******************************************************************************
  * 
  */
+ManagedShared!T managedShared(T)(T dat)
+{
+	import std.algorithm: move;
+	auto s = new ManagedShared!T;
+	s.asUnshared = dat.move();
+	return s;
+}
+
+/// ditto
 ManagedShared!T managedShared(T, Args...)(Args args)
 {
 	auto s = new ManagedShared!T;
