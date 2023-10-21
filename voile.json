@@ -31232,6 +31232,37 @@
      {
       "name" : "T",
       "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "managedShared",
+      "kind" : "function",
+      "line" : 1770,
+      "char" : 17,
+      "type" : "ManagedShared!T(T dat)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "T"
+       }
+      ],
+      "endline" : 1776,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 1779,
+    "char" : 17,
+    "name" : "managedShared",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
      },
      {
       "name" : "Args",
@@ -31242,7 +31273,7 @@
      {
       "name" : "managedShared",
       "kind" : "function",
-      "line" : 1770,
+      "line" : 1779,
       "char" : 17,
       "type" : "ManagedShared!T(Args args)",
       "parameters" : [
@@ -31251,33 +31282,45 @@
         "type" : "Args"
        }
       ],
-      "endline" : 1782,
+      "endline" : 1795,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1784_C9",
+    "name" : "__unittest_L1796_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1784,
+    "line" : 1796,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1825,
+    "endline" : 1823,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1825_C9",
+    "name" : "__unittest_L1823_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1825,
+    "line" : 1823,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1876,
+    "endline" : 1864,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L1864_C9",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 1864,
+    "char" : 9,
+    "storageClass" : [
+     "@system"
+    ],
+    "endline" : 1915,
     "endchar" : 1
    },
    {
@@ -31285,20 +31328,20 @@
     "kind" : "class",
     "protection" : "public",
     "comment" : " マルチタスクキューによって管理されるタスクデータ\n",
-    "line" : 1876,
+    "line" : 1915,
     "char" : 1,
     "members" : [
      {
       "name" : "std.datetime",
       "kind" : "import",
-      "line" : 1878,
+      "line" : 1917,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.uuid",
       "kind" : "import",
-      "line" : 1879,
+      "line" : 1918,
       "char" : 9,
       "protection" : "private"
      },
@@ -31307,7 +31350,7 @@
       "kind" : "enum",
       "protection" : "public",
       "comment" : "状態\n",
-      "line" : 1881,
+      "line" : 1920,
       "char" : 2,
       "baseDeco" : "i",
       "members" : [
@@ -31317,7 +31360,7 @@
         "protection" : "public",
         "value" : "0",
         "comment" : "初期状態で、タスクプールに追加される前\n",
-        "line" : 1884,
+        "line" : 1923,
         "char" : 3
        },
        {
@@ -31326,7 +31369,7 @@
         "protection" : "public",
         "value" : "1",
         "comment" : "タスクプールに追加された状態\n",
-        "line" : 1886,
+        "line" : 1925,
         "char" : 3
        },
        {
@@ -31335,7 +31378,7 @@
         "protection" : "public",
         "value" : "2",
         "comment" : "実行中の状態\n",
-        "line" : 1888,
+        "line" : 1927,
         "char" : 3
        },
        {
@@ -31344,7 +31387,7 @@
         "protection" : "public",
         "value" : "3",
         "comment" : "実行が終了した状態\n",
-        "line" : 1890,
+        "line" : 1929,
         "char" : 3
        },
        {
@@ -31353,7 +31396,7 @@
         "protection" : "public",
         "value" : "4",
         "comment" : "実行の結果、異常終了した状態\n",
-        "line" : 1892,
+        "line" : 1931,
         "char" : 3
        },
        {
@@ -31362,7 +31405,7 @@
         "protection" : "public",
         "value" : "5",
         "comment" : "実行されずにドロップされた状態\n",
-        "line" : 1894,
+        "line" : 1933,
         "char" : 3
        }
       ]
@@ -31372,7 +31415,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "タスクの種類\n",
-      "line" : 1898,
+      "line" : 1937,
       "char" : 35,
       "storageClass" : [
        "immutable"
@@ -31386,7 +31429,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "タスクの本体\n",
-      "line" : 1900,
+      "line" : 1939,
       "char" : 35,
       "storageClass" : [
        "immutable"
@@ -31400,7 +31443,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "Queueに追加された時刻\n",
-      "line" : 1902,
+      "line" : 1941,
       "char" : 35,
       "storageClass" : [
        "shared"
@@ -31414,7 +31457,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "Poolに追加された時刻\n",
-      "line" : 1904,
+      "line" : 1943,
       "char" : 35,
       "storageClass" : [
        "shared"
@@ -31429,7 +31472,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "実行開始した時刻\n",
-      "line" : 1906,
+      "line" : 1945,
       "char" : 35,
       "storageClass" : [
        "shared"
@@ -31444,7 +31487,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "実行終了した時刻\n",
-      "line" : 1908,
+      "line" : 1947,
       "char" : 35,
       "storageClass" : [
        "shared"
@@ -31459,7 +31502,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "一意なID\n",
-      "line" : 1910,
+      "line" : 1949,
       "char" : 35,
       "storageClass" : [
        "immutable"
@@ -31473,7 +31516,7 @@
       "kind" : "variable",
       "protection" : "protected",
       "comment" : "状態\n",
-      "line" : 1912,
+      "line" : 1951,
       "char" : 8,
       "deco" : "E5voile4sync8TaskData5State",
       "init" : "State.waiting",
@@ -31484,10 +31527,10 @@
       "kind" : "function",
       "protection" : "protected",
       "comment" : "Poolに追加されたタイミングでコールバック\n",
-      "line" : 1914,
+      "line" : 1953,
       "char" : 7,
       "deco" : "OFZv",
-      "endline" : 1914,
+      "endline" : 1953,
       "endchar" : 27
      },
      {
@@ -31495,10 +31538,10 @@
       "kind" : "function",
       "protection" : "protected",
       "comment" : "実行開始したタイミングでコールバック\n",
-      "line" : 1916,
+      "line" : 1955,
       "char" : 7,
       "deco" : "OFZv",
-      "endline" : 1916,
+      "endline" : 1955,
       "endchar" : 27
      },
      {
@@ -31506,10 +31549,10 @@
       "kind" : "function",
       "protection" : "protected",
       "comment" : "実行終了したタイミングでコールバック\n",
-      "line" : 1918,
+      "line" : 1957,
       "char" : 7,
       "deco" : "OFZv",
-      "endline" : 1918,
+      "endline" : 1957,
       "endchar" : 25
      },
      {
@@ -31517,7 +31560,7 @@
       "kind" : "function",
       "protection" : "protected",
       "comment" : "実行失敗したタイミングでコールバック\n",
-      "line" : 1920,
+      "line" : 1959,
       "char" : 7,
       "deco" : "OFC6object9ThrowableZv",
       "originalType" : "shared void(Throwable)",
@@ -31527,7 +31570,7 @@
         "deco" : "C6object9Throwable"
        }
       ],
-      "endline" : 1920,
+      "endline" : 1959,
       "endchar" : 37
      },
      {
@@ -31535,10 +31578,10 @@
       "kind" : "function",
       "protection" : "protected",
       "comment" : "実行されずにドロップしたタイミングでコールバック\n",
-      "line" : 1922,
+      "line" : 1961,
       "char" : 7,
       "deco" : "OFZv",
-      "endline" : 1922,
+      "endline" : 1961,
       "endchar" : 29
      },
      {
@@ -31546,7 +31589,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1926,
+      "line" : 1965,
       "char" : 2,
       "deco" : "FAyaDOFZvS3std4uuid4UUIDZC5voile4sync8TaskData",
       "originalType" : "(string ty, void delegate() shared callback, UUID id = randomUUID())",
@@ -31565,7 +31608,7 @@
         "default" : "randomUUID()"
        }
       ],
-      "endline" : 1932,
+      "endline" : 1971,
       "endchar" : 2
      }
     ]
@@ -31575,55 +31618,55 @@
     "kind" : "class",
     "protection" : "public",
     "comment" : " マルチタスクキュー\n\n タスクの待ち行列を作成する。\n 同じ種類のタスクは待ち行列によって順次実行し、違う種類のタスクはタスクプールで並列実行する。\n コンストラクタでタスクプールの設定を行い、$(D invoke)関数によってタスクの種類と実行内容を指定する。\n $(D invoke)により指定されるタスクは、$(D TaskData)クラスを継承することで細かく内容を調整することができる。\n $(D invoke)によって待ち行列に追加された未だ実行されていないタスクを、$(D drop)によって実行取り消しすることができる。\n $(D informations)関数により、各タスクの実行状況を調べることができる。\n\n 以下のようなことが可能\n\n <img src=\"img/voile.sync.MultiTaskQueue-testcase.drawio.svg\" />\n",
-    "line" : 1949,
+    "line" : 1988,
     "char" : 1,
     "members" : [
      {
       "name" : "core.atomic",
       "kind" : "import",
-      "line" : 1952,
+      "line" : 1991,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "core.sync.mutex",
       "kind" : "import",
-      "line" : 1953,
+      "line" : 1992,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "core.thread",
       "kind" : "import",
-      "line" : 1954,
+      "line" : 1993,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.concurrency",
       "kind" : "import",
-      "line" : 1955,
+      "line" : 1994,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.parallelism",
       "kind" : "import",
-      "line" : 1956,
+      "line" : 1995,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.uuid",
       "kind" : "import",
-      "line" : 1957,
+      "line" : 1996,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.datetime",
       "kind" : "import",
-      "line" : 1958,
+      "line" : 1997,
       "char" : 9,
       "protection" : "private"
      },
@@ -31631,7 +31674,7 @@
       "name" : "_pool",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 1960,
+      "line" : 1999,
       "char" : 11,
       "deco" : "C3std11parallelism8TaskPool",
       "originalType" : "TaskPool",
@@ -31641,7 +31684,7 @@
       "name" : "_finishPool",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 1961,
+      "line" : 2000,
       "char" : 18,
       "deco" : "DFZv",
       "offset" : 24
@@ -31650,14 +31693,14 @@
       "name" : "TaskQueue",
       "kind" : "struct",
       "protection" : "private",
-      "line" : 1963,
+      "line" : 2002,
       "char" : 2,
       "members" : [
        {
         "name" : "_tasks",
         "kind" : "variable",
         "protection" : "private",
-        "line" : 1966,
+        "line" : 2005,
         "char" : 22,
         "deco" : "HAyaAC5voile4sync8TaskData",
         "offset" : 0
@@ -31666,7 +31709,7 @@
         "name" : "State",
         "kind" : "enum",
         "protection" : "private",
-        "line" : 1967,
+        "line" : 2006,
         "char" : 3,
         "baseDeco" : "i",
         "members" : [
@@ -31675,7 +31718,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "0",
-          "line" : 1969,
+          "line" : 2008,
           "char" : 4
          },
          {
@@ -31683,7 +31726,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "1",
-          "line" : 1969,
+          "line" : 2008,
           "char" : 11
          }
         ]
@@ -31692,7 +31735,7 @@
         "name" : "_state",
         "kind" : "variable",
         "protection" : "private",
-        "line" : 1971,
+        "line" : 2010,
         "char" : 9,
         "deco" : "E5voile4sync14MultiTaskQueue9TaskQueue5State",
         "init" : "State.ready",
@@ -31703,7 +31746,7 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 1974,
+        "line" : 2013,
         "char" : 8,
         "deco" : "FC5voile4sync8TaskDataDFZvZv",
         "originalType" : "void(TaskData task, void delegate() onCreated = null)",
@@ -31718,7 +31761,7 @@
           "default" : "cast(void delegate())null"
          }
         ],
-        "endline" : 1989,
+        "endline" : 2028,
         "endchar" : 3
        },
        {
@@ -31726,7 +31769,7 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 1991,
+        "line" : 2030,
         "char" : 12,
         "deco" : "FAyaS3std4uuid4UUIDZC5voile4sync8TaskData",
         "parameters" : [
@@ -31739,7 +31782,7 @@
           "deco" : "S3std4uuid4UUID"
          }
         ],
-        "endline" : 2014,
+        "endline" : 2053,
         "endchar" : 3
        },
        {
@@ -31747,7 +31790,7 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 2016,
+        "line" : 2055,
         "char" : 12,
         "deco" : "FAyaZC5voile4sync8TaskData",
         "parameters" : [
@@ -31756,7 +31799,7 @@
           "deco" : "Aya"
          }
         ],
-        "endline" : 2033,
+        "endline" : 2072,
         "endchar" : 3
        },
        {
@@ -31764,7 +31807,7 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 2035,
+        "line" : 2074,
         "char" : 12,
         "deco" : "FAyaJC5voile4sync8TaskDataZQw",
         "parameters" : [
@@ -31780,7 +31823,7 @@
           ]
          }
         ],
-        "endline" : 2054,
+        "endline" : 2093,
         "endchar" : 3
        },
        {
@@ -31788,7 +31831,7 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 2056,
+        "line" : 2095,
         "char" : 12,
         "deco" : "FAyaZC5voile4sync8TaskData",
         "parameters" : [
@@ -31797,7 +31840,7 @@
           "deco" : "Aya"
          }
         ],
-        "endline" : 2060,
+        "endline" : 2099,
         "endchar" : 3
        },
        {
@@ -31805,7 +31848,7 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 2062,
+        "line" : 2101,
         "char" : 12,
         "deco" : "FAyaZC5voile4sync8TaskData",
         "parameters" : [
@@ -31814,7 +31857,7 @@
           "deco" : "Aya"
          }
         ],
-        "endline" : 2068,
+        "endline" : 2107,
         "endchar" : 3
        },
        {
@@ -31822,7 +31865,7 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 2070,
+        "line" : 2109,
         "char" : 12,
         "deco" : "FAyaS3std4uuid4UUIDZC5voile4sync8TaskData",
         "parameters" : [
@@ -31835,7 +31878,7 @@
           "deco" : "S3std4uuid4UUID"
          }
         ],
-        "endline" : 2080,
+        "endline" : 2119,
         "endchar" : 3
        },
        {
@@ -31843,7 +31886,7 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : "現在実行中の次のタスクを得る\n",
-        "line" : 2082,
+        "line" : 2121,
         "char" : 12,
         "deco" : "FAyaZC5voile4sync8TaskData",
         "parameters" : [
@@ -31852,7 +31895,7 @@
           "deco" : "Aya"
          }
         ],
-        "endline" : 2088,
+        "endline" : 2127,
         "endchar" : 3
        },
        {
@@ -31860,7 +31903,7 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : "現在実行中のタスクの次のタスクを破棄する。破棄されたタスクを返す。\n",
-        "line" : 2090,
+        "line" : 2129,
         "char" : 12,
         "deco" : "FAyaZC5voile4sync8TaskData",
         "parameters" : [
@@ -31869,7 +31912,7 @@
           "deco" : "Aya"
          }
         ],
-        "endline" : 2103,
+        "endline" : 2142,
         "endchar" : 3
        },
        {
@@ -31877,10 +31920,10 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 2105,
+        "line" : 2144,
         "char" : 12,
         "deco" : "FZAAya",
-        "endline" : 2108,
+        "endline" : 2147,
         "endchar" : 3
        }
       ]
@@ -31889,7 +31932,7 @@
       "name" : "_taskQueue",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 2110,
+      "line" : 2149,
       "char" : 33,
       "storageClass" : [
        "shared"
@@ -31902,7 +31945,7 @@
       "name" : "_startTask",
       "kind" : "function",
       "protection" : "private",
-      "line" : 2112,
+      "line" : 2151,
       "char" : 7,
       "deco" : "OFAyaZv",
       "parameters" : [
@@ -31911,14 +31954,14 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 2169,
+      "endline" : 2208,
       "endchar" : 2
      },
      {
       "name" : "_initialize",
       "kind" : "function",
       "protection" : "private",
-      "line" : 2171,
+      "line" : 2210,
       "char" : 7,
       "deco" : "FC3std11parallelism8TaskPoolDFZvZv",
       "parameters" : [
@@ -31931,7 +31974,7 @@
         "deco" : "DFZv"
        }
       ],
-      "endline" : 2176,
+      "endline" : 2215,
       "endchar" : 2
      },
      {
@@ -31939,7 +31982,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : " コンストラクタ\n\n Params:\n      pool = 使用するタスクプールを指定できる\n      callbackFinishPool = タスクキューを破棄した際に全てのタスクが終了した際に呼ばれる。タスクプールを終了するために使用できる。\n      worker = ワーカースレッド数を指定して作成できる\n      daemon = スレッドのデーモン化をする場合はtrue。disposeしない場合がある場合にtrueを指定する。\n",
-      "line" : 2189,
+      "line" : 2228,
       "char" : 2,
       "deco" : "FC3std11parallelism8TaskPoolDFZvZC5voile4sync14MultiTaskQueue",
       "originalType" : "(TaskPool pool, void delegate() callbackFinishPool = null)",
@@ -31954,7 +31997,7 @@
         "default" : "cast(void delegate())null"
        }
       ],
-      "endline" : 2192,
+      "endline" : 2231,
       "endchar" : 2
      },
      {
@@ -31962,7 +32005,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2195,
+      "line" : 2234,
       "char" : 2,
       "deco" : "OFC3std11parallelism8TaskPoolDFZvZOC5voile4sync14MultiTaskQueue",
       "originalType" : "shared (TaskPool pool, void delegate() callbackFinishPool = null)",
@@ -31977,7 +32020,7 @@
         "default" : "cast(void delegate())null"
        }
       ],
-      "endline" : 2200,
+      "endline" : 2239,
       "endchar" : 2
      },
      {
@@ -31985,7 +32028,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2202,
+      "line" : 2241,
       "char" : 2,
       "deco" : "FmbZC5voile4sync14MultiTaskQueue",
       "originalType" : "(size_t worker = 8, bool daemon = false)",
@@ -32001,7 +32044,7 @@
         "default" : "false"
        }
       ],
-      "endline" : 2207,
+      "endline" : 2246,
       "endchar" : 2
      },
      {
@@ -32009,7 +32052,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2209,
+      "line" : 2248,
       "char" : 2,
       "deco" : "OFmbZOC5voile4sync14MultiTaskQueue",
       "originalType" : "shared (size_t worker = 8, bool daemon = false)",
@@ -32025,7 +32068,7 @@
         "default" : "false"
        }
       ],
-      "endline" : 2214,
+      "endline" : 2253,
       "endchar" : 2
      },
      {
@@ -32033,10 +32076,10 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " インスタンスを破棄する。\n",
-      "line" : 2219,
+      "line" : 2258,
       "char" : 7,
       "deco" : "FZv",
-      "endline" : 2237,
+      "endline" : 2276,
       "endchar" : 2
      },
      {
@@ -32044,7 +32087,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " タスクを実行予約する\n\n タスクを待ち行列に追加する。待ち行列に追加されると、順次実行される。\n 待ち行列は$(D type)毎にあり、どの待ち行列に追加されるかはタスクの$(D type)により決まる。\n 同じ$(D type)では、追加された順に順次実行される。\n 異なる$(D type)の場合は並行して実行される。並行数はコンストラクタで指定したタスクプールに依存する。\n\n Params:\n      tsk = タスクデータを指定する\n      type = タスク種別を指定する\n      dg = タスクの処理内容のデリゲートを指定する\n      id = タスクの識別用IDを指定する\n Returns:\n      タスクを追加することができたらtrueを、追加できなかったらfalseを返す。\n",
-      "line" : 2255,
+      "line" : 2294,
       "char" : 7,
       "deco" : "FC5voile4sync8TaskDataZb",
       "parameters" : [
@@ -32053,7 +32096,7 @@
         "deco" : "C5voile4sync8TaskData"
        }
       ],
-      "endline" : 2269,
+      "endline" : 2308,
       "endchar" : 2
      },
      {
@@ -32061,7 +32104,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2271,
+      "line" : 2310,
       "char" : 7,
       "deco" : "OFC5voile4sync8TaskDataZb",
       "parameters" : [
@@ -32070,7 +32113,7 @@
         "deco" : "C5voile4sync8TaskData"
        }
       ],
-      "endline" : 2275,
+      "endline" : 2314,
       "endchar" : 2
      },
      {
@@ -32078,7 +32121,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2277,
+      "line" : 2316,
       "char" : 7,
       "deco" : "FAyaDOFZvS3std4uuid4UUIDZb",
       "parameters" : [
@@ -32096,7 +32139,7 @@
         "default" : "randomUUID()"
        }
       ],
-      "endline" : 2280,
+      "endline" : 2319,
       "endchar" : 2
      },
      {
@@ -32104,7 +32147,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2282,
+      "line" : 2321,
       "char" : 7,
       "deco" : "OFAyaDOFZvS3std4uuid4UUIDZb",
       "parameters" : [
@@ -32122,7 +32165,7 @@
         "default" : "randomUUID()"
        }
       ],
-      "endline" : 2285,
+      "endline" : 2324,
       "endchar" : 2
      },
      {
@@ -32130,7 +32173,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " タスク実行を取りやめる\n\n タスクがまだ実行されていない場合は、実行を取りやめる。\n\n Params:\n      type = タスク種別を指定する\n      id = タスクの識別用IDを指定する\n Returns:\n      正常にドロップされた場合はtrueが返り、さもなくばfalseが返る。\n",
-      "line" : 2298,
+      "line" : 2337,
       "char" : 7,
       "deco" : "FAyaS3std4uuid4UUIDZb",
       "parameters" : [
@@ -32143,7 +32186,7 @@
         "deco" : "S3std4uuid4UUID"
        }
       ],
-      "endline" : 2312,
+      "endline" : 2351,
       "endchar" : 2
      },
      {
@@ -32151,7 +32194,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " タスクを取り出す\n",
-      "line" : 2317,
+      "line" : 2356,
       "char" : 19,
       "deco" : "FAyaS3std4uuid4UUIDZOC5voile4sync8TaskData",
       "parameters" : [
@@ -32164,7 +32207,7 @@
         "deco" : "S3std4uuid4UUID"
        }
       ],
-      "endline" : 2321,
+      "endline" : 2360,
       "endchar" : 2
      },
      {
@@ -32172,7 +32215,7 @@
       "kind" : "struct",
       "protection" : "public",
       "comment" : " タスクの情報\n",
-      "line" : 2327,
+      "line" : 2366,
       "char" : 2,
       "members" : [
        {
@@ -32180,7 +32223,7 @@
         "kind" : "variable",
         "protection" : "public",
         "comment" : "タスクの種類\n",
-        "line" : 2330,
+        "line" : 2369,
         "char" : 18,
         "deco" : "Aya",
         "offset" : 0
@@ -32190,7 +32233,7 @@
         "kind" : "variable",
         "protection" : "public",
         "comment" : "Queueに追加された時刻\n",
-        "line" : 2332,
+        "line" : 2371,
         "char" : 18,
         "deco" : "S3std8datetime7systime7SysTime",
         "offset" : 16
@@ -32200,7 +32243,7 @@
         "kind" : "variable",
         "protection" : "public",
         "comment" : "Poolに追加された時刻\n",
-        "line" : 2334,
+        "line" : 2373,
         "char" : 18,
         "deco" : "S3std8datetime7systime7SysTime",
         "offset" : 32
@@ -32210,7 +32253,7 @@
         "kind" : "variable",
         "protection" : "public",
         "comment" : "実行開始した時刻\n",
-        "line" : 2336,
+        "line" : 2375,
         "char" : 18,
         "deco" : "S3std8datetime7systime7SysTime",
         "offset" : 48
@@ -32220,7 +32263,7 @@
         "kind" : "variable",
         "protection" : "public",
         "comment" : "実行終了した時刻\n",
-        "line" : 2338,
+        "line" : 2377,
         "char" : 18,
         "deco" : "S3std8datetime7systime7SysTime",
         "offset" : 64
@@ -32230,7 +32273,7 @@
         "kind" : "variable",
         "protection" : "public",
         "comment" : "一意なID\n",
-        "line" : 2340,
+        "line" : 2379,
         "char" : 18,
         "deco" : "S3std4uuid4UUID",
         "offset" : 80
@@ -32240,7 +32283,7 @@
         "kind" : "alias",
         "protection" : "public",
         "comment" : "タスクの状態\n",
-        "line" : 2342,
+        "line" : 2381,
         "char" : 3,
         "deco" : "E5voile4sync8TaskData5State",
         "originalType" : "TaskData.State"
@@ -32250,7 +32293,7 @@
         "kind" : "variable",
         "protection" : "public",
         "comment" : "ditto\n",
-        "line" : 2344,
+        "line" : 2383,
         "char" : 9,
         "deco" : "E5voile4sync8TaskData5State",
         "offset" : 96
@@ -32259,7 +32302,7 @@
         "name" : "opAssign",
         "kind" : "generated function",
         "protection" : "public",
-        "line" : 2327,
+        "line" : 2366,
         "char" : 2,
         "deco" : "FNaNbNcNiNjNfS5voile4sync14MultiTaskQueue8TaskInfoZQBm",
         "originalType" : "pure nothrow ref @safe TaskInfo(TaskInfo p) return",
@@ -32277,31 +32320,31 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " 情報取得\n\n タスクの実行状況を調べる。\n\n Returns:\n      タスクの情報を$(D TaskInfo)の配列で返す。\n",
-      "line" : 2355,
+      "line" : 2394,
       "char" : 13,
       "deco" : "xFNdNfZAS5voile4sync14MultiTaskQueue8TaskInfo",
-      "endline" : 2367,
+      "endline" : 2406,
       "endchar" : 2
      }
     ]
    },
    {
-    "name" : "__unittest_L2371_C9",
+    "name" : "__unittest_L2410_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 2371,
+    "line" : 2410,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2559,
+    "endline" : 2598,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2559,
+    "line" : 2598,
     "char" : 1,
     "name" : "MessageQueue",
     "parameters" : [
@@ -32316,13 +32359,13 @@
       "name" : "MessageQueue",
       "kind" : "class",
       "protection" : "public",
-      "line" : 2559,
+      "line" : 2598,
       "char" : 1,
       "members" : [
        {
         "name" : "core.lifetime",
         "kind" : "import",
-        "line" : 2564,
+        "line" : 2603,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -32332,7 +32375,7 @@
        {
         "name" : "core.time",
         "kind" : "import",
-        "line" : 2565,
+        "line" : 2604,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -32343,7 +32386,7 @@
        {
         "name" : "core.sync.mutex",
         "kind" : "import",
-        "line" : 2566,
+        "line" : 2605,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -32353,7 +32396,7 @@
        {
         "name" : "core.sync.condition",
         "kind" : "import",
-        "line" : 2567,
+        "line" : 2606,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -32363,7 +32406,7 @@
        {
         "name" : "std.container.dlist",
         "kind" : "import",
-        "line" : 2568,
+        "line" : 2607,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -32373,7 +32416,7 @@
        {
         "name" : "std.range",
         "kind" : "import",
-        "line" : 2569,
+        "line" : 2608,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -32385,7 +32428,7 @@
        {
         "name" : "std.exception",
         "kind" : "import",
-        "line" : 2570,
+        "line" : 2609,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -32395,46 +32438,46 @@
        {
         "name" : "_cond",
         "kind" : "variable",
-        "line" : 2571,
+        "line" : 2610,
         "char" : 12,
         "type" : "Condition"
        },
        {
         "name" : "_list",
         "kind" : "variable",
-        "line" : 2572,
+        "line" : 2611,
         "char" : 10,
         "type" : "DList!T"
        },
        {
         "name" : "_length",
         "kind" : "variable",
-        "line" : 2573,
+        "line" : 2612,
         "char" : 10,
         "type" : "size_t"
        },
        {
         "name" : "_mutex",
         "kind" : "function",
-        "line" : 2574,
+        "line" : 2613,
         "char" : 16,
         "type" : "shared nothrow @trusted shared(Mutex)()",
-        "endline" : 2580,
+        "endline" : 2619,
         "endchar" : 2
        },
        {
         "name" : "_wait",
         "kind" : "function",
-        "line" : 2581,
+        "line" : 2620,
         "char" : 7,
         "type" : "nothrow @trusted void()",
-        "endline" : 2587,
+        "endline" : 2626,
         "endchar" : 2
        },
        {
         "name" : "_wait",
         "kind" : "function",
-        "line" : 2588,
+        "line" : 2627,
         "char" : 7,
         "type" : "nothrow @trusted bool(Duration dur)",
         "parameters" : [
@@ -32443,23 +32486,23 @@
           "type" : "Duration"
          }
         ],
-        "endline" : 2594,
+        "endline" : 2633,
         "endchar" : 2
        },
        {
         "name" : "_notify",
         "kind" : "function",
-        "line" : 2595,
+        "line" : 2634,
         "char" : 7,
         "type" : "nothrow @trusted void()",
-        "endline" : 2598,
+        "endline" : 2637,
         "endchar" : 2
        },
        {
         "name" : "this",
         "kind" : "constructor",
         "comment" : " コンストラクタ\n",
-        "line" : 2603,
+        "line" : 2642,
         "char" : 2,
         "type" : "nothrow @system (return scope Condition cond)",
         "parameters" : [
@@ -32472,24 +32515,24 @@
           ]
          }
         ],
-        "endline" : 2606,
+        "endline" : 2645,
         "endchar" : 2
        },
        {
         "name" : "this",
         "kind" : "constructor",
         "comment" : "ditto\n",
-        "line" : 2608,
+        "line" : 2647,
         "char" : 2,
         "type" : "nothrow @system ()",
-        "endline" : 2611,
+        "endline" : 2650,
         "endchar" : 2
        },
        {
         "name" : "this",
         "kind" : "constructor",
         "comment" : "ditto\n",
-        "line" : 2613,
+        "line" : 2652,
         "char" : 2,
         "type" : "shared nothrow @trusted (Condition cond)",
         "parameters" : [
@@ -32498,14 +32541,14 @@
           "type" : "Condition"
          }
         ],
-        "endline" : 2616,
+        "endline" : 2655,
         "endchar" : 2
        },
        {
         "name" : "this",
         "kind" : "constructor",
         "comment" : "ditto\n",
-        "line" : 2618,
+        "line" : 2657,
         "char" : 2,
         "type" : "shared nothrow @safe (shared(Condition) cond)",
         "parameters" : [
@@ -32514,24 +32557,24 @@
           "type" : "shared(Condition)"
          }
         ],
-        "endline" : 2621,
+        "endline" : 2660,
         "endchar" : 2
        },
        {
         "name" : "this",
         "kind" : "constructor",
         "comment" : "ditto\n",
-        "line" : 2623,
+        "line" : 2662,
         "char" : 2,
         "type" : "shared nothrow @safe ()",
-        "endline" : 2626,
+        "endline" : 2665,
         "endchar" : 2
        },
        {
         "name" : "put",
         "kind" : "function",
         "comment" : " 供給\n",
-        "line" : 2631,
+        "line" : 2670,
         "char" : 7,
         "type" : "nothrow void(T dat)",
         "parameters" : [
@@ -32540,14 +32583,14 @@
           "type" : "T"
          }
         ],
-        "endline" : 2636,
+        "endline" : 2675,
         "endchar" : 2
        },
        {
         "name" : "put",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 2638,
+        "line" : 2677,
         "char" : 7,
         "type" : "shared nothrow @trusted void(T dat)",
         "parameters" : [
@@ -32556,13 +32599,13 @@
           "type" : "T"
          }
         ],
-        "endline" : 2645,
+        "endline" : 2684,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 2647,
+        "line" : 2686,
         "char" : 7,
         "name" : "put",
         "parameters" : [
@@ -32576,7 +32619,7 @@
          {
           "name" : "put",
           "kind" : "function",
-          "line" : 2647,
+          "line" : 2686,
           "char" : 7,
           "type" : "nothrow void(Range src)",
           "parameters" : [
@@ -32585,7 +32628,7 @@
             "type" : "Range"
            }
           ],
-          "endline" : 2656,
+          "endline" : 2695,
           "endchar" : 2
          }
         ]
@@ -32593,7 +32636,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 2658,
+        "line" : 2697,
         "char" : 7,
         "name" : "put",
         "parameters" : [
@@ -32607,7 +32650,7 @@
          {
           "name" : "put",
           "kind" : "function",
-          "line" : 2658,
+          "line" : 2697,
           "char" : 7,
           "type" : "shared nothrow @trusted void(Range src)",
           "parameters" : [
@@ -32616,7 +32659,7 @@
             "type" : "Range"
            }
           ],
-          "endline" : 2666,
+          "endline" : 2705,
           "endchar" : 2
          }
         ]
@@ -32625,26 +32668,26 @@
         "name" : "consume",
         "kind" : "function",
         "comment" : " 消費\n",
-        "line" : 2671,
+        "line" : 2710,
         "char" : 4,
         "type" : "nothrow T()",
-        "endline" : 2679,
+        "endline" : 2718,
         "endchar" : 2
        },
        {
         "name" : "consume",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 2681,
+        "line" : 2720,
         "char" : 4,
         "type" : "shared nothrow @trusted T()",
-        "endline" : 2688,
+        "endline" : 2727,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 2690,
+        "line" : 2729,
         "char" : 7,
         "name" : "consumeAll",
         "parameters" : [
@@ -32658,7 +32701,7 @@
          {
           "name" : "consumeAll",
           "kind" : "function",
-          "line" : 2690,
+          "line" : 2729,
           "char" : 7,
           "type" : "nothrow void(ref OutputRange dst)",
           "parameters" : [
@@ -32670,7 +32713,7 @@
             ]
            }
           ],
-          "endline" : 2699,
+          "endline" : 2738,
           "endchar" : 2
          }
         ]
@@ -32678,7 +32721,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 2701,
+        "line" : 2740,
         "char" : 7,
         "name" : "consumeAll",
         "parameters" : [
@@ -32692,7 +32735,7 @@
          {
           "name" : "consumeAll",
           "kind" : "function",
-          "line" : 2701,
+          "line" : 2740,
           "char" : 7,
           "type" : "shared nothrow @trusted void(ref OutputRange dst)",
           "parameters" : [
@@ -32704,7 +32747,7 @@
             ]
            }
           ],
-          "endline" : 2709,
+          "endline" : 2748,
           "endchar" : 2
          }
         ]
@@ -32713,7 +32756,7 @@
         "name" : "tryConsume",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 2711,
+        "line" : 2750,
         "char" : 7,
         "type" : "nothrow bool(ref T dst, Duration timeout = 0.msecs)",
         "parameters" : [
@@ -32730,14 +32773,14 @@
           "default" : "0.msecs"
          }
         ],
-        "endline" : 2727,
+        "endline" : 2766,
         "endchar" : 2
        },
        {
         "name" : "tryConsume",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 2729,
+        "line" : 2768,
         "char" : 7,
         "type" : "shared nothrow @trusted bool(ref T dst, Duration timeout = 0.msecs)",
         "parameters" : [
@@ -32754,13 +32797,13 @@
           "default" : "0.msecs"
          }
         ],
-        "endline" : 2736,
+        "endline" : 2775,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 2738,
+        "line" : 2777,
         "char" : 7,
         "name" : "tryConsumeAll",
         "parameters" : [
@@ -32774,7 +32817,7 @@
          {
           "name" : "tryConsumeAll",
           "kind" : "function",
-          "line" : 2738,
+          "line" : 2777,
           "char" : 7,
           "type" : "nothrow bool(ref OutputRange dst, Duration timeout = 0.msecs)",
           "parameters" : [
@@ -32791,7 +32834,7 @@
             "default" : "0.msecs"
            }
           ],
-          "endline" : 2750,
+          "endline" : 2789,
           "endchar" : 2
          }
         ]
@@ -32799,7 +32842,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 2752,
+        "line" : 2791,
         "char" : 7,
         "name" : "tryConsumeAll",
         "parameters" : [
@@ -32813,7 +32856,7 @@
          {
           "name" : "tryConsumeAll",
           "kind" : "function",
-          "line" : 2752,
+          "line" : 2791,
           "char" : 7,
           "type" : "shared nothrow @trusted bool(ref OutputRange dst, Duration timeout = 0.msecs)",
           "parameters" : [
@@ -32830,7 +32873,7 @@
             "default" : "0.msecs"
            }
           ],
-          "endline" : 2760,
+          "endline" : 2799,
           "endchar" : 2
          }
         ]
@@ -32839,27 +32882,27 @@
         "name" : "waitForData",
         "kind" : "function",
         "comment" : " データ供給待ち\n",
-        "line" : 2765,
+        "line" : 2804,
         "char" : 7,
         "type" : "nothrow bool()",
-        "endline" : 2770,
+        "endline" : 2809,
         "endchar" : 2
        },
        {
         "name" : "waitForData",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 2772,
+        "line" : 2811,
         "char" : 7,
         "type" : "shared nothrow @trusted bool()",
-        "endline" : 2779,
+        "endline" : 2818,
         "endchar" : 2
        },
        {
         "name" : "waitForData",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 2781,
+        "line" : 2820,
         "char" : 7,
         "type" : "nothrow bool(Duration timeout)",
         "parameters" : [
@@ -32868,14 +32911,14 @@
           "type" : "Duration"
          }
         ],
-        "endline" : 2786,
+        "endline" : 2825,
         "endchar" : 2
        },
        {
         "name" : "waitForData",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 2788,
+        "line" : 2827,
         "char" : 7,
         "type" : "shared nothrow @trusted bool(Duration timeout)",
         "parameters" : [
@@ -32884,34 +32927,34 @@
           "type" : "Duration"
          }
         ],
-        "endline" : 2795,
+        "endline" : 2834,
         "endchar" : 2
        },
        {
         "name" : "length",
         "kind" : "function",
         "comment" : " 現在の待ち行列の長さ\n",
-        "line" : 2800,
+        "line" : 2839,
         "char" : 9,
         "type" : "const nothrow @property @trusted size_t()",
-        "endline" : 2803,
+        "endline" : 2842,
         "endchar" : 2
        },
        {
         "name" : "length",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 2805,
+        "line" : 2844,
         "char" : 9,
         "type" : "shared const nothrow @property @trusted size_t()",
-        "endline" : 2809,
+        "endline" : 2848,
         "endchar" : 2
        },
        {
         "name" : "close",
         "kind" : "function",
         "comment" : " とじる\n",
-        "line" : 2814,
+        "line" : 2853,
         "char" : 7,
         "type" : "nothrow void(bool waitForConsume = false)",
         "parameters" : [
@@ -32921,14 +32964,14 @@
           "default" : "false"
          }
         ],
-        "endline" : 2820,
+        "endline" : 2859,
         "endchar" : 2
        },
        {
         "name" : "close",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 2822,
+        "line" : 2861,
         "char" : 7,
         "type" : "shared nothrow @trusted void(bool waitForConsume = false)",
         "parameters" : [
@@ -32938,7 +32981,7 @@
           "default" : "false"
          }
         ],
-        "endline" : 2829,
+        "endline" : 2868,
         "endchar" : 2
        }
       ]
@@ -32946,22 +32989,22 @@
     ]
    },
    {
-    "name" : "__unittest_L2833_C9",
+    "name" : "__unittest_L2872_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 2833,
+    "line" : 2872,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2877,
+    "endline" : 2916,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2877,
+    "line" : 2916,
     "char" : 1,
     "name" : "MessageBox",
     "parameters" : [
@@ -32981,13 +33024,13 @@
       "name" : "MessageBox",
       "kind" : "class",
       "protection" : "public",
-      "line" : 2877,
+      "line" : 2916,
       "char" : 1,
       "members" : [
        {
         "name" : "core.lifetime",
         "kind" : "import",
-        "line" : 2882,
+        "line" : 2921,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -32997,7 +33040,7 @@
        {
         "name" : "core.time",
         "kind" : "import",
-        "line" : 2883,
+        "line" : 2922,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -33008,7 +33051,7 @@
        {
         "name" : "std.container.dlist",
         "kind" : "import",
-        "line" : 2884,
+        "line" : 2923,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -33018,7 +33061,7 @@
        {
         "name" : "std.range",
         "kind" : "import",
-        "line" : 2885,
+        "line" : 2924,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -33030,7 +33073,7 @@
        {
         "name" : "std.exception",
         "kind" : "import",
-        "line" : 2886,
+        "line" : 2925,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -33040,7 +33083,7 @@
        {
         "name" : "vibe.core.core",
         "kind" : "import",
-        "line" : 2889,
+        "line" : 2928,
         "char" : 10,
         "protection" : "private",
         "selective" : [
@@ -33050,7 +33093,7 @@
        {
         "name" : "_isVibeTask",
         "kind" : "variable",
-        "line" : 2890,
+        "line" : 2929,
         "char" : 13,
         "storageClass" : [
          "enum"
@@ -33061,7 +33104,7 @@
        {
         "name" : "std.concurrency",
         "kind" : "import",
-        "line" : 2896,
+        "line" : 2935,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -33072,7 +33115,7 @@
        {
         "name" : "_isTid",
         "kind" : "variable",
-        "line" : 2897,
+        "line" : 2936,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -33083,7 +33126,7 @@
        {
         "name" : "core.thread",
         "kind" : "import",
-        "line" : 2898,
+        "line" : 2937,
         "char" : 9,
         "protection" : "private",
         "selective" : [
@@ -33095,7 +33138,7 @@
        {
         "name" : "_isFiber",
         "kind" : "variable",
-        "line" : 2899,
+        "line" : 2938,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -33106,7 +33149,7 @@
        {
         "name" : "_isThread",
         "kind" : "variable",
-        "line" : 2900,
+        "line" : 2939,
         "char" : 12,
         "storageClass" : [
          "enum"
@@ -33117,14 +33160,14 @@
        {
         "name" : "MapKey",
         "kind" : "alias",
-        "line" : 2903,
+        "line" : 2942,
         "char" : 3,
         "type" : "Fiber"
        },
        {
         "name" : "_hasDefaultKey",
         "kind" : "variable",
-        "line" : 2904,
+        "line" : 2943,
         "char" : 13,
         "storageClass" : [
          "enum"
@@ -33135,7 +33178,7 @@
        {
         "name" : "_mapkey",
         "kind" : "function",
-        "line" : 2905,
+        "line" : 2944,
         "char" : 38,
         "storageClass" : [
          "static"
@@ -33147,32 +33190,32 @@
           "type" : "Key"
          }
         ],
-        "endline" : 2905,
+        "endline" : 2944,
         "endchar" : 73
        },
        {
         "name" : "_defaultKey",
         "kind" : "function",
-        "line" : 2906,
+        "line" : 2945,
         "char" : 35,
         "storageClass" : [
          "static"
         ],
         "type" : "Key()",
-        "endline" : 2906,
+        "endline" : 2945,
         "endchar" : 72
        },
        {
         "name" : "Queue",
         "kind" : "alias",
-        "line" : 2936,
+        "line" : 2975,
         "char" : 2,
         "type" : "shared(MessageQueue!T)"
        },
        {
         "name" : "_map",
         "kind" : "variable",
-        "line" : 2937,
+        "line" : 2976,
         "char" : 39,
         "storageClass" : [
          "shared"
@@ -33182,7 +33225,7 @@
        {
         "name" : "_reqQueue",
         "kind" : "function",
-        "line" : 2939,
+        "line" : 2978,
         "char" : 29,
         "type" : "nothrow @trusted Queue(Key k)",
         "parameters" : [
@@ -33191,13 +33234,13 @@
           "type" : "Key"
          }
         ],
-        "endline" : 2948,
+        "endline" : 2987,
         "endchar" : 2
        },
        {
         "name" : "_reqQueue",
         "kind" : "function",
-        "line" : 2949,
+        "line" : 2988,
         "char" : 29,
         "type" : "shared nothrow @trusted Queue(Key k)",
         "parameters" : [
@@ -33206,13 +33249,13 @@
           "type" : "Key"
          }
         ],
-        "endline" : 2949,
+        "endline" : 2988,
         "endchar" : 106
        },
        {
         "name" : "_getQueue",
         "kind" : "function",
-        "line" : 2950,
+        "line" : 2989,
         "char" : 29,
         "type" : "nothrow @trusted Queue(Key k)",
         "parameters" : [
@@ -33221,13 +33264,13 @@
           "type" : "Key"
          }
         ],
-        "endline" : 2959,
+        "endline" : 2998,
         "endchar" : 2
        },
        {
         "name" : "_getQueue",
         "kind" : "function",
-        "line" : 2960,
+        "line" : 2999,
         "char" : 29,
         "type" : "shared nothrow @trusted Queue(Key k)",
         "parameters" : [
@@ -33236,13 +33279,13 @@
           "type" : "Key"
          }
         ],
-        "endline" : 2960,
+        "endline" : 2999,
         "endchar" : 106
        },
        {
         "name" : "_removeQueue",
         "kind" : "function",
-        "line" : 2961,
+        "line" : 3000,
         "char" : 28,
         "type" : "nothrow @trusted void(Key k)",
         "parameters" : [
@@ -33251,13 +33294,13 @@
           "type" : "Key"
          }
         ],
-        "endline" : 2970,
+        "endline" : 3009,
         "endchar" : 2
        },
        {
         "name" : "_removeQueue",
         "kind" : "function",
-        "line" : 2971,
+        "line" : 3010,
         "char" : 28,
         "type" : "shared nothrow @trusted void(Key k)",
         "parameters" : [
@@ -33266,70 +33309,70 @@
           "type" : "Key"
          }
         ],
-        "endline" : 2971,
+        "endline" : 3010,
         "endchar" : 111
        },
        {
         "name" : "_allQueue",
         "kind" : "function",
-        "line" : 2972,
+        "line" : 3011,
         "char" : 31,
         "type" : "nothrow @trusted Queue[]()",
-        "endline" : 2984,
+        "endline" : 3023,
         "endchar" : 2
        },
        {
         "name" : "_allQueue",
         "kind" : "function",
-        "line" : 2985,
+        "line" : 3024,
         "char" : 31,
         "type" : "shared nothrow @trusted Queue[]()",
-        "endline" : 2985,
+        "endline" : 3024,
         "endchar" : 102
        },
        {
         "name" : "_clearQueue",
         "kind" : "function",
-        "line" : 2986,
+        "line" : 3025,
         "char" : 28,
         "type" : "nothrow @trusted void()",
-        "endline" : 2995,
+        "endline" : 3034,
         "endchar" : 2
        },
        {
         "name" : "_clearQueue",
         "kind" : "function",
-        "line" : 2996,
+        "line" : 3035,
         "char" : 28,
         "type" : "shared nothrow @trusted void()",
-        "endline" : 2996,
+        "endline" : 3035,
         "endchar" : 103
        },
        {
         "name" : "this",
         "kind" : "constructor",
         "comment" : " コンストラクタ\n",
-        "line" : 3002,
+        "line" : 3041,
         "char" : 2,
         "type" : "shared ()",
-        "endline" : 3005,
+        "endline" : 3044,
         "endchar" : 2
        },
        {
         "name" : "this",
         "kind" : "constructor",
         "comment" : "ditto\n",
-        "line" : 3007,
+        "line" : 3046,
         "char" : 2,
         "type" : "@system ()",
-        "endline" : 3010,
+        "endline" : 3049,
         "endchar" : 2
        },
        {
         "name" : "put",
         "kind" : "function",
         "comment" : " 供給\n",
-        "line" : 3015,
+        "line" : 3054,
         "char" : 7,
         "type" : "shared nothrow void(Key key, T dat)",
         "parameters" : [
@@ -33342,13 +33385,13 @@
           "type" : "T"
          }
         ],
-        "endline" : 3018,
+        "endline" : 3057,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3020,
+        "line" : 3059,
         "char" : 7,
         "name" : "put",
         "parameters" : [],
@@ -33357,7 +33400,7 @@
          {
           "name" : "put",
           "kind" : "function",
-          "line" : 3020,
+          "line" : 3059,
           "char" : 7,
           "type" : "shared nothrow void(T dat)",
           "parameters" : [
@@ -33366,7 +33409,7 @@
             "type" : "T"
            }
           ],
-          "endline" : 3024,
+          "endline" : 3063,
           "endchar" : 2
          }
         ]
@@ -33374,7 +33417,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3026,
+        "line" : 3065,
         "char" : 7,
         "name" : "put",
         "parameters" : [
@@ -33388,7 +33431,7 @@
          {
           "name" : "put",
           "kind" : "function",
-          "line" : 3026,
+          "line" : 3065,
           "char" : 7,
           "type" : "shared nothrow void(Key key, Range dat)",
           "parameters" : [
@@ -33401,7 +33444,7 @@
             "type" : "Range"
            }
           ],
-          "endline" : 3030,
+          "endline" : 3069,
           "endchar" : 2
          }
         ]
@@ -33409,7 +33452,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3032,
+        "line" : 3071,
         "char" : 7,
         "name" : "put",
         "parameters" : [
@@ -33423,7 +33466,7 @@
          {
           "name" : "put",
           "kind" : "function",
-          "line" : 3032,
+          "line" : 3071,
           "char" : 7,
           "type" : "shared nothrow void(Range src)",
           "parameters" : [
@@ -33432,7 +33475,7 @@
             "type" : "Range"
            }
           ],
-          "endline" : 3036,
+          "endline" : 3075,
           "endchar" : 2
          }
         ]
@@ -33441,7 +33484,7 @@
         "name" : "consume",
         "kind" : "function",
         "comment" : " 消費\n",
-        "line" : 3041,
+        "line" : 3080,
         "char" : 4,
         "type" : "shared nothrow T(Key key)",
         "parameters" : [
@@ -33450,13 +33493,13 @@
           "type" : "Key"
          }
         ],
-        "endline" : 3044,
+        "endline" : 3083,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3046,
+        "line" : 3085,
         "char" : 4,
         "name" : "consume",
         "parameters" : [],
@@ -33465,10 +33508,10 @@
          {
           "name" : "consume",
           "kind" : "function",
-          "line" : 3046,
+          "line" : 3085,
           "char" : 4,
           "type" : "shared nothrow T()",
-          "endline" : 3050,
+          "endline" : 3089,
           "endchar" : 2
          }
         ]
@@ -33476,7 +33519,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3052,
+        "line" : 3091,
         "char" : 7,
         "name" : "consumeAll",
         "parameters" : [
@@ -33490,7 +33533,7 @@
          {
           "name" : "consumeAll",
           "kind" : "function",
-          "line" : 3052,
+          "line" : 3091,
           "char" : 7,
           "type" : "shared nothrow void(Key key, ref OutputRange dst)",
           "parameters" : [
@@ -33506,7 +33549,7 @@
             ]
            }
           ],
-          "endline" : 3056,
+          "endline" : 3095,
           "endchar" : 2
          }
         ]
@@ -33514,7 +33557,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3058,
+        "line" : 3097,
         "char" : 7,
         "name" : "consumeAll",
         "parameters" : [
@@ -33528,7 +33571,7 @@
          {
           "name" : "consumeAll",
           "kind" : "function",
-          "line" : 3058,
+          "line" : 3097,
           "char" : 7,
           "type" : "shared nothrow void(ref OutputRange dst)",
           "parameters" : [
@@ -33540,7 +33583,7 @@
             ]
            }
           ],
-          "endline" : 3062,
+          "endline" : 3101,
           "endchar" : 2
          }
         ]
@@ -33549,7 +33592,7 @@
         "name" : "tryConsume",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 3064,
+        "line" : 3103,
         "char" : 7,
         "type" : "shared nothrow bool(Key key, ref T dst, Duration timeout = 0.msecs)",
         "parameters" : [
@@ -33570,13 +33613,13 @@
           "default" : "0.msecs"
          }
         ],
-        "endline" : 3067,
+        "endline" : 3106,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3069,
+        "line" : 3108,
         "char" : 7,
         "name" : "tryConsume",
         "parameters" : [],
@@ -33585,7 +33628,7 @@
          {
           "name" : "tryConsume",
           "kind" : "function",
-          "line" : 3069,
+          "line" : 3108,
           "char" : 7,
           "type" : "shared nothrow bool(ref T dst, Duration timeout = 0.msecs)",
           "parameters" : [
@@ -33602,7 +33645,7 @@
             "default" : "0.msecs"
            }
           ],
-          "endline" : 3073,
+          "endline" : 3112,
           "endchar" : 2
          }
         ]
@@ -33610,7 +33653,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3075,
+        "line" : 3114,
         "char" : 7,
         "name" : "tryConsumeAll",
         "parameters" : [
@@ -33624,7 +33667,7 @@
          {
           "name" : "tryConsumeAll",
           "kind" : "function",
-          "line" : 3075,
+          "line" : 3114,
           "char" : 7,
           "type" : "shared nothrow bool(Key key, ref OutputRange dst, Duration timeout = 0.msecs)",
           "parameters" : [
@@ -33645,7 +33688,7 @@
             "default" : "0.msecs"
            }
           ],
-          "endline" : 3079,
+          "endline" : 3118,
           "endchar" : 2
          }
         ]
@@ -33653,7 +33696,7 @@
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3081,
+        "line" : 3120,
         "char" : 7,
         "name" : "tryConsumeAll",
         "parameters" : [
@@ -33667,7 +33710,7 @@
          {
           "name" : "tryConsumeAll",
           "kind" : "function",
-          "line" : 3081,
+          "line" : 3120,
           "char" : 7,
           "type" : "shared nothrow bool(ref OutputRange dst, Duration timeout = 0.msecs)",
           "parameters" : [
@@ -33684,7 +33727,7 @@
             "default" : "0.msecs"
            }
           ],
-          "endline" : 3085,
+          "endline" : 3124,
           "endchar" : 2
          }
         ]
@@ -33693,7 +33736,7 @@
         "name" : "waitForData",
         "kind" : "function",
         "comment" : " データ供給待ち\n",
-        "line" : 3090,
+        "line" : 3129,
         "char" : 7,
         "type" : "shared nothrow bool(Key key)",
         "parameters" : [
@@ -33702,13 +33745,13 @@
           "type" : "Key"
          }
         ],
-        "endline" : 3093,
+        "endline" : 3132,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3095,
+        "line" : 3134,
         "char" : 7,
         "name" : "waitForData",
         "parameters" : [],
@@ -33717,10 +33760,10 @@
          {
           "name" : "waitForData",
           "kind" : "function",
-          "line" : 3095,
+          "line" : 3134,
           "char" : 7,
           "type" : "shared nothrow bool()",
-          "endline" : 3099,
+          "endline" : 3138,
           "endchar" : 2
          }
         ]
@@ -33729,7 +33772,7 @@
         "name" : "waitForData",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 3101,
+        "line" : 3140,
         "char" : 7,
         "type" : "shared nothrow bool(Key key, Duration timeout)",
         "parameters" : [
@@ -33742,13 +33785,13 @@
           "type" : "Duration"
          }
         ],
-        "endline" : 3104,
+        "endline" : 3143,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3106,
+        "line" : 3145,
         "char" : 7,
         "name" : "waitForData",
         "parameters" : [],
@@ -33757,7 +33800,7 @@
          {
           "name" : "waitForData",
           "kind" : "function",
-          "line" : 3106,
+          "line" : 3145,
           "char" : 7,
           "type" : "shared nothrow bool(Duration timeout)",
           "parameters" : [
@@ -33766,7 +33809,7 @@
             "type" : "Duration"
            }
           ],
-          "endline" : 3110,
+          "endline" : 3149,
           "endchar" : 2
          }
         ]
@@ -33775,7 +33818,7 @@
         "name" : "close",
         "kind" : "function",
         "comment" : " とじる\n",
-        "line" : 3116,
+        "line" : 3155,
         "char" : 7,
         "type" : "shared nothrow void(Key key, bool waitForConsume = false)",
         "parameters" : [
@@ -33789,13 +33832,13 @@
           "default" : "false"
          }
         ],
-        "endline" : 3120,
+        "endline" : 3159,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3122,
+        "line" : 3161,
         "char" : 7,
         "name" : "close",
         "parameters" : [],
@@ -33804,7 +33847,7 @@
          {
           "name" : "close",
           "kind" : "function",
-          "line" : 3122,
+          "line" : 3161,
           "char" : 7,
           "type" : "shared nothrow void(bool waitForConsume = false)",
           "parameters" : [
@@ -33814,7 +33857,7 @@
             "default" : "false"
            }
           ],
-          "endline" : 3126,
+          "endline" : 3165,
           "endchar" : 2
          }
         ]
@@ -33823,7 +33866,7 @@
         "name" : "closeAll",
         "kind" : "function",
         "comment" : "ditto\n",
-        "line" : 3128,
+        "line" : 3167,
         "char" : 7,
         "type" : "shared nothrow void(bool waitForConsume = false)",
         "parameters" : [
@@ -33833,14 +33876,14 @@
           "default" : "false"
          }
         ],
-        "endline" : 3133,
+        "endline" : 3172,
         "endchar" : 2
        },
        {
         "name" : "opIndex",
         "kind" : "function",
         "comment" : " Queueにアクセス\n",
-        "line" : 3138,
+        "line" : 3177,
         "char" : 8,
         "type" : "shared nothrow Queue(Key key)",
         "parameters" : [
@@ -33849,13 +33892,13 @@
           "type" : "Key"
          }
         ],
-        "endline" : 3141,
+        "endline" : 3180,
         "endchar" : 2
        },
        {
         "kind" : "template",
         "comment" : "ditto\n",
-        "line" : 3143,
+        "line" : 3182,
         "char" : 8,
         "name" : "opBinaryRight",
         "parameters" : [
@@ -33870,7 +33913,7 @@
          {
           "name" : "opBinaryRight",
           "kind" : "function",
-          "line" : 3143,
+          "line" : 3182,
           "char" : 8,
           "type" : "shared nothrow Queue(Key key)",
           "parameters" : [
@@ -33879,7 +33922,7 @@
             "type" : "Key"
            }
           ],
-          "endline" : 3146,
+          "endline" : 3185,
           "endchar" : 2
          }
         ]
@@ -33889,15 +33932,15 @@
     ]
    },
    {
-    "name" : "__unittest_L3149_C9",
+    "name" : "__unittest_L3188_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 3149,
+    "line" : 3188,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 3192,
+    "endline" : 3231,
     "endchar" : 1
    }
   ]
