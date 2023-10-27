@@ -344,6 +344,65 @@ private auto toDelegateEx(Ptr, F)(Ptr ptr, F funcptr)
 	return _ConnectData(cast(void*)ptr, cast(void*)funcptr).dg;
 }
 
+
+/* This template based from std.functional.DelegateFaker */
+/* See_Also: LDC 1.29.0 `Breaking extern(D) ABI change for all targets` */
+/*           https://github.com/ldc-developers/ldc/releases/tag/v1.29.0 */
+version (LDC) private struct DelegateFakerEx2(F) {
+	template GeneratingPolicy()
+	{
+		enum WITHOUT_SYMBOL = true;
+		template generateFunctionBody(unused...)
+		{
+			enum generateFunctionBody =
+			q{
+				auto fp = cast(F) &this;
+				return fp(null, args);
+			};
+		}
+	}
+	template FuncInfo(Func)
+	{
+		alias RT = ReturnType!(Func);
+		alias PT = ParameterTypeTuple!(Func)[1..$];
+	}
+	alias FuncInfo_doIt = FuncInfo!(F);
+	template ExFuncInfo()
+	{
+		alias FuncType = FunctionTypeOf!F;
+		alias RT       = ReturnType!F;
+		alias PT       = ParameterTypeTuple!F[1..$];
+		alias stcs     = ParameterStorageClassTuple!F[1..$];
+		alias valiadic = variadicFunctionStyle!F;
+		alias attrib   = functionAttributes!F;
+		alias linkage  = functionLinkage!F;
+		alias abst     = isAbstractFunction!F;
+		alias virt     = isVirtualMethod!F;
+	}
+	mixin( MemberFunctionGeneratorEx!(GeneratingPolicy!())
+			.generateFunction!("FuncInfo_doIt", ExFuncInfo!(), "doIt") );
+}
+
+version (LDC) private auto toDelegateEx(Ptr, F)(Ptr ptr, F funcptr)
+	if (Ptr.sizeof == size_t.sizeof && isCallable!F && ParameterTypeTuple!F.length > 1 &&
+	    is(Ptr: ParameterTypeTuple!F[0]))
+{
+	alias DelType = typeof(&(new DelegateFakerEx2!(F)).doIt);
+	static struct _ConnectData
+	{
+		union
+		{
+			struct
+			{
+				void* ptr;
+				void* funcptr;
+			}
+			DelType dg;
+		}
+	}
+	return _ConnectData(cast(void*)ptr, cast(void*)funcptr).dg;
+}
+
 @system unittest
 {
 	int[] testary;
@@ -1226,9 +1285,19 @@ public:
 	static if (Args.length > 0 && !hasUnsharedAliasing!Args)
 	{
 		static assert(Tid.sizeof == (void*).sizeof);
-		private static void _TidCaller(Args args, Tid* tid)
+		version (LDC)
 		{
-			(*cast(Tid*)&tid).send(args);
+			private static void _TidCaller(Args args, Tid* tid)
+			{
+				(*cast(Tid*)&tid).send(args);
+			}
+		}
+		else
+		{
+			private static void _TidCaller(Tid* tid, Args args)
+			{
+				(*cast(Tid*)&tid).send(args);
+			}
 		}
 		///
 		static Proc toConnectable(Func)(Func tid)
@@ -1237,10 +1306,21 @@ public:
 			return cast(Proc)toDelegateEx(*cast(Tid**)&tid, &_TidCaller);
 		}
 		
-		private static void _RangeOutputter(Range)(Args args, Range r)
+		version (LDC)
 		{
-			if (!r.empty)
-				.put(r, args);
+			private static void _RangeOutputter(Range)(Range r, Args args)
+			{
+				if (!r.empty)
+					.put(r, args);
+			}
+		}
+		else
+		{
+			private static void _RangeOutputter(Range)(Args args, Range r)
+			{
+				if (!r.empty)
+					.put(r, args);
+			}
 		}
 		///
 		static Proc toConnectable(Range)(Range r)
@@ -1316,9 +1396,19 @@ public:
 				return proc(args);
 			}
 		}
-		static auto ref _caller(Args args, Data* data)
+		version (LDC)
 		{
-			return data.call(args);
+			static auto ref _caller(Data* data, Args args)
+			{
+				return data.call(args);
+			}
+		}
+		else
+		{
+			static auto ref _caller(Args args, Data* data)
+			{
+				return data.call(args);
+			}
 		}
 		if (_procs.isEmpty())
 			_procs = unique!ProcList;
@@ -1636,4 +1726,18 @@ debug (workaround)
 	Handler!(void delegate()) h2;
 	static assert(!__traits(compiles, h2 = h1));
 	static assert(__traits(compiles, h2 = h1.move()));
+}
+
+///
+@system unittest
+{
+	int val;
+	Handler!(void delegate(int test)) h;
+	h.singleShotConnect((int test) {
+		val = test;
+	});
+	h(100);
+	assert(val == 100);
+	h(200);
+	assert(val == 100);
 }
