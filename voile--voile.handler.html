@@ -133,6 +133,18 @@
 <span class="d_keyword">static</span> <span class="d_keyword">assert</span>(<span class="d_keyword">__traits</span>(compiles, h2 = h1.move()));
 </pre>
 </div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">int</span> val;
+<span class="d_psymbol">Handler</span>!(<span class="d_keyword">void</span> <span class="d_keyword">delegate</span>(<span class="d_keyword">int</span> test)) h;
+h.singleShotConnect((<span class="d_keyword">int</span> test) {
+	val = test;
+});
+h(100);
+<span class="d_keyword">assert</span>(val == 100);
+h(200);
+<span class="d_keyword">assert</span>(val == 100);
+</pre>
+</div>
 <dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.emit"></span><div class="quickindex" id="quickindex.Handler.emit"></div>RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>);
 <br>
 const RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>);
