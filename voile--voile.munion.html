@@ -216,7 +216,7 @@ dat.set!id = 5;
 <span class="d_keyword">assert</span>(dat.empty);
 
 <span class="d_comment">// ignored member
-</span><span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_keyword">__traits</span>(compiles, dat.set!ignore(0)));
+</span><span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_keyword">__traits</span>(compiles, dat.set!ignored(0)));
 </pre>
 </div>
 <dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata.opEquals"></span><div class="quickindex" id="quickindex.Endata.opEquals"></div>const bool <code class="ddoc_psymbol">opEquals</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Endata <span class="ddoc_param">rhs</span>);
@@ -385,6 +385,8 @@ ED <span class="d_param">dat</span>;
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".initialize"></span><div class="quickindex" id="quickindex.initialize"></div>void <code class="ddoc_psymbol">initialize</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU, Args...)</span>(auto ref MU <span class="ddoc_param">dat</span>, auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU &amp;&amp; isAvailableTag!(MU, tag))</span>;
 <br>
 void <code class="ddoc_psymbol">initialize</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU, Args...)</span>(auto ref MU <span class="ddoc_param">dat</span>, auto ref Args <span class="ddoc_param">args</span>)<br><span class="ddoc_constraint">if(isTypeEnum!MU &amp;&amp; hasType!(MU, T))</span>;
+<br>
+void <code class="ddoc_psymbol">initialize</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU)</span>(auto ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isEndata!MU &amp;&amp; !isAvailableTag!(MU, tag) &amp;&amp; (ImplOf!MU.getIndex!tag == cast(ImplOf!MU.IndexType)ImplOf!MU.notfoundTag))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">初期化する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">struct</span> S { <span class="d_keyword">int</span> x; }
@@ -401,7 +403,7 @@ MU <span class="d_param">dat</span>;
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">import</span> std.datetime: Date;
-<span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!Date date }
+<span class="d_keyword">enum</span> E { @data!<span class="d_keyword">int</span> x, @data!Date date, test }
 <span class="d_keyword">mixin</span> EnumMemberAlieses!E;
 <span class="d_keyword">alias</span> ED = Endata!E;
 ED <span class="d_param">dat</span>;
@@ -410,6 +412,8 @@ ED <span class="d_param">dat</span>;
 <span class="d_keyword">assert</span>(get!x(<span class="d_param">dat</span>) == 1);
 <span class="d_psymbol">initialize</span>!date(<span class="d_param">dat</span>, Date(2020, 8, 5));
 <span class="d_keyword">assert</span>(get!date(<span class="d_param">dat</span>) == Date(2020, 8, 5));
+<span class="d_psymbol">initialize</span>!test(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(tag(<span class="d_param">dat</span>) == test);
 </pre>
 </div>
 </dd>
