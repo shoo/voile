@@ -1514,16 +1514,18 @@ struct FileSystem
 	// 
 	private bool moveFilesImpl(bool absConvert)(string src, string dst, bool force, bool retrycnt)
 	{
-		auto absWork      = absolutePath();
-		auto absSrcDir    = .absolutePath(src, absWork).buildNormalizedPath();
-		auto absTargetDir = .absolutePath(dst, absWork).buildNormalizedPath();
-		return moveFilesImpl!false(absSrcDir, absTargetDir, force, retrycnt);
+		auto absWork   = absolutePath();
+		auto absSrc    = .absolutePath(src, absWork).buildNormalizedPath();
+		auto absTarget = .absolutePath(dst, absWork).buildNormalizedPath();
+		return moveFilesImpl!false(absSrc, absTarget, force, retrycnt);
 	}
 	// 
 	private bool moveFilesImpl(bool absConvert: false)(string src, string dst, bool force, bool retrycnt)
 	{
 		if (!src.exists)
 			return true;
+		if (!dst.dirName.exists)
+			mkdirRecurse(dst.dirName);
 		version (Windows)
 		{
 			if (src.driveName == dst.driveName)
