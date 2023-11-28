@@ -200,11 +200,19 @@ private mixin template ManagedUnionImpl(Instance, tags...)
 	 * 初期化する
 	 */
 	void initialize(TagType t, Args...)(auto ref Args args) @trusted
-	if (getIndex!t < memberCount)
+	if (getIndex!t != cast(IndexType)notfoundTag && getIndex!t < memberCount)
 	{
 		static if (hasDestructor)
 			clear();
 		_emplace(_inst.tupleof[getIndex!t], args);
+		_tag = t;
+	}
+	/// ditto
+	void initialize(TagType t)() @trusted
+	if (getIndex!t == cast(IndexType)notfoundTag)
+	{
+		static if (hasDestructor)
+			clear();
 		_tag = t;
 	}
 	
@@ -808,7 +816,7 @@ if (is(E == enum))
 	assert(dat.empty);
 	
 	// ignored member
-	static assert(!__traits(compiles, dat.set!ignore(0)));
+	static assert(!__traits(compiles, dat.set!ignored(0)));
 }
 
 @safe pure nothrow unittest
@@ -1173,6 +1181,13 @@ if (isTypeEnum!MU && hasType!(MU, T))
 {
 	dat.getInstance()._implT.initialize!T(args);
 }
+/// ditto
+void initialize(alias tag, MU)(auto ref MU dat)
+if (isEndata!MU && !isAvailableTag!(MU, tag)
+ && ImplOf!MU.getIndex!tag == cast(ImplOf!MU.IndexType)ImplOf!MU.notfoundTag)
+{
+	dat.getInstance()._impl.initialize!tag();
+}
 ///
 @safe @nogc nothrow pure unittest
 {
@@ -1191,7 +1206,7 @@ if (isTypeEnum!MU && hasType!(MU, T))
 @safe unittest
 {
 	import std.datetime: Date;
-	enum E { @data!int x, @data!Date date }
+	enum E { @data!int x, @data!Date date, test }
 	mixin EnumMemberAlieses!E;
 	alias ED = Endata!E;
 	ED dat;
@@ -1200,6 +1215,8 @@ if (isTypeEnum!MU && hasType!(MU, T))
 	assert(get!x(dat) == 1);
 	initialize!date(dat, Date(2020, 8, 5));
 	assert(get!date(dat) == Date(2020, 8, 5));
+	initialize!test(dat);
+	assert(tag(dat) == test);
 }
 
 
