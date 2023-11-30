@@ -731,13 +731,19 @@ if (is(E == enum))
 	{
 		switch (__traits(getMember, this, uniqueMemberName!E)._impl._tag)
 		{
-			static foreach (i; 0..__traits(getMember, this, uniqueMemberName!E)._impl.MemberTypes.length)
+			static foreach (e; EnumMembers!(EndataImpl!E.TagType))
 			{
-			case __traits(getMember, this, uniqueMemberName!E)._impl.getTag!i:
-				return __traits(getMember, this, uniqueMemberName!E)._impl.getTag!i
-				        == __traits(getMember, rhs, uniqueMemberName!E)._impl._tag
-				    && __traits(getMember, this, uniqueMemberName!E)._impl._inst.tupleof[i]
-				        == __traits(getMember, rhs, uniqueMemberName!E)._impl._inst.tupleof[i];
+			case e:
+				static if (EndataImpl!E._impl.getIndex!e != cast(EndataImpl!E._impl.IndexType)EndataImpl!E._impl.notfoundTag)
+				{
+					return e == __traits(getMember, rhs, uniqueMemberName!E)._impl._tag
+					    && __traits(getMember, this, uniqueMemberName!E)._impl._inst.tupleof[EndataImpl!E._impl.getIndex!e]
+					        == __traits(getMember, rhs, uniqueMemberName!E)._impl._inst.tupleof[EndataImpl!E._impl.getIndex!e];
+				}
+				else
+				{
+					return e == __traits(getMember, rhs, uniqueMemberName!E)._impl._tag;
+				}
 			}
 			default:
 				return false;
@@ -1081,6 +1087,9 @@ if (isManagedUnion!MU)
 		return ret;
 	}();
 }
+
+/// ditto
+enum allTags(MU) = EnumMembers!(ImplOf!MU.TagType);
 
 /// ditto
 template EnumMemberTags(MU)

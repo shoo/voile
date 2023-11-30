@@ -790,25 +790,32 @@ if (isInputBinary!InputRange && is(T == struct))
 	// データ内容の記録
 	switch (tmptag)
 	{
-		static foreach (tag; memberTags!T)
+		static foreach (tag; allTags!T)
 		{
 		case tag:
-			import std.conv;
-			static if (isBasicType!(TypeFromTag!(T, tag)))
+			static if (isAvailableTag!(T, tag))
 			{
-				enum tagName = tag.to!string;
-				enum endian  = getEndian!(__traits(getMember, Tag, tagName));
-				alias Type = TypeFromTag!(T, tag);
-				Type tmpdat;
-				tmpdat.deserializeFromBinDat!endian(r);
-				dst.initialize!tag(tmpdat);
+				import std.conv;
+				static if (isBasicType!(TypeFromTag!(T, tag)))
+				{
+					enum tagName = tag.to!string;
+					enum endian  = getEndian!(__traits(getMember, Tag, tagName));
+					alias Type = TypeFromTag!(T, tag);
+					Type tmpdat;
+					tmpdat.deserializeFromBinDat!endian(r);
+					dst.initialize!tag(tmpdat);
+				}
+				else
+				{
+					alias Type = TypeFromTag!(T, tag);
+					Type tmpdat;
+					tmpdat.deserializeFromBinDat(r);
+					dst.initialize!tag(tmpdat);
+				}
 			}
 			else
 			{
-				alias Type = TypeFromTag!(T, tag);
-				Type tmpdat;
-				tmpdat.deserializeFromBinDat(r);
-				dst.initialize!tag(tmpdat);
+				dst.initialize!tag();
 			}
 			return;
 		}
@@ -963,7 +970,8 @@ if (isInputBinary!InputRange)
 	@littleEndian enum A: short
 	{
 		@bigEndian    @data!int a,
-		@littleEndian @data!short b
+		@littleEndian @data!short b,
+		c
 	}
 	Endata!A a;
 	a.deserializeFromBinDat(bin!(0x00, 0x00, 0x00, 0x00, 0x00, 0x0a));
@@ -974,6 +982,11 @@ if (isInputBinary!InputRange)
 	a.deserializeFromBinDat(bin!(0x01, 0x00, 0x0b, 0x00));
 	tmp.b = 11;
 	assert(a == tmp);
+	
+	a.deserializeFromBinDat(bin!(0x02, 0x00));
+	tmp.initialize!(A.c);
+	assert(a == tmp);
+	assert(tmp.serializeToBinDat() == bin!(0x02, 0x00));
 }
 
 /// Proxy
