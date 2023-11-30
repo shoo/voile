@@ -432,7 +432,8 @@ c.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(
 @littleEndian <span class="d_keyword">enum</span> A: <span class="d_keyword">short</span>
 {
 	@bigEndian    @data!<span class="d_keyword">int</span> a,
-	@littleEndian @data!<span class="d_keyword">short</span> b
+	@littleEndian @data!<span class="d_keyword">short</span> b,
+	c
 }
 Endata!A a;
 a.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0x00, 0x00, 0x00, 0x00, 0x00, 0x0a));
@@ -443,6 +444,11 @@ tmp.a = 10;
 a.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0x01, 0x00, 0x0b, 0x00));
 tmp.b = 11;
 <span class="d_keyword">assert</span>(a == tmp);
+
+a.<span class="d_psymbol">deserializeFromBinDat</span>(bin!(0x02, 0x00));
+tmp.initialize!(A.c);
+<span class="d_keyword">assert</span>(a == tmp);
+<span class="d_keyword">assert</span>(tmp.serializeToBinDat() == bin!(0x02, 0x00));
 </pre>
 </div>
 <div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
