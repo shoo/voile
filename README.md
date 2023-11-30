@@ -2,7 +2,7 @@
 SHOO's scrap library for D language.
 
 <!-- [![GitHub tag](https://img.shields.io/github/tag/shoo/voile.svg?maxAge=86400)](#) -->
-[![master](https://github.com/shoo/voile/workflows/status/badge.svg)](https://github.com/shoo/voile/actions?query=workflow%3Astatus)
+[![master](https://github.com/shoo/voile/actions/workflows/master.yml/badge.svg)](https://github.com/shoo/voile/actions/workflows/master.yml)
 [![codecov](https://codecov.io/gh/shoo/voile/branch/master/graph/badge.svg)](https://codecov.io/gh/shoo/voile)
 
 # Instlation and Build
