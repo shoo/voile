@@ -25679,48 +25679,61 @@
         "type" : "matchInfo!(MU, Funcs)"
        },
        {
-        "name" : "matchImpl",
-        "kind" : "function",
+        "kind" : "template",
         "line" : 2057,
         "char" : 27,
-        "storageClass" : [
-         "auto"
-        ],
-        "type" : "ref (return ref inout MU dat)",
+        "name" : "matchImpl",
         "parameters" : [
          {
-          "name" : "dat",
-          "type" : "MU",
-          "storageClass" : [
-           "inout",
-           "ref",
-           "return"
-          ]
+          "name" : "TMU",
+          "kind" : "type"
          }
         ],
-        "endline" : 2084,
-        "endchar" : 3
+        "constraint" : "is(Unqual!TMU == MU)",
+        "members" : [
+         {
+          "name" : "matchImpl",
+          "kind" : "function",
+          "line" : 2057,
+          "char" : 27,
+          "storageClass" : [
+           "auto"
+          ],
+          "type" : "ref (return ref TMU dat)",
+          "parameters" : [
+           {
+            "name" : "dat",
+            "type" : "TMU",
+            "storageClass" : [
+             "ref",
+             "return"
+            ]
+           }
+          ],
+          "endline" : 2086,
+          "endchar" : 3
+         }
+        ]
        },
        {
         "name" : "match",
         "kind" : "function",
-        "line" : 2087,
+        "line" : 2089,
         "char" : 27,
         "storageClass" : [
          "auto"
         ],
-        "type" : "ref (inout ref MU dat)",
+        "type" : "ref (ref MU dat)",
         "parameters" : [
          {
           "name" : "dat",
           "type" : "MU",
           "storageClass" : [
-           "inout",
            "ref"
           ]
          }
         ],
-        "endline" : 2108,
+        "endline" : 2110,
         "endchar" : 3
        }
       ]
@@ -25728,11 +25741,11 @@
     ]
    },
    {
-    "name" : "__unittest_L2112_C26",
+    "name" : "__unittest_L2114_C26",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2112,
+    "line" : 2114,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -25740,15 +25753,15 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 2142,
+    "endline" : 2144,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L2142_C26",
+    "name" : "__unittest_L2144_C26",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2142,
+    "line" : 2144,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -25756,14 +25769,14 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 2162,
+    "endline" : 2164,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L2162_C26",
+    "name" : "__unittest_L2164_C26",
     "kind" : "function",
     "protection" : "public",
-    "line" : 2162,
+    "line" : 2164,
     "char" : 26,
     "storageClass" : [
      "nothrow",
@@ -25771,7 +25784,7 @@
      "@nogc",
      "@safe"
     ],
-    "endline" : 2207,
+    "endline" : 2224,
     "endchar" : 1
    }
   ]
