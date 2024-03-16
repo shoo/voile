@@ -2054,14 +2054,16 @@ template match(Funcs...)
 		alias minfo = matchInfo!(MU, Funcs);
 		
 		// 関数本体
-		pragma(inline) auto ref matchImpl(inout return ref MU dat)
+		pragma(inline) auto ref matchImpl(TMU)(return ref TMU dat)
+		if (is(Unqual!TMU == MU))
 		{
+			alias qOf = QualifierOf!TMU;
 			static if (minfo.hasDefault)
 			{
 				final switch (dat.getInstance()._impl._tag)
 				{
 				static foreach (F; minfo.callbacks) case minfo.getTag!F:
-					return F(cast(inout)(ref () @trusted 
+					return F(cast(qOf!(minfo.getParams!F[0]))(ref () @trusted 
 						=> *cast(minfo.getParams!F[0]*)&dat.getInstance()._impl._inst.tupleof[minfo.getIndex!F])());
 				case dat.getInstance()._impl.notfoundTag:
 				static foreach (tag; minfo.defaultTags) case tag:
@@ -2084,7 +2086,7 @@ template match(Funcs...)
 		}
 		
 		// 関数本体
-		pragma(inline) auto ref match(inout ref MU dat)
+		pragma(inline) auto ref match(ref MU dat)
 		{
 			static if (minfo.hasCatch)
 			{
@@ -2162,9 +2164,17 @@ template match(Funcs...)
 @safe pure @nogc nothrow unittest
 {
 	import std.exception;
+	import std.datetime: SysTime;
 	import std.conv: ConvException;
 	import voile.misc: nogcEnforce;
-	alias U = TypeEnum!(int, short, long);
+	struct A
+	{
+		int a;
+		string b;
+		int[] val;
+		SysTime tim;
+	}
+	alias U = TypeEnum!(int, short, long, A);
 	U dat;
 	dat.set!0 = 1;
 	
@@ -2178,6 +2188,13 @@ template match(Funcs...)
 		(int x)  => x + 1,
 		()       => 50,
 		(long x) => x + 100) == 200);
+	
+	dat = A(10, "test");
+	assert(dat.match!(
+		(int x)  => x + 1,
+		(A a)    => a.a + 10,
+		()       => 50,
+		(long x) => x + 100) == 20);
 	
 	assert(!dat.empty);
 	dat.clear();
