@@ -27123,100 +27123,113 @@
         ]
        }
       ],
-      "endline" : 1096,
+      "endline" : 1097,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1099_C7",
+    "name" : "__unittest_L1100_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1099,
+    "line" : 1100,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1128,
+    "endline" : 1129,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1128_C7",
+    "name" : "__unittest_L1129_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1128,
+    "line" : 1129,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1155,
+    "endline" : 1156,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1155_C7",
+    "name" : "__unittest_L1156_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1155,
+    "line" : 1156,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1194,
+    "endline" : 1195,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1194_C7",
+    "name" : "__unittest_L1195_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "This behavior is different from Phobos' std.getopt.\n",
-    "line" : 1194,
+    "line" : 1195,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1218,
+    "endline" : 1219,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1218_C7",
+    "name" : "__unittest_L1219_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1218,
+    "line" : 1219,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1250,
+    "endline" : 1251,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1250_C7",
+    "name" : "__unittest_L1251_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1250,
+    "line" : 1251,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1289,
+    "endline" : 1290,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1289_C7",
+    "name" : "__unittest_L1290_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1289,
+    "line" : 1290,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1347,
+    "endline" : 1351,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L1351_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "\n",
+    "line" : 1351,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1371,
     "endchar" : 1
    }
   ]

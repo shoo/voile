@@ -450,6 +450,26 @@ Dat <span class="d_param">dat</span>;
 <span class="d_keyword">assert</span>(<span class="d_param">dat</span>.hoge == <span class="d_string">"hogehogehoge"</span>);
 </pre>
 </div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">import</span> std.conv, std.math;
+
+@passThrough()
+<span class="d_keyword">struct</span> Dat
+{
+	@opt(<span class="d_string">"foo"</span>)
+	<span class="d_keyword">int</span> foo;
+	@opt(<span class="d_string">"bar"</span>)
+	string bar;
+}
+Dat <span class="d_param">dat</span>;
+
+<span class="d_keyword">auto</span> <span class="d_param">args</span> = [<span class="d_string">"program.name"</span>, <span class="d_string">"--foo=10"</span>, <span class="d_string">"aaa"</span>, <span class="d_string">"--bar=12345"</span>, <span class="d_string">"--valueF32=10"</span>, <span class="d_string">"bbb"</span>, <span class="d_string">"--hoge="</span>, <span class="d_string">"ccc"</span>, <span class="d_string">"--fuga=5"</span>];
+<span class="d_param">args</span>.<span class="d_psymbol">parseOptions</span>(<span class="d_param">dat</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.foo == 10);
+<span class="d_keyword">assert</span>(<span class="d_param">dat</span>.bar == <span class="d_string">"12345"</span>);
+<span class="d_keyword">assert</span>(<span class="d_param">args</span> == [<span class="d_string">"program.name"</span>, <span class="d_string">"aaa"</span>, <span class="d_string">"--valueF32=10"</span>, <span class="d_string">"bbb"</span>, <span class="d_string">"--hoge="</span>, <span class="d_string">"ccc"</span>, <span class="d_string">"--fuga=5"</span>]);
+</pre>
+</div>
 </dd>
 </div></dl>
 
