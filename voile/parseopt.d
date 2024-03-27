@@ -1090,6 +1090,7 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 		}
 	}
 	enforce!ParseOptException(requiredOptions.length == 0, "Less arguments...");
+	args = passedArgs;
 	return helpWanted
 		? HelpInformation(getHelpString!T, true)
 		: HelpInformation.init;
@@ -1343,4 +1344,27 @@ HelpInformation parseOptions(T)(ref string[] args, ref T dat) @safe
 	assert(dat.valueF32.isClose(10.0f+12345 + 10));
 	assert(dat.hogeLen == 3);
 	assert(dat.hoge == "hogehogehoge");
+}
+
+
+///
+@safe unittest
+{
+	import std.conv, std.math;
+	
+	@passThrough()
+	struct Dat
+	{
+		@opt("foo")
+		int foo;
+		@opt("bar")
+		string bar;
+	}
+	Dat dat;
+	
+	auto args = ["program.name", "--foo=10", "aaa", "--bar=12345", "--valueF32=10", "bbb", "--hoge=", "ccc", "--fuga=5"];
+	args.parseOptions(dat);
+	assert(dat.foo == 10);
+	assert(dat.bar == "12345");
+	assert(args == ["program.name", "aaa", "--valueF32=10", "bbb", "--hoge=", "ccc", "--fuga=5"]);
 }
