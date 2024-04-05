@@ -1609,9 +1609,25 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 }
 
 /// ditto
+T deserializeFromJson(T)(in JSONValue jv)
+{
+	T ret;
+	ret.deserializeFromJson(jv);
+	return ret;
+}
+
+/// ditto
 void deserializeFromJsonString(T)(ref T data, string jsonContents)
 {
 	deserializeFromJson(data, parseJSON(jsonContents));
+}
+
+/// ditto
+T deserializeFromJsonString(T)(string jsonContents)
+{
+	T ret;
+	ret.deserializeFromJsonString(jsonContents);
+	return ret;
 }
 
 /// ditto
@@ -1619,6 +1635,14 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 {
 	import std.file;
 	deserializeFromJsonString(data, std.file.readText(jsonFile));
+}
+
+/// ditto
+T deserializeFromJsonFile(T)(string jsonFile)
+{
+	T ret;
+	ret.deserializeFromJsonFile(jsonFile);
+	return ret;
 }
 
 ///
@@ -1667,7 +1691,7 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	JSONValue jv1     = serializeToJson(x);
 	string    jsonStr = jv1.toPrettyString();
 	JSONValue jv2     = parseJSON(jsonStr);
-	y.deserializeFromJson(jv2);
+	y = deserializeFromJson!Data(jv2);
 	assert(x != y);
 	y.testval = x.testval;
 	assert(x == y);
@@ -1696,7 +1720,7 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	}
 	
 	x.serializeToJsonFile("test.json", JSONOptions.doNotEscapeSlashes);
-	z.deserializeFromJsonFile("test.json");
+	z = deserializeFromJsonFile!Data("test.json");
 	assert(x != z);
 	z.testval = x.testval;
 	assert(x == z);

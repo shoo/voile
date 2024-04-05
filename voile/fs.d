@@ -984,13 +984,11 @@ struct FileSystem
 	T readJson(T)(string filename)
 	{
 		import voile.json;
-		T ret;
-		static assert(__traits(compiles, ret.deserializeFromJsonString("")), "Unsupported type " ~ T.stringof);
+		static assert(__traits(compiles, deserializeFromJsonString!T("")), "Unsupported type " ~ T.stringof);
 		auto absFilename = absolutePath(filename);
 		if (!isFileImpl!false(absFilename))
 			return T.init;
-		ret.deserializeFromJsonString(readTextImpl!false(absFilename));
-		return ret;
+		return deserializeFromJsonString!T(readTextImpl!false(absFilename));
 	}
 	
 	///
