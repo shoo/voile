@@ -6,6 +6,7 @@ module voile.json;
 import std.json, std.traits, std.meta, std.conv, std.array;
 import std.typecons: Rebindable;
 import std.sumtype: SumType, isSumType;
+import std.typecons: Tuple;
 import voile.misc: assumePure;
 import voile.munion;
 import voile.attr;
@@ -1293,6 +1294,51 @@ private auto ref JSONValue _serializeToJsonImpl(E)(in Endata!E dat) @property
 	assert(mujson["str"].str == "xxx");
 }
 
+//
+private JSONValue _serializeToJsonImpl(Types...)(in Tuple!Types dat) @trusted
+{
+	import std.meta: allSatisfy;
+	enum bool isAvailableFieldName(string fieldName) = fieldName.length > 0;
+	static if (allSatisfy!(isAvailableFieldName, Tuple!Types.fieldNames))
+	{
+		// すべてに名前がついている場合
+		auto ret = JSONValue.emptyObject;
+		static foreach (idx, memberName; Tuple!Types.fieldNames)
+			ret.setValue(memberName, serializeToJson(dat[idx]));
+		return ret;
+	}
+	else
+	{
+		// 名前のないフィールドがある場合は名前を無視して配列にしてしまう
+		auto ret = JSONValue.emptyArray;
+		static foreach (idx; 0..Tuple!Types.length)
+			ret.array ~= serializeToJson(dat[idx]);
+		return ret;
+	}
+}
+
+@safe unittest
+{
+	auto dat1 = Tuple!(int, "test", string, "data")(10, "test");
+	auto js1 = _serializeToJsonImpl(dat1);
+	assert(js1.type == JSONType.object);
+	assert("test" in js1);
+	assert(js1["test"].type == JSONType.integer);
+	assert(js1["test"].integer == 10);
+	assert("data" in js1);
+	assert(js1["data"].type == JSONType.string);
+	assert(js1["data"].str == "test");
+	
+	auto dat2 = Tuple!(int, string)(10, "test");
+	auto js2 = _serializeToJsonImpl(dat2);
+	assert(js2.type == JSONType.array);
+	assert((() @trusted => js2.array.length)() == 2);
+	assert(js2[0].type == JSONType.integer);
+	assert(js2[0].integer == 10);
+	assert(js2[1].type == JSONType.string);
+	assert(js2[1].str == "test");
+}
+
 /*******************************************************************************
  * serialize data to JSON
  */
@@ -1750,7 +1796,7 @@ private void _deserializeFromJsonImpl(U)(ref Tagged!U dst, in JSONValue src)
 }
 
 /// Endata
-void _deserializeFromJsonImpl(E)(ref Endata!E dst, in JSONValue src)
+private void _deserializeFromJsonImpl(E)(ref Endata!E dst, in JSONValue src)
 {
 	foreach (k, v; src.object)
 	{
@@ -1781,6 +1827,39 @@ void _deserializeFromJsonImpl(E)(ref Endata!E dst, in JSONValue src)
 	assert(dat.x == 10);
 }
 
+private void _deserializeFromJsonImpl(Types...)(ref Tuple!Types dst, in JSONValue src) @trusted
+{
+	import std.meta: allSatisfy;
+	enum bool isAvailableFieldName(string fieldName) = fieldName.length > 0;
+	static if (allSatisfy!(isAvailableFieldName, Tuple!Types.fieldNames))
+	{
+		// すべてに名前がついている場合
+		static foreach (idx, memberName; Tuple!Types.fieldNames)
+			dst[idx].deserializeFromJson(src.getValue!JSONValue(memberName));
+	}
+	else
+	{
+		// 名前のないフィールドがある場合は名前を無視して配列にしてしまう
+		if (src.type == JSONType.array && src.array.length == Tuple!Types.Types.length)
+			static foreach (idx, Type; Tuple!Types.Types)
+				dst[idx].deserializeFromJson(src[idx]);
+	}
+}
+
+@safe unittest
+{
+	Tuple!(int, "test", string, "data") dat1;
+	auto js1 = JSONValue(["test": JSONValue(10), "data": JSONValue("test")]);
+	dat1._deserializeFromJsonImpl(js1);
+	assert(dat1.test == 10);
+	assert(dat1.data == "test");
+	
+	Tuple!(int, string) dat2;
+	auto js2 = JSONValue([JSONValue(10), JSONValue("test")]);
+	dat2._deserializeFromJsonImpl(js2);
+	assert(dat2[0] == 10);
+	assert(dat2[1] == "test");
+}
 
 /*******************************************************************************
  * deserialize data from JSON
