@@ -5,6 +5,8 @@ module voile.json;
 
 import std.json, std.traits, std.meta, std.conv, std.array;
 import std.typecons: Rebindable;
+import std.sumtype: SumType, isSumType;
+import std.typecons: Tuple;
 import voile.misc: assumePure;
 import voile.munion;
 import voile.attr;
@@ -862,6 +864,21 @@ if (isManagedUnion!MU)
 		enum string uniqueKey = candidate;
 	}
 }
+//
+private template uniqueKey(ST, string name, uint num = 0)
+if (isSumType!ST)
+{
+	enum string candidate = num == 0 ? name : text(name, num);
+	
+	static if (anySatisfy!(ApplyRight!(hasMember, candidate), ST.Types))
+	{
+		enum string uniqueKey = uniqueKey!(ST, name, num+1);
+	}
+	else
+	{
+		enum string uniqueKey = candidate;
+	}
+}
 
 @system unittest
 {
@@ -872,6 +889,69 @@ if (isManagedUnion!MU)
 	static assert(uniqueKey!(TypeEnum!(A, B), "c") == "c2");
 	static assert(uniqueKey!(TypeEnum!(A, B), "d") == "d");
 }
+
+
+private bool _isNotEq(string[] rhs, string[] lhs) @safe
+{
+	import std.algorithm: canFind;
+	bool ret = true;
+	foreach (k; rhs)
+		ret &= lhs.canFind(k);
+	return !ret;
+}
+@safe unittest
+{
+	assert(_isNotEq(["a", "b"], ["a", "c"]));
+	assert(!_isNotEq(["a", "b"], ["a", "b"]));
+	assert(!_isNotEq(["a", "b"], ["b", "a"]));
+}
+private bool _isUniq(string[] keyMembers, string[][] anotherKeyMembers) @safe
+{
+	bool ret = true;
+	foreach (keys; anotherKeyMembers)
+		ret &= _isNotEq(keyMembers, keys);
+	return ret;
+}
+@safe unittest
+{
+	assert(_isUniq(["a", "b"], [["a", "c"], ["a", "d"]]));
+	assert(!_isUniq(["a", "b"], [["a", "b"], ["a", "d"]]));
+	assert(!_isUniq(["a", "b"], [["b", "a"], ["a", "d"]]));
+}
+private bool _isAllUniq(string[][] keyMembers) @safe
+{
+	bool ret = true;
+	foreach (idx; 0..keyMembers.length)
+		ret &= _isUniq(keyMembers[idx], keyMembers[idx+1..$]);
+	return ret;
+}
+@safe unittest
+{
+	assert(_isAllUniq([["a", "b"], ["a", "c"], ["a", "d"]]));
+	assert(!_isAllUniq([["a", "b"], ["a", "b"], ["a", "d"]]));
+	assert(!_isAllUniq([["a", "b"], ["b", "a"], ["a", "d"]]));
+}
+
+
+private enum _isKeyAllUnique(Types...) = ()
+{
+	string[][] members;
+	static foreach (Type; Types)
+		members ~= [getKeyMemberNames!Type];
+	return _isAllUniq(members);
+}();
+
+@safe unittest
+{
+	struct A { @key int a; @key int b;      int c; }
+	struct B { @key int a;      int b; @key int c; }
+	struct C {      int a; @key int b; @key int c; }
+	struct D { @key int a; @key int b; @key int c; }
+	static assert(_isKeyAllUnique!(A, B));
+	static assert(_isKeyAllUnique!(A, C));
+	static assert(!_isKeyAllUnique!(A, D));
+}
+
 
 /+
 // キーの数が同じで、キーの名称が同じで、キーの型が同じならそのキー名を返す
@@ -990,6 +1070,43 @@ private alias _getKinds(T, string uk, alias tag) = aliasSeqOf!(()
 		ret ~= Kind(uk, JSONValue(tag));
 	return ret;
 }());
+
+
+
+private JSONValue _serializeToJsonImpl(Types...)(in SumType!Types dat)
+{
+	import std.sumtype: match;
+	return dat.match!( (_) => _.serializeToJson() );
+}
+
+@system unittest
+{
+	alias MU = SumType!(int, string);
+	MU dat = 10;
+	auto mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.integer);
+	assert(mujson.integer == 10);
+	
+	dat = "xxx";
+	mujson = _serializeToJsonImpl(dat);
+	assert(mujson.type == JSONType.string);
+	assert(mujson.str == "xxx");
+}
+
+@system unittest
+{
+	struct A{ @key int a; int b; }
+	struct B{ int a; @key int c; }
+	
+	SumType!(A, B) dat1 = A(1, 10);
+	auto mujson1 = _serializeToJsonImpl(dat1);
+	assert(mujson1.type == JSONType.object);
+	assert(mujson1["a"].type == JSONType.integer);
+	assert(mujson1["a"].integer == 1);
+	assert(mujson1["b"].type == JSONType.integer);
+	assert(mujson1["b"].integer == 10);
+}
+
 
 // - TypeEnumなら、まず型で 数値/文字列/配列/オブジェクト でそれぞれかぶりがないか検証する
 //   - 数値にかぶりがある→無視して記録する。
@@ -1177,6 +1294,51 @@ private auto ref JSONValue _serializeToJsonImpl(E)(in Endata!E dat) @property
 	assert(mujson["str"].str == "xxx");
 }
 
+//
+private JSONValue _serializeToJsonImpl(Types...)(in Tuple!Types dat) @trusted
+{
+	import std.meta: allSatisfy;
+	enum bool isAvailableFieldName(string fieldName) = fieldName.length > 0;
+	static if (allSatisfy!(isAvailableFieldName, Tuple!Types.fieldNames))
+	{
+		// すべてに名前がついている場合
+		auto ret = JSONValue.emptyObject;
+		static foreach (idx, memberName; Tuple!Types.fieldNames)
+			ret.setValue(memberName, serializeToJson(dat[idx]));
+		return ret;
+	}
+	else
+	{
+		// 名前のないフィールドがある場合は名前を無視して配列にしてしまう
+		auto ret = JSONValue.emptyArray;
+		static foreach (idx; 0..Tuple!Types.length)
+			ret.array ~= serializeToJson(dat[idx]);
+		return ret;
+	}
+}
+
+@safe unittest
+{
+	auto dat1 = Tuple!(int, "test", string, "data")(10, "test");
+	auto js1 = _serializeToJsonImpl(dat1);
+	assert(js1.type == JSONType.object);
+	assert("test" in js1);
+	assert(js1["test"].type == JSONType.integer);
+	assert(js1["test"].integer == 10);
+	assert("data" in js1);
+	assert(js1["data"].type == JSONType.string);
+	assert(js1["data"].str == "test");
+	
+	auto dat2 = Tuple!(int, string)(10, "test");
+	auto js2 = _serializeToJsonImpl(dat2);
+	assert(js2.type == JSONType.array);
+	assert((() @trusted => js2.array.length)() == 2);
+	assert(js2[0].type == JSONType.integer);
+	assert(js2[0].integer == 10);
+	assert(js2[1].type == JSONType.string);
+	assert(js2[1].str == "test");
+}
+
 /*******************************************************************************
  * serialize data to JSON
  */
@@ -1282,6 +1444,175 @@ void serializeToJsonFile(T)(in T data, string jsonfile, JSONOptions options = JS
 	std.file.write(jsonfile, contents);
 }
 
+
+//
+private void _deserializeFromJsonImpl(Types...)(ref SumType!Types dat, in JSONValue json)
+{
+	import std.sumtype: canMatch, match;
+	alias MU = SumType!Types;
+	final switch (json.type)
+	{
+	case JSONType.null_:
+		dat = MU.init;
+		break;
+	case JSONType.string:
+		static if (canMatch!(MU, string))
+			dat = json.str;
+		break;
+	case JSONType.integer:
+		static if (canMatch!(MU, long))
+			dat = json.integer;
+		else static if (canMatch!(MU, int))
+			dat = json.integer;
+		else static if (canMatch!(MU, short))
+			dat = json.integer;
+		else static if (canMatch!(MU, byte))
+			dat = json.integer;
+		break;
+	case JSONType.uinteger:
+		static if (canMatch!(MU, ulong))
+			dat = json.uinteger;
+		else static if (canMatch!(MU, uint))
+			dat = json.uinteger;
+		else static if (canMatch!(MU, ushort))
+			dat = json.uinteger;
+		else static if (canMatch!(MU, ubyte))
+			dat = json.uinteger;
+		break;
+	case JSONType.float_:
+		static if (canMatch!(MU, real))
+			dat = json.floating;
+		else static if (canMatch!(MU, double))
+			dat = json.floating;
+		else static if (canMatch!(MU, float))
+			dat = json.floating;
+		break;
+	case JSONType.array:
+		// 配列型の候補を選択
+		alias AryTypes = Filter!(isArray, MU.Types);
+		static if (AryTypes.length == 0)
+		{
+			// 配列型がないなら無視
+			return;
+		}
+		else static if (AryTypes.length == 1)
+		{
+			// 配列型が1つならそれを最優先で選択
+			dat = deserializeFromJson!(AryTypes[0])(tmp, json);
+			return;
+		}
+		else
+		{
+			// 配列型が複数ある場合は1つ目のデータの要素で決定
+			if (json.array.length == 0)
+				dat = MU.init;
+			import std.meta;
+			alias ElementTypes = staticMap!(ForeachType, AryTypes);
+			SumType!ElementTypes datElm;
+			datElm.deserializeFromJson(json.array[0]);
+			import std.sumtype: match;
+			datElm.match!(
+				(_){
+					alias AryType = MU.Types[staticIndexOf!(typeof(_), ElementTypes)];
+					dat = json.deserializeFromJson!AryType();
+				}
+			);
+			return;
+		}
+		assert(0);
+	case JSONType.object:
+		// オブジェクト型の候補を選択
+		enum bool isObjType(T) = isAggregateType!T || isAssociativeArray!T;
+		alias ObjTypes = Filter!(isObjType, Types);
+		static if (ObjTypes.length == 0)
+		{
+			// オブジェクト型がないなら無視
+		}
+		else static if (ObjTypes.length == 1)
+		{
+			// オブジェクト型が1つならそれを最優先で選択
+			dst = deserializeFromJson!(ObjTypes[0])(json);
+		}
+		else
+		{
+			// キーメンバーがすべて違う場合は、キーメンバーを持っている型を使用する
+			static if (_isKeyAllUnique!ObjTypes)
+			{
+				static foreach (ObjType; ObjTypes)
+				{{
+					bool matchKeys = true;
+					static foreach (memberName; getKeyMemberNames!ObjType)
+						matchKeys &= cast(bool)(memberName in json);
+					if (matchKeys)
+					{
+						dat = deserializeFromJson!ObjType(json);
+						return;
+					}
+				}}
+			}
+			else
+			{
+				// オブジェクト型が複数ある場合はキーデータの要素で決定
+				static foreach (idx; 0..ObjTypes.length)
+				{
+					// キーメンバーをすべて持っている型を探す
+					static foreach (kind; _getKinds!(ObjTypes[idx], uniqueKey!(MU, "_tag"), staticIndexOf!(ObjTypes[idx], MU.Types)))
+					{
+						if (auto v = kind.key in json)
+						{
+							if (*v == kind.value)
+							{
+								dat = deserializeFromJson!(ObjTypes[idx])(json);
+								return;
+							}
+						}
+					}
+				}
+			}
+		}
+		break;
+	case JSONType.true_:
+	case JSONType.false_:
+		static if (hasType!(TypeEnum!Types, bool))
+			dat.initialize!bool(src.boolean);
+		break;
+	}
+}
+//
+@system unittest
+{
+	struct A{ @key @value!1 int a; int b; }
+	struct B{ @key @value!2 int a; int c; }
+	struct C{ int a; @key @value!1 int b; @key @value!1 int c; }
+	struct D{ int a; int b; @key int c; }
+	import std.sumtype: match;
+	SumType!(A, B) dat1;
+	auto mujson1 = JSONValue(["a": JSONValue(1), "b": JSONValue(10)]);
+	_deserializeFromJsonImpl(dat1, mujson1);
+	auto result = dat1.match!(
+		(A a) => 1,
+		(B b) => 2,
+	);
+	assert(result == 1);
+	
+	SumType!(A[], B[]) dat2;
+	auto mujson2 = JSONValue([JSONValue(["a": 1]), JSONValue(["b": 10])]);
+	_deserializeFromJsonImpl(dat2, mujson2);
+	result = dat2.match!(
+		(A[] a) => 1,
+		(B[] b) => 2,
+	);
+	assert(result == 1);
+	
+	SumType!(A, D) dat3;
+	auto mujson3 = JSONValue(["c": 10]);
+	_deserializeFromJsonImpl(dat3, mujson3);
+	result = dat3.match!(
+		(A a) => 1,
+		(D b) => 2,
+	);
+	assert(result == 2);
+}
 
 
 // - TypeEnumなら、まず型で 数値/文字列/配列/オブジェクト でそれぞれかぶりがないか検証する
@@ -1402,9 +1733,7 @@ private void _deserializeFromJsonImpl(Types...)(ref TypeEnum!Types dat, in JSONV
 					{
 						if (*v == kind.value)
 						{
-							TypeFromTag!(MU, tag) tmp;
-							deserializeFromJson(tmp, json);
-							dat.initialize!tag(tmp);
+							dat.initialize!tag(deserializeFromJson!(TypeFromTag!(MU, tag))(json));
 							return;
 						}
 					}
@@ -1420,7 +1749,7 @@ private void _deserializeFromJsonImpl(Types...)(ref TypeEnum!Types dat, in JSONV
 	}
 }
 
-///
+//
 @system unittest
 {
 	struct A{ @key @value!1 int a; int b; }
@@ -1467,7 +1796,7 @@ private void _deserializeFromJsonImpl(U)(ref Tagged!U dst, in JSONValue src)
 }
 
 /// Endata
-void _deserializeFromJsonImpl(E)(ref Endata!E dst, in JSONValue src)
+private void _deserializeFromJsonImpl(E)(ref Endata!E dst, in JSONValue src)
 {
 	foreach (k, v; src.object)
 	{
@@ -1498,6 +1827,39 @@ void _deserializeFromJsonImpl(E)(ref Endata!E dst, in JSONValue src)
 	assert(dat.x == 10);
 }
 
+private void _deserializeFromJsonImpl(Types...)(ref Tuple!Types dst, in JSONValue src) @trusted
+{
+	import std.meta: allSatisfy;
+	enum bool isAvailableFieldName(string fieldName) = fieldName.length > 0;
+	static if (allSatisfy!(isAvailableFieldName, Tuple!Types.fieldNames))
+	{
+		// すべてに名前がついている場合
+		static foreach (idx, memberName; Tuple!Types.fieldNames)
+			dst[idx].deserializeFromJson(src.getValue!JSONValue(memberName));
+	}
+	else
+	{
+		// 名前のないフィールドがある場合は名前を無視して配列にしてしまう
+		if (src.type == JSONType.array && src.array.length == Tuple!Types.Types.length)
+			static foreach (idx, Type; Tuple!Types.Types)
+				dst[idx].deserializeFromJson(src[idx]);
+	}
+}
+
+@safe unittest
+{
+	Tuple!(int, "test", string, "data") dat1;
+	auto js1 = JSONValue(["test": JSONValue(10), "data": JSONValue("test")]);
+	dat1._deserializeFromJsonImpl(js1);
+	assert(dat1.test == 10);
+	assert(dat1.data == "test");
+	
+	Tuple!(int, string) dat2;
+	auto js2 = JSONValue([JSONValue(10), JSONValue("test")]);
+	dat2._deserializeFromJsonImpl(js2);
+	assert(dat2[0] == 10);
+	assert(dat2[1] == "test");
+}
 
 /*******************************************************************************
  * deserialize data from JSON
@@ -1609,9 +1971,25 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 }
 
 /// ditto
+T deserializeFromJson(T)(in JSONValue jv)
+{
+	T ret;
+	ret.deserializeFromJson(jv);
+	return ret;
+}
+
+/// ditto
 void deserializeFromJsonString(T)(ref T data, string jsonContents)
 {
 	deserializeFromJson(data, parseJSON(jsonContents));
+}
+
+/// ditto
+T deserializeFromJsonString(T)(string jsonContents)
+{
+	T ret;
+	ret.deserializeFromJsonString(jsonContents);
+	return ret;
 }
 
 /// ditto
@@ -1619,6 +1997,14 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 {
 	import std.file;
 	deserializeFromJsonString(data, std.file.readText(jsonFile));
+}
+
+/// ditto
+T deserializeFromJsonFile(T)(string jsonFile)
+{
+	T ret;
+	ret.deserializeFromJsonFile(jsonFile);
+	return ret;
 }
 
 ///
@@ -1667,7 +2053,7 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	JSONValue jv1     = serializeToJson(x);
 	string    jsonStr = jv1.toPrettyString();
 	JSONValue jv2     = parseJSON(jsonStr);
-	y.deserializeFromJson(jv2);
+	y = deserializeFromJson!Data(jv2);
 	assert(x != y);
 	y.testval = x.testval;
 	assert(x == y);
@@ -1696,7 +2082,7 @@ void deserializeFromJsonFile(T)(ref T data, string jsonFile)
 	}
 	
 	x.serializeToJsonFile("test.json", JSONOptions.doNotEscapeSlashes);
-	z.deserializeFromJsonFile("test.json");
+	z = deserializeFromJsonFile!Data("test.json");
 	assert(x != z);
 	z.testval = x.testval;
 	assert(x == z);
