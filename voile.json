@@ -7505,35 +7505,35 @@
           "type" : "string"
          }
         ],
-        "endline" : 994,
+        "endline" : 992,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "__unittest_L997_C10",
+      "name" : "__unittest_L995_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 997,
+      "line" : 995,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1005,
+      "endline" : 1003,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1005_C10",
+      "name" : "__unittest_L1003_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1005,
+      "line" : 1003,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1031,
+      "endline" : 1029,
       "endchar" : 2
      },
      {
@@ -7541,7 +7541,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " ファイルを新しく作成する\n",
-      "line" : 1031,
+      "line" : 1029,
       "char" : 7,
       "deco" : "FAyaZS3std5stdio4File",
       "parameters" : [
@@ -7550,7 +7550,7 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 1038,
+      "endline" : 1036,
       "endchar" : 2
      },
      {
@@ -7558,7 +7558,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " ファイルを開く\n\n ファイルがなければ新しく作成して開く\n",
-      "line" : 1045,
+      "line" : 1043,
       "char" : 7,
       "deco" : "FAyaQdZS3std5stdio4File",
       "parameters" : [
@@ -7572,13 +7572,13 @@
         "default" : "\"r+\""
        }
       ],
-      "endline" : 1051,
+      "endline" : 1049,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1054,
+      "line" : 1052,
       "char" : 15,
       "name" : "clearReadonlyImpl",
       "parameters" : [
@@ -7592,7 +7592,7 @@
        {
         "name" : "clearReadonlyImpl",
         "kind" : "function",
-        "line" : 1054,
+        "line" : 1052,
         "char" : 15,
         "type" : "const @safe bool(string target)",
         "parameters" : [
@@ -7601,7 +7601,7 @@
           "type" : "string"
          }
         ],
-        "endline" : 1059,
+        "endline" : 1057,
         "endchar" : 2
        }
       ]
@@ -7609,7 +7609,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1060,
+      "line" : 1058,
       "char" : 15,
       "name" : "clearReadonlyImpl",
       "parameters" : [
@@ -7624,7 +7624,7 @@
        {
         "name" : "clearReadonlyImpl",
         "kind" : "function",
-        "line" : 1060,
+        "line" : 1058,
         "char" : 15,
         "type" : "const @safe bool(string target)",
         "parameters" : [
@@ -7633,7 +7633,7 @@
           "type" : "string"
          }
         ],
-        "endline" : 1077,
+        "endline" : 1075,
         "endchar" : 2
        }
       ]
@@ -7643,7 +7643,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1082,
+      "line" : 1080,
       "char" : 7,
       "deco" : "xFAyaZb",
       "parameters" : [
@@ -7652,13 +7652,13 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 1085,
+      "endline" : 1083,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1088,
+      "line" : 1086,
       "char" : 15,
       "name" : "removeFilesImpl",
       "parameters" : [
@@ -7672,7 +7672,7 @@
        {
         "name" : "removeFilesImpl",
         "kind" : "function",
-        "line" : 1088,
+        "line" : 1086,
         "char" : 15,
         "type" : "@safe bool(string target, bool force, uint retrycnt)",
         "parameters" : [
@@ -7689,7 +7689,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1091,
+        "endline" : 1089,
         "endchar" : 2
        }
       ]
@@ -7697,7 +7697,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1092,
+      "line" : 1090,
       "char" : 15,
       "name" : "removeFilesImpl",
       "parameters" : [
@@ -7712,7 +7712,7 @@
        {
         "name" : "removeFilesImpl",
         "kind" : "function",
-        "line" : 1092,
+        "line" : 1090,
         "char" : 15,
         "type" : "@trusted bool(string target, bool force, uint retrycnt)",
         "parameters" : [
@@ -7729,7 +7729,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1151,
+        "endline" : 1149,
         "endchar" : 2
        }
       ]
@@ -7739,7 +7739,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1156,
+      "line" : 1154,
       "char" : 7,
       "deco" : "FNfAyabkZb",
       "originalType" : "@safe bool(string target, bool force = true, uint retrycnt = 5)",
@@ -7759,19 +7759,19 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1159,
+      "endline" : 1157,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1160_C10",
+      "name" : "__unittest_L1158_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1160,
+      "line" : 1158,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1188,
+      "endline" : 1186,
       "endchar" : 2
      },
      {
@@ -7779,7 +7779,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1188,
+      "line" : 1186,
       "char" : 7,
       "deco" : "FAyaQdbkZb",
       "originalType" : "bool(string targetDir, string blobFilter, bool force = true, uint retrycnt = 5)",
@@ -7803,25 +7803,25 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1210,
+      "endline" : 1208,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1211_C10",
+      "name" : "__unittest_L1209_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1211,
+      "line" : 1209,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1232,
+      "endline" : 1230,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1232,
+      "line" : 1230,
       "char" : 15,
       "name" : "copyFileImpl",
       "parameters" : [
@@ -7835,7 +7835,7 @@
        {
         "name" : "copyFileImpl",
         "kind" : "function",
-        "line" : 1232,
+        "line" : 1230,
         "char" : 15,
         "type" : "bool(string src, string target, bool force, uint retrycnt)",
         "parameters" : [
@@ -7856,7 +7856,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1238,
+        "endline" : 1236,
         "endchar" : 2
        }
       ]
@@ -7864,7 +7864,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1239,
+      "line" : 1237,
       "char" : 15,
       "name" : "copyFileImpl",
       "parameters" : [
@@ -7879,7 +7879,7 @@
        {
         "name" : "copyFileImpl",
         "kind" : "function",
-        "line" : 1239,
+        "line" : 1237,
         "char" : 15,
         "type" : "bool(string src, string target, bool force, uint retrycnt)",
         "parameters" : [
@@ -7900,7 +7900,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1285,
+        "endline" : 1283,
         "endchar" : 2
        }
       ]
@@ -7910,7 +7910,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " ファイルをコピーする\n",
-      "line" : 1290,
+      "line" : 1288,
       "char" : 7,
       "deco" : "FAyaQdbkZb",
       "originalType" : "bool(string srcFile, string targetFile, bool force = true, uint retrycnt = 5)",
@@ -7934,25 +7934,25 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1293,
+      "endline" : 1291,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1294_C10",
+      "name" : "__unittest_L1292_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1294,
+      "line" : 1292,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1303,
+      "endline" : 1301,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1303,
+      "line" : 1301,
       "char" : 15,
       "name" : "copyFilesImpl",
       "parameters" : [
@@ -7966,7 +7966,7 @@
        {
         "name" : "copyFilesImpl",
         "kind" : "function",
-        "line" : 1303,
+        "line" : 1301,
         "char" : 15,
         "type" : "bool(string srcDir, string targetDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -7987,7 +7987,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1309,
+        "endline" : 1307,
         "endchar" : 2
        }
       ]
@@ -7995,7 +7995,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1311,
+      "line" : 1309,
       "char" : 15,
       "name" : "copyFilesImpl",
       "parameters" : [
@@ -8010,7 +8010,7 @@
        {
         "name" : "copyFilesImpl",
         "kind" : "function",
-        "line" : 1311,
+        "line" : 1309,
         "char" : 15,
         "type" : "bool(string srcDir, string targetDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -8031,7 +8031,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1330,
+        "endline" : 1328,
         "endchar" : 2
        }
       ]
@@ -8039,7 +8039,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1332,
+      "line" : 1330,
       "char" : 15,
       "name" : "copyFilesImpl",
       "parameters" : [
@@ -8053,7 +8053,7 @@
        {
         "name" : "copyFilesImpl",
         "kind" : "function",
-        "line" : 1332,
+        "line" : 1330,
         "char" : 15,
         "type" : "bool(string srcDir, string blobFilter, string targetDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -8078,7 +8078,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1339,
+        "endline" : 1337,
         "endchar" : 2
        }
       ]
@@ -8086,7 +8086,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1341,
+      "line" : 1339,
       "char" : 15,
       "name" : "copyFilesImpl",
       "parameters" : [
@@ -8101,7 +8101,7 @@
        {
         "name" : "copyFilesImpl",
         "kind" : "function",
-        "line" : 1341,
+        "line" : 1339,
         "char" : 15,
         "type" : "bool(string srcDir, string blobFilter, string targetDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -8126,7 +8126,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1361,
+        "endline" : 1359,
         "endchar" : 2
        }
       ]
@@ -8136,7 +8136,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1366,
+      "line" : 1364,
       "char" : 7,
       "deco" : "FAyaQdbkZb",
       "originalType" : "bool(string src, string target, bool force = true, uint retrycnt = 5)",
@@ -8160,33 +8160,33 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1376,
+      "endline" : 1374,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1379_C10",
+      "name" : "__unittest_L1377_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1379,
+      "line" : 1377,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1388,
+      "endline" : 1386,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1388_C10",
+      "name" : "__unittest_L1386_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1388,
+      "line" : 1386,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1400,
+      "endline" : 1398,
       "endchar" : 2
      },
      {
@@ -8194,7 +8194,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1400,
+      "line" : 1398,
       "char" : 7,
       "deco" : "FAyaQdQfbkZb",
       "originalType" : "bool(string srcDir, string blobFilter, string targetDir, bool force = true, uint retrycnt = 5)",
@@ -8222,26 +8222,26 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1403,
+      "endline" : 1401,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1405_C10",
+      "name" : "__unittest_L1403_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1405,
+      "line" : 1403,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1418,
+      "endline" : 1416,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1418,
+      "line" : 1416,
       "char" : 15,
       "name" : "mirrorFilesImpl",
       "parameters" : [
@@ -8255,7 +8255,7 @@
        {
         "name" : "mirrorFilesImpl",
         "kind" : "function",
-        "line" : 1418,
+        "line" : 1416,
         "char" : 15,
         "type" : "bool(string srcDir, string dstDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -8276,7 +8276,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1424,
+        "endline" : 1422,
         "endchar" : 2
        }
       ]
@@ -8284,7 +8284,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1426,
+      "line" : 1424,
       "char" : 15,
       "name" : "mirrorFilesImpl",
       "parameters" : [
@@ -8299,7 +8299,7 @@
        {
         "name" : "mirrorFilesImpl",
         "kind" : "function",
-        "line" : 1426,
+        "line" : 1424,
         "char" : 15,
         "type" : "bool(string srcDir, string dstDir, bool force, uint retrycnt)",
         "parameters" : [
@@ -8320,7 +8320,7 @@
           "deco" : "k"
          }
         ],
-        "endline" : 1501,
+        "endline" : 1499,
         "endchar" : 2
        }
       ]
@@ -8330,7 +8330,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " ファイルをミラーリングする\n",
-      "line" : 1506,
+      "line" : 1504,
       "char" : 7,
       "deco" : "FAyaQdbkZb",
       "originalType" : "bool(string srcDir, string dstDir, bool force = true, uint retrycnt = 5)",
@@ -8354,13 +8354,13 @@
         "default" : "5u"
        }
       ],
-      "endline" : 1509,
+      "endline" : 1507,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1515,
+      "line" : 1513,
       "char" : 15,
       "name" : "moveFilesImpl",
       "parameters" : [
@@ -8374,7 +8374,7 @@
        {
         "name" : "moveFilesImpl",
         "kind" : "function",
-        "line" : 1515,
+        "line" : 1513,
         "char" : 15,
         "type" : "bool(string src, string dst, bool force, bool retrycnt)",
         "parameters" : [
@@ -8395,7 +8395,7 @@
           "deco" : "b"
          }
         ],
-        "endline" : 1521,
+        "endline" : 1519,
         "endchar" : 2
        }
       ]
@@ -8403,7 +8403,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1523,
+      "line" : 1521,
       "char" : 15,
       "name" : "moveFilesImpl",
       "parameters" : [
@@ -8418,7 +8418,7 @@
        {
         "name" : "moveFilesImpl",
         "kind" : "function",
-        "line" : 1523,
+        "line" : 1521,
         "char" : 15,
         "type" : "bool(string src, string dst, bool force, bool retrycnt)",
         "parameters" : [
@@ -8439,7 +8439,7 @@
           "deco" : "b"
          }
         ],
-        "endline" : 1590,
+        "endline" : 1588,
         "endchar" : 2
        }
       ]
@@ -8449,7 +8449,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " ファイルを移動する\n",
-      "line" : 1595,
+      "line" : 1593,
       "char" : 7,
       "deco" : "FAyaQdbbZb",
       "parameters" : [
@@ -8472,7 +8472,7 @@
         "default" : "true"
        }
       ],
-      "endline" : 1598,
+      "endline" : 1596,
       "endchar" : 2
      },
      {
@@ -8480,7 +8480,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " シンボリックリンクを作成する\n",
-      "line" : 1603,
+      "line" : 1601,
       "char" : 7,
       "deco" : "FIAaIQdZv",
       "parameters" : [
@@ -8499,19 +8499,19 @@
         ]
        }
       ],
-      "endline" : 1626,
+      "endline" : 1624,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1627_C10",
+      "name" : "__unittest_L1625_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1627,
+      "line" : 1625,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1640,
+      "endline" : 1638,
       "endchar" : 2
      },
      {
@@ -8519,7 +8519,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " シンボリックリンクの実パスを得る\n",
-      "line" : 1640,
+      "line" : 1638,
       "char" : 9,
       "deco" : "FIAaZAya",
       "parameters" : [
@@ -8531,25 +8531,25 @@
         ]
        }
       ],
-      "endline" : 1708,
+      "endline" : 1706,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1709_C10",
+      "name" : "__unittest_L1707_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1709,
+      "line" : 1707,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1721,
+      "endline" : 1719,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1721,
+      "line" : 1719,
       "char" : 15,
       "name" : "setTimeStampImpl",
       "parameters" : [
@@ -8563,7 +8563,7 @@
        {
         "name" : "setTimeStampImpl",
         "kind" : "function",
-        "line" : 1721,
+        "line" : 1719,
         "char" : 15,
         "type" : "void(string target, SysTime accessTime, SysTime modificationTime)",
         "parameters" : [
@@ -8580,7 +8580,7 @@
           "type" : "SysTime"
          }
         ],
-        "endline" : 1724,
+        "endline" : 1722,
         "endchar" : 2
        }
       ]
@@ -8588,7 +8588,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1726,
+      "line" : 1724,
       "char" : 15,
       "name" : "setTimeStampImpl",
       "parameters" : [
@@ -8603,7 +8603,7 @@
        {
         "name" : "setTimeStampImpl",
         "kind" : "function",
-        "line" : 1726,
+        "line" : 1724,
         "char" : 15,
         "type" : "void(string target, SysTime accessTime, SysTime modificationTime)",
         "parameters" : [
@@ -8620,7 +8620,7 @@
           "type" : "SysTime"
          }
         ],
-        "endline" : 1729,
+        "endline" : 1727,
         "endchar" : 2
        }
       ]
@@ -8628,7 +8628,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1731,
+      "line" : 1729,
       "char" : 15,
       "name" : "getTimeStampImpl",
       "parameters" : [
@@ -8642,7 +8642,7 @@
        {
         "name" : "getTimeStampImpl",
         "kind" : "function",
-        "line" : 1731,
+        "line" : 1729,
         "char" : 15,
         "type" : "void(string target, out SysTime accessTime, out SysTime modificationTime)",
         "parameters" : [
@@ -8665,7 +8665,7 @@
           ]
          }
         ],
-        "endline" : 1734,
+        "endline" : 1732,
         "endchar" : 2
        }
       ]
@@ -8673,7 +8673,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 1736,
+      "line" : 1734,
       "char" : 15,
       "name" : "getTimeStampImpl",
       "parameters" : [
@@ -8688,7 +8688,7 @@
        {
         "name" : "getTimeStampImpl",
         "kind" : "function",
-        "line" : 1736,
+        "line" : 1734,
         "char" : 15,
         "type" : "void(string target, out SysTime accessTime, out SysTime modificationTime)",
         "parameters" : [
@@ -8711,7 +8711,7 @@
           ]
          }
         ],
-        "endline" : 1740,
+        "endline" : 1738,
         "endchar" : 2
        }
       ]
@@ -8721,7 +8721,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " タイムスタンプを変更/取得する\n",
-      "line" : 1746,
+      "line" : 1744,
       "char" : 7,
       "deco" : "FAyaS3std8datetime7systime7SysTimeQBeZv",
       "parameters" : [
@@ -8738,7 +8738,7 @@
         "deco" : "S3std8datetime7systime7SysTime"
        }
       ],
-      "endline" : 1749,
+      "endline" : 1747,
       "endchar" : 2
      },
      {
@@ -8746,7 +8746,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1751,
+      "line" : 1749,
       "char" : 7,
       "deco" : "FAyaS3std8datetime7systime7SysTimeZv",
       "parameters" : [
@@ -8759,7 +8759,7 @@
         "deco" : "S3std8datetime7systime7SysTime"
        }
       ],
-      "endline" : 1754,
+      "endline" : 1752,
       "endchar" : 2
      },
      {
@@ -8767,7 +8767,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1756,
+      "line" : 1754,
       "char" : 7,
       "deco" : "FAyaS3std8datetime4date8DateTimeQBcZv",
       "parameters" : [
@@ -8784,7 +8784,7 @@
         "deco" : "S3std8datetime4date8DateTime"
        }
       ],
-      "endline" : 1759,
+      "endline" : 1757,
       "endchar" : 2
      },
      {
@@ -8792,7 +8792,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1761,
+      "line" : 1759,
       "char" : 7,
       "deco" : "FAyaS3std8datetime4date8DateTimeZv",
       "parameters" : [
@@ -8805,7 +8805,7 @@
         "deco" : "S3std8datetime4date8DateTime"
        }
       ],
-      "endline" : 1764,
+      "endline" : 1762,
       "endchar" : 2
      },
      {
@@ -8813,7 +8813,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1766,
+      "line" : 1764,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime7systime7SysTimeJQBfZv",
       "parameters" : [
@@ -8836,7 +8836,7 @@
         ]
        }
       ],
-      "endline" : 1769,
+      "endline" : 1767,
       "endchar" : 2
      },
      {
@@ -8844,7 +8844,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1771,
+      "line" : 1769,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime7systime7SysTimeZv",
       "parameters" : [
@@ -8860,7 +8860,7 @@
         ]
        }
       ],
-      "endline" : 1775,
+      "endline" : 1773,
       "endchar" : 2
      },
      {
@@ -8868,7 +8868,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1777,
+      "line" : 1775,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime4date8DateTimeJQBdZv",
       "parameters" : [
@@ -8891,7 +8891,7 @@
         ]
        }
       ],
-      "endline" : 1783,
+      "endline" : 1781,
       "endchar" : 2
      },
      {
@@ -8899,7 +8899,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1785,
+      "line" : 1783,
       "char" : 7,
       "deco" : "FAyaJS3std8datetime4date8DateTimeZv",
       "parameters" : [
@@ -8915,7 +8915,7 @@
         ]
        }
       ],
-      "endline" : 1790,
+      "endline" : 1788,
       "endchar" : 2
      },
      {
@@ -8923,7 +8923,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1792,
+      "line" : 1790,
       "char" : 10,
       "deco" : "FAyaZS3std8datetime7systime7SysTime",
       "parameters" : [
@@ -8932,19 +8932,19 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 1797,
+      "endline" : 1795,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1799_C10",
+      "name" : "__unittest_L1797_C10",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1799,
+      "line" : 1797,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1853,
+      "endline" : 1851,
       "endchar" : 2
      },
      {
@@ -8952,7 +8952,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " パスを検索する\n",
-      "line" : 1853,
+      "line" : 1851,
       "char" : 9,
       "deco" : "xFNeIAaIAAyaZAya",
       "parameters" : [
@@ -8972,7 +8972,7 @@
         "default" : "null"
        }
       ],
-      "endline" : 1893,
+      "endline" : 1891,
       "endchar" : 2
      },
      {
@@ -8980,7 +8980,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " プロセスを実行する\n",
-      "line" : 1898,
+      "line" : 1896,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9006,7 +9006,7 @@
         "default" : "Config(Flags.none, null)"
        }
       ],
-      "endline" : 1908,
+      "endline" : 1906,
       "endchar" : 2
      },
      {
@@ -9014,7 +9014,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1911,
+      "line" : 1909,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9052,7 +9052,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1925,
+      "endline" : 1923,
       "endchar" : 2
      },
      {
@@ -9060,7 +9060,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1928,
+      "line" : 1926,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9098,7 +9098,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1942,
+      "endline" : 1940,
       "endchar" : 2
      },
      {
@@ -9106,7 +9106,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1945,
+      "line" : 1943,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9132,7 +9132,7 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1955,
+      "endline" : 1953,
       "endchar" : 2
      },
      {
@@ -9140,7 +9140,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1958,
+      "line" : 1956,
       "char" : 7,
       "storageClass" : [
        "auto"
@@ -9166,59 +9166,59 @@
         "default" : "Config(Flags.suppressConsole, null)"
        }
       ],
-      "endline" : 1968,
+      "endline" : 1966,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1971_C10",
+      "name" : "__unittest_L1969_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1971,
+      "line" : 1969,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 1991,
+      "endline" : 1989,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1991_C10",
+      "name" : "__unittest_L1989_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1991,
+      "line" : 1989,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2011,
+      "endline" : 2009,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L2011_C10",
+      "name" : "__unittest_L2009_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2011,
+      "line" : 2009,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2032,
+      "endline" : 2030,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L2032_C10",
+      "name" : "__unittest_L2030_C10",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2032,
+      "line" : 2030,
       "char" : 10,
       "storageClass" : [
        "@system"
       ],
-      "endline" : 2047,
+      "endline" : 2045,
       "endchar" : 1
      },
      {
@@ -9265,16 +9265,16 @@
     ]
    },
    {
-    "name" : "__unittest_L2049_C9",
+    "name" : "__unittest_L2047_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "コピー禁止とムーブ、インスタンス削除の例\n",
-    "line" : 2049,
+    "line" : 2047,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2067,
+    "endline" : 2065,
     "endchar" : 1
    },
    {
@@ -9282,7 +9282,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 一時ディレクトリを作成し、作成したディレクトリのFileSystemを返す\n",
-    "line" : 2067,
+    "line" : 2065,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -9303,7 +9303,7 @@
       "default" : "5u"
      }
     ],
-    "endline" : 2092,
+    "endline" : 2090,
     "endchar" : 1
    },
    {
@@ -9311,7 +9311,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 使い捨ての一時ディレクトリを作成\n\n 作成したディレクトリのFileSystemを返す。返されたFileSystemは、インスタンスの破棄時に削除される。\n",
-    "line" : 2099,
+    "line" : 2097,
     "char" : 12,
     "deco" : "FNfAyaQdkZS5voile2fs10FileSystem",
     "originalType" : "@safe FileSystem(string basePath = tempDir, string prefix = \"voile-\", uint retrycnt = 5)",
@@ -9332,20 +9332,20 @@
       "default" : "5u"
      }
     ],
-    "endline" : 2109,
+    "endline" : 2107,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L2112_C7",
+    "name" : "__unittest_L2110_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2112,
+    "line" : 2110,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 2121,
+    "endline" : 2119,
     "endchar" : 1
    }
   ]
@@ -12372,9 +12372,30 @@
     ]
    },
    {
-    "name" : "voile.misc",
+    "name" : "std.sumtype",
     "kind" : "import",
     "line" : 8,
+    "char" : 8,
+    "protection" : "private",
+    "selective" : [
+     "SumType",
+     "isSumType"
+    ]
+   },
+   {
+    "name" : "std.typecons",
+    "kind" : "import",
+    "line" : 9,
+    "char" : 8,
+    "protection" : "private",
+    "selective" : [
+     "Tuple"
+    ]
+   },
+   {
+    "name" : "voile.misc",
+    "kind" : "import",
+    "line" : 10,
     "char" : 8,
     "protection" : "private",
     "selective" : [
@@ -12384,14 +12405,14 @@
    {
     "name" : "voile.munion",
     "kind" : "import",
-    "line" : 9,
+    "line" : 11,
     "char" : 8,
     "protection" : "private"
    },
    {
     "name" : "voile.attr",
     "kind" : "import",
-    "line" : 10,
+    "line" : 12,
     "char" : 8,
     "protection" : "private"
    },
@@ -12399,7 +12420,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " JSONValueデータを得る\n",
-    "line" : 16,
+    "line" : 18,
     "char" : 11,
     "name" : "json",
     "parameters" : [
@@ -12413,7 +12434,7 @@
      {
       "name" : "json",
       "kind" : "function",
-      "line" : 16,
+      "line" : 18,
       "char" : 11,
       "type" : "@property JSONValue(auto const ref T[] x)",
       "parameters" : [
@@ -12427,29 +12448,29 @@
         ]
        }
       ],
-      "endline" : 20,
+      "endline" : 22,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L22_C9",
+    "name" : "__unittest_L24_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 22,
+    "line" : 24,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 40,
+    "endline" : 42,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 40,
+    "line" : 42,
     "char" : 11,
     "name" : "json",
     "parameters" : [
@@ -12463,7 +12484,7 @@
      {
       "name" : "json",
       "kind" : "function",
-      "line" : 40,
+      "line" : 42,
       "char" : 11,
       "type" : "@property JSONValue(auto const ref T x)",
       "parameters" : [
@@ -12477,42 +12498,42 @@
         ]
        }
       ],
-      "endline" : 46,
+      "endline" : 48,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L48_C9",
+    "name" : "__unittest_L50_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 48,
+    "line" : 50,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 58,
+    "endline" : 60,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L58_C9",
+    "name" : "__unittest_L60_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 58,
+    "line" : 60,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 86,
+    "endline" : 88,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 86,
+    "line" : 88,
     "char" : 11,
     "name" : "json",
     "parameters" : [
@@ -12526,7 +12547,7 @@
      {
       "name" : "json",
       "kind" : "function",
-      "line" : 86,
+      "line" : 88,
       "char" : 11,
       "type" : "@property JSONValue(auto const ref T x)",
       "parameters" : [
@@ -12540,29 +12561,29 @@
         ]
        }
       ],
-      "endline" : 90,
+      "endline" : 92,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L92_C9",
+    "name" : "__unittest_L94_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 92,
+    "line" : 94,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 105,
+    "endline" : 107,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 105,
+    "line" : 107,
     "char" : 11,
     "name" : "json",
     "parameters" : [
@@ -12576,7 +12597,7 @@
      {
       "name" : "json",
       "kind" : "function",
-      "line" : 105,
+      "line" : 107,
       "char" : 11,
       "type" : "@property JSONValue(auto const ref T[] ary)",
       "parameters" : [
@@ -12590,55 +12611,55 @@
         ]
        }
       ],
-      "endline" : 116,
+      "endline" : 118,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L118_C9",
+    "name" : "__unittest_L120_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 118,
+    "line" : 120,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 131,
+    "endline" : 133,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L131_C9",
+    "name" : "__unittest_L133_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 131,
+    "line" : 133,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 145,
+    "endline" : 147,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L145_C9",
+    "name" : "__unittest_L147_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 145,
+    "line" : 147,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 174,
+    "endline" : 176,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 174,
+    "line" : 176,
     "char" : 11,
     "name" : "json",
     "parameters" : [
@@ -12656,7 +12677,7 @@
      {
       "name" : "json",
       "kind" : "function",
-      "line" : 174,
+      "line" : 176,
       "char" : 11,
       "type" : "@property JSONValue(auto const ref Value[Key] aa)",
       "parameters" : [
@@ -12670,29 +12691,29 @@
         ]
        }
       ],
-      "endline" : 189,
+      "endline" : 191,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L191_C9",
+    "name" : "__unittest_L193_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 191,
+    "line" : 193,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 201,
+    "endline" : 203,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 201,
+    "line" : 203,
     "char" : 11,
     "name" : "json",
     "parameters" : [
@@ -12706,7 +12727,7 @@
      {
       "name" : "json",
       "kind" : "function",
-      "line" : 201,
+      "line" : 203,
       "char" : 11,
       "type" : "@property JSONValue(auto const ref JV v)",
       "parameters" : [
@@ -12720,7 +12741,7 @@
         ]
        }
       ],
-      "endline" : 205,
+      "endline" : 207,
       "endchar" : 1
      }
     ]
@@ -12728,7 +12749,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 208,
+    "line" : 210,
     "char" : 14,
     "name" : "_setValue",
     "parameters" : [
@@ -12742,7 +12763,7 @@
      {
       "name" : "_setValue",
       "kind" : "function",
-      "line" : 208,
+      "line" : 210,
       "char" : 14,
       "type" : "void(ref JSONValue v, ref string name, ref T val)",
       "parameters" : [
@@ -12768,7 +12789,7 @@
         ]
        }
       ],
-      "endline" : 221,
+      "endline" : 223,
       "endchar" : 1
      }
     ]
@@ -12777,7 +12798,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " JSONValueデータの操作\n",
-    "line" : 227,
+    "line" : 229,
     "char" : 6,
     "name" : "setValue",
     "parameters" : [
@@ -12790,7 +12811,7 @@
      {
       "name" : "setValue",
       "kind" : "function",
-      "line" : 227,
+      "line" : 229,
       "char" : 6,
       "type" : "pure nothrow @trusted void(ref JSONValue v, string name, T val)",
       "parameters" : [
@@ -12810,68 +12831,68 @@
         "type" : "T"
        }
       ],
-      "endline" : 236,
+      "endline" : 238,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L239_C9",
+    "name" : "__unittest_L241_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 239,
+    "line" : 241,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 252,
+    "endline" : 254,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L252_C9",
+    "name" : "__unittest_L254_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 252,
+    "line" : 254,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 267,
+    "endline" : 269,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L267_C9",
+    "name" : "__unittest_L269_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 267,
+    "line" : 269,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 287,
+    "endline" : 289,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L287_C9",
+    "name" : "__unittest_L289_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 287,
+    "line" : 289,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 302,
+    "endline" : 304,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 302,
+    "line" : 304,
     "char" : 6,
     "name" : "fromJson",
     "parameters" : [
@@ -12885,7 +12906,7 @@
      {
       "name" : "fromJson",
       "kind" : "function",
-      "line" : 302,
+      "line" : 304,
       "char" : 6,
       "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
@@ -12904,29 +12925,29 @@
         ]
        }
       ],
-      "endline" : 318,
+      "endline" : 320,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L320_C9",
+    "name" : "__unittest_L322_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 320,
+    "line" : 322,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 331,
+    "endline" : 333,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 331,
+    "line" : 333,
     "char" : 6,
     "name" : "fromJson",
     "parameters" : [
@@ -12940,7 +12961,7 @@
      {
       "name" : "fromJson",
       "kind" : "function",
-      "line" : 331,
+      "line" : 333,
       "char" : 6,
       "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
@@ -12959,29 +12980,29 @@
         ]
        }
       ],
-      "endline" : 345,
+      "endline" : 347,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L347_C9",
+    "name" : "__unittest_L349_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 347,
+    "line" : 349,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 357,
+    "endline" : 359,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 357,
+    "line" : 359,
     "char" : 6,
     "name" : "fromJson",
     "parameters" : [
@@ -12995,7 +13016,7 @@
      {
       "name" : "fromJson",
       "kind" : "function",
-      "line" : 357,
+      "line" : 359,
       "char" : 6,
       "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
@@ -13014,29 +13035,29 @@
         ]
        }
       ],
-      "endline" : 374,
+      "endline" : 376,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L376_C9",
+    "name" : "__unittest_L378_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 376,
+    "line" : 378,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 387,
+    "endline" : 389,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 387,
+    "line" : 389,
     "char" : 6,
     "name" : "fromJson",
     "parameters" : [
@@ -13050,7 +13071,7 @@
      {
       "name" : "fromJson",
       "kind" : "function",
-      "line" : 387,
+      "line" : 389,
       "char" : 6,
       "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
@@ -13069,29 +13090,29 @@
         ]
        }
       ],
-      "endline" : 448,
+      "endline" : 450,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L450_C9",
+    "name" : "__unittest_L452_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 450,
+    "line" : 452,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 462,
+    "endline" : 464,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 462,
+    "line" : 464,
     "char" : 6,
     "name" : "fromJson",
     "parameters" : [
@@ -13105,7 +13126,7 @@
      {
       "name" : "fromJson",
       "kind" : "function",
-      "line" : 462,
+      "line" : 464,
       "char" : 6,
       "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
@@ -13124,7 +13145,7 @@
         ]
        }
       ],
-      "endline" : 473,
+      "endline" : 475,
       "endchar" : 1
      }
     ]
@@ -13133,7 +13154,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 476,
+    "line" : 478,
     "char" : 6,
     "name" : "fromJson",
     "parameters" : [
@@ -13147,7 +13168,7 @@
      {
       "name" : "fromJson",
       "kind" : "function",
-      "line" : 476,
+      "line" : 478,
       "char" : 6,
       "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
@@ -13166,7 +13187,7 @@
         ]
        }
       ],
-      "endline" : 485,
+      "endline" : 487,
       "endchar" : 1
      }
     ]
@@ -13175,7 +13196,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 488,
+    "line" : 490,
     "char" : 6,
     "name" : "fromJson",
     "parameters" : [
@@ -13189,7 +13210,7 @@
      {
       "name" : "fromJson",
       "kind" : "function",
-      "line" : 488,
+      "line" : 490,
       "char" : 6,
       "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
@@ -13208,7 +13229,7 @@
         ]
        }
       ],
-      "endline" : 502,
+      "endline" : 504,
       "endchar" : 1
      }
     ]
@@ -13217,7 +13238,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 505,
+    "line" : 507,
     "char" : 6,
     "name" : "fromJson",
     "parameters" : [
@@ -13231,7 +13252,7 @@
      {
       "name" : "fromJson",
       "kind" : "function",
-      "line" : 505,
+      "line" : 507,
       "char" : 6,
       "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
@@ -13250,7 +13271,7 @@
         ]
        }
       ],
-      "endline" : 520,
+      "endline" : 522,
       "endchar" : 1
      }
     ]
@@ -13259,7 +13280,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 523,
+    "line" : 525,
     "char" : 6,
     "name" : "fromJson",
     "parameters" : [
@@ -13277,7 +13298,7 @@
      {
       "name" : "fromJson",
       "kind" : "function",
-      "line" : 523,
+      "line" : 525,
       "char" : 6,
       "type" : "bool(in JSONValue src, ref Value[Key] dst)",
       "parameters" : [
@@ -13296,7 +13317,7 @@
         ]
        }
       ],
-      "endline" : 548,
+      "endline" : 550,
       "endchar" : 1
      }
     ]
@@ -13305,7 +13326,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 551,
+    "line" : 553,
     "char" : 6,
     "name" : "fromJson",
     "parameters" : [
@@ -13319,7 +13340,7 @@
      {
       "name" : "fromJson",
       "kind" : "function",
-      "line" : 551,
+      "line" : 553,
       "char" : 6,
       "type" : "bool(in JSONValue src, ref T dst)",
       "parameters" : [
@@ -13338,7 +13359,7 @@
         ]
        }
       ],
-      "endline" : 556,
+      "endline" : 558,
       "endchar" : 1
      }
     ]
@@ -13346,7 +13367,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 559,
+    "line" : 561,
     "char" : 11,
     "name" : "_getValue",
     "parameters" : [
@@ -13359,7 +13380,7 @@
      {
       "name" : "_getValue",
       "kind" : "function",
-      "line" : 559,
+      "line" : 561,
       "char" : 11,
       "type" : "T(in JSONValue v, string name, lazy scope T defaultVal = T.init)",
       "parameters" : [
@@ -13384,7 +13405,7 @@
         "default" : "T.init"
        }
       ],
-      "endline" : 589,
+      "endline" : 591,
       "endchar" : 1
      }
     ]
@@ -13393,7 +13414,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 592,
+    "line" : 594,
     "char" : 3,
     "name" : "getValue",
     "parameters" : [
@@ -13406,7 +13427,7 @@
      {
       "name" : "getValue",
       "kind" : "function",
-      "line" : 592,
+      "line" : 594,
       "char" : 3,
       "type" : "pure nothrow @trusted T(in JSONValue v, string name, lazy scope T defaultVal = T.init)",
       "parameters" : [
@@ -13431,113 +13452,113 @@
         "default" : "T.init"
        }
       ],
-      "endline" : 609,
+      "endline" : 611,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L613_C9",
+    "name" : "__unittest_L615_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 613,
+    "line" : 615,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 628,
+    "endline" : 630,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L628_C9",
+    "name" : "__unittest_L630_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 628,
+    "line" : 630,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 643,
+    "endline" : 645,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L643_C9",
+    "name" : "__unittest_L645_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 643,
+    "line" : 645,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 670,
+    "endline" : 672,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L670_C9",
+    "name" : "__unittest_L672_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 670,
+    "line" : 672,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 697,
+    "endline" : 699,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L697_C9",
+    "name" : "__unittest_L699_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 697,
+    "line" : 699,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 712,
+    "endline" : 714,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L712_C9",
+    "name" : "__unittest_L714_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 712,
+    "line" : 714,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 729,
+    "endline" : 731,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L729_C9",
+    "name" : "__unittest_L731_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 729,
+    "line" : 731,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 757,
+    "endline" : 759,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L757_C9",
+    "name" : "__unittest_L759_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 757,
+    "line" : 759,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 785,
+    "endline" : 787,
     "endchar" : 1
    },
    {
@@ -13545,7 +13566,7 @@
     "kind" : "alias",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 785,
+    "line" : 787,
     "char" : 1,
     "deco" : "AxS3std4json9JSONValue",
     "originalType" : "Rebindable!(const(JSONValue[]))"
@@ -13555,7 +13576,7 @@
     "kind" : "alias",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 787,
+    "line" : 789,
     "char" : 1,
     "deco" : "S3std8typecons__T10RebindableTxHAyaSQBj4json9JSONValueZQBm"
    },
@@ -13564,7 +13585,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 792,
+    "line" : 794,
     "char" : 6,
     "deco" : "FS3std4json9JSONValueAyaKAxSQBaQzQwZb",
     "originalType" : "bool(JSONValue json, string name, ref JSONValueArray ary)",
@@ -13585,7 +13606,7 @@
       ]
      }
     ],
-    "endline" : 804,
+    "endline" : 806,
     "endchar" : 1
    },
    {
@@ -13593,7 +13614,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 809,
+    "line" : 811,
     "char" : 6,
     "deco" : "FS3std4json9JSONValueAyaKSQy8typecons__T10RebindableTxHQBiSQCfQCeQCcZQBdZb",
     "originalType" : "bool(JSONValue json, string name, ref JSONValueObject object)",
@@ -13614,14 +13635,14 @@
       ]
      }
     ],
-    "endline" : 821,
+    "endline" : 823,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 824,
+    "line" : 826,
     "char" : 1,
     "name" : "AttrConverter",
     "parameters" : [
@@ -13635,14 +13656,14 @@
       "name" : "AttrConverter",
       "kind" : "struct",
       "protection" : "public",
-      "line" : 824,
+      "line" : 826,
       "char" : 1,
       "members" : [
        {
         "name" : "from",
         "kind" : "variable",
         "comment" : "\n",
-        "line" : 827,
+        "line" : 829,
         "char" : 29,
         "type" : "T function(in JSONValue v)"
        },
@@ -13650,7 +13671,7 @@
         "name" : "to",
         "kind" : "variable",
         "comment" : "\n",
-        "line" : 829,
+        "line" : 831,
         "char" : 29,
         "type" : "JSONValue function(in T v)"
        }
@@ -13662,7 +13683,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " Attribute converting method\n",
-    "line" : 835,
+    "line" : 837,
     "char" : 17,
     "name" : "converter",
     "parameters" : [
@@ -13675,7 +13696,7 @@
      {
       "name" : "converter",
       "kind" : "function",
-      "line" : 835,
+      "line" : 837,
       "char" : 17,
       "type" : "AttrConverter!T(T function(in JSONValue) from, JSONValue function(in T) to)",
       "parameters" : [
@@ -13688,7 +13709,7 @@
         "type" : "JSONValue function(in T)"
        }
       ],
-      "endline" : 838,
+      "endline" : 840,
       "endchar" : 1
      }
     ]
@@ -13696,7 +13717,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 843,
+    "line" : 845,
     "char" : 14,
     "name" : "isJSONizableRaw",
     "parameters" : [
@@ -13709,7 +13730,7 @@
      {
       "name" : "isJSONizableRaw",
       "kind" : "variable",
-      "line" : 843,
+      "line" : 845,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -13721,7 +13742,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 851,
+    "line" : 853,
     "char" : 9,
     "name" : "uniqueKey",
     "parameters" : [
@@ -13746,7 +13767,7 @@
      {
       "name" : "candidate",
       "kind" : "variable",
-      "line" : 854,
+      "line" : 856,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -13757,7 +13778,7 @@
      {
       "name" : "uniqueKey",
       "kind" : "variable",
-      "line" : 858,
+      "line" : 860,
       "char" : 15,
       "storageClass" : [
        "enum"
@@ -13768,29 +13789,207 @@
     ]
    },
    {
-    "name" : "__unittest_L866_C9",
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 868,
+    "char" : 9,
+    "name" : "uniqueKey",
+    "parameters" : [
+     {
+      "name" : "ST",
+      "kind" : "type"
+     },
+     {
+      "name" : "name",
+      "kind" : "value",
+      "deco" : "Aya"
+     },
+     {
+      "name" : "num",
+      "kind" : "value",
+      "deco" : "k",
+      "defaultValue" : "0"
+     }
+    ],
+    "constraint" : "isSumType!ST",
+    "members" : [
+     {
+      "name" : "candidate",
+      "kind" : "variable",
+      "line" : 871,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "type" : "string",
+      "init" : "num == 0 ? name : text(name, num)"
+     },
+     {
+      "name" : "uniqueKey",
+      "kind" : "variable",
+      "line" : 875,
+      "char" : 15,
+      "storageClass" : [
+       "enum"
+      ],
+      "type" : "string",
+      "init" : "uniqueKey!(ST, name, num + 1)"
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L883_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 866,
+    "line" : 883,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 944,
+    "endline" : 894,
+    "endchar" : 1
+   },
+   {
+    "name" : "_isNotEq",
+    "kind" : "function",
+    "protection" : "private",
+    "line" : 894,
+    "char" : 14,
+    "deco" : "FNfAAyaQeZb",
+    "parameters" : [
+     {
+      "name" : "rhs",
+      "deco" : "AAya"
+     },
+     {
+      "name" : "lhs",
+      "deco" : "AAya"
+     }
+    ],
+    "endline" : 901,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L902_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 902,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 908,
+    "endchar" : 1
+   },
+   {
+    "name" : "_isUniq",
+    "kind" : "function",
+    "protection" : "private",
+    "line" : 908,
+    "char" : 14,
+    "deco" : "FNfAAyaAQfZb",
+    "parameters" : [
+     {
+      "name" : "keyMembers",
+      "deco" : "AAya"
+     },
+     {
+      "name" : "anotherKeyMembers",
+      "deco" : "AAAya"
+     }
+    ],
+    "endline" : 914,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L915_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 915,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 921,
+    "endchar" : 1
+   },
+   {
+    "name" : "_isAllUniq",
+    "kind" : "function",
+    "protection" : "private",
+    "line" : 921,
+    "char" : 14,
+    "deco" : "FNfAAAyaZb",
+    "parameters" : [
+     {
+      "name" : "keyMembers",
+      "deco" : "AAAya"
+     }
+    ],
+    "endline" : 927,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L928_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 928,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 936,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 936,
+    "char" : 14,
+    "name" : "_isKeyAllUnique",
+    "parameters" : [
+     {
+      "name" : "Types",
+      "kind" : "tuple"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "_isKeyAllUnique",
+      "kind" : "variable",
+      "line" : 936,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "()\n{\nstring[][] members;\nstatic foreach (Type; Types)\n{\nmembers ~= [getKeyMemberNames!Type];\n}\nreturn _isAllUniq(members);\n}\n()"
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L944_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 944,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1024,
     "endchar" : 1
    },
    {
     "name" : "Kind",
     "kind" : "struct",
     "protection" : "private",
-    "line" : 944,
+    "line" : 1024,
     "char" : 9,
     "members" : [
      {
       "name" : "key",
       "kind" : "variable",
       "protection" : "public",
-      "line" : 946,
+      "line" : 1026,
       "char" : 9,
       "deco" : "Aya",
       "offset" : 0
@@ -13799,7 +13998,7 @@
       "name" : "value",
       "kind" : "variable",
       "protection" : "public",
-      "line" : 947,
+      "line" : 1027,
       "char" : 12,
       "deco" : "S3std4json9JSONValue",
       "offset" : 16
@@ -13810,7 +14009,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 951,
+    "line" : 1031,
     "char" : 6,
     "name" : "kind",
     "parameters" : [
@@ -13823,7 +14022,7 @@
      {
       "name" : "kind",
       "kind" : "function",
-      "line" : 951,
+      "line" : 1031,
       "char" : 6,
       "storageClass" : [
        "auto"
@@ -13839,7 +14038,7 @@
         "type" : "T"
        }
       ],
-      "endline" : 955,
+      "endline" : 1035,
       "endchar" : 1
      }
     ]
@@ -13848,7 +14047,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 958,
+    "line" : 1038,
     "char" : 6,
     "name" : "kind",
     "parameters" : [
@@ -13861,7 +14060,7 @@
      {
       "name" : "kind",
       "kind" : "function",
-      "line" : 958,
+      "line" : 1038,
       "char" : 6,
       "storageClass" : [
        "auto"
@@ -13873,7 +14072,7 @@
         "type" : "T"
        }
       ],
-      "endline" : 962,
+      "endline" : 1042,
       "endchar" : 1
      }
     ]
@@ -13881,7 +14080,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 964,
+    "line" : 1044,
     "char" : 9,
     "name" : "_getKinds",
     "parameters" : [
@@ -13903,7 +14102,7 @@
      {
       "name" : "_getKinds",
       "kind" : "alias",
-      "line" : 964,
+      "line" : 1044,
       "char" : 9,
       "type" : "aliasSeqOf!(()\n{\nKind[] ret;\nstatic if (hasValue!(T, Kind))\n{\nret = [getValues!(T, Kind)];\n}\nelse\n{\nstatic if (getKeyMemberNames!T.length > 0)\n{\nstatic foreach (member; getKeyMemberNames!T)\n{\nstatic foreach (val; getValues!(__traits(getMember, T, member)))\n{\nret ~= Kind(member, JSONValue(val));\n}\n}\n}\nelse\n{\nstatic if (is(typeof(T.type) : string))\n{\nret ~= Kind(\"type\", JSONValue(T.stringof));\n}\nelse\n{\nstatic if (is(typeof(T.kind) : string))\n{\nret ~= Kind(\"kind\", JSONValue(T.stringof));\n}\nelse\n{\nstatic if (is(typeof(T.tag) : typeof(tag)))\n{\nret ~= Kind(\"tag\", JSONValue(tag));\n}\n\n}\n}\n}\n}\nif (ret.length == 0)\nret ~= Kind(uk, JSONValue(tag));\nreturn ret;\n}\n())"
      }
@@ -13912,7 +14111,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1012,
+    "line" : 1076,
     "char" : 19,
     "name" : "_serializeToJsonImpl",
     "parameters" : [
@@ -13925,7 +14124,64 @@
      {
       "name" : "_serializeToJsonImpl",
       "kind" : "function",
-      "line" : 1012,
+      "line" : 1076,
+      "char" : 19,
+      "type" : "JSONValue(in SumType!Types dat)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "SumType!Types",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 1080,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1082_C9",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 1082,
+    "char" : 9,
+    "storageClass" : [
+     "@system"
+    ],
+    "endline" : 1096,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L1096_C9",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 1096,
+    "char" : 9,
+    "storageClass" : [
+     "@system"
+    ],
+    "endline" : 1129,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 1129,
+    "char" : 19,
+    "name" : "_serializeToJsonImpl",
+    "parameters" : [
+     {
+      "name" : "Types",
+      "kind" : "tuple"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "_serializeToJsonImpl",
+      "kind" : "function",
+      "line" : 1129,
       "char" : 19,
       "type" : "JSONValue(in TypeEnum!Types dat)",
       "parameters" : [
@@ -13937,41 +14193,41 @@
         ]
        }
       ],
-      "endline" : 1034,
+      "endline" : 1151,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1037_C9",
+    "name" : "__unittest_L1154_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1037,
+    "line" : 1154,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1051,
+    "endline" : 1168,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1051_C9",
+    "name" : "__unittest_L1168_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1051,
+    "line" : 1168,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1092,
+    "endline" : 1209,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1092,
+    "line" : 1209,
     "char" : 19,
     "name" : "_serializeToJsonImpl",
     "parameters" : [
@@ -13984,7 +14240,7 @@
      {
       "name" : "_serializeToJsonImpl",
       "kind" : "function",
-      "line" : 1092,
+      "line" : 1209,
       "char" : 19,
       "type" : "@property JSONValue(in Tagged!U dat)",
       "parameters" : [
@@ -13996,41 +14252,41 @@
         ]
        }
       ],
-      "endline" : 1102,
+      "endline" : 1219,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1104_C9",
+    "name" : "__unittest_L1221_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1104,
+    "line" : 1221,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1121,
+    "endline" : 1238,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1121_C9",
+    "name" : "__unittest_L1238_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1121,
+    "line" : 1238,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1149,
+    "endline" : 1266,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1149,
+    "line" : 1266,
     "char" : 28,
     "name" : "_serializeToJsonImpl",
     "parameters" : [
@@ -14043,7 +14299,7 @@
      {
       "name" : "_serializeToJsonImpl",
       "kind" : "function",
-      "line" : 1149,
+      "line" : 1266,
       "char" : 28,
       "storageClass" : [
        "auto"
@@ -14058,29 +14314,74 @@
         ]
        }
       ],
-      "endline" : 1162,
+      "endline" : 1279,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1164_C9",
+    "name" : "__unittest_L1281_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1164,
+    "line" : 1281,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1183,
+    "endline" : 1298,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 1298,
+    "char" : 19,
+    "name" : "_serializeToJsonImpl",
+    "parameters" : [
+     {
+      "name" : "Types",
+      "kind" : "tuple"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "_serializeToJsonImpl",
+      "kind" : "function",
+      "line" : 1298,
+      "char" : 19,
+      "type" : "@trusted JSONValue(in Tuple!Types dat)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "Tuple!Types",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 1318,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1320_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 1320,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1345,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " serialize data to JSON\n",
-    "line" : 1183,
+    "line" : 1345,
     "char" : 11,
     "name" : "serializeToJson",
     "parameters" : [
@@ -14093,7 +14394,7 @@
      {
       "name" : "serializeToJson",
       "kind" : "function",
-      "line" : 1183,
+      "line" : 1345,
       "char" : 11,
       "type" : "JSONValue(in T data)",
       "parameters" : [
@@ -14105,7 +14406,7 @@
         ]
        }
       ],
-      "endline" : 1269,
+      "endline" : 1431,
       "endchar" : 1
      }
     ]
@@ -14114,7 +14415,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1272,
+    "line" : 1434,
     "char" : 8,
     "name" : "serializeToJsonString",
     "parameters" : [
@@ -14127,7 +14428,7 @@
      {
       "name" : "serializeToJsonString",
       "kind" : "function",
-      "line" : 1272,
+      "line" : 1434,
       "char" : 8,
       "type" : "string(in T data, JSONOptions options = JSONOptions.none)",
       "parameters" : [
@@ -14144,7 +14445,7 @@
         "default" : "JSONOptions.none"
        }
       ],
-      "endline" : 1275,
+      "endline" : 1437,
       "endchar" : 1
      }
     ]
@@ -14153,7 +14454,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1278,
+    "line" : 1440,
     "char" : 6,
     "name" : "serializeToJsonFile",
     "parameters" : [
@@ -14166,7 +14467,7 @@
      {
       "name" : "serializeToJsonFile",
       "kind" : "function",
-      "line" : 1278,
+      "line" : 1440,
       "char" : 6,
       "type" : "void(in T data, string jsonfile, JSONOptions options = JSONOptions.none)",
       "parameters" : [
@@ -14187,7 +14488,7 @@
         "default" : "JSONOptions.none"
        }
       ],
-      "endline" : 1283,
+      "endline" : 1445,
       "endchar" : 1
      }
     ]
@@ -14195,7 +14496,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1302,
+    "line" : 1449,
     "char" : 14,
     "name" : "_deserializeFromJsonImpl",
     "parameters" : [
@@ -14208,7 +14509,59 @@
      {
       "name" : "_deserializeFromJsonImpl",
       "kind" : "function",
-      "line" : 1302,
+      "line" : 1449,
+      "char" : 14,
+      "type" : "void(ref SumType!Types dat, in JSONValue json)",
+      "parameters" : [
+       {
+        "name" : "dat",
+        "type" : "SumType!Types",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "json",
+        "type" : "JSONValue",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 1580,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1582_C9",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 1582,
+    "char" : 9,
+    "storageClass" : [
+     "@system"
+    ],
+    "endline" : 1633,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 1633,
+    "char" : 14,
+    "name" : "_deserializeFromJsonImpl",
+    "parameters" : [
+     {
+      "name" : "Types",
+      "kind" : "tuple"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "_deserializeFromJsonImpl",
+      "kind" : "function",
+      "line" : 1633,
       "char" : 14,
       "type" : "void(ref TypeEnum!Types dat, in JSONValue json)",
       "parameters" : [
@@ -14227,28 +14580,27 @@
         ]
        }
       ],
-      "endline" : 1421,
+      "endline" : 1750,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1424_C9",
+    "name" : "__unittest_L1753_C9",
     "kind" : "function",
     "protection" : "public",
-    "comment" : "\n",
-    "line" : 1424,
+    "line" : 1753,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1440,
+    "endline" : 1769,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 1440,
+    "line" : 1769,
     "char" : 14,
     "name" : "_deserializeFromJsonImpl",
     "parameters" : [
@@ -14261,7 +14613,7 @@
      {
       "name" : "_deserializeFromJsonImpl",
       "kind" : "function",
-      "line" : 1440,
+      "line" : 1769,
       "char" : 14,
       "type" : "void(ref Tagged!U dst, in JSONValue src)",
       "parameters" : [
@@ -14280,30 +14632,30 @@
         ]
        }
       ],
-      "endline" : 1458,
+      "endline" : 1787,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1460_C9",
+    "name" : "__unittest_L1789_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1460,
+    "line" : 1789,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1470,
+    "endline" : 1799,
     "endchar" : 1
    },
    {
     "kind" : "template",
-    "protection" : "public",
+    "protection" : "private",
     "comment" : "Endata\n",
-    "line" : 1470,
-    "char" : 6,
+    "line" : 1799,
+    "char" : 14,
     "name" : "_deserializeFromJsonImpl",
     "parameters" : [
      {
@@ -14315,8 +14667,8 @@
      {
       "name" : "_deserializeFromJsonImpl",
       "kind" : "function",
-      "line" : 1470,
-      "char" : 6,
+      "line" : 1799,
+      "char" : 14,
       "type" : "void(ref Endata!E dst, in JSONValue src)",
       "parameters" : [
        {
@@ -14334,28 +14686,80 @@
         ]
        }
       ],
-      "endline" : 1489,
+      "endline" : 1818,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1491_C9",
+    "name" : "__unittest_L1820_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1491,
+    "line" : 1820,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1505,
+    "endline" : 1830,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 1830,
+    "char" : 14,
+    "name" : "_deserializeFromJsonImpl",
+    "parameters" : [
+     {
+      "name" : "Types",
+      "kind" : "tuple"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "_deserializeFromJsonImpl",
+      "kind" : "function",
+      "line" : 1830,
+      "char" : 14,
+      "type" : "@trusted void(ref Tuple!Types dst, in JSONValue src)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "type" : "Tuple!Types",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "src",
+        "type" : "JSONValue",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 1847,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1849_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 1849,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1867,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : " deserialize data from JSON\n",
-    "line" : 1505,
+    "line" : 1867,
     "char" : 6,
     "name" : "deserializeFromJson",
     "parameters" : [
@@ -14368,7 +14772,7 @@
      {
       "name" : "deserializeFromJson",
       "kind" : "function",
-      "line" : 1505,
+      "line" : 1867,
       "char" : 6,
       "type" : "void(ref T data, in JSONValue json)",
       "parameters" : [
@@ -14387,7 +14791,7 @@
         ]
        }
       ],
-      "endline" : 1609,
+      "endline" : 1971,
       "endchar" : 1
      }
     ]
@@ -14396,7 +14800,41 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1612,
+    "line" : 1974,
+    "char" : 3,
+    "name" : "deserializeFromJson",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "deserializeFromJson",
+      "kind" : "function",
+      "line" : 1974,
+      "char" : 3,
+      "type" : "T(in JSONValue jv)",
+      "parameters" : [
+       {
+        "name" : "jv",
+        "type" : "JSONValue",
+        "storageClass" : [
+         "in"
+        ]
+       }
+      ],
+      "endline" : 1979,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 1982,
     "char" : 6,
     "name" : "deserializeFromJsonString",
     "parameters" : [
@@ -14409,7 +14847,7 @@
      {
       "name" : "deserializeFromJsonString",
       "kind" : "function",
-      "line" : 1612,
+      "line" : 1982,
       "char" : 6,
       "type" : "void(ref T data, string jsonContents)",
       "parameters" : [
@@ -14425,7 +14863,7 @@
         "type" : "string"
        }
       ],
-      "endline" : 1615,
+      "endline" : 1985,
       "endchar" : 1
      }
     ]
@@ -14434,7 +14872,38 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1618,
+    "line" : 1988,
+    "char" : 3,
+    "name" : "deserializeFromJsonString",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "deserializeFromJsonString",
+      "kind" : "function",
+      "line" : 1988,
+      "char" : 3,
+      "type" : "T(string jsonContents)",
+      "parameters" : [
+       {
+        "name" : "jsonContents",
+        "type" : "string"
+       }
+      ],
+      "endline" : 1993,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 1996,
     "char" : 6,
     "name" : "deserializeFromJsonFile",
     "parameters" : [
@@ -14447,7 +14916,7 @@
      {
       "name" : "deserializeFromJsonFile",
       "kind" : "function",
-      "line" : 1618,
+      "line" : 1996,
       "char" : 6,
       "type" : "void(ref T data, string jsonFile)",
       "parameters" : [
@@ -14463,58 +14932,89 @@
         "type" : "string"
        }
       ],
-      "endline" : 1622,
+      "endline" : 2000,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L1625_C9",
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 2003,
+    "char" : 3,
+    "name" : "deserializeFromJsonFile",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "deserializeFromJsonFile",
+      "kind" : "function",
+      "line" : 2003,
+      "char" : 3,
+      "type" : "T(string jsonFile)",
+      "parameters" : [
+       {
+        "name" : "jsonFile",
+        "type" : "string"
+       }
+      ],
+      "endline" : 2008,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L2011_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1625,
+    "line" : 2011,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1726,
+    "endline" : 2112,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1726_C9",
+    "name" : "__unittest_L2112_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1726,
+    "line" : 2112,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1744,
+    "endline" : 2130,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1744_C9",
+    "name" : "__unittest_L2130_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1744,
+    "line" : 2130,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1760,
+    "endline" : 2146,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1760_C9",
+    "name" : "__unittest_L2146_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1760,
+    "line" : 2146,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1776,
+    "endline" : 2162,
     "endchar" : 1
    },
    {
@@ -14522,7 +15022,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 1776,
+    "line" : 2162,
     "char" : 11,
     "deco" : "FNdIS3std4json9JSONValueZSQvQtQq",
     "parameters" : [
@@ -14534,31 +15034,31 @@
       ]
      }
     ],
-    "endline" : 1799,
+    "endline" : 2185,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1801_C9",
+    "name" : "__unittest_L2187_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1801,
+    "line" : 2187,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1811,
+    "endline" : 2197,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1811_C9",
+    "name" : "__unittest_L2197_C9",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1811,
+    "line" : 2197,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 1825,
+    "endline" : 2211,
     "endchar" : 1
    },
    {
@@ -14566,27 +15066,27 @@
     "kind" : "struct",
     "protection" : "public",
     "comment" : " JWT\n",
-    "line" : 1825,
+    "line" : 2211,
     "char" : 1,
     "members" : [
      {
       "name" : "std.digest.hmac",
       "kind" : "import",
-      "line" : 1828,
+      "line" : 2214,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.digest.sha",
       "kind" : "import",
-      "line" : 1829,
+      "line" : 2215,
       "char" : 9,
       "protection" : "private"
      },
      {
       "name" : "std.exception",
       "kind" : "import",
-      "line" : 1830,
+      "line" : 2216,
       "char" : 9,
       "protection" : "private",
       "selective" : [
@@ -14596,7 +15096,7 @@
      {
       "name" : "std.string",
       "kind" : "import",
-      "line" : 1831,
+      "line" : 2217,
       "char" : 9,
       "protection" : "private",
       "selective" : [
@@ -14607,7 +15107,7 @@
       "name" : "_key",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 1832,
+      "line" : 2218,
       "char" : 21,
       "deco" : "Ayh",
       "offset" : 0
@@ -14616,7 +15116,7 @@
       "name" : "_payload",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 1833,
+      "line" : 2219,
       "char" : 12,
       "deco" : "S3std4json9JSONValue",
       "offset" : 16
@@ -14626,7 +15126,7 @@
       "kind" : "enum",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1838,
+      "line" : 2224,
       "char" : 2,
       "baseDeco" : "i",
       "members" : [
@@ -14635,7 +15135,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "0",
-        "line" : 1840,
+        "line" : 2226,
         "char" : 3
        },
        {
@@ -14643,7 +15143,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "1",
-        "line" : 1840,
+        "line" : 2226,
         "char" : 10
        },
        {
@@ -14651,7 +15151,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "2",
-        "line" : 1840,
+        "line" : 2226,
         "char" : 17
        }
       ]
@@ -14661,7 +15161,7 @@
       "kind" : "variable",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1843,
+      "line" : 2229,
       "char" : 12,
       "deco" : "E5voile4json8JWTValue9Algorithm",
       "init" : "Algorithm.HS256",
@@ -14672,7 +15172,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1849,
+      "line" : 2235,
       "char" : 2,
       "deco" : "FNcAxaAxhZS5voile4json8JWTValue",
       "originalType" : "ref (const(char)[] jwt, const(ubyte)[] key)",
@@ -14686,7 +15186,7 @@
         "deco" : "Axh"
        }
       ],
-      "endline" : 1888,
+      "endline" : 2274,
       "endchar" : 2
      },
      {
@@ -14694,7 +15194,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1891,
+      "line" : 2277,
       "char" : 2,
       "deco" : "FNcAxaQdZS5voile4json8JWTValue",
       "originalType" : "ref (const(char)[] jwt, const(char)[] key)",
@@ -14708,7 +15208,7 @@
         "deco" : "Axa"
        }
       ],
-      "endline" : 1894,
+      "endline" : 2280,
       "endchar" : 2
      },
      {
@@ -14716,7 +15216,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1897,
+      "line" : 2283,
       "char" : 2,
       "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxhZSQBjQBgQBe",
       "originalType" : "ref (Algorithm algo, const(ubyte)[] key)",
@@ -14730,7 +15230,7 @@
         "deco" : "Axh"
        }
       ],
-      "endline" : 1901,
+      "endline" : 2287,
       "endchar" : 2
      },
      {
@@ -14738,7 +15238,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1904,
+      "line" : 2290,
       "char" : 2,
       "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxhS3stdQBg9JSONValueZSQCbQByQBw",
       "originalType" : "ref (Algorithm algo, const(ubyte)[] key, JSONValue payload)",
@@ -14756,7 +15256,7 @@
         "deco" : "S3std4json9JSONValue"
        }
       ],
-      "endline" : 1909,
+      "endline" : 2295,
       "endchar" : 2
      },
      {
@@ -14764,7 +15264,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1912,
+      "line" : 2298,
       "char" : 2,
       "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxhHAyaS3stdQBk9JSONValueZSQCfQCcQCa",
       "originalType" : "ref (Algorithm algo, const(ubyte)[] key, JSONValue[string] payload)",
@@ -14782,7 +15282,7 @@
         "deco" : "HAyaS3std4json9JSONValue"
        }
       ],
-      "endline" : 1917,
+      "endline" : 2303,
       "endchar" : 2
      },
      {
@@ -14790,7 +15290,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1920,
+      "line" : 2306,
       "char" : 2,
       "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxaZSQBjQBgQBe",
       "originalType" : "ref (Algorithm algo, const(char)[] key)",
@@ -14804,7 +15304,7 @@
         "deco" : "Axa"
        }
       ],
-      "endline" : 1924,
+      "endline" : 2310,
       "endchar" : 2
      },
      {
@@ -14812,7 +15312,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1927,
+      "line" : 2313,
       "char" : 2,
       "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxaS3stdQBg9JSONValueZSQCbQByQBw",
       "originalType" : "ref (Algorithm algo, const(char)[] key, JSONValue payload)",
@@ -14830,7 +15330,7 @@
         "deco" : "S3std4json9JSONValue"
        }
       ],
-      "endline" : 1932,
+      "endline" : 2318,
       "endchar" : 2
      },
      {
@@ -14838,7 +15338,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1935,
+      "line" : 2321,
       "char" : 2,
       "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxaHAyaS3stdQBk9JSONValueZSQCfQCcQCa",
       "originalType" : "ref (Algorithm algo, const(char)[] key, JSONValue[string] payload)",
@@ -14856,7 +15356,7 @@
         "deco" : "HAyaS3std4json9JSONValue"
        }
       ],
-      "endline" : 1940,
+      "endline" : 2326,
       "endchar" : 2
      },
      {
@@ -14864,7 +15364,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1946,
+      "line" : 2332,
       "char" : 7,
       "deco" : "FAyaZv",
       "parameters" : [
@@ -14873,7 +15373,7 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 1949,
+      "endline" : 2335,
       "endchar" : 2
      },
      {
@@ -14881,7 +15381,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "dittp\n",
-      "line" : 1951,
+      "line" : 2337,
       "char" : 7,
       "deco" : "FAxhZv",
       "parameters" : [
@@ -14890,7 +15390,7 @@
         "deco" : "Axh"
        }
       ],
-      "endline" : 1954,
+      "endline" : 2340,
       "endchar" : 2
      },
      {
@@ -14898,7 +15398,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1959,
+      "line" : 2345,
       "char" : 23,
       "deco" : "NgFNcNjAyaZNgS3std4json9JSONValue",
       "parameters" : [
@@ -14907,14 +15407,14 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 1962,
+      "endline" : 2348,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1967,
+      "line" : 2353,
       "char" : 7,
       "name" : "opIndexAssign",
       "parameters" : [
@@ -14927,7 +15427,7 @@
        {
         "name" : "opIndexAssign",
         "kind" : "function",
-        "line" : 1967,
+        "line" : 2353,
         "char" : 7,
         "type" : "void(auto ref T value, string name) return",
         "parameters" : [
@@ -14944,7 +15444,7 @@
           "type" : "string"
          }
         ],
-        "endline" : 1970,
+        "endline" : 2356,
         "endchar" : 2
        }
       ]
@@ -14954,10 +15454,10 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1975,
+      "line" : 2361,
       "char" : 23,
       "deco" : "NgFNcNjZNgS3std4json9JSONValue",
-      "endline" : 1978,
+      "endline" : 2364,
       "endchar" : 2
      },
      {
@@ -14965,32 +15465,32 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1983,
+      "line" : 2369,
       "char" : 9,
       "deco" : "xFZAya",
-      "endline" : 2003,
+      "endline" : 2389,
       "endchar" : 2
      }
     ]
    },
    {
-    "name" : "__unittest_L2007_C9",
+    "name" : "__unittest_L2393_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2007,
+    "line" : 2393,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2028,
+    "endline" : 2414,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2028,
+    "line" : 2414,
     "char" : 6,
     "name" : "setValue",
     "parameters" : [
@@ -15003,7 +15503,7 @@
      {
       "name" : "setValue",
       "kind" : "function",
-      "line" : 2028,
+      "line" : 2414,
       "char" : 6,
       "type" : "void(ref JWTValue dat, string name, T val)",
       "parameters" : [
@@ -15023,7 +15523,7 @@
         "type" : "T"
        }
       ],
-      "endline" : 2031,
+      "endline" : 2417,
       "endchar" : 1
      }
     ]
@@ -15032,7 +15532,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2036,
+    "line" : 2422,
     "char" : 3,
     "name" : "getValue",
     "parameters" : [
@@ -15045,7 +15545,7 @@
      {
       "name" : "getValue",
       "kind" : "function",
-      "line" : 2036,
+      "line" : 2422,
       "char" : 3,
       "type" : "T(in JWTValue dat, string name, lazy T defaultVal)",
       "parameters" : [
@@ -15068,7 +15568,7 @@
         ]
        }
       ],
-      "endline" : 2039,
+      "endline" : 2425,
       "endchar" : 1
      }
     ]
@@ -15077,7 +15577,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " シリアライズ/デシリアライズ\n",
-    "line" : 2045,
+    "line" : 2431,
     "char" : 10,
     "name" : "serializeToJwt",
     "parameters" : [
@@ -15090,7 +15590,7 @@
      {
       "name" : "serializeToJwt",
       "kind" : "function",
-      "line" : 2045,
+      "line" : 2431,
       "char" : 10,
       "type" : "JWTValue(in T data, JWTValue.Algorithm algo, const(ubyte)[] key)",
       "parameters" : [
@@ -15110,7 +15610,7 @@
         "type" : "const(ubyte)[]"
        }
       ],
-      "endline" : 2050,
+      "endline" : 2436,
       "endchar" : 1
      }
     ]
@@ -15119,7 +15619,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2053,
+    "line" : 2439,
     "char" : 10,
     "name" : "serializeToJwt",
     "parameters" : [
@@ -15132,7 +15632,7 @@
      {
       "name" : "serializeToJwt",
       "kind" : "function",
-      "line" : 2053,
+      "line" : 2439,
       "char" : 10,
       "type" : "JWTValue(in T data, JWTValue.Algorithm algo, const(char)[] key)",
       "parameters" : [
@@ -15152,7 +15652,7 @@
         "type" : "const(char)[]"
        }
       ],
-      "endline" : 2057,
+      "endline" : 2443,
       "endchar" : 1
      }
     ]
@@ -15161,7 +15661,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2060,
+    "line" : 2446,
     "char" : 10,
     "name" : "serializeToJwt",
     "parameters" : [
@@ -15174,7 +15674,7 @@
      {
       "name" : "serializeToJwt",
       "kind" : "function",
-      "line" : 2060,
+      "line" : 2446,
       "char" : 10,
       "type" : "JWTValue(in T data, const(ubyte)[] key)",
       "parameters" : [
@@ -15190,7 +15690,7 @@
         "type" : "const(ubyte)[]"
        }
       ],
-      "endline" : 2063,
+      "endline" : 2449,
       "endchar" : 1
      }
     ]
@@ -15199,7 +15699,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2066,
+    "line" : 2452,
     "char" : 10,
     "name" : "serializeToJwt",
     "parameters" : [
@@ -15212,7 +15712,7 @@
      {
       "name" : "serializeToJwt",
       "kind" : "function",
-      "line" : 2066,
+      "line" : 2452,
       "char" : 10,
       "type" : "JWTValue(in T data, const(char)[] key)",
       "parameters" : [
@@ -15228,7 +15728,7 @@
         "type" : "const(char)[]"
        }
       ],
-      "endline" : 2070,
+      "endline" : 2456,
       "endchar" : 1
      }
     ]
@@ -15237,7 +15737,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2073,
+    "line" : 2459,
     "char" : 8,
     "name" : "serializeToJwtString",
     "parameters" : [
@@ -15250,7 +15750,7 @@
      {
       "name" : "serializeToJwtString",
       "kind" : "function",
-      "line" : 2073,
+      "line" : 2459,
       "char" : 8,
       "type" : "string(in T data, JWTValue.Algorithm algo, const(ubyte)[] key)",
       "parameters" : [
@@ -15270,7 +15770,7 @@
         "type" : "const(ubyte)[]"
        }
       ],
-      "endline" : 2076,
+      "endline" : 2462,
       "endchar" : 1
      }
     ]
@@ -15279,7 +15779,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2079,
+    "line" : 2465,
     "char" : 8,
     "name" : "serializeToJwtString",
     "parameters" : [
@@ -15292,7 +15792,7 @@
      {
       "name" : "serializeToJwtString",
       "kind" : "function",
-      "line" : 2079,
+      "line" : 2465,
       "char" : 8,
       "type" : "string(in T data, JWTValue.Algorithm algo, const(char)[] key)",
       "parameters" : [
@@ -15312,7 +15812,7 @@
         "type" : "const(char)[]"
        }
       ],
-      "endline" : 2083,
+      "endline" : 2469,
       "endchar" : 1
      }
     ]
@@ -15321,7 +15821,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2086,
+    "line" : 2472,
     "char" : 8,
     "name" : "serializeToJwtString",
     "parameters" : [
@@ -15334,7 +15834,7 @@
      {
       "name" : "serializeToJwtString",
       "kind" : "function",
-      "line" : 2086,
+      "line" : 2472,
       "char" : 8,
       "type" : "string(in T data, const(ubyte)[] key)",
       "parameters" : [
@@ -15350,7 +15850,7 @@
         "type" : "const(ubyte)[]"
        }
       ],
-      "endline" : 2089,
+      "endline" : 2475,
       "endchar" : 1
      }
     ]
@@ -15359,7 +15859,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2092,
+    "line" : 2478,
     "char" : 8,
     "name" : "serializeToJwtString",
     "parameters" : [
@@ -15372,7 +15872,7 @@
      {
       "name" : "serializeToJwtString",
       "kind" : "function",
-      "line" : 2092,
+      "line" : 2478,
       "char" : 8,
       "type" : "string(in T data, const(char)[] key)",
       "parameters" : [
@@ -15388,7 +15888,7 @@
         "type" : "const(char)[]"
        }
       ],
-      "endline" : 2096,
+      "endline" : 2482,
       "endchar" : 1
      }
     ]
@@ -15397,7 +15897,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2099,
+    "line" : 2485,
     "char" : 6,
     "name" : "deserializeFromJwt",
     "parameters" : [
@@ -15410,7 +15910,7 @@
      {
       "name" : "deserializeFromJwt",
       "kind" : "function",
-      "line" : 2099,
+      "line" : 2485,
       "char" : 6,
       "type" : "void(ref T data, JWTValue jwt)",
       "parameters" : [
@@ -15426,7 +15926,7 @@
         "type" : "JWTValue"
        }
       ],
-      "endline" : 2102,
+      "endline" : 2488,
       "endchar" : 1
      }
     ]
@@ -15435,7 +15935,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2105,
+    "line" : 2491,
     "char" : 6,
     "name" : "deserializeFromJwtString",
     "parameters" : [
@@ -15448,7 +15948,7 @@
      {
       "name" : "deserializeFromJwtString",
       "kind" : "function",
-      "line" : 2105,
+      "line" : 2491,
       "char" : 6,
       "type" : "void(ref T data, const(char)[] jwt, const(char)[] key)",
       "parameters" : [
@@ -15468,22 +15968,22 @@
         "type" : "const(char)[]"
        }
       ],
-      "endline" : 2108,
+      "endline" : 2494,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L2112_C9",
+    "name" : "__unittest_L2498_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2112,
+    "line" : 2498,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2137,
+    "endline" : 2523,
     "endchar" : 1
    }
   ]

@@ -508,14 +508,17 @@ auto <code class="ddoc_psymbol">kind</code><span class="ddoc_template_param_list
 <span class="def-anchor" id=".serializeToJsonFile"></span><div class="quickindex" id="quickindex.serializeToJsonFile"></div>void <code class="ddoc_psymbol">serializeToJsonFile</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in T <span class="ddoc_param">data</span>, string <span class="ddoc_param">jsonfile</span>, JSONOptions <span class="ddoc_param">options</span> = JSONOptions.none);
 <br></div></dt>
 <dd><div class="ddoc_summary">serialize <span class="ddoc_param">data</span> to JSON</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id="._deserializeFromJsonImpl"></span><div class="quickindex" id="quickindex._deserializeFromJsonImpl"></div>void <code class="ddoc_psymbol">_deserializeFromJsonImpl</code><span class="ddoc_template_param_list" title="Template parameter list">(E)</span>(ref Endata!E <span class="ddoc_param">dst</span>, in JSONValue <span class="ddoc_param">src</span>);
-<br></div></dt>
-<dd><div class="ddoc_summary">Endata</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".deserializeFromJson"></span><div class="quickindex" id="quickindex.deserializeFromJson"></div>void <code class="ddoc_psymbol">deserializeFromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">data</span>, in JSONValue <span class="ddoc_param">json</span>);
+<br>
+T <code class="ddoc_psymbol">deserializeFromJson</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in JSONValue <span class="ddoc_param">jv</span>);
 <br>
 <span class="def-anchor" id=".deserializeFromJsonString"></span><div class="quickindex" id="quickindex.deserializeFromJsonString"></div>void <code class="ddoc_psymbol">deserializeFromJsonString</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">data</span>, string <span class="ddoc_param">jsonContents</span>);
 <br>
+T <code class="ddoc_psymbol">deserializeFromJsonString</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(string <span class="ddoc_param">jsonContents</span>);
+<br>
 <span class="def-anchor" id=".deserializeFromJsonFile"></span><div class="quickindex" id="quickindex.deserializeFromJsonFile"></div>void <code class="ddoc_psymbol">deserializeFromJsonFile</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(ref T <span class="ddoc_param">data</span>, string <span class="ddoc_param">jsonFile</span>);
+<br>
+T <code class="ddoc_psymbol">deserializeFromJsonFile</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(string <span class="ddoc_param">jsonFile</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">deserialize <span class="ddoc_param">data</span> from JSON</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">import</span> std.exception, std.datetime.systime;
@@ -543,7 +546,7 @@ auto <code class="ddoc_psymbol">kind</code><span class="ddoc_template_param_list
 	TE te;
 	ED ed;
 	
-	@converter!SysTime(jv=&gt;SysTime.fromISOExtString(jv.str),
+	@converter!SysTime(<span class="d_param">jv</span>=&gt;SysTime.fromISOExtString(<span class="d_param">jv</span>.str),
 	                   v =&gt;JSONValue(v.toISOExtString()))
 	SysTime time;
 }
@@ -561,7 +564,7 @@ y.testval = 200;
 JSONValue jv1     = serializeToJson(x);
 string    jsonStr = jv1.toPrettyString();
 JSONValue jv2     = parseJSON(jsonStr);
-y.<span class="d_psymbol">deserializeFromJson</span>(jv2);
+y = <span class="d_psymbol">deserializeFromJson</span>!Data(jv2);
 <span class="d_keyword">assert</span>(x != y);
 y.testval = x.testval;
 <span class="d_keyword">assert</span>(x == y);
@@ -590,7 +593,7 @@ y.testval = x.testval;
 }
 
 x.serializeToJsonFile(<span class="d_string">"test.json"</span>, JSONOptions.doNotEscapeSlashes);
-z.<span class="d_psymbol">deserializeFromJsonFile</span>(<span class="d_string">"test.json"</span>);
+z = <span class="d_psymbol">deserializeFromJsonFile</span>!Data(<span class="d_string">"test.json"</span>);
 <span class="d_keyword">assert</span>(x != z);
 z.testval = x.testval;
 <span class="d_keyword">assert</span>(x == z);
