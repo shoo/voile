@@ -1055,6 +1055,31 @@ class DispatchLogger: NamedLogger
 		{
 			_logLevel = lv;
 		}
+		
+		/***********************************************************************
+		 * Constructor
+		 */
+		this(string targetName,
+			string file = null, string moduleName = null,
+			string funcName = null, string prettyFuncName = null,
+			string msg = null,
+			size_t lineMax = size_t.max, size_t lineMin = size_t.min, LogLevel logLevel = LogLevel.all)
+		{
+			_targetName = targetName;
+			if (file)
+				_file = regex(file);
+			if (moduleName)
+				_moduleName = regex(moduleName);
+			if (funcName)
+				_funcName = regex(funcName);
+			if (prettyFuncName)
+				_prettyFuncName = regex(prettyFuncName);
+			if (msg)
+				_msg = regex(msg);
+			_lineMax = lineMax;
+			_lineMin = lineMin;
+			_logLevel = logLevel;
+		}
 	}
 	
 private:
