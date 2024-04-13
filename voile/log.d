@@ -157,25 +157,25 @@ private:
 	size_t _idx;
 public:
 	///
-	LogData front() const @property
+	LogData front() @safe const @property
 	{
 		return _datas[_idx];
 	}
 	
 	///
-	bool empty() const @property
+	bool empty() @safe const @property
 	{
 		return _idx == _datas.length;
 	}
 	
 	///
-	void popFront()
+	void popFront() @safe
 	{
 		_idx++;
 	}
 	
 	///
-	void put(LogData data)
+	void put(LogData data) @safe
 	{
 		_datas ~= data;
 	}
@@ -1063,7 +1063,7 @@ class DispatchLogger: NamedLogger
 			string file = null, string moduleName = null,
 			string funcName = null, string prettyFuncName = null,
 			string msg = null,
-			size_t lineMax = size_t.max, size_t lineMin = size_t.min, LogLevel logLevel = LogLevel.all)
+			size_t lineMax = size_t.max, size_t lineMin = size_t.min, LogLevel logLevel = LogLevel.all) @safe
 		{
 			_targetName = targetName;
 			if (file)
@@ -1127,6 +1127,26 @@ public:
 		// 全てのフィルタに引っかからなかった場合は破棄
 		return;
 	}
+}
+
+///
+@safe unittest
+{
+	auto logger = new DispatchLogger;
+	with (logger)
+	{
+		insertLogger("test1", new InMemoryLogger);
+		insertLogger("test2", new InMemoryLogger);
+		addFilter(Filter("test1", msg: r"test\d{3}"));
+		addFilter(Filter("test2", logLevel: LogLevel.warning));
+	}
+	logger.info("test001");    // -> test1
+	logger.trace("aaa");       // -> drop
+	logger.warning("xxx");     // -> test2
+	logger.warning("test002"); // -> test1
+	import std.algorithm: equal, map;
+	assert((cast(InMemoryLogger)logger.getLogger("test1")).logStorage.map!"a.msg".equal(["test001", "test002"]));
+	assert((cast(InMemoryLogger)logger.getLogger("test2")).logStorage.map!"a.msg".equal(["xxx"]));
 }
 
 /*******************************************************************************
