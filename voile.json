@@ -16868,7 +16868,7 @@
       "comment" : "\n",
       "line" : 160,
       "char" : 10,
-      "deco" : "xFNdZS5voile3log7LogData",
+      "deco" : "xFNdNfZS5voile3log7LogData",
       "endline" : 163,
       "endchar" : 2,
       "overrides" : [
@@ -16882,7 +16882,7 @@
       "comment" : "\n",
       "line" : 166,
       "char" : 7,
-      "deco" : "xFNdZb",
+      "deco" : "xFNdNfZb",
       "endline" : 169,
       "endchar" : 2,
       "overrides" : [
@@ -16896,7 +16896,7 @@
       "comment" : "\n",
       "line" : 172,
       "char" : 7,
-      "deco" : "FZv",
+      "deco" : "FNfZv",
       "endline" : 175,
       "endchar" : 2,
       "overrides" : [
@@ -16910,7 +16910,7 @@
       "comment" : "\n",
       "line" : 178,
       "char" : 7,
-      "deco" : "FS5voile3log7LogDataZv",
+      "deco" : "FNfS5voile3log7LogDataZv",
       "parameters" : [
        {
         "name" : "data",
@@ -18895,6 +18895,64 @@
         ],
         "endline" : 1057,
         "endchar" : 3
+       },
+       {
+        "name" : "this",
+        "kind" : "constructor",
+        "protection" : "public",
+        "comment" : " Constructor\n",
+        "line" : 1062,
+        "char" : 3,
+        "deco" : "FNcNfAyaQdQfQhQjQlmmE3std6logger4core8LogLevelZS5voile3log14DispatchLogger6Filter",
+        "originalType" : "ref @safe (string targetName, string file = null, string moduleName = null, string funcName = null, string prettyFuncName = null, string msg = null, size_t lineMax = size_t.max, size_t lineMin = size_t.min, LogLevel logLevel = LogLevel.all)",
+        "parameters" : [
+         {
+          "name" : "targetName",
+          "deco" : "Aya"
+         },
+         {
+          "name" : "file",
+          "deco" : "Aya",
+          "default" : "null"
+         },
+         {
+          "name" : "moduleName",
+          "deco" : "Aya",
+          "default" : "null"
+         },
+         {
+          "name" : "funcName",
+          "deco" : "Aya",
+          "default" : "null"
+         },
+         {
+          "name" : "prettyFuncName",
+          "deco" : "Aya",
+          "default" : "null"
+         },
+         {
+          "name" : "msg",
+          "deco" : "Aya",
+          "default" : "null"
+         },
+         {
+          "name" : "lineMax",
+          "deco" : "m",
+          "default" : "18446744073709551615LU"
+         },
+         {
+          "name" : "lineMin",
+          "deco" : "m",
+          "default" : "0LU"
+         },
+         {
+          "name" : "logLevel",
+          "deco" : "E3std6logger4core8LogLevel",
+          "default" : "LogLevel.all"
+         }
+        ],
+        "endline" : 1082,
+        "endchar" : 3
        }
       ]
      },
@@ -18902,7 +18960,7 @@
       "name" : "_filters",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 1061,
+      "line" : 1086,
       "char" : 11,
       "deco" : "AS5voile3log14DispatchLogger6Filter",
       "offset" : 200
@@ -18912,7 +18970,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1066,
+      "line" : 1091,
       "char" : 7,
       "deco" : "FNfS5voile3log14DispatchLogger6FilterZv",
       "parameters" : [
@@ -18921,7 +18979,7 @@
         "deco" : "S5voile3log14DispatchLogger6Filter"
        }
       ],
-      "endline" : 1069,
+      "endline" : 1094,
       "endchar" : 2
      },
      {
@@ -18929,7 +18987,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1073,
+      "line" : 1098,
       "char" : 16,
       "storageClass" : [
        "override"
@@ -18944,7 +19002,7 @@
         ]
        }
       ],
-      "endline" : 1104,
+      "endline" : 1129,
       "endchar" : 2,
       "overrides" : [
        "std.logger.multilogger.MultiLogger.writeLogMsg"
@@ -18962,18 +19020,31 @@
     ]
    },
    {
+    "name" : "__unittest_L1133_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "\n",
+    "line" : 1133,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1155,
+    "endchar" : 1
+   },
+   {
     "name" : "SynchronizedLogger",
     "kind" : "class",
     "protection" : "public",
     "comment" : " マルチスレッド同期機構を備えたLogger\n",
-    "line" : 1110,
+    "line" : 1155,
     "char" : 1,
     "base" : "std.logger.core.Logger",
     "members" : [
      {
       "name" : "std.logger",
       "kind" : "import",
-      "line" : 1113,
+      "line" : 1158,
       "char" : 9,
       "protection" : "private",
       "selective" : [
@@ -18984,7 +19055,7 @@
       "name" : "_logger",
       "kind" : "variable",
       "protection" : "private",
-      "line" : 1114,
+      "line" : 1159,
       "char" : 9,
       "deco" : "C3std6logger4core6Logger",
       "originalType" : "Logger",
@@ -18995,7 +19066,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1117,
+      "line" : 1162,
       "char" : 2,
       "deco" : "FC3std6logger4core6LoggerEQyQwQr8LogLevelZC5voile3log18SynchronizedLogger",
       "originalType" : "(Logger logger, LogLevel lv = LogLevel.all)",
@@ -19010,7 +19081,7 @@
         "default" : "LogLevel.all"
        }
       ],
-      "endline" : 1121,
+      "endline" : 1166,
       "endchar" : 2
      },
      {
@@ -19018,7 +19089,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1123,
+      "line" : 1168,
       "char" : 2,
       "deco" : "FOC3std6logger4core6LoggerEQyQwQr8LogLevelZC5voile3log18SynchronizedLogger",
       "originalType" : "(shared Logger logger, LogLevel lv = LogLevel.all)",
@@ -19033,7 +19104,7 @@
         "default" : "LogLevel.all"
        }
       ],
-      "endline" : 1127,
+      "endline" : 1172,
       "endchar" : 2
      },
      {
@@ -19041,7 +19112,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1129,
+      "line" : 1174,
       "char" : 2,
       "deco" : "OFC3std6logger4core6LoggerEQyQwQr8LogLevelZOC5voile3log18SynchronizedLogger",
       "originalType" : "shared (Logger logger, LogLevel lv = LogLevel.all)",
@@ -19056,7 +19127,7 @@
         "default" : "LogLevel.all"
        }
       ],
-      "endline" : 1133,
+      "endline" : 1178,
       "endchar" : 2
      },
      {
@@ -19064,7 +19135,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1135,
+      "line" : 1180,
       "char" : 2,
       "deco" : "OFOC3std6logger4core6LoggerEQyQwQr8LogLevelZOC5voile3log18SynchronizedLogger",
       "originalType" : "shared (shared Logger logger, LogLevel lv = LogLevel.all)",
@@ -19079,7 +19150,7 @@
         "default" : "LogLevel.all"
        }
       ],
-      "endline" : 1139,
+      "endline" : 1184,
       "endchar" : 2
      },
      {
@@ -19087,7 +19158,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1142,
+      "line" : 1187,
       "char" : 16,
       "storageClass" : [
        "override"
@@ -19102,7 +19173,7 @@
         ]
        }
       ],
-      "endline" : 1146,
+      "endline" : 1191,
       "endchar" : 2,
       "overrides" : [
        "std.logger.core.Logger.writeLogMsg"
@@ -19114,7 +19185,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " クラス内で使用するロガーを切り替えるためのミックスインテンプレート\n",
-    "line" : 1153,
+    "line" : 1198,
     "char" : 7,
     "name" : "Logging",
     "parameters" : [
@@ -19127,7 +19198,7 @@
      {
       "name" : "std.logger",
       "kind" : "import",
-      "line" : 1155,
+      "line" : 1200,
       "char" : 17,
       "protection" : "private",
       "selective" : [
@@ -19138,7 +19209,7 @@
      {
       "name" : "std.string",
       "kind" : "import",
-      "line" : 1156,
+      "line" : 1201,
       "char" : 17,
       "protection" : "private",
       "selective" : [
@@ -19148,15 +19219,15 @@
      {
       "name" : "logger",
       "kind" : "function",
-      "line" : 1159,
+      "line" : 1204,
       "char" : 49,
       "type" : "const @trusted typeof(loggerAlias[0])()",
-      "endline" : 1162,
+      "endline" : 1207,
       "endchar" : 3
      },
      {
       "kind" : "template",
-      "line" : 1172,
+      "line" : 1217,
       "char" : 30,
       "name" : "log",
       "parameters" : [
@@ -19205,7 +19276,7 @@
        {
         "name" : "log",
         "kind" : "function",
-        "line" : 1172,
+        "line" : 1217,
         "char" : 30,
         "type" : "const void(Args args)",
         "parameters" : [
@@ -19214,14 +19285,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1205,
+        "endline" : 1250,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1206,
+      "line" : 1251,
       "char" : 30,
       "name" : "trace",
       "parameters" : [
@@ -19270,7 +19341,7 @@
        {
         "name" : "trace",
         "kind" : "function",
-        "line" : 1206,
+        "line" : 1251,
         "char" : 30,
         "type" : "const void(Args args)",
         "parameters" : [
@@ -19279,14 +19350,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1227,
+        "endline" : 1272,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1228,
+      "line" : 1273,
       "char" : 30,
       "name" : "info",
       "parameters" : [
@@ -19335,7 +19406,7 @@
        {
         "name" : "info",
         "kind" : "function",
-        "line" : 1228,
+        "line" : 1273,
         "char" : 30,
         "type" : "const void(Args args)",
         "parameters" : [
@@ -19344,14 +19415,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1249,
+        "endline" : 1294,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1250,
+      "line" : 1295,
       "char" : 30,
       "name" : "warning",
       "parameters" : [
@@ -19400,7 +19471,7 @@
        {
         "name" : "warning",
         "kind" : "function",
-        "line" : 1250,
+        "line" : 1295,
         "char" : 30,
         "type" : "const nothrow void(Args args)",
         "parameters" : [
@@ -19409,14 +19480,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1278,
+        "endline" : 1323,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1279,
+      "line" : 1324,
       "char" : 30,
       "name" : "error",
       "parameters" : [
@@ -19465,7 +19536,7 @@
        {
         "name" : "error",
         "kind" : "function",
-        "line" : 1279,
+        "line" : 1324,
         "char" : 30,
         "type" : "const nothrow void(Args args)",
         "parameters" : [
@@ -19474,14 +19545,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1307,
+        "endline" : 1352,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1308,
+      "line" : 1353,
       "char" : 30,
       "name" : "fatal",
       "parameters" : [
@@ -19530,7 +19601,7 @@
        {
         "name" : "fatal",
         "kind" : "function",
-        "line" : 1308,
+        "line" : 1353,
         "char" : 30,
         "type" : "const nothrow void(Args args)",
         "parameters" : [
@@ -19539,14 +19610,14 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1336,
+        "endline" : 1381,
         "endchar" : 2
        }
       ]
      },
      {
       "kind" : "template",
-      "line" : 1337,
+      "line" : 1382,
       "char" : 30,
       "name" : "critical",
       "parameters" : [
@@ -19595,7 +19666,7 @@
        {
         "name" : "critical",
         "kind" : "function",
-        "line" : 1337,
+        "line" : 1382,
         "char" : 30,
         "type" : "const nothrow void(Args args)",
         "parameters" : [
@@ -19604,7 +19675,7 @@
           "type" : "Args"
          }
         ],
-        "endline" : 1365,
+        "endline" : 1410,
         "endchar" : 2
        }
       ]
@@ -19616,7 +19687,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " 名前からロガーを取得する\n",
-    "line" : 1372,
+    "line" : 1417,
     "char" : 8,
     "deco" : "FNeAyaC3std6logger4core6LoggerZQz",
     "originalType" : "@trusted Logger(string name, Logger defaultLogger = cast()sharedLog)",
@@ -19631,7 +19702,7 @@
       "default" : "sharedLog()"
      }
     ],
-    "endline" : 1382,
+    "endline" : 1427,
     "endchar" : 1
    }
   ]
