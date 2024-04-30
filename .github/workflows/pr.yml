@@ -289,9 +289,9 @@ jobs:
 
   # No. OS      ARCH    COMPILER   UT  TT  BLD DOC COV
   # 21. macOS   x86_64  dmd        o   o   x   x   o
-  test-osx-x86_64-dmd-latest:
-    name: test-osx-x86_64-dmd-latest
-    runs-on: macos-latest
+  test-macos12-x86_64-dmd-latest:
+    name: test-macos12-x86_64-dmd-latest
+    runs-on: macos-12
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
@@ -305,15 +305,15 @@ jobs:
       - name: Upload coverage result
         uses: actions/upload-artifact@v2
         with:
-          name: coverage-osx
+          name: coverage-macos12
           path: .cov
 
 
   # No. OS      ARCH    COMPILER   UT  TT  BLD DOC COV
   # 22. macOS   x86_64  ldc        o   x   o   o   x
-  test-osx-x86_64-ldc-latest:
-    name: test-osx-x86_64-ldc-latest
-    runs-on: macos-latest
+  test-macos12-x86_64-ldc-latest:
+    name: test-macos12-x86_64-ldc-latest
+    runs-on: macos-12
     steps:
       - uses: actions/checkout@v2
       - name: Install D compiler
@@ -338,7 +338,7 @@ jobs:
   # Upload coverage to Codecov
   upload-codecov:
     name: upload-codecov
-    needs: [test-windows-x86-dmd-latest, test-windows-x86-ldc-latest, test-windows-x86_64-dmd-latest, test-windows-x86_64-ldc-latest, test-windows-x86_64-ldc-master, test-linux-x86-ldc-latest, test-linux-x86_64-dmd-latest, test-linux-x86_64-ldc-latest, test-linux-x86_64-dmd-master, test-osx-x86_64-dmd-latest, test-osx-x86_64-ldc-latest]
+    needs: [test-windows-x86-dmd-latest, test-windows-x86-ldc-latest, test-windows-x86_64-dmd-latest, test-windows-x86_64-ldc-latest, test-windows-x86_64-ldc-master, test-linux-x86-ldc-latest, test-linux-x86_64-dmd-latest, test-linux-x86_64-ldc-latest, test-linux-x86_64-dmd-master, test-macos12-x86_64-dmd-latest, test-macos12-x86_64-ldc-latest]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -359,7 +359,7 @@ jobs:
       - name: Download coverage result
         uses: actions/download-artifact@v2
         with:
-          name: coverage-osx
-          path: coverage-osx
+          name: coverage-macos12
+          path: coverage-macos12
       - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }} -s coverage-osx
+        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }} -s coverage-macos12
