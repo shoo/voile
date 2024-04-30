@@ -1053,7 +1053,12 @@ private alias _getKinds(T, string uk, alias tag) = aliasSeqOf!(()
 		static foreach (member; getKeyMemberNames!T)
 		{
 			static foreach (val; getValues!(__traits(getMember, T, member)))
-				ret ~= Kind(member, JSONValue(val));
+			{
+				static if (hasName!(__traits(getMember, T, member)))
+					ret ~= Kind(getName!(__traits(getMember, T, member)), JSONValue(val));
+				else
+					ret ~= Kind(member, JSONValue(val));
+			}
 		}
 	}
 	else
@@ -1444,7 +1449,6 @@ void serializeToJsonFile(T)(in T data, string jsonfile, JSONOptions options = JS
 	std.file.write(jsonfile, contents);
 }
 
-
 //
 private void _deserializeFromJsonImpl(Types...)(ref SumType!Types dat, in JSONValue json)
 {
@@ -1453,39 +1457,39 @@ private void _deserializeFromJsonImpl(Types...)(ref SumType!Types dat, in JSONVa
 	final switch (json.type)
 	{
 	case JSONType.null_:
-		dat = MU.init;
+		() @trusted { dat = MU.init; }();
 		break;
 	case JSONType.string:
 		static if (canMatch!(MU, string))
-			dat = json.str;
+			() @trusted { dat = json.str; }();
 		break;
 	case JSONType.integer:
 		static if (canMatch!(MU, long))
-			dat = json.integer;
+			() @trusted { dat = json.integer; }();
 		else static if (canMatch!(MU, int))
-			dat = json.integer;
+			() @trusted { dat = json.integer; }();
 		else static if (canMatch!(MU, short))
-			dat = json.integer;
+			() @trusted { dat = json.integer; }();
 		else static if (canMatch!(MU, byte))
-			dat = json.integer;
+			() @trusted { dat = json.integer; }();
 		break;
 	case JSONType.uinteger:
 		static if (canMatch!(MU, ulong))
-			dat = json.uinteger;
+			() @trusted { dat = json.uinteger; }();
 		else static if (canMatch!(MU, uint))
-			dat = json.uinteger;
+			() @trusted { dat = json.uinteger; }();
 		else static if (canMatch!(MU, ushort))
-			dat = json.uinteger;
+			() @trusted { dat = json.uinteger; }();
 		else static if (canMatch!(MU, ubyte))
-			dat = json.uinteger;
+			() @trusted { dat = json.uinteger; }();
 		break;
 	case JSONType.float_:
 		static if (canMatch!(MU, real))
-			dat = json.floating;
+			() @trusted { dat = json.floating; }();
 		else static if (canMatch!(MU, double))
-			dat = json.floating;
+			() @trusted { dat = json.floating; }();
 		else static if (canMatch!(MU, float))
-			dat = json.floating;
+			() @trusted { dat = json.floating; }();
 		break;
 	case JSONType.array:
 		// 配列型の候補を選択
@@ -1498,14 +1502,14 @@ private void _deserializeFromJsonImpl(Types...)(ref SumType!Types dat, in JSONVa
 		else static if (AryTypes.length == 1)
 		{
 			// 配列型が1つならそれを最優先で選択
-			dat = deserializeFromJson!(AryTypes[0])(tmp, json);
+			() @trusted { dat = deserializeFromJson!(AryTypes[0])(tmp, json); }();
 			return;
 		}
 		else
 		{
 			// 配列型が複数ある場合は1つ目のデータの要素で決定
 			if (json.array.length == 0)
-				dat = MU.init;
+				() @trusted { dat = MU.init; }();
 			import std.meta;
 			alias ElementTypes = staticMap!(ForeachType, AryTypes);
 			SumType!ElementTypes datElm;
@@ -1514,7 +1518,7 @@ private void _deserializeFromJsonImpl(Types...)(ref SumType!Types dat, in JSONVa
 			datElm.match!(
 				(_){
 					alias AryType = MU.Types[staticIndexOf!(typeof(_), ElementTypes)];
-					dat = json.deserializeFromJson!AryType();
+					() @trusted { dat = json.deserializeFromJson!AryType(); }();
 				}
 			);
 			return;
@@ -1531,7 +1535,7 @@ private void _deserializeFromJsonImpl(Types...)(ref SumType!Types dat, in JSONVa
 		else static if (ObjTypes.length == 1)
 		{
 			// オブジェクト型が1つならそれを最優先で選択
-			dst = deserializeFromJson!(ObjTypes[0])(json);
+			() @trusted { dst = deserializeFromJson!(ObjTypes[0])(json); }();
 		}
 		else
 		{
@@ -1545,7 +1549,7 @@ private void _deserializeFromJsonImpl(Types...)(ref SumType!Types dat, in JSONVa
 						matchKeys &= cast(bool)(memberName in json);
 					if (matchKeys)
 					{
-						dat = deserializeFromJson!ObjType(json);
+						() @trusted { dat = deserializeFromJson!ObjType(json); }();
 						return;
 					}
 				}}
@@ -1562,7 +1566,7 @@ private void _deserializeFromJsonImpl(Types...)(ref SumType!Types dat, in JSONVa
 						{
 							if (*v == kind.value)
 							{
-								dat = deserializeFromJson!(ObjTypes[idx])(json);
+								() @trusted { dat = deserializeFromJson!(ObjTypes[idx])(json); }();
 								return;
 							}
 						}
@@ -1574,7 +1578,7 @@ private void _deserializeFromJsonImpl(Types...)(ref SumType!Types dat, in JSONVa
 	case JSONType.true_:
 	case JSONType.false_:
 		static if (hasType!(TypeEnum!Types, bool))
-			dat.initialize!bool(src.boolean);
+			() @trusted { dat = src.boolean; }();
 		break;
 	}
 }
@@ -1878,7 +1882,7 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 	{
 		if (json.type != JSONType.array)
 			return;
-		auto jvAry = json.array;
+		auto jvAry = (() @trusted => json.array)();
 		static if (isDynamicArray!T)
 			data.length = jvAry.length;
 		foreach (idx, ref dataElm; data)
@@ -1891,7 +1895,7 @@ void deserializeFromJson(T)(ref T data, in JSONValue json)
 		data.clear();
 		alias KeyType = typeof(data.byKey.front);
 		alias ValueType = typeof(data.byValue.front);
-		foreach (pair; json.object.byPair)
+		foreach (pair; (() @trusted => json.object)().byPair)
 		{
 			import std.algorithm: move;
 			data.update(pair.key.to!KeyType(),
