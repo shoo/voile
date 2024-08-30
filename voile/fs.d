@@ -979,7 +979,7 @@ struct FileSystem
 	}
 	
 	/***************************************************************************
-	 * JSONファイルを書き出す
+	 * JSONファイルを読み込む
 	 */
 	T readJson(T)(string filename)
 	{
@@ -991,11 +991,22 @@ struct FileSystem
 		return deserializeFromJsonString!T(readTextImpl!false(absFilename));
 	}
 	
+	/// ditto
+	T readJson(T: JSONValue)(string filename)
+	{
+		auto absFilename = absolutePath(filename);
+		if (!isFileImpl!false(absFilename))
+			return T.init;
+		return parseJSON(readTextImpl!false(absFilename));
+	}
+	
 	///
 	@system unittest
 	{
 		auto fs = createDisposableDir("ut");
 		fs.writeJson!uint("a/b/test.json", 10);
+		auto jv = fs.readJson!JSONValue("a/b/test.json");
+		assert(jv.get!int == 10);
 		assert(fs.readJson!uint("a/b/test.json") == 10);
 	}
 	
