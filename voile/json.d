@@ -2225,6 +2225,11 @@ public:
 	/***************************************************************************
 	 * 
 	 */
+	string type;
+	
+	/***************************************************************************
+	 * 
+	 */
 	enum Algorithm
 	{
 		HS256, HS384, HS512
@@ -2243,7 +2248,7 @@ public:
 		auto jwtElms = split(jwt, '.');
 		enforce(jwtElms.length == 3, "Unknown format");
 		auto header = parseJSON(cast(const(char)[])B64.decode(jwtElms[0]));
-		enforce(header.getValue("typ", string.init) == "JWT", "Unknown format");
+		type = enforce(header.getValue("typ", string.init), "Unknown format");
 		switch (header.getValue("alg", string.init))
 		{
 		case "HS256":
@@ -2284,49 +2289,78 @@ public:
 	}
 	
 	/// ditto
-	this(Algorithm algo, const(ubyte)[] key)
+	this(const(char)[] typ, Algorithm algo, const(ubyte)[] key, JSONValue payload) @safe
 	{
-		algorithm = algo;
-		_key = key.idup;
-	}
-	
-	/// ditto
-	this(Algorithm algo, const(ubyte)[] key, JSONValue payload)
-	{
+		type = typ.idup;
 		algorithm = algo;
 		_key = key.idup;
 		_payload = payload;
 	}
 	
 	/// ditto
-	this(Algorithm algo, const(ubyte)[] key, JSONValue[string] payload)
+	this(const(char)[] typ, Algorithm algo, const(char)[] key, JSONValue payload) @safe
 	{
-		algorithm = algo;
-		_key = key.idup;
-		_payload = JSONValue(payload);
+		this(typ, algo, key.representation, payload);
 	}
 	
 	/// ditto
-	this(Algorithm algo, const(char)[] key)
+	this(const(char)[] typ, Algorithm algo, const(ubyte)[] key, JSONValue[string] payload) @safe
 	{
-		algorithm = algo;
-		_key = key.representation;
+		this(typ, algo, key, JSONValue(payload));
 	}
 	
 	/// ditto
-	this(Algorithm algo, const(char)[] key, JSONValue payload)
+	this(const(char)[] typ, Algorithm algo, const(char)[] key, JSONValue[string] payload) @safe
 	{
-		algorithm = algo;
-		_key = key.representation;
-		_payload = payload;
+		this(typ, algo, key.representation, payload);
 	}
 	
 	/// ditto
-	this(Algorithm algo, const(char)[] key, JSONValue[string] payload)
+	this(const(char)[] typ, Algorithm algo, const(ubyte)[] key) @safe
 	{
-		algorithm = algo;
-		_key = key.representation;
-		_payload = JSONValue(payload);
+		this(typ, algo, key, JSONValue.init);
+	}
+	
+	/// ditto
+	this(const(char)[] typ, Algorithm algo, const(char)[] key) @safe
+	{
+		this(typ, algo, key.representation);
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(ubyte)[] key, JSONValue payload) @safe
+	{
+		this("JWT", algo, key, payload);
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(char)[] key, JSONValue payload) @safe
+	{
+		this(algo, key.representation, payload);
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(ubyte)[] key, JSONValue[string] payload) @safe
+	{
+		this(algo, key, JSONValue(payload));
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(char)[] key, JSONValue[string] payload) @safe
+	{
+		this(algo, key.representation, payload);
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(ubyte)[] key) @safe
+	{
+		this("JWT", algo, key);
+	}
+	
+	/// ditto
+	this(Algorithm algo, const(char)[] key) @safe
+	{
+		this(algo, key.representation);
 	}
 	
 	
@@ -2377,7 +2411,7 @@ public:
 		import std.base64;
 		alias B64 = Base64Impl!('+', '/', Base64.NoPadding);
 		
-		ret ~= B64.encode(text(`{"alg":"`, algorithm, `","typ":"JWT"}`).representation);
+		ret ~= B64.encode(text(`{"alg":"`, algorithm, `","typ":"`, type, `"}`).representation);
 		ret ~= ".";
 		ret ~= B64.encode(_payload.toString().representation);
 		
@@ -2426,6 +2460,27 @@ void setValue(T)(ref JWTValue dat, string name, T val)
 T getValue(T)(in JWTValue dat, string name, lazy T defaultVal)
 {
 	return dat._payload.getValue(name, defaultVal);
+}
+
+@safe unittest
+{
+	auto jwt = JWTValue(JWTValue.Algorithm.HS256, "test");
+	assert(jwt.type == "JWT");
+	jwt = JWTValue("Test", JWTValue.Algorithm.HS256, "test", ["test": JSONValue("test")]);
+	assert(jwt.type == "Test");
+	assert(jwt.getValue("test", "x") == "test");
+	jwt = JWTValue(JWTValue.Algorithm.HS256, "test", ["test": JSONValue("test")]);
+	assert(jwt.type == "JWT");
+	assert(jwt.getValue("test", "x") == "test");
+	jwt = JWTValue(JWTValue.Algorithm.HS256, "test", JSONValue(["test": "test"]));
+	assert(jwt.type == "JWT");
+	assert(jwt.getValue("test", "x") == "test");
+	jwt = JWTValue("Test", JWTValue.Algorithm.HS256, "test", JSONValue(["test": "test"]));
+	assert(jwt.type == "Test");
+	assert(jwt.getValue("test", "x") == "test");
+	jwt = JWTValue("Test", JWTValue.Algorithm.HS256, "test");
+	assert(jwt.type == "Test");
+	assert(jwt.getValue("test", "x") == "x");
 }
 
 
