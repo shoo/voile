@@ -644,7 +644,11 @@ jwt[<span class="d_string">"testkey"</span>] = <span class="d_string">"testvalue
 assertThrown(<span class="d_psymbol">JWTValue</span>(testjwt, <span class="d_string">"testsecret2"</span>));
 </pre>
 </div>
-<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.Algorithm"></span><div class="quickindex" id="quickindex.JWTValue.Algorithm"></div>enum <code class="ddoc_psymbol">Algorithm</code>: <span class="ddoc_enum_basetype">int</span>;
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.type"></span><div class="quickindex" id="quickindex.JWTValue.type"></div>string <code class="ddoc_psymbol">type</code>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.Algorithm"></span><div class="quickindex" id="quickindex.JWTValue.Algorithm"></div>enum <code class="ddoc_psymbol">Algorithm</code>: <span class="ddoc_enum_basetype">int</span>;
 <br>
 <span class="def-anchor" id=".JWTValue.algorithm"></span><div class="quickindex" id="quickindex.JWTValue.algorithm"></div>Algorithm <code class="ddoc_psymbol">algorithm</code>;
 <br></div></dt>
@@ -654,17 +658,29 @@ assertThrown(<span class="d_psymbol">JWTValue</span>(testjwt, <span class="d_str
 <br>
 this(const(char)[] <span class="ddoc_param">jwt</span>, const(char)[] <span class="ddoc_param">key</span>);
 <br>
-this(Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
+@safe this(const(char)[] <span class="ddoc_param">typ</span>, Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>, JSONValue <span class="ddoc_param">payload</span>);
 <br>
-this(Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>, JSONValue <span class="ddoc_param">payload</span>);
+@safe this(const(char)[] <span class="ddoc_param">typ</span>, Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>, JSONValue <span class="ddoc_param">payload</span>);
 <br>
-this(Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>, JSONValue[string] <span class="ddoc_param">payload</span>);
+@safe this(const(char)[] <span class="ddoc_param">typ</span>, Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>, JSONValue[string] <span class="ddoc_param">payload</span>);
 <br>
-this(Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>);
+@safe this(const(char)[] <span class="ddoc_param">typ</span>, Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>, JSONValue[string] <span class="ddoc_param">payload</span>);
 <br>
-this(Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>, JSONValue <span class="ddoc_param">payload</span>);
+@safe this(const(char)[] <span class="ddoc_param">typ</span>, Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
 <br>
-this(Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>, JSONValue[string] <span class="ddoc_param">payload</span>);
+@safe this(const(char)[] <span class="ddoc_param">typ</span>, Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>);
+<br>
+@safe this(Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>, JSONValue <span class="ddoc_param">payload</span>);
+<br>
+@safe this(Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>, JSONValue <span class="ddoc_param">payload</span>);
+<br>
+@safe this(Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>, JSONValue[string] <span class="ddoc_param">payload</span>);
+<br>
+@safe this(Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>, JSONValue[string] <span class="ddoc_param">payload</span>);
+<br>
+@safe this(Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
+<br>
+@safe this(Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>);
 <br></div></dt>
 <dd>
 </dd>

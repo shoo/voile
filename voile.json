@@ -15122,11 +15122,21 @@
       "offset" : 16
      },
      {
+      "name" : "type",
+      "kind" : "variable",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 2228,
+      "char" : 9,
+      "deco" : "Aya",
+      "offset" : 40
+     },
+     {
       "name" : "Algorithm",
       "kind" : "enum",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2228,
+      "line" : 2233,
       "char" : 2,
       "baseDeco" : "i",
       "members" : [
@@ -15135,7 +15145,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "0",
-        "line" : 2230,
+        "line" : 2235,
         "char" : 3
        },
        {
@@ -15143,7 +15153,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "1",
-        "line" : 2230,
+        "line" : 2235,
         "char" : 10
        },
        {
@@ -15151,7 +15161,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "2",
-        "line" : 2230,
+        "line" : 2235,
         "char" : 17
        }
       ]
@@ -15161,18 +15171,18 @@
       "kind" : "variable",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2233,
+      "line" : 2238,
       "char" : 12,
       "deco" : "E5voile4json8JWTValue9Algorithm",
       "init" : "Algorithm.HS256",
-      "offset" : 40
+      "offset" : 56
      },
      {
       "name" : "this",
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2239,
+      "line" : 2244,
       "char" : 2,
       "deco" : "FNcAxaAxhZS5voile4json8JWTValue",
       "originalType" : "ref (const(char)[] jwt, const(ubyte)[] key)",
@@ -15186,7 +15196,7 @@
         "deco" : "Axh"
        }
       ],
-      "endline" : 2278,
+      "endline" : 2283,
       "endchar" : 2
      },
      {
@@ -15194,7 +15204,7 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2281,
+      "line" : 2286,
       "char" : 2,
       "deco" : "FNcAxaQdZS5voile4json8JWTValue",
       "originalType" : "ref (const(char)[] jwt, const(char)[] key)",
@@ -15208,7 +15218,7 @@
         "deco" : "Axa"
        }
       ],
-      "endline" : 2284,
+      "endline" : 2289,
       "endchar" : 2
      },
      {
@@ -15216,33 +15226,15 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2287,
+      "line" : 2292,
       "char" : 2,
-      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxhZSQBjQBgQBe",
-      "originalType" : "ref (Algorithm algo, const(ubyte)[] key)",
+      "deco" : "FNcNfAxaE5voile4json8JWTValue9AlgorithmAxhS3stdQBg9JSONValueZSQCbQByQBw",
+      "originalType" : "ref @safe (const(char)[] typ, Algorithm algo, const(ubyte)[] key, JSONValue payload)",
       "parameters" : [
        {
-        "name" : "algo",
-        "deco" : "E5voile4json8JWTValue9Algorithm"
+        "name" : "typ",
+        "deco" : "Axa"
        },
-       {
-        "name" : "key",
-        "deco" : "Axh"
-       }
-      ],
-      "endline" : 2291,
-      "endchar" : 2
-     },
-     {
-      "name" : "this",
-      "kind" : "constructor",
-      "protection" : "public",
-      "comment" : "ditto\n",
-      "line" : 2294,
-      "char" : 2,
-      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxhS3stdQBg9JSONValueZSQCbQByQBw",
-      "originalType" : "ref (Algorithm algo, const(ubyte)[] key, JSONValue payload)",
-      "parameters" : [
        {
         "name" : "algo",
         "deco" : "E5voile4json8JWTValue9Algorithm"
@@ -15256,7 +15248,7 @@
         "deco" : "S3std4json9JSONValue"
        }
       ],
-      "endline" : 2299,
+      "endline" : 2298,
       "endchar" : 2
      },
      {
@@ -15264,11 +15256,45 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2302,
+      "line" : 2301,
       "char" : 2,
-      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxhHAyaS3stdQBk9JSONValueZSQCfQCcQCa",
-      "originalType" : "ref (Algorithm algo, const(ubyte)[] key, JSONValue[string] payload)",
+      "deco" : "FNcNfAxaE5voile4json8JWTValue9AlgorithmQBiS3stdQBg9JSONValueZSQCbQByQBw",
+      "originalType" : "ref @safe (const(char)[] typ, Algorithm algo, const(char)[] key, JSONValue payload)",
       "parameters" : [
+       {
+        "name" : "typ",
+        "deco" : "Axa"
+       },
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axa"
+       },
+       {
+        "name" : "payload",
+        "deco" : "S3std4json9JSONValue"
+       }
+      ],
+      "endline" : 2304,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 2307,
+      "char" : 2,
+      "deco" : "FNcNfAxaE5voile4json8JWTValue9AlgorithmAxhHAyaS3stdQBk9JSONValueZSQCfQCcQCa",
+      "originalType" : "ref @safe (const(char)[] typ, Algorithm algo, const(ubyte)[] key, JSONValue[string] payload)",
+      "parameters" : [
+       {
+        "name" : "typ",
+        "deco" : "Axa"
+       },
        {
         "name" : "algo",
         "deco" : "E5voile4json8JWTValue9Algorithm"
@@ -15282,7 +15308,7 @@
         "deco" : "HAyaS3std4json9JSONValue"
        }
       ],
-      "endline" : 2307,
+      "endline" : 2310,
       "endchar" : 2
      },
      {
@@ -15290,33 +15316,15 @@
       "kind" : "constructor",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 2310,
+      "line" : 2313,
       "char" : 2,
-      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxaZSQBjQBgQBe",
-      "originalType" : "ref (Algorithm algo, const(char)[] key)",
+      "deco" : "FNcNfAxaE5voile4json8JWTValue9AlgorithmQBiHAyaS3stdQBk9JSONValueZSQCfQCcQCa",
+      "originalType" : "ref @safe (const(char)[] typ, Algorithm algo, const(char)[] key, JSONValue[string] payload)",
       "parameters" : [
        {
-        "name" : "algo",
-        "deco" : "E5voile4json8JWTValue9Algorithm"
-       },
-       {
-        "name" : "key",
+        "name" : "typ",
         "deco" : "Axa"
-       }
-      ],
-      "endline" : 2314,
-      "endchar" : 2
-     },
-     {
-      "name" : "this",
-      "kind" : "constructor",
-      "protection" : "public",
-      "comment" : "ditto\n",
-      "line" : 2317,
-      "char" : 2,
-      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxaS3stdQBg9JSONValueZSQCbQByQBw",
-      "originalType" : "ref (Algorithm algo, const(char)[] key, JSONValue payload)",
-      "parameters" : [
+       },
        {
         "name" : "algo",
         "deco" : "E5voile4json8JWTValue9Algorithm"
@@ -15327,7 +15335,33 @@
        },
        {
         "name" : "payload",
-        "deco" : "S3std4json9JSONValue"
+        "deco" : "HAyaS3std4json9JSONValue"
+       }
+      ],
+      "endline" : 2316,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 2319,
+      "char" : 2,
+      "deco" : "FNcNfAxaE5voile4json8JWTValue9AlgorithmAxhZSQBjQBgQBe",
+      "originalType" : "ref @safe (const(char)[] typ, Algorithm algo, const(ubyte)[] key)",
+      "parameters" : [
+       {
+        "name" : "typ",
+        "deco" : "Axa"
+       },
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axh"
        }
       ],
       "endline" : 2322,
@@ -15340,8 +15374,112 @@
       "comment" : "ditto\n",
       "line" : 2325,
       "char" : 2,
-      "deco" : "FNcE5voile4json8JWTValue9AlgorithmAxaHAyaS3stdQBk9JSONValueZSQCfQCcQCa",
-      "originalType" : "ref (Algorithm algo, const(char)[] key, JSONValue[string] payload)",
+      "deco" : "FNcNfAxaE5voile4json8JWTValue9AlgorithmQBiZSQBjQBgQBe",
+      "originalType" : "ref @safe (const(char)[] typ, Algorithm algo, const(char)[] key)",
+      "parameters" : [
+       {
+        "name" : "typ",
+        "deco" : "Axa"
+       },
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axa"
+       }
+      ],
+      "endline" : 2328,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 2331,
+      "char" : 2,
+      "deco" : "FNcNfE5voile4json8JWTValue9AlgorithmAxhS3stdQBg9JSONValueZSQCbQByQBw",
+      "originalType" : "ref @safe (Algorithm algo, const(ubyte)[] key, JSONValue payload)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axh"
+       },
+       {
+        "name" : "payload",
+        "deco" : "S3std4json9JSONValue"
+       }
+      ],
+      "endline" : 2334,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 2337,
+      "char" : 2,
+      "deco" : "FNcNfE5voile4json8JWTValue9AlgorithmAxaS3stdQBg9JSONValueZSQCbQByQBw",
+      "originalType" : "ref @safe (Algorithm algo, const(char)[] key, JSONValue payload)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axa"
+       },
+       {
+        "name" : "payload",
+        "deco" : "S3std4json9JSONValue"
+       }
+      ],
+      "endline" : 2340,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 2343,
+      "char" : 2,
+      "deco" : "FNcNfE5voile4json8JWTValue9AlgorithmAxhHAyaS3stdQBk9JSONValueZSQCfQCcQCa",
+      "originalType" : "ref @safe (Algorithm algo, const(ubyte)[] key, JSONValue[string] payload)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axh"
+       },
+       {
+        "name" : "payload",
+        "deco" : "HAyaS3std4json9JSONValue"
+       }
+      ],
+      "endline" : 2346,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 2349,
+      "char" : 2,
+      "deco" : "FNcNfE5voile4json8JWTValue9AlgorithmAxaHAyaS3stdQBk9JSONValueZSQCfQCcQCa",
+      "originalType" : "ref @safe (Algorithm algo, const(char)[] key, JSONValue[string] payload)",
       "parameters" : [
        {
         "name" : "algo",
@@ -15356,7 +15494,51 @@
         "deco" : "HAyaS3std4json9JSONValue"
        }
       ],
-      "endline" : 2330,
+      "endline" : 2352,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 2355,
+      "char" : 2,
+      "deco" : "FNcNfE5voile4json8JWTValue9AlgorithmAxhZSQBjQBgQBe",
+      "originalType" : "ref @safe (Algorithm algo, const(ubyte)[] key)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axh"
+       }
+      ],
+      "endline" : 2358,
+      "endchar" : 2
+     },
+     {
+      "name" : "this",
+      "kind" : "constructor",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 2361,
+      "char" : 2,
+      "deco" : "FNcNfE5voile4json8JWTValue9AlgorithmAxaZSQBjQBgQBe",
+      "originalType" : "ref @safe (Algorithm algo, const(char)[] key)",
+      "parameters" : [
+       {
+        "name" : "algo",
+        "deco" : "E5voile4json8JWTValue9Algorithm"
+       },
+       {
+        "name" : "key",
+        "deco" : "Axa"
+       }
+      ],
+      "endline" : 2364,
       "endchar" : 2
      },
      {
@@ -15364,7 +15546,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2336,
+      "line" : 2370,
       "char" : 7,
       "deco" : "FAyaZv",
       "parameters" : [
@@ -15373,7 +15555,7 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 2339,
+      "endline" : 2373,
       "endchar" : 2
      },
      {
@@ -15381,7 +15563,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "dittp\n",
-      "line" : 2341,
+      "line" : 2375,
       "char" : 7,
       "deco" : "FAxhZv",
       "parameters" : [
@@ -15390,7 +15572,7 @@
         "deco" : "Axh"
        }
       ],
-      "endline" : 2344,
+      "endline" : 2378,
       "endchar" : 2
      },
      {
@@ -15398,7 +15580,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2349,
+      "line" : 2383,
       "char" : 23,
       "deco" : "NgFNcNjAyaZNgS3std4json9JSONValue",
       "parameters" : [
@@ -15407,14 +15589,14 @@
         "deco" : "Aya"
        }
       ],
-      "endline" : 2352,
+      "endline" : 2386,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2357,
+      "line" : 2391,
       "char" : 7,
       "name" : "opIndexAssign",
       "parameters" : [
@@ -15427,7 +15609,7 @@
        {
         "name" : "opIndexAssign",
         "kind" : "function",
-        "line" : 2357,
+        "line" : 2391,
         "char" : 7,
         "type" : "void(auto ref T value, string name) return",
         "parameters" : [
@@ -15444,7 +15626,7 @@
           "type" : "string"
          }
         ],
-        "endline" : 2360,
+        "endline" : 2394,
         "endchar" : 2
        }
       ]
@@ -15454,10 +15636,10 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2365,
+      "line" : 2399,
       "char" : 23,
       "deco" : "NgFNcNjZNgS3std4json9JSONValue",
-      "endline" : 2368,
+      "endline" : 2402,
       "endchar" : 2
      },
      {
@@ -15465,32 +15647,32 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 2373,
+      "line" : 2407,
       "char" : 9,
       "deco" : "xFZAya",
-      "endline" : 2393,
+      "endline" : 2427,
       "endchar" : 2
      }
     ]
    },
    {
-    "name" : "__unittest_L2397_C9",
+    "name" : "__unittest_L2431_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2397,
+    "line" : 2431,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2418,
+    "endline" : 2452,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2418,
+    "line" : 2452,
     "char" : 6,
     "name" : "setValue",
     "parameters" : [
@@ -15503,7 +15685,7 @@
      {
       "name" : "setValue",
       "kind" : "function",
-      "line" : 2418,
+      "line" : 2452,
       "char" : 6,
       "type" : "void(ref JWTValue dat, string name, T val)",
       "parameters" : [
@@ -15523,7 +15705,7 @@
         "type" : "T"
        }
       ],
-      "endline" : 2421,
+      "endline" : 2455,
       "endchar" : 1
      }
     ]
@@ -15532,7 +15714,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
-    "line" : 2426,
+    "line" : 2460,
     "char" : 3,
     "name" : "getValue",
     "parameters" : [
@@ -15545,7 +15727,7 @@
      {
       "name" : "getValue",
       "kind" : "function",
-      "line" : 2426,
+      "line" : 2460,
       "char" : 3,
       "type" : "T(in JWTValue dat, string name, lazy T defaultVal)",
       "parameters" : [
@@ -15568,16 +15750,28 @@
         ]
        }
       ],
-      "endline" : 2429,
+      "endline" : 2463,
       "endchar" : 1
      }
     ]
    },
    {
+    "name" : "__unittest_L2465_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 2465,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 2490,
+    "endchar" : 1
+   },
+   {
     "kind" : "template",
     "protection" : "public",
     "comment" : " シリアライズ/デシリアライズ\n",
-    "line" : 2435,
+    "line" : 2490,
     "char" : 10,
     "name" : "serializeToJwt",
     "parameters" : [
@@ -15590,7 +15784,7 @@
      {
       "name" : "serializeToJwt",
       "kind" : "function",
-      "line" : 2435,
+      "line" : 2490,
       "char" : 10,
       "type" : "JWTValue(in T data, JWTValue.Algorithm algo, const(ubyte)[] key)",
       "parameters" : [
@@ -15610,7 +15804,7 @@
         "type" : "const(ubyte)[]"
        }
       ],
-      "endline" : 2440,
+      "endline" : 2495,
       "endchar" : 1
      }
     ]
@@ -15619,7 +15813,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2443,
+    "line" : 2498,
     "char" : 10,
     "name" : "serializeToJwt",
     "parameters" : [
@@ -15632,7 +15826,7 @@
      {
       "name" : "serializeToJwt",
       "kind" : "function",
-      "line" : 2443,
+      "line" : 2498,
       "char" : 10,
       "type" : "JWTValue(in T data, JWTValue.Algorithm algo, const(char)[] key)",
       "parameters" : [
@@ -15652,7 +15846,7 @@
         "type" : "const(char)[]"
        }
       ],
-      "endline" : 2447,
+      "endline" : 2502,
       "endchar" : 1
      }
     ]
@@ -15661,7 +15855,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2450,
+    "line" : 2505,
     "char" : 10,
     "name" : "serializeToJwt",
     "parameters" : [
@@ -15674,7 +15868,7 @@
      {
       "name" : "serializeToJwt",
       "kind" : "function",
-      "line" : 2450,
+      "line" : 2505,
       "char" : 10,
       "type" : "JWTValue(in T data, const(ubyte)[] key)",
       "parameters" : [
@@ -15690,7 +15884,7 @@
         "type" : "const(ubyte)[]"
        }
       ],
-      "endline" : 2453,
+      "endline" : 2508,
       "endchar" : 1
      }
     ]
@@ -15699,7 +15893,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2456,
+    "line" : 2511,
     "char" : 10,
     "name" : "serializeToJwt",
     "parameters" : [
@@ -15712,7 +15906,7 @@
      {
       "name" : "serializeToJwt",
       "kind" : "function",
-      "line" : 2456,
+      "line" : 2511,
       "char" : 10,
       "type" : "JWTValue(in T data, const(char)[] key)",
       "parameters" : [
@@ -15728,7 +15922,7 @@
         "type" : "const(char)[]"
        }
       ],
-      "endline" : 2460,
+      "endline" : 2515,
       "endchar" : 1
      }
     ]
@@ -15737,7 +15931,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2463,
+    "line" : 2518,
     "char" : 8,
     "name" : "serializeToJwtString",
     "parameters" : [
@@ -15750,7 +15944,7 @@
      {
       "name" : "serializeToJwtString",
       "kind" : "function",
-      "line" : 2463,
+      "line" : 2518,
       "char" : 8,
       "type" : "string(in T data, JWTValue.Algorithm algo, const(ubyte)[] key)",
       "parameters" : [
@@ -15770,7 +15964,7 @@
         "type" : "const(ubyte)[]"
        }
       ],
-      "endline" : 2466,
+      "endline" : 2521,
       "endchar" : 1
      }
     ]
@@ -15779,7 +15973,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2469,
+    "line" : 2524,
     "char" : 8,
     "name" : "serializeToJwtString",
     "parameters" : [
@@ -15792,7 +15986,7 @@
      {
       "name" : "serializeToJwtString",
       "kind" : "function",
-      "line" : 2469,
+      "line" : 2524,
       "char" : 8,
       "type" : "string(in T data, JWTValue.Algorithm algo, const(char)[] key)",
       "parameters" : [
@@ -15812,7 +16006,7 @@
         "type" : "const(char)[]"
        }
       ],
-      "endline" : 2473,
+      "endline" : 2528,
       "endchar" : 1
      }
     ]
@@ -15821,7 +16015,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2476,
+    "line" : 2531,
     "char" : 8,
     "name" : "serializeToJwtString",
     "parameters" : [
@@ -15834,7 +16028,7 @@
      {
       "name" : "serializeToJwtString",
       "kind" : "function",
-      "line" : 2476,
+      "line" : 2531,
       "char" : 8,
       "type" : "string(in T data, const(ubyte)[] key)",
       "parameters" : [
@@ -15850,7 +16044,7 @@
         "type" : "const(ubyte)[]"
        }
       ],
-      "endline" : 2479,
+      "endline" : 2534,
       "endchar" : 1
      }
     ]
@@ -15859,7 +16053,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2482,
+    "line" : 2537,
     "char" : 8,
     "name" : "serializeToJwtString",
     "parameters" : [
@@ -15872,7 +16066,7 @@
      {
       "name" : "serializeToJwtString",
       "kind" : "function",
-      "line" : 2482,
+      "line" : 2537,
       "char" : 8,
       "type" : "string(in T data, const(char)[] key)",
       "parameters" : [
@@ -15888,7 +16082,7 @@
         "type" : "const(char)[]"
        }
       ],
-      "endline" : 2486,
+      "endline" : 2541,
       "endchar" : 1
      }
     ]
@@ -15897,7 +16091,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2489,
+    "line" : 2544,
     "char" : 6,
     "name" : "deserializeFromJwt",
     "parameters" : [
@@ -15910,7 +16104,7 @@
      {
       "name" : "deserializeFromJwt",
       "kind" : "function",
-      "line" : 2489,
+      "line" : 2544,
       "char" : 6,
       "type" : "void(ref T data, JWTValue jwt)",
       "parameters" : [
@@ -15926,7 +16120,7 @@
         "type" : "JWTValue"
        }
       ],
-      "endline" : 2492,
+      "endline" : 2547,
       "endchar" : 1
      }
     ]
@@ -15935,7 +16129,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2495,
+    "line" : 2550,
     "char" : 6,
     "name" : "deserializeFromJwtString",
     "parameters" : [
@@ -15948,7 +16142,7 @@
      {
       "name" : "deserializeFromJwtString",
       "kind" : "function",
-      "line" : 2495,
+      "line" : 2550,
       "char" : 6,
       "type" : "void(ref T data, const(char)[] jwt, const(char)[] key)",
       "parameters" : [
@@ -15968,22 +16162,22 @@
         "type" : "const(char)[]"
        }
       ],
-      "endline" : 2498,
+      "endline" : 2553,
       "endchar" : 1
      }
     ]
    },
    {
-    "name" : "__unittest_L2502_C9",
+    "name" : "__unittest_L2557_C9",
     "kind" : "function",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 2502,
+    "line" : 2557,
     "char" : 9,
     "storageClass" : [
      "@system"
     ],
-    "endline" : 2527,
+    "endline" : 2582,
     "endchar" : 1
    }
   ]
