@@ -17,7 +17,7 @@ jobs:
     name: create-windows-x86
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install D compiler
         uses: dlang-community/setup-dlang@v1
         with:
@@ -39,7 +39,7 @@ jobs:
     name: create-windows-x86_64
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install D compiler
         uses: dlang-community/setup-dlang@v1
         with:
@@ -61,7 +61,7 @@ jobs:
     name: create-linux-x86_64
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install D compiler
         uses: dlang-community/setup-dlang@v1
         with:
@@ -87,11 +87,11 @@ jobs:
 
   # No. OS      ARCH    COMPILER   UT  TT  BLD DOC
   # 22. macOS   x86_64  ldc        o   o   O   o
-  create-macos12-x86_64:
-    name: create-macos12-x86_64
-    runs-on: macos-12
+  create-macos13-x86_64:
+    name: create-macos13-x86_64
+    runs-on: macos-13
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install D compiler
         uses: dlang-community/setup-dlang@v1
         with:
@@ -104,14 +104,14 @@ jobs:
       #- name: Upload created archive
       #  uses: actions/upload-artifact@v4
       #  with:
-      #    name: macos12-x86_64-binary
+      #    name: macos13-x86_64-binary
       #    path: ${{ steps.create_archive.outputs.ARCNAME }}
       #    include-hidden-files: true
 
   # Deploy Pages
   create-release:
     name: create-release
-    needs: [create-windows-x86, create-windows-x86_64, create-linux-x86_64, create-macos12-x86_64]
+    needs: [create-windows-x86, create-windows-x86_64, create-linux-x86_64, create-macos13-x86_64]
     runs-on: ubuntu-latest
     steps:
       #- name: Get Names
@@ -134,10 +134,10 @@ jobs:
       #  with:
       #    name: linux-x86_64-binary
       #    path: ./
-      #- name: Download macos12-x86_64-binary
+      #- name: Download macos13-x86_64-binary
       #  uses: actions/download-artifact@v4
       #  with:
-      #    name: macos12-x86_64-binary
+      #    name: macos13-x86_64-binary
       #    path: ./
       - name: Create Release
         id: create_release
@@ -180,12 +180,12 @@ jobs:
       #    asset_name: ${{ steps.get_names.outputs.PROJNAME }}-${{ steps.get_names.outputs.TAGNAME }}-linux-x86_64.tar.gz
       #    asset_content_type: application/x-gzip
       #- name: Upload Release Asset OSX
-      #  id: upload-release-asset-macos12
+      #  id: upload-release-asset-macos13
       #  uses: actions/upload-release-asset@v1
       #  env:
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #  with:
       #    upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #    asset_path: ${{ steps.get_names.outputs.PROJNAME }}-${{ steps.get_names.outputs.TAGNAME }}-macos12-x86_64.tar.gz
-      #    asset_name: ${{ steps.get_names.outputs.PROJNAME }}-${{ steps.get_names.outputs.TAGNAME }}-macos12-x86_64.tar.gz
+      #    asset_path: ${{ steps.get_names.outputs.PROJNAME }}-${{ steps.get_names.outputs.TAGNAME }}-macos13-x86_64.tar.gz
+      #    asset_name: ${{ steps.get_names.outputs.PROJNAME }}-${{ steps.get_names.outputs.TAGNAME }}-macos13-x86_64.tar.gz
       #    asset_content_type: application/x-gzip
