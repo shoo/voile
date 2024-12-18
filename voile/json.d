@@ -907,7 +907,7 @@ private bool _isNotEq(string[] rhs, string[] lhs) @safe
 }
 private bool _isUniq(string[] keyMembers, string[][] anotherKeyMembers) @safe
 {
-	bool ret = true;
+	bool ret = keyMembers.length > 0;
 	foreach (keys; anotherKeyMembers)
 		ret &= _isNotEq(keyMembers, keys);
 	return ret;
@@ -920,7 +920,7 @@ private bool _isUniq(string[] keyMembers, string[][] anotherKeyMembers) @safe
 }
 private bool _isAllUniq(string[][] keyMembers) @safe
 {
-	bool ret = true;
+	bool ret = keyMembers.length > 0;
 	foreach (idx; 0..keyMembers.length)
 		ret &= _isUniq(keyMembers[idx], keyMembers[idx+1..$]);
 	return ret;
@@ -930,6 +930,7 @@ private bool _isAllUniq(string[][] keyMembers) @safe
 	assert(_isAllUniq([["a", "b"], ["a", "c"], ["a", "d"]]));
 	assert(!_isAllUniq([["a", "b"], ["a", "b"], ["a", "d"]]));
 	assert(!_isAllUniq([["a", "b"], ["b", "a"], ["a", "d"]]));
+	assert(!_isAllUniq([[], [], []]));
 }
 
 
@@ -1081,7 +1082,19 @@ private alias _getKinds(T, string uk, alias tag) = aliasSeqOf!(()
 private JSONValue _serializeToJsonImpl(Types...)(in SumType!Types dat)
 {
 	import std.sumtype: match;
-	return dat.match!( (_) => _.serializeToJson() );
+	return dat.match!( (_) {
+		static if (hasValue!(typeof(_), Kind))
+		{
+			auto jv = _.serializeToJson();
+			static foreach (tag; getValues!(typeof(_), Kind))
+				jv[tag.key] = tag.value;
+			return jv;
+		}
+		else
+		{
+			return _.serializeToJson();
+		}
+	});
 }
 
 @system unittest
@@ -1110,6 +1123,21 @@ private JSONValue _serializeToJsonImpl(Types...)(in SumType!Types dat)
 	assert(mujson1["a"].integer == 1);
 	assert(mujson1["b"].type == JSONType.integer);
 	assert(mujson1["b"].integer == 10);
+}
+
+@system unittest
+{
+	@kind("$type", "a") struct A{ int a; int b; }
+	@kind("$type", "b") struct B{ int a; int c; }
+	SumType!(A, B) dat1 = A(1, 10);
+	auto mujson1 = _serializeToJsonImpl(dat1);
+	assert(mujson1.type == JSONType.object);
+	assert(mujson1["a"].type == JSONType.integer);
+	assert(mujson1["a"].integer == 1);
+	assert(mujson1["b"].type == JSONType.integer);
+	assert(mujson1["b"].integer == 10);
+	assert(mujson1["$type"].type == JSONType.string);
+	assert(mujson1["$type"].str == "a");
 }
 
 
@@ -1617,6 +1645,21 @@ private void _deserializeFromJsonImpl(Types...)(ref SumType!Types dat, in JSONVa
 	);
 	assert(result == 2);
 }
+@system unittest
+{
+	import std.sumtype: match;
+	@kind("$type", "a") struct A{ int a; int b; }
+	@kind("$type", "b") struct B{ int a; int c; }
+	SumType!(A, B) dat1;
+	auto mujson1 = JSONValue(["$type": JSONValue("b"), "a": JSONValue(1), "c": JSONValue(10)]);
+	_deserializeFromJsonImpl(dat1, mujson1);
+	auto result = dat1.match!(
+		(A a) => 42,
+		(B b) => b.c,
+	);
+	assert(result == 10);
+}
+
 
 
 // - TypeEnumなら、まず型で 数値/文字列/配列/オブジェクト でそれぞれかぶりがないか検証する
