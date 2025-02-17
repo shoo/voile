@@ -30,6 +30,8 @@
 
 	<li><a title="Binary data serializer/deserializer" href="voile--voile.bindat.html"><span >bindat</span></a></li>
 
+	<li><a title="CBOR data module" href="voile--voile.cbor.html"><span >cbor</span></a></li>
+
 	<li><a title="データ形式向けのバイナリ操作" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
 
 	<li><a title="ファイルシステムヘルパー" href="voile--voile.fs.html"><span >fs</span></a></li>
@@ -291,6 +293,11 @@ auto <code class="ddoc_psymbol">combinationMatrix</code><span class="ddoc_templa
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".shuffle"></span><div class="quickindex" id="quickindex.shuffle"></div>auto <code class="ddoc_psymbol">shuffle</code><span class="ddoc_template_param_list" title="Template parameter list">(R)</span>(R <span class="ddoc_param">ary</span>)<br><span class="ddoc_constraint">if(isRandomAccessRange!R)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">Shuffle elements of specified range</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".get"></span><div class="quickindex" id="quickindex.get"></div>@trusted T <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(T, ST)</span>(ref ST <span class="ddoc_param">value</span>, lazy T <span class="ddoc_param">defaultValue</span> = T.init)<br><span class="ddoc_constraint">if(isSumType!ST)</span>;
+<br>
+@trusted const(T) <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(T, ST)</span>(in ST <span class="ddoc_param">value</span>, lazy T <span class="ddoc_param">defaultValue</span> = T.init)<br><span class="ddoc_constraint">if(isSumType!ST)</span>;
+<br></div></dt>
+<dd><div class="ddoc_summary">Check if the SumType contains a <span class="ddoc_param">value</span></div></dd>
 </div></dl>
 
                 

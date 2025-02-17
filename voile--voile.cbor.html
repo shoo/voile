@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.cbor</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="UDA" href="voile--voile.attr.html"><span >attr</span></a></li>
+
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="Binary data serializer/deserializer" href="voile--voile.bindat.html"><span >bindat</span></a></li>
+
+	<li><a title="CBOR data module" href="voile--voile.cbor.html"><span >cbor</span></a></li>
+
+	<li><a title="データ形式向けのバイナリ操作" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="ファイルシステムヘルパー" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="JSONValueのヘルパー、シリアライズ・デシリアライズ" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="便利関数" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="管理された共用体を提供する" href="voile--voile.munion.html"><span >munion</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="参照カウンタ" href="voile--voile.refcnt.html"><span >refcnt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.cbor</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">CBOR data module
+</div><div class="ddoc_description">This module provides functionality for working with CBOR (Concise Binary Object Representation) data.
+ It includes definitions for various CBOR data types, a builder for constructing CBOR values,
+ and methods for converting between CBOR and native D types.
+
+</div>
+<div class="ddoc_see_also"><span class="ddoc_see_also_header">See Also:</span>
+ <a href="https://tools.ietf.org/html/rfc7049">RFC 7049</a></div>
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".isBinary"></span><div class="quickindex" id="quickindex.isBinary"></div>enum auto <code class="ddoc_psymbol">isBinary</code>(T);
+<br></div></dt>
+<dd><div class="ddoc_summary">Determines if the type is binary</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".kind"></span><div class="quickindex" id="quickindex.kind"></div>auto <code class="ddoc_psymbol">kind</code>(string <span class="ddoc_param">name</span>, string <span class="ddoc_param">value</span>);
+<br>
+auto <code class="ddoc_psymbol">kind</code>(string <span class="ddoc_param">value</span>);
+<br>
+auto <code class="ddoc_psymbol">kind</code><span class="ddoc_template_param_list" title="Template parameter list">(string value)</span>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Kind attribute
+</div><div class="ddoc_description">Attribute used for serialization of SumType.
+ By adding this attribute to all aggregate types used in SumType, they become serializable.</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isSerializableSumType"></span><div class="quickindex" id="quickindex.isSerializableSumType"></div>enum auto <code class="ddoc_psymbol">isSerializableSumType</code>(T);
+<br></div></dt>
+<dd><div class="ddoc_summary">Determines if the SumType can be serialized to CBOR format
+</div><div class="ddoc_description">This template returns <code class="ddoc_keyword">true</code> if the type T meets the following conditions:
+<ul><li>T is a SumType</li>
+<li>All members of the SumType are serializable</li>
+<li>All members of the SumType have the @kind attribute if they are aggregate types</li>
+<li>There is at most one member of each of the following types:
+   integral, floating point, boolean, string, binary, array, associative array
+</li>
+</ul>
+</div>
+<div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">T</td>
+<td class="ddoc_param_desc">The type to check</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ <code class="ddoc_keyword">true</code> if T is a serializable sum type, <code class="ddoc_keyword">false</code> otherwise</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate">@kind(<span class="d_string">"test1"</span>) <span class="d_keyword">struct</span> Test1 { <span class="d_keyword">int</span> value; }
+@kind(<span class="d_string">"test2"</span>) <span class="d_keyword">struct</span> Test2 { <span class="d_keyword">int</span> value; }
+<span class="d_keyword">alias</span> ST1 = SumType!(Test1, Test2);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(allSatisfy!(hasKind, ST1.Types));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(allSatisfy!(isSerializable, ST1.Types));
+
+<span class="d_keyword">struct</span> Test3 { <span class="d_keyword">int</span> value; }
+<span class="d_keyword">alias</span> ST2 = SumType!(Test1, Test2, Test3);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!allSatisfy!(hasKind, ST2.Types));
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isSerializableSumType</span>!ST2);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!isSerializableData!ST2);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!isSerializable!ST2);
+
+<span class="d_keyword">alias</span> ST3 = SumType!(<span class="d_keyword">int</span>, <span class="d_keyword">ulong</span>, string, <span class="d_keyword">immutable</span>(<span class="d_keyword">ubyte</span>)[]);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_psymbol">isSerializableSumType</span>!ST3);
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!isSerializable!ST3);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isSerializable"></span><div class="quickindex" id="quickindex.isSerializable"></div>template <code class="ddoc_psymbol">isSerializable</code>(T)<br></div></dt>
+<dd><div class="ddoc_summary">Checks if a given type is serializable to CBOR format.
+</div><div class="ddoc_description">This function determines whether a type can be serialized into the CBOR (Concise Binary Object Representation) format.
+ CBOR is a binary data serialization format which aims to provide a more compact representation compared to JSON.
+
+</div>
+<div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
+ <table class="ddoc_params_table"><tr class="ddoc_param_row"><td class="ddoc_param_id">T</td>
+<td class="ddoc_param_desc">The type to check for serializability.</td></tr>
+</table></div>
+
+<div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
+ bool - <code class="d_inlinecode donthyphenate notranslate">true</code> if the type is serializable to CBOR, <code class="d_inlinecode donthyphenate notranslate">false</code> otherwise.</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder"></span><div class="quickindex" id="quickindex.Builder"></div>struct <code class="ddoc_psymbol">Builder</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">The <code class="ddoc_psymbol">Builder</code> struct is used to generate and manipulate CBOR (Concise Binary Object Representation) data.
+</div><div class="ddoc_description"><ul><li>Use the <code class="d_inlinecode donthyphenate notranslate">make</code> method to create a <code class="d_inlinecode donthyphenate notranslate">CborValue</code>.</li>
+<li>Use the <code class="d_inlinecode donthyphenate notranslate">parse</code> method to convert binary data to a <code class="d_inlinecode donthyphenate notranslate">CborValue</code>.</li>
+<li>Use the <code class="d_inlinecode donthyphenate notranslate">build</code> method to convert a <code class="d_inlinecode donthyphenate notranslate">CborValue</code> to binary format.</li>
+<li>The <code class="d_inlinecode donthyphenate notranslate">serialize</code> and <code class="d_inlinecode donthyphenate notranslate">deserialize</code> methods support ORM (Object-Relational Mapping).</li>
+</ul></div>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue"></span><div class="quickindex" id="quickindex.Builder.CborValue"></div>struct <code class="ddoc_psymbol">CborValue</code>;
+<br></div></dt>
+<dd>
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.Type"></span><div class="quickindex" id="quickindex.Builder.CborValue.Type"></div>enum <code class="ddoc_psymbol">Type</code>: <span class="ddoc_enum_basetype">ubyte</span>;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.this"></span><div class="quickindex" id="quickindex.Builder.CborValue.this"></div>@trusted this<span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">value</span>, ref Builder <span class="ddoc_param">builder</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Constructor</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.type"></span><div class="quickindex" id="quickindex.Builder.CborValue.type"></div>const pure nothrow @safe Type <code class="ddoc_psymbol">type</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Type getter</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.opAssign"></span><div class="quickindex" id="quickindex.Builder.CborValue.opAssign"></div>pure nothrow @nogc ref @trusted CborValue <code class="ddoc_psymbol">opAssign</code>(CborValue <span class="ddoc_param">v</span>) return;
+<br></div></dt>
+<dd><div class="ddoc_summary">Assign operator</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.isNull"></span><div class="quickindex" id="quickindex.Builder.CborValue.isNull"></div>const pure nothrow @safe bool <code class="ddoc_psymbol">isNull</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Null check</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.isUndefined"></span><div class="quickindex" id="quickindex.Builder.CborValue.isUndefined"></div>const pure nothrow @safe bool <code class="ddoc_psymbol">isUndefined</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Undefined check</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.isOverflowedInteger"></span><div class="quickindex" id="quickindex.Builder.CborValue.isOverflowedInteger"></div>const pure nothrow @trusted bool <code class="ddoc_psymbol">isOverflowedInteger</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Overflow number check
+</div><div class="ddoc_description">CBOR supports signed integers, but the range it can handle differs from D's long type.
+ This function determines whether a CBOR signed integer exceeds the range of D's long type.
+ Specifically, the range of CBOR integers is -ulong.max(-1-2^64) to ulong.max(2^64).
+ In contrast, the range of D's long type is long.min(-1-2^63) to long.max(2^63),
+ and the range of the ulong type is 0 to ulong.max(2^64).</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.get"></span><div class="quickindex" id="quickindex.Builder.CborValue.get"></div>const nothrow @safe T <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(lazy T <span class="ddoc_param">defaultValue</span> = T.init);
+<br></div></dt>
+<dd><div class="ddoc_summary">Retrieve the value as a D language type
+</div><div class="ddoc_description">Since the types handled by CBOR may not match the types in the D language, conversion is performed.
+ Specify the type with T or a default value, and return the converted type.
+ For example, if the long type is specified, CBOR's positive and negative integers,
+ as well as floating-point numbers, are cast and converted to the long type. Strings are also
+ parsed and converted to integers.</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.require"></span><div class="quickindex" id="quickindex.Builder.CborValue.require"></div>nothrow ref T <code class="ddoc_psymbol">require</code><span class="ddoc_template_param_list" title="Template parameter list">(T, K)</span>(K <span class="ddoc_param">key</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.getValue"></span><div class="quickindex" id="quickindex.Builder.CborValue.getValue"></div>const nothrow T <code class="ddoc_psymbol">getValue</code><span class="ddoc_template_param_list" title="Template parameter list">(T, K)</span>(K <span class="ddoc_param">key</span>, lazy T <span class="ddoc_param">defaultValue</span> = T.init);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.builder"></span><div class="quickindex" id="quickindex.Builder.CborValue.builder"></div>pure nothrow ref @safe Builder <code class="ddoc_psymbol">builder</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Get the <code class="ddoc_psymbol">builder</code> instance.</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.make"></span><div class="quickindex" id="quickindex.Builder.make"></div>@safe CborValue <code class="ddoc_psymbol">make</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">value</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Create a CborValue from a given <span class="ddoc_param">value</span>.</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.emptyArray"></span><div class="quickindex" id="quickindex.Builder.emptyArray"></div>pure nothrow @safe CborValue <code class="ddoc_psymbol">emptyArray</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Create a CborValue of empty array.</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.emptyMap"></span><div class="quickindex" id="quickindex.Builder.emptyMap"></div>pure nothrow @safe CborValue <code class="ddoc_psymbol">emptyMap</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Create a CborValue of empty map.</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.deepCopy"></span><div class="quickindex" id="quickindex.Builder.deepCopy"></div>@safe CborValue <code class="ddoc_psymbol">deepCopy</code>(CborValue <span class="ddoc_param">src</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Deep copy a CborValue.</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">Builder b1;
+Builder b2;
+<span class="d_keyword">immutable</span> str = <span class="d_string">"123"</span>;
+<span class="d_keyword">auto</span> v1 = b1.make(str);
+<span class="d_keyword">assert</span>(v1.get!string <span class="d_keyword">is</span> str);
+<span class="d_keyword">auto</span> v2 = b1.<span class="d_psymbol">deepCopy</span>(v1);
+<span class="d_keyword">assert</span>(v2.get!string <span class="d_keyword">is</span> str);
+<span class="d_comment">// Check if the copied value is a new instance
+</span><span class="d_keyword">auto</span> v3 = b2.<span class="d_psymbol">deepCopy</span>(v1);
+<span class="d_keyword">assert</span>(v3.get!string !<span class="d_keyword">is</span> v1.get!string);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.parse"></span><div class="quickindex" id="quickindex.Builder.parse"></div>@safe size_t <code class="ddoc_psymbol">parse</code>(ref CborValue <span class="ddoc_param">dst</span>, immutable(ubyte)[] <span class="ddoc_param">src</span>);
+<br>
+@safe bool <code class="ddoc_psymbol">parse</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange)</span>(ref OutputRange <span class="ddoc_param">dst</span>, immutable(ubyte)[] <span class="ddoc_param">src</span>);
+<br>
+@safe CborValue <code class="ddoc_psymbol">parse</code>(ref immutable(ubyte)[] <span class="ddoc_param">src</span>);
+<br>
+@trusted CborValue <code class="ddoc_psymbol">parse</code>(ref ubyte[] <span class="ddoc_param">src</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Parse a binary CBOR data to a CborValue.</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">Builder b;
+<span class="d_keyword">immutable</span>(<span class="d_keyword">ubyte</span>)[] data = [0x63, 'f', 'o', 'o', 0x43, 0x01, 0x02, 0x03];
+<span class="d_keyword">auto</span> v1 = b.<span class="d_psymbol">parse</span>(data);
+<span class="d_keyword">assert</span>(v1.get!string == <span class="d_string">"foo"</span>);
+<span class="d_keyword">assert</span>(data == [0x43, 0x01, 0x02, 0x03]);
+<span class="d_keyword">auto</span> v2 = b.<span class="d_psymbol">parse</span>(data);
+<span class="d_keyword">assert</span>(v2.get!(<span class="d_keyword">immutable</span>(<span class="d_keyword">ubyte</span>)[]) == [1, 2, 3]);
+<span class="d_keyword">assert</span>(data.length == 0);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.build"></span><div class="quickindex" id="quickindex.Builder.build"></div>@safe void <code class="ddoc_psymbol">build</code><span class="ddoc_template_param_list" title="Template parameter list">(OutputRange)</span>(ref OutputRange <span class="ddoc_param">dst</span>, CborValue <span class="ddoc_param">src</span>)<br><span class="ddoc_constraint">if(isOutputRange!(OutputRange, ubyte))</span>;
+<br>
+@safe immutable(ubyte)[] <code class="ddoc_psymbol">build</code>(CborValue <span class="ddoc_param">src</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Build a CborValue to a binary CBOR data.</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">Builder b;
+<span class="d_keyword">auto</span> v1 = b.make(<span class="d_string">"foo"</span>);
+<span class="d_keyword">auto</span> data = b.<span class="d_psymbol">build</span>(v1);
+<span class="d_keyword">assert</span>(data == [0x63, 'f', 'o', 'o']);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.serialize"></span><div class="quickindex" id="quickindex.Builder.serialize"></div>@safe CborValue <code class="ddoc_psymbol">serialize</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">value</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Serialize a various data to CborValue.
+</div><div class="ddoc_description">The <code class="ddoc_psymbol">serialize</code> function generates a CborValue instance from the given data.
+ The data type must be one of the following.
+
+<ul><li>CborValue</li>
+<li>Integral type(int, uint, long, ulong, short, ushort, byte, ubyte)</li>
+<li>Floating point type(float, double)</li>
+<li>bool</li>
+<li>string</li>
+<li>binary(immutable(ubyte)[])</li>
+<li><code class="ddoc_keyword">null</code></li>
+<li>Array
+<ul><li>Recursively serialized</li>
+</ul></li>
+<li>AssociativeArray
+<ul><li>Recursively serialized</li>
+</ul></li>
+<li>SumType
+<ul><li>Converted to a map type CborValue
+<ul><li>All types have the @kind attribute</li>
+</ul></li>
+<li>Recursively serialized</li>
+</ul></li>
+<li>Aggregate type (struct, class, union): meets one of the following conditions
+<ul><li>Composed of simple public member variables
+<ul><li>Converted to a map type CborValue</li>
+<li>Recursively serialized</li>
+<li>If the @ignore attribute is present, do not <code class="ddoc_psymbol">serialize</code></li>
+<li>If the @ignoreIf attribute is present, do not <code class="ddoc_psymbol">serialize</code> if the condition is met</li>
+<li>If the @name attribute is present, use that name</li>
+<li>If the @<span class="ddoc_param">value</span> attribute is present, use that <span class="ddoc_param">value</span></li>
+</ul></li>
+<li>toCbor/fromCbor methods, where fromCtor is a static method</li>
+<li>toBinary/fromBinary methods, where fromBinary is a static method</li>
+<li>toRepresentation/fromRepresentation methods, where fromRepresentation is a static method</li>
+</ul></li>
+</ul></div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">Builder b;
+<span class="d_keyword">struct</span> Foo
+{
+	<span class="d_keyword">int</span> x;
+	string y;
+}
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(isSerializable!Foo);
+<span class="d_keyword">auto</span> foo = Foo(42, <span class="d_string">"foo"</span>);
+<span class="d_keyword">auto</span> v = b.<span class="d_psymbol">serialize</span>(foo);
+<span class="d_keyword">assert</span>(v.getValue!<span class="d_keyword">int</span>(<span class="d_string">"x"</span>) == 42);
+<span class="d_keyword">assert</span>(v.getValue!string(<span class="d_string">"y"</span>) == <span class="d_string">"foo"</span>);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.deserialize"></span><div class="quickindex" id="quickindex.Builder.deserialize"></div>@safe bool <code class="ddoc_psymbol">deserialize</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in CborValue <span class="ddoc_param">src</span>, ref T <span class="ddoc_param">dst</span>);
+<br>
+@safe T <code class="ddoc_psymbol">deserialize</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in CborValue <span class="ddoc_param">src</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Deserialize a CborValue to a various data.</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate">Builder b;
+<span class="d_keyword">struct</span> Foo
+{
+	<span class="d_keyword">int</span> x;
+	string y;
+}
+<span class="d_keyword">static</span> <span class="d_keyword">assert</span>(isSerializable!Foo);
+<span class="d_keyword">auto</span> v = b.<span class="d_psymbol">deserialize</span>!Foo(b.make([<span class="d_string">"x"</span>: b.make(42), <span class="d_string">"y"</span>: b.make(<span class="d_string">"foo"</span>)]));
+<span class="d_keyword">assert</span>(v.x == 42);
+<span class="d_keyword">assert</span>(v.y == <span class="d_string">"foo"</span>);
+</pre>
+</div>
+</dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CborValue"></span><div class="quickindex" id="quickindex.CborValue"></div>alias <code class="ddoc_psymbol">CborValue</code> = Builder.<code class="ddoc_psymbol">CborValue</code>;
+<br>
+<span class="def-anchor" id=".CborType"></span><div class="quickindex" id="quickindex.CborType"></div>alias <code class="ddoc_psymbol">CborType</code> = Builder.CborValue.Type;
+<br></div></dt>
+<dd><div class="ddoc_summary">CBOR data type</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".CBOR"></span><div class="quickindex" id="quickindex.CBOR"></div>alias <code class="ddoc_psymbol">CBOR</code> = Builder;
+<br>
+<span class="def-anchor" id=".CborBuilder"></span><div class="quickindex" id="quickindex.CborBuilder"></div>alias <code class="ddoc_psymbol">CborBuilder</code> = Builder;
+<br></div></dt>
+<dd><div class="ddoc_summary"><code class="ddoc_psymbol">CBOR</code> builder</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".parseCBOR"></span><div class="quickindex" id="quickindex.parseCBOR"></div>@trusted CborValue <code class="ddoc_psymbol">parseCBOR</code>(immutable(ubyte)[] <span class="ddoc_param">binary</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Perse CBOR data</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".toCBOR"></span><div class="quickindex" id="quickindex.toCBOR"></div>@trusted immutable(ubyte)[] <code class="ddoc_psymbol">toCBOR</code>(CborValue <span class="ddoc_param">cv</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Perse CBOR data</div></dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>

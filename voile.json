@@ -4414,6 +4414,2212 @@
   ]
  },
  {
+  "name" : "voile.cbor",
+  "kind" : "module",
+  "file" : "/home/runner/work/voile/voile/voile/cbor.d",
+  "comment" : " CBOR data module\n\n This module provides functionality for working with CBOR (Concise Binary Object Representation) data.\n It includes definitions for various CBOR data types, a builder for constructing CBOR values,\n and methods for converting between CBOR and native D types.\n\n See_Also: [RFC 7049](https://tools.ietf.org/html/rfc7049)\n",
+  "members" : [
+   {
+    "name" : "std.sumtype",
+    "kind" : "import",
+    "line" : 12,
+    "char" : 8,
+    "protection" : "private"
+   },
+   {
+    "name" : "std.range",
+    "kind" : "import",
+    "line" : 13,
+    "char" : 8,
+    "protection" : "private"
+   },
+   {
+    "name" : "std.algorithm",
+    "kind" : "import",
+    "line" : 13,
+    "char" : 19,
+    "protection" : "private"
+   },
+   {
+    "name" : "std.array",
+    "kind" : "import",
+    "line" : 13,
+    "char" : 34,
+    "protection" : "private"
+   },
+   {
+    "name" : "std.traits",
+    "kind" : "import",
+    "line" : 13,
+    "char" : 45,
+    "protection" : "private"
+   },
+   {
+    "name" : "std.meta",
+    "kind" : "import",
+    "line" : 13,
+    "char" : 57,
+    "protection" : "private"
+   },
+   {
+    "name" : "std.string",
+    "kind" : "import",
+    "line" : 13,
+    "char" : 67,
+    "protection" : "private"
+   },
+   {
+    "name" : "core.lifetime",
+    "kind" : "import",
+    "line" : 14,
+    "char" : 8,
+    "protection" : "private",
+    "selective" : [
+     "move"
+    ]
+   },
+   {
+    "name" : "voile.attr",
+    "kind" : "import",
+    "line" : 15,
+    "char" : 8,
+    "protection" : "private"
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : " Determines if the type is binary\n",
+    "line" : 21,
+    "char" : 6,
+    "name" : "isBinary",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isBinary",
+      "kind" : "variable",
+      "line" : 21,
+      "char" : 6,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "is(T == immutable(ubyte)[])"
+     }
+    ]
+   },
+   {
+    "name" : "Kind",
+    "kind" : "struct",
+    "protection" : "private",
+    "line" : 23,
+    "char" : 9,
+    "members" : [
+     {
+      "name" : "key",
+      "kind" : "variable",
+      "protection" : "public",
+      "line" : 25,
+      "char" : 9,
+      "deco" : "Aya",
+      "offset" : 0
+     },
+     {
+      "name" : "value",
+      "kind" : "variable",
+      "protection" : "public",
+      "line" : 26,
+      "char" : 9,
+      "deco" : "Aya",
+      "offset" : 16
+     }
+    ]
+   },
+   {
+    "name" : "kind",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : " Kind attribute\n\n Attribute used for serialization of SumType.\n By adding this attribute to all aggregate types used in SumType, they become serializable.\n",
+    "line" : 35,
+    "char" : 6,
+    "storageClass" : [
+     "auto"
+    ],
+    "deco" : "FNaNbNiNfAyaQdZS5voile4attr__T5ValueTSQw4cbor4KindZQv",
+    "originalType" : "(string name, string value)",
+    "parameters" : [
+     {
+      "name" : "name",
+      "deco" : "Aya",
+      "storageClass" : [
+       "scope",
+       "return"
+      ]
+     },
+     {
+      "name" : "value",
+      "deco" : "Aya",
+      "storageClass" : [
+       "scope",
+       "return"
+      ]
+     }
+    ],
+    "endline" : 39,
+    "endchar" : 1
+   },
+   {
+    "name" : "kind",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 42,
+    "char" : 6,
+    "storageClass" : [
+     "auto"
+    ],
+    "deco" : "FNaNbNiNfAyaZS5voile4attr__T5ValueTSQw4cbor4KindZQv",
+    "originalType" : "(string value)",
+    "parameters" : [
+     {
+      "name" : "value",
+      "deco" : "Aya",
+      "storageClass" : [
+       "scope",
+       "return"
+      ]
+     }
+    ],
+    "endline" : 46,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 49,
+    "char" : 6,
+    "name" : "kind",
+    "parameters" : [
+     {
+      "name" : "value",
+      "kind" : "value",
+      "deco" : "Aya"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "kind",
+      "kind" : "function",
+      "line" : 49,
+      "char" : 6,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "()",
+      "endline" : 53,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 55,
+    "char" : 14,
+    "name" : "hasKind",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "hasKind",
+      "kind" : "variable",
+      "line" : 55,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "hasValue!(T, Kind)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 56,
+    "char" : 14,
+    "name" : "getKind",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "getKind",
+      "kind" : "variable",
+      "line" : 56,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "getValues!(T, Kind)[0]"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 58,
+    "char" : 14,
+    "name" : "isArrayWithoutBinary",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isArrayWithoutBinary",
+      "kind" : "variable",
+      "line" : 58,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "isArray!T && !isBinary!T"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : " Determines if the SumType can be serialized to CBOR format\n\n This template returns true if the type T meets the following conditions:\n - T is a SumType\n - All members of the SumType are serializable\n - All members of the SumType have the @kind attribute if they are aggregate types\n - There is at most one member of each of the following types:\n   integral, floating point, boolean, string, binary, array, associative array\n\n Params:\n      T = The type to check\n Returns: true if T is a serializable sum type, false otherwise\n",
+    "line" : 74,
+    "char" : 6,
+    "name" : "isSerializableSumType",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isSerializableSumType",
+      "kind" : "variable",
+      "line" : 74,
+      "char" : 6,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "isSumType!T && allSatisfy!(isSerializable, T.Types) && allSatisfy!(hasKind, Filter!(isAggregateType, T.Types)) && (Filter!(isIntegral, T.Types).length <= 1) && (Filter!(isFloatingPoint, T.Types).length <= 1) && (Filter!(isBoolean, T.Types).length <= 1) && (Filter!(isSomeString, T.Types).length <= 1) && (Filter!(isBinary, T.Types).length <= 1) && (Filter!(isArrayWithoutBinary, T.Types).length <= 1) && (Filter!(isAssociativeArray, T.Types).length <= 1)"
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L86_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 86,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 106,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 106,
+    "char" : 14,
+    "name" : "hasConvertCborMethodA",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "hasConvertCborMethodA",
+      "kind" : "variable",
+      "line" : 106,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "is(typeof(T.toCbor(lvalueOf!Builder)) == CborValue) && is(typeof(T.fromCbor(lvalueOf!CborValue)) == T)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 108,
+    "char" : 14,
+    "name" : "hasConvertCborMethodB",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "hasConvertCborMethodB",
+      "kind" : "variable",
+      "line" : 108,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "is(typeof(T.toCbor()) == CborValue) && is(typeof(T.fromCbor(lvalueOf!CborValue)) == T)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 110,
+    "char" : 14,
+    "name" : "hasConvertCborMethod",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "hasConvertCborMethod",
+      "kind" : "variable",
+      "line" : 110,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "hasConvertCborMethodA!T || hasConvertCborMethodB!T"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 111,
+    "char" : 14,
+    "name" : "hasConvertCborBinaryMethodA",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "hasConvertCborBinaryMethodA",
+      "kind" : "variable",
+      "line" : 111,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "is(typeof(T.toBinary()) == immutable(ubyte)[]) && is(typeof(T.fromBinary((immutable(ubyte)[]).init)) == T)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 113,
+    "char" : 14,
+    "name" : "hasConvertCborBinaryMethodB",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "hasConvertCborBinaryMethodB",
+      "kind" : "variable",
+      "line" : 113,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "is(typeof(T.toRepresentation()) == immutable(ubyte)[]) && is(typeof(T.fromRepresentation((immutable(ubyte)[]).init)) == T)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 115,
+    "char" : 14,
+    "name" : "hasConvertCborBinaryMethodC",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "hasConvertCborBinaryMethodC",
+      "kind" : "variable",
+      "line" : 115,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "is(typeof(T.toRepresentation()) == string) && is(typeof(T.fromRepresentation(string.init)) == T)"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 117,
+    "char" : 14,
+    "name" : "hasConvertCborBinaryMethod",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "hasConvertCborBinaryMethod",
+      "kind" : "variable",
+      "line" : 117,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "hasConvertCborBinaryMethodA!T || hasConvertCborBinaryMethodB!T || hasConvertCborBinaryMethodC!T"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 119,
+    "char" : 14,
+    "name" : "isSerializableData",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isSerializableData",
+      "kind" : "variable",
+      "line" : 119,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "isIntegral!T || isFloatingPoint!T || isBoolean!T || isSomeString!T || isBinary!T || isArray!T || isAssociativeArray!T || isAggregateType!T && !hasElaborateAssign!T && !hasElaborateCopyConstructor!T && !hasElaborateMove!T && !hasElaborateDestructor!T && !hasNested!T && !isSumType!T || isAggregateType!T && hasConvertCborMethod!T || isAggregateType!T && hasConvertCborBinaryMethod!T"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "private",
+    "line" : 135,
+    "char" : 14,
+    "name" : "isAccessible",
+    "parameters" : [
+     {
+      "name" : "var",
+      "kind" : "alias"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isAccessible",
+      "kind" : "variable",
+      "line" : 135,
+      "char" : 14,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "__traits(getVisibility, var).startsWith(\"public\", \"export\") != 0"
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : " Checks if a given type is serializable to CBOR format.\n\n This function determines whether a type can be serialized into the CBOR (Concise Binary Object Representation) format.\n CBOR is a binary data serialization format which aims to provide a more compact representation compared to JSON.\n\n Params:\n   T = The type to check for serializability.\n\n Returns:\n   bool - `true` if the type is serializable to CBOR, `false` otherwise.\n",
+    "line" : 150,
+    "char" : 1,
+    "name" : "isSerializable",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "isSerializable",
+      "kind" : "variable",
+      "line" : 153,
+      "char" : 8,
+      "storageClass" : [
+       "enum"
+      ],
+      "init" : "isSerializable!(ElementType!T)"
+     }
+    ]
+   },
+   {
+    "name" : "Builder",
+    "kind" : "struct",
+    "protection" : "public",
+    "comment" : " The Builder struct is used to generate and manipulate CBOR (Concise Binary Object Representation) data.\n\n - Use the `make` method to create a `CborValue`.\n - Use the `parse` method to convert binary data to a `CborValue`.\n - Use the `build` method to convert a `CborValue` to binary format.\n - The `serialize` and `deserialize` methods support ORM (Object-Relational Mapping).\n",
+    "line" : 177,
+    "char" : 1,
+    "members" : [
+     {
+      "name" : "String",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 180,
+      "char" : 2,
+      "baseDeco" : "Aya",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "null",
+        "line" : 180,
+        "char" : 24
+       }
+      ]
+     },
+     {
+      "name" : "Binary",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 181,
+      "char" : 2,
+      "baseDeco" : "Ayh",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "null",
+        "line" : 181,
+        "char" : 36
+       }
+      ]
+     },
+     {
+      "name" : "Undefined",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 182,
+      "char" : 2,
+      "baseDeco" : "i",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "0",
+        "line" : 182,
+        "char" : 19
+       }
+      ]
+     },
+     {
+      "name" : "Null",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 183,
+      "char" : 2,
+      "baseDeco" : "i",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "0",
+        "line" : 183,
+        "char" : 14
+       }
+      ]
+     },
+     {
+      "name" : "HalfFloat",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 184,
+      "char" : 2,
+      "baseDeco" : "t",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "cast(ushort)0u",
+        "line" : 184,
+        "char" : 27
+       },
+       {
+        "name" : "nan",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "cast(ushort)32256u",
+        "line" : 184,
+        "char" : 37
+       },
+       {
+        "name" : "infinity",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "cast(ushort)31744u",
+        "line" : 184,
+        "char" : 51
+       }
+      ]
+     },
+     {
+      "name" : "SingleFloat",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 185,
+      "char" : 2,
+      "baseDeco" : "f",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "0.0F",
+        "line" : 185,
+        "char" : 28
+       },
+       {
+        "name" : "nan",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "nanF",
+        "line" : 185,
+        "char" : 38
+       },
+       {
+        "name" : "inifinity",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "infF",
+        "line" : 185,
+        "char" : 55
+       }
+      ]
+     },
+     {
+      "name" : "DoubleFloat",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 186,
+      "char" : 2,
+      "baseDeco" : "d",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "0.0",
+        "line" : 186,
+        "char" : 29
+       },
+       {
+        "name" : "nan",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "nan",
+        "line" : 186,
+        "char" : 39
+       },
+       {
+        "name" : "inifinity",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "inf",
+        "line" : 186,
+        "char" : 57
+       }
+      ]
+     },
+     {
+      "name" : "PositiveInteger",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 187,
+      "char" : 2,
+      "baseDeco" : "m",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "0LU",
+        "line" : 187,
+        "char" : 32
+       }
+      ]
+     },
+     {
+      "name" : "NegativeInteger",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 188,
+      "char" : 2,
+      "baseDeco" : "m",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "0LU",
+        "line" : 188,
+        "char" : 32
+       }
+      ]
+     },
+     {
+      "name" : "Boolean",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 189,
+      "char" : 2,
+      "baseDeco" : "b",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "false",
+        "line" : 189,
+        "char" : 23
+       }
+      ]
+     },
+     {
+      "kind" : "template",
+      "protection" : "private",
+      "line" : 190,
+      "char" : 11,
+      "name" : "convToFloat",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "constraint" : "is(T == float)",
+      "members" : [
+       {
+        "name" : "convToFloat",
+        "kind" : "function",
+        "line" : 190,
+        "char" : 11,
+        "type" : "@safe T(HalfFloat fp)",
+        "parameters" : [
+         {
+          "name" : "fp",
+          "type" : "HalfFloat"
+         }
+        ],
+        "endline" : 225,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
+      "kind" : "template",
+      "protection" : "private",
+      "comment" : "ditto\n",
+      "line" : 227,
+      "char" : 11,
+      "name" : "convToFloat",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "constraint" : "is(T == double)",
+      "members" : [
+       {
+        "name" : "convToFloat",
+        "kind" : "function",
+        "line" : 227,
+        "char" : 11,
+        "type" : "@safe T(HalfFloat fp)",
+        "parameters" : [
+         {
+          "name" : "fp",
+          "type" : "HalfFloat"
+         }
+        ],
+        "endline" : 262,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
+      "kind" : "template",
+      "protection" : "private",
+      "comment" : "ditto\n",
+      "line" : 264,
+      "char" : 14,
+      "name" : "convToFloat",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "constraint" : "is(T == real)",
+      "members" : [
+       {
+        "name" : "convToFloat",
+        "kind" : "function",
+        "line" : 264,
+        "char" : 14,
+        "type" : "@safe real(HalfFloat fp)",
+        "parameters" : [
+         {
+          "name" : "fp",
+          "type" : "HalfFloat"
+         }
+        ],
+        "endline" : 268,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
+      "name" : "__unittest_L270_C8",
+      "kind" : "function",
+      "protection" : "private",
+      "line" : 270,
+      "char" : 8,
+      "storageClass" : [
+       "@safe"
+      ],
+      "endline" : 309,
+      "endchar" : 2
+     },
+     {
+      "kind" : "template",
+      "protection" : "private",
+      "line" : 309,
+      "char" : 9,
+      "name" : "Dictionary",
+      "parameters" : [
+       {
+        "name" : "K",
+        "kind" : "type"
+       },
+       {
+        "name" : "V",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "Dictionary",
+        "kind" : "struct",
+        "protection" : "public",
+        "line" : 309,
+        "char" : 9,
+        "members" : [
+         {
+          "name" : "Item",
+          "kind" : "struct",
+          "protection" : "public",
+          "line" : 312,
+          "char" : 3,
+          "members" : [
+           {
+            "name" : "key",
+            "kind" : "variable",
+            "line" : 314,
+            "char" : 6,
+            "type" : "K"
+           },
+           {
+            "name" : "value",
+            "kind" : "variable",
+            "line" : 315,
+            "char" : 6,
+            "type" : "V"
+           }
+          ]
+         },
+         {
+          "name" : "items",
+          "kind" : "variable",
+          "line" : 317,
+          "char" : 10,
+          "type" : "Item[]"
+         },
+         {
+          "name" : "byKeyValue",
+          "kind" : "function",
+          "comment" : "\n",
+          "line" : 320,
+          "char" : 8,
+          "storageClass" : [
+           "auto"
+          ],
+          "type" : "inout ()",
+          "endline" : 320,
+          "endchar" : 35
+         },
+         {
+          "name" : "append",
+          "kind" : "function",
+          "comment" : "\n",
+          "line" : 322,
+          "char" : 8,
+          "storageClass" : [
+           "auto"
+          ],
+          "type" : "(ref K k, ref V v)",
+          "parameters" : [
+           {
+            "name" : "k",
+            "type" : "K",
+            "storageClass" : [
+             "ref"
+            ]
+           },
+           {
+            "name" : "v",
+            "type" : "V",
+            "storageClass" : [
+             "ref"
+            ]
+           }
+          ],
+          "endline" : 322,
+          "endchar" : 55
+         },
+         {
+          "name" : "append",
+          "kind" : "function",
+          "comment" : "\n",
+          "line" : 324,
+          "char" : 8,
+          "storageClass" : [
+           "auto"
+          ],
+          "type" : "(K k, V v)",
+          "parameters" : [
+           {
+            "name" : "k",
+            "type" : "K"
+           },
+           {
+            "name" : "v",
+            "type" : "V"
+           }
+          ],
+          "endline" : 324,
+          "endchar" : 47
+         },
+         {
+          "name" : "get",
+          "kind" : "function",
+          "comment" : "\n",
+          "line" : 326,
+          "char" : 8,
+          "storageClass" : [
+           "auto"
+          ],
+          "type" : "@trusted (K k, lazy V defaultValue = V.init)",
+          "parameters" : [
+           {
+            "name" : "k",
+            "type" : "K"
+           },
+           {
+            "name" : "defaultValue",
+            "type" : "V",
+            "storageClass" : [
+             "lazy"
+            ],
+            "default" : "V.init"
+           }
+          ],
+          "endline" : 332,
+          "endchar" : 3
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "kind" : "template",
+      "protection" : "private",
+      "line" : 334,
+      "char" : 2,
+      "name" : "Array",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "Array",
+        "kind" : "enum",
+        "line" : 334,
+        "char" : 22,
+        "base" : "T[]",
+        "members" : [
+         {
+          "name" : "init",
+          "kind" : "enum member",
+          "value" : "T[].init",
+          "line" : 334,
+          "char" : 40
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "name" : "allocStr",
+      "kind" : "function",
+      "protection" : "private",
+      "line" : 336,
+      "char" : 7,
+      "storageClass" : [
+       "auto"
+      ],
+      "deco" : "FNaNbNiNfZE5voile4cbor7Builder6String",
+      "originalType" : "()",
+      "endline" : 336,
+      "endchar" : 32
+     },
+     {
+      "kind" : "template",
+      "protection" : "private",
+      "line" : 337,
+      "char" : 7,
+      "name" : "allocDic",
+      "parameters" : [
+       {
+        "name" : "K",
+        "kind" : "type"
+       },
+       {
+        "name" : "V",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "allocDic",
+        "kind" : "function",
+        "line" : 337,
+        "char" : 7,
+        "storageClass" : [
+         "auto"
+        ],
+        "type" : "()",
+        "endline" : 337,
+        "endchar" : 49
+       }
+      ]
+     },
+     {
+      "kind" : "template",
+      "protection" : "private",
+      "line" : 338,
+      "char" : 7,
+      "name" : "allocAry",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "allocAry",
+        "kind" : "function",
+        "line" : 338,
+        "char" : 7,
+        "storageClass" : [
+         "auto"
+        ],
+        "type" : "()",
+        "endline" : 338,
+        "endchar" : 36
+       }
+      ]
+     },
+     {
+      "kind" : "template",
+      "protection" : "private",
+      "line" : 339,
+      "char" : 6,
+      "name" : "copyMemory",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "copyMemory",
+        "kind" : "function",
+        "line" : 339,
+        "char" : 6,
+        "type" : "const T[](const(T)[] src)",
+        "parameters" : [
+         {
+          "name" : "src",
+          "type" : "const(T)[]"
+         }
+        ],
+        "endline" : 339,
+        "endchar" : 52
+       }
+      ]
+     },
+     {
+      "kind" : "template",
+      "protection" : "private",
+      "line" : 340,
+      "char" : 17,
+      "name" : "copyImmutableMemory",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "copyImmutableMemory",
+        "kind" : "function",
+        "line" : 340,
+        "char" : 17,
+        "type" : "const immutable(T)[](const(T)[] src)",
+        "parameters" : [
+         {
+          "name" : "src",
+          "type" : "const(T)[]"
+         }
+        ],
+        "endline" : 340,
+        "endchar" : 73
+       }
+      ]
+     },
+     {
+      "name" : "DummyMap",
+      "kind" : "enum",
+      "protection" : "private",
+      "line" : 341,
+      "char" : 2,
+      "baseDeco" : "S5voile4cbor7Builder__T10DictionaryTiTiZQr",
+      "members" : [
+       {
+        "name" : "init",
+        "kind" : "enum member",
+        "protection" : "public",
+        "value" : "Dictionary(null)",
+        "line" : 341,
+        "char" : 41
+       }
+      ]
+     },
+     {
+      "name" : "CborValue",
+      "kind" : "struct",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 346,
+      "char" : 9,
+      "members" : [
+       {
+        "name" : "CborArray",
+        "kind" : "alias",
+        "protection" : "private",
+        "line" : 349,
+        "char" : 3,
+        "deco" : "E5voile4cbor7Builder__T5ArrayTSQBeQBbQz9CborValueZQBb",
+        "originalType" : "Array!CborValue"
+       },
+       {
+        "name" : "CborMap",
+        "kind" : "alias",
+        "protection" : "private",
+        "line" : 350,
+        "char" : 3,
+        "deco" : "E5voile4cbor7Builder8DummyMap"
+       },
+       {
+        "name" : "CborType",
+        "kind" : "alias",
+        "protection" : "private",
+        "line" : 351,
+        "char" : 3,
+        "deco" : "S3std7sumtype__T7SumTypeTE5voile4cbor7Builder9UndefinedTEQBfQBcQBa4NullTEQBvQBsQBq7BooleanTEQCoQClQCj15PositiveIntegerTEQDqQDnQDl15NegativeIntegerTEQEsQEpQEn9HalfFloatTEQFnQFkQFi11SingleFloatTEQGlQGiQGg11DoubleFloatTEQHjQHgQHe6StringTEQIbQHyQHw6BinaryTEQItQIqQIo__T5ArrayTSQJnQJkQJi9CborValueZQBcTEQKmQKjQKh8DummyMapZQLp",
+        "originalType" : "SumType!(Undefined, Null, Boolean, PositiveInteger, NegativeInteger, HalfFloat, SingleFloat, DoubleFloat, String, Binary, CborArray, CborMap)"
+       },
+       {
+        "name" : "_reqMap",
+        "kind" : "function",
+        "protection" : "private",
+        "line" : 364,
+        "char" : 48,
+        "deco" : "NgFNcNeZNgS5voile4cbor7Builder__T10DictionaryTSQBkQBhQBf9CborValueTQvZQBl",
+        "endline" : 368,
+        "endchar" : 3
+       },
+       {
+        "name" : "_reqArray",
+        "kind" : "function",
+        "protection" : "private",
+        "line" : 369,
+        "char" : 22,
+        "deco" : "NgFNeZANgS5voile4cbor7Builder9CborValue",
+        "endline" : 373,
+        "endchar" : 3
+       },
+       {
+        "name" : "_reqStr",
+        "kind" : "function",
+        "protection" : "private",
+        "line" : 374,
+        "char" : 10,
+        "deco" : "NgFNeZAya",
+        "endline" : 378,
+        "endchar" : 3
+       },
+       {
+        "name" : "Type",
+        "kind" : "enum",
+        "protection" : "public",
+        "comment" : "\n",
+        "line" : 381,
+        "char" : 3,
+        "baseDeco" : "h",
+        "members" : [
+         {
+          "name" : "undefined",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "cast(ubyte)0u",
+          "line" : 383,
+          "char" : 4
+         },
+         {
+          "name" : "nullValue",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "1",
+          "line" : 384,
+          "char" : 4
+         },
+         {
+          "name" : "boolean",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "2",
+          "line" : 385,
+          "char" : 4
+         },
+         {
+          "name" : "positive",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "3",
+          "line" : 386,
+          "char" : 4
+         },
+         {
+          "name" : "negative",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "4",
+          "line" : 387,
+          "char" : 4
+         },
+         {
+          "name" : "float16",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "5",
+          "line" : 388,
+          "char" : 4
+         },
+         {
+          "name" : "float32",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "6",
+          "line" : 389,
+          "char" : 4
+         },
+         {
+          "name" : "float64",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "7",
+          "line" : 390,
+          "char" : 4
+         },
+         {
+          "name" : "string",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "8",
+          "line" : 391,
+          "char" : 4
+         },
+         {
+          "name" : "binary",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "9",
+          "line" : 392,
+          "char" : 4
+         },
+         {
+          "name" : "array",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "10",
+          "line" : 393,
+          "char" : 4
+         },
+         {
+          "name" : "map",
+          "kind" : "enum member",
+          "protection" : "public",
+          "value" : "11",
+          "line" : 394,
+          "char" : 4
+         }
+        ]
+       },
+       {
+        "name" : "_instance",
+        "kind" : "variable",
+        "protection" : "private",
+        "line" : 397,
+        "char" : 12,
+        "deco" : "S3std7sumtype__T7SumTypeTE5voile4cbor7Builder9UndefinedTEQBfQBcQBa4NullTEQBvQBsQBq7BooleanTEQCoQClQCj15PositiveIntegerTEQDqQDnQDl15NegativeIntegerTEQEsQEpQEn9HalfFloatTEQFnQFkQFi11SingleFloatTEQGlQGiQGg11DoubleFloatTEQHjQHgQHe6StringTEQIbQHyQHw6BinaryTEQItQIqQIo__T5ArrayTSQJnQJkQJi9CborValueZQBcTEQKmQKjQKh8DummyMapZQLp",
+        "originalType" : "CborType",
+        "offset" : 0
+       },
+       {
+        "name" : "_builder",
+        "kind" : "variable",
+        "protection" : "private",
+        "line" : 398,
+        "char" : 12,
+        "deco" : "PS5voile4cbor7Builder",
+        "offset" : 24
+       },
+       {
+        "kind" : "template",
+        "protection" : "public",
+        "comment" : " Constructor\n",
+        "line" : 403,
+        "char" : 3,
+        "name" : "this",
+        "parameters" : [
+         {
+          "name" : "T",
+          "kind" : "type"
+         }
+        ],
+        "members" : [
+         {
+          "name" : "this",
+          "kind" : "constructor",
+          "line" : 403,
+          "char" : 3,
+          "type" : "@trusted (T value, ref Builder builder)",
+          "parameters" : [
+           {
+            "name" : "value",
+            "type" : "T"
+           },
+           {
+            "name" : "builder",
+            "type" : "Builder",
+            "storageClass" : [
+             "ref"
+            ]
+           }
+          ],
+          "endline" : 478,
+          "endchar" : 3
+         }
+        ]
+       },
+       {
+        "name" : "type",
+        "kind" : "function",
+        "protection" : "public",
+        "comment" : " Type getter\n",
+        "line" : 483,
+        "char" : 8,
+        "deco" : "xFNaNbNfZE5voile4cbor7Builder9CborValue4Type",
+        "endline" : 486,
+        "endchar" : 3
+       },
+       {
+        "name" : "~this",
+        "kind" : "destructor",
+        "protection" : "public",
+        "comment" : " Destructor\n",
+        "line" : 491,
+        "char" : 3,
+        "deco" : "FNaNbNiNfZv",
+        "endline" : 493,
+        "endchar" : 3
+       },
+       {
+        "name" : "opAssign",
+        "kind" : "function",
+        "protection" : "public",
+        "comment" : " Assign operator\n",
+        "line" : 497,
+        "char" : 17,
+        "deco" : "FNaNbNcNiNjNeS5voile4cbor7Builder9CborValueZQBf",
+        "parameters" : [
+         {
+          "name" : "v",
+          "deco" : "S5voile4cbor7Builder9CborValue"
+         }
+        ],
+        "endline" : 502,
+        "endchar" : 3
+       },
+       {
+        "name" : "isNull",
+        "kind" : "function",
+        "protection" : "public",
+        "comment" : " Null check\n",
+        "line" : 507,
+        "char" : 8,
+        "deco" : "xFNaNbNfZb",
+        "endline" : 511,
+        "endchar" : 3
+       },
+       {
+        "name" : "isUndefined",
+        "kind" : "function",
+        "protection" : "public",
+        "comment" : " Undefined check\n",
+        "line" : 516,
+        "char" : 8,
+        "deco" : "xFNaNbNfZb",
+        "endline" : 520,
+        "endchar" : 3
+       },
+       {
+        "name" : "isOverflowedInteger",
+        "kind" : "function",
+        "protection" : "public",
+        "comment" : " Overflow number check\n\n CBOR supports signed integers, but the range it can handle differs from D's long type.\n This function determines whether a CBOR signed integer exceeds the range of D's long type.\n Specifically, the range of CBOR integers is -ulong.max(-1-2^64) to ulong.max(2^64).\n In contrast, the range of D's long type is long.min(-1-2^63) to long.max(2^63),\n and the range of the ulong type is 0 to ulong.max(2^64).\n",
+        "line" : 531,
+        "char" : 8,
+        "deco" : "xFNaNbNeZb",
+        "endline" : 537,
+        "endchar" : 3
+       },
+       {
+        "kind" : "template",
+        "protection" : "public",
+        "comment" : " Retrieve the value as a D language type\n\n Since the types handled by CBOR may not match the types in the D language, conversion is performed.\n Specify the type with T or a default value, and return the converted type.\n For example, if the long type is specified, CBOR's positive and negative integers,\n as well as floating-point numbers, are cast and converted to the long type. Strings are also\n parsed and converted to integers.\n",
+        "line" : 548,
+        "char" : 5,
+        "name" : "get",
+        "parameters" : [
+         {
+          "name" : "T",
+          "kind" : "type"
+         }
+        ],
+        "members" : [
+         {
+          "name" : "get",
+          "kind" : "function",
+          "line" : 548,
+          "char" : 5,
+          "type" : "const nothrow @safe T(lazy T defaultValue = T.init)",
+          "parameters" : [
+           {
+            "name" : "defaultValue",
+            "type" : "T",
+            "storageClass" : [
+             "lazy"
+            ],
+            "default" : "T.init"
+           }
+          ],
+          "endline" : 630,
+          "endchar" : 3
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "protection" : "public",
+        "comment" : "\n",
+        "line" : 635,
+        "char" : 9,
+        "name" : "require",
+        "parameters" : [
+         {
+          "name" : "T",
+          "kind" : "type"
+         },
+         {
+          "name" : "K",
+          "kind" : "type"
+         }
+        ],
+        "members" : [
+         {
+          "name" : "require",
+          "kind" : "function",
+          "line" : 635,
+          "char" : 9,
+          "type" : "nothrow ref T(K key)",
+          "parameters" : [
+           {
+            "name" : "key",
+            "type" : "K"
+           }
+          ],
+          "endline" : 664,
+          "endchar" : 3
+         }
+        ]
+       },
+       {
+        "kind" : "template",
+        "protection" : "public",
+        "comment" : "\n",
+        "line" : 669,
+        "char" : 5,
+        "name" : "getValue",
+        "parameters" : [
+         {
+          "name" : "T",
+          "kind" : "type"
+         },
+         {
+          "name" : "K",
+          "kind" : "type"
+         }
+        ],
+        "members" : [
+         {
+          "name" : "getValue",
+          "kind" : "function",
+          "line" : 669,
+          "char" : 5,
+          "type" : "const nothrow T(K key, lazy T defaultValue = T.init)",
+          "parameters" : [
+           {
+            "name" : "key",
+            "type" : "K"
+           },
+           {
+            "name" : "defaultValue",
+            "type" : "T",
+            "storageClass" : [
+             "lazy"
+            ],
+            "default" : "T.init"
+           }
+          ],
+          "endline" : 690,
+          "endchar" : 3
+         }
+        ]
+       },
+       {
+        "name" : "builder",
+        "kind" : "function",
+        "protection" : "public",
+        "comment" : " Get the builder instance.\n",
+        "line" : 695,
+        "char" : 15,
+        "deco" : "FNaNbNcNfZS5voile4cbor7Builder",
+        "endline" : 698,
+        "endchar" : 3
+       },
+       {
+        "name" : "__xdtor",
+        "kind" : "alias",
+        "protection" : "public"
+       }
+      ]
+     },
+     {
+      "kind" : "template",
+      "protection" : "public",
+      "comment" : " Create a CborValue from a given value.\n",
+      "line" : 704,
+      "char" : 12,
+      "name" : "make",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "make",
+        "kind" : "function",
+        "line" : 704,
+        "char" : 12,
+        "type" : "@safe CborValue(T value)",
+        "parameters" : [
+         {
+          "name" : "value",
+          "type" : "T"
+         }
+        ],
+        "endline" : 707,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
+      "name" : "emptyArray",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : " Create a CborValue of empty array.\n",
+      "line" : 712,
+      "char" : 12,
+      "deco" : "FNaNbNfZS5voile4cbor7Builder9CborValue",
+      "endline" : 715,
+      "endchar" : 2
+     },
+     {
+      "name" : "emptyMap",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : " Create a CborValue of empty map.\n",
+      "line" : 720,
+      "char" : 12,
+      "deco" : "FNaNbNfZS5voile4cbor7Builder9CborValue",
+      "endline" : 723,
+      "endchar" : 2
+     },
+     {
+      "name" : "deepCopy",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : " Deep copy a CborValue.\n",
+      "line" : 728,
+      "char" : 12,
+      "deco" : "FNfS5voile4cbor7Builder9CborValueZQBf",
+      "parameters" : [
+       {
+        "name" : "src",
+        "deco" : "S5voile4cbor7Builder9CborValue"
+       }
+      ],
+      "endline" : 751,
+      "endchar" : 2
+     },
+     {
+      "name" : "__unittest_L754_C8",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 754,
+      "char" : 8,
+      "storageClass" : [
+       "@safe"
+      ],
+      "endline" : 768,
+      "endchar" : 2
+     },
+     {
+      "name" : "__unittest_L768_C8",
+      "kind" : "function",
+      "protection" : "public",
+      "line" : 768,
+      "char" : 8,
+      "storageClass" : [
+       "@safe"
+      ],
+      "endline" : 786,
+      "endchar" : 2
+     },
+     {
+      "name" : "parse",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : " Parse a binary CBOR data to a CborValue.\n",
+      "line" : 786,
+      "char" : 9,
+      "deco" : "FNfKS5voile4cbor7Builder9CborValueAyhZm",
+      "originalType" : "@safe size_t(ref CborValue dst, immutable(ubyte)[] src)",
+      "parameters" : [
+       {
+        "name" : "dst",
+        "deco" : "S5voile4cbor7Builder9CborValue",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "src",
+        "deco" : "Ayh"
+       }
+      ],
+      "endline" : 910,
+      "endchar" : 2
+     },
+     {
+      "kind" : "template",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 912,
+      "char" : 7,
+      "name" : "parse",
+      "parameters" : [
+       {
+        "name" : "OutputRange",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "parse",
+        "kind" : "function",
+        "line" : 912,
+        "char" : 7,
+        "type" : "@safe bool(ref OutputRange dst, immutable(ubyte)[] src)",
+        "parameters" : [
+         {
+          "name" : "dst",
+          "type" : "OutputRange",
+          "storageClass" : [
+           "ref"
+          ]
+         },
+         {
+          "name" : "src",
+          "type" : "immutable(ubyte)[]"
+         }
+        ],
+        "endline" : 928,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
+      "name" : "parse",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 930,
+      "char" : 12,
+      "deco" : "FNfKAyhZS5voile4cbor7Builder9CborValue",
+      "parameters" : [
+       {
+        "name" : "src",
+        "deco" : "Ayh",
+        "storageClass" : [
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 938,
+      "endchar" : 2
+     },
+     {
+      "name" : "parse",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 940,
+      "char" : 12,
+      "deco" : "FNeKAhZS5voile4cbor7Builder9CborValue",
+      "parameters" : [
+       {
+        "name" : "src",
+        "deco" : "Ah",
+        "storageClass" : [
+         "ref"
+        ]
+       }
+      ],
+      "endline" : 949,
+      "endchar" : 2
+     },
+     {
+      "name" : "__unittest_L952_C8",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 952,
+      "char" : 8,
+      "storageClass" : [
+       "@safe"
+      ],
+      "endline" : 967,
+      "endchar" : 2
+     },
+     {
+      "kind" : "template",
+      "protection" : "public",
+      "comment" : " Build a CborValue to a binary CBOR data.\n",
+      "line" : 967,
+      "char" : 7,
+      "name" : "build",
+      "parameters" : [
+       {
+        "name" : "OutputRange",
+        "kind" : "type"
+       }
+      ],
+      "constraint" : "isOutputRange!(OutputRange, ubyte)",
+      "members" : [
+       {
+        "name" : "build",
+        "kind" : "function",
+        "line" : 967,
+        "char" : 7,
+        "type" : "@safe void(ref OutputRange dst, CborValue src)",
+        "parameters" : [
+         {
+          "name" : "dst",
+          "type" : "OutputRange",
+          "storageClass" : [
+           "ref"
+          ]
+         },
+         {
+          "name" : "src",
+          "type" : "CborValue"
+         }
+        ],
+        "endline" : 1051,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
+      "name" : "build",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 1053,
+      "char" : 21,
+      "deco" : "FNfS5voile4cbor7Builder9CborValueZAyh",
+      "parameters" : [
+       {
+        "name" : "src",
+        "deco" : "S5voile4cbor7Builder9CborValue"
+       }
+      ],
+      "endline" : 1058,
+      "endchar" : 2
+     },
+     {
+      "name" : "__unittest_L1061_C8",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1061,
+      "char" : 8,
+      "storageClass" : [
+       "@safe"
+      ],
+      "endline" : 1102,
+      "endchar" : 2
+     },
+     {
+      "kind" : "template",
+      "protection" : "public",
+      "comment" : " Serialize a various data to CborValue.\n\n The serialize function generates a CborValue instance from the given data.\n The data type must be one of the following.\n\n - CborValue\n - Integral type(int, uint, long, ulong, short, ushort, byte, ubyte)\n - Floating point type(float, double)\n - bool\n - string\n - binary(immutable(ubyte)[])\n - null\n - Array\n   - Recursively serialized\n - AssociativeArray\n   - Recursively serialized\n - SumType\n   - Converted to a map type CborValue\n     - All types have the @kind attribute\n   - Recursively serialized\n - Aggregate type (struct, class, union): meets one of the following conditions\n   - Composed of simple public member variables\n     - Converted to a map type CborValue\n     - Recursively serialized\n     - If the @ignore attribute is present, do not serialize\n     - If the @ignoreIf attribute is present, do not serialize if the condition is met\n     - If the @name attribute is present, use that name\n     - If the @value attribute is present, use that value\n   - toCbor/fromCbor methods, where fromCtor is a static method\n   - toBinary/fromBinary methods, where fromBinary is a static method\n   - toRepresentation/fromRepresentation methods, where fromRepresentation is a static method\n",
+      "line" : 1102,
+      "char" : 12,
+      "name" : "serialize",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "serialize",
+        "kind" : "function",
+        "line" : 1102,
+        "char" : 12,
+        "type" : "@safe CborValue(T value)",
+        "parameters" : [
+         {
+          "name" : "value",
+          "type" : "T"
+         }
+        ],
+        "endline" : 1203,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
+      "name" : "__unittest_L1206_C8",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1206,
+      "char" : 8,
+      "storageClass" : [
+       "@safe"
+      ],
+      "endline" : 1224,
+      "endchar" : 2
+     },
+     {
+      "kind" : "template",
+      "protection" : "public",
+      "comment" : " Deserialize a CborValue to a various data.\n",
+      "line" : 1224,
+      "char" : 7,
+      "name" : "deserialize",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "deserialize",
+        "kind" : "function",
+        "line" : 1224,
+        "char" : 7,
+        "type" : "@safe bool(in CborValue src, ref T dst)",
+        "parameters" : [
+         {
+          "name" : "src",
+          "type" : "CborValue",
+          "storageClass" : [
+           "in"
+          ]
+         },
+         {
+          "name" : "dst",
+          "type" : "T",
+          "storageClass" : [
+           "ref"
+          ]
+         }
+        ],
+        "endline" : 1395,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
+      "kind" : "template",
+      "protection" : "public",
+      "comment" : "ditto\n",
+      "line" : 1397,
+      "char" : 4,
+      "name" : "deserialize",
+      "parameters" : [
+       {
+        "name" : "T",
+        "kind" : "type"
+       }
+      ],
+      "members" : [
+       {
+        "name" : "deserialize",
+        "kind" : "function",
+        "line" : 1397,
+        "char" : 4,
+        "type" : "@safe T(in CborValue src)",
+        "parameters" : [
+         {
+          "name" : "src",
+          "type" : "CborValue",
+          "storageClass" : [
+           "in"
+          ]
+         }
+        ],
+        "endline" : 1403,
+        "endchar" : 2
+       }
+      ]
+     },
+     {
+      "name" : "__unittest_L1405_C8",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : "\n",
+      "line" : 1405,
+      "char" : 8,
+      "storageClass" : [
+       "@safe"
+      ],
+      "endline" : 1419,
+      "endchar" : 2
+     },
+     {
+      "name" : "__unittest_L1419_C8",
+      "kind" : "function",
+      "protection" : "public",
+      "line" : 1419,
+      "char" : 8,
+      "storageClass" : [
+       "@safe"
+      ],
+      "endline" : 1567,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "CborValue",
+    "kind" : "alias",
+    "protection" : "public",
+    "comment" : " CBOR data type\n",
+    "line" : 1572,
+    "char" : 1,
+    "deco" : "S5voile4cbor7Builder9CborValue",
+    "originalType" : "Builder.CborValue"
+   },
+   {
+    "name" : "CborType",
+    "kind" : "alias",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 1574,
+    "char" : 1,
+    "deco" : "E5voile4cbor7Builder9CborValue4Type",
+    "originalType" : "Builder.CborValue.Type"
+   },
+   {
+    "name" : "CBOR",
+    "kind" : "alias",
+    "protection" : "public",
+    "comment" : " CBOR builder\n",
+    "line" : 1579,
+    "char" : 1,
+    "deco" : "S5voile4cbor7Builder"
+   },
+   {
+    "name" : "CborBuilder",
+    "kind" : "alias",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 1581,
+    "char" : 1,
+    "deco" : "S5voile4cbor7Builder"
+   },
+   {
+    "name" : "parseCBOR",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : " Perse CBOR data\n",
+    "line" : 1587,
+    "char" : 11,
+    "deco" : "FNeAyhZS5voile4cbor7Builder9CborValue",
+    "parameters" : [
+     {
+      "name" : "binary",
+      "deco" : "Ayh"
+     }
+    ],
+    "endline" : 1591,
+    "endchar" : 1
+   },
+   {
+    "name" : "toCBOR",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : " Perse CBOR data\n",
+    "line" : 1596,
+    "char" : 20,
+    "deco" : "FNeS5voile4cbor7Builder9CborValueZAyh",
+    "parameters" : [
+     {
+      "name" : "cv",
+      "deco" : "S5voile4cbor7Builder9CborValue"
+     }
+    ],
+    "endline" : 1599,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L1602_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 1602,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1723,
+    "endchar" : 1
+   },
+   {
+    "name" : "__unittest_L1723_C7",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 1723,
+    "char" : 7,
+    "storageClass" : [
+     "@safe"
+    ],
+    "endline" : 1854,
+    "endchar" : 1
+   }
+  ]
+ },
+ {
   "name" : "voile.dataformatter",
   "kind" : "module",
   "file" : "/home/runner/work/voile/voile/voile/dataformatter.d",
@@ -19960,6 +22166,13 @@
     "protection" : "private"
    },
    {
+    "name" : "std.sumtype",
+    "kind" : "import",
+    "line" : 8,
+    "char" : 48,
+    "protection" : "private"
+   },
+   {
     "kind" : "template",
     "protection" : "public",
     "comment" : "\n",
@@ -21827,6 +24040,112 @@
       "endchar" : 1
      }
     ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : " Check if the SumType contains a value\n",
+    "line" : 1710,
+    "char" : 3,
+    "name" : "get",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "ST",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isSumType!ST",
+    "members" : [
+     {
+      "name" : "get",
+      "kind" : "function",
+      "line" : 1710,
+      "char" : 3,
+      "type" : "@trusted T(ref ST value, lazy T defaultValue = T.init)",
+      "parameters" : [
+       {
+        "name" : "value",
+        "type" : "ST",
+        "storageClass" : [
+         "ref"
+        ]
+       },
+       {
+        "name" : "defaultValue",
+        "type" : "T",
+        "storageClass" : [
+         "lazy"
+        ],
+        "default" : "T.init"
+       }
+      ],
+      "endline" : 1717,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 1719,
+    "char" : 10,
+    "name" : "get",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     },
+     {
+      "name" : "ST",
+      "kind" : "type"
+     }
+    ],
+    "constraint" : "isSumType!ST",
+    "members" : [
+     {
+      "name" : "get",
+      "kind" : "function",
+      "line" : 1719,
+      "char" : 10,
+      "type" : "@trusted const(T)(in ST value, lazy T defaultValue = T.init)",
+      "parameters" : [
+       {
+        "name" : "value",
+        "type" : "ST",
+        "storageClass" : [
+         "in"
+        ]
+       },
+       {
+        "name" : "defaultValue",
+        "type" : "T",
+        "storageClass" : [
+         "lazy"
+        ],
+        "default" : "T.init"
+       }
+      ],
+      "endline" : 1726,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "name" : "__unittest_L1728_C9",
+    "kind" : "function",
+    "protection" : "public",
+    "line" : 1728,
+    "char" : 9,
+    "storageClass" : [
+     "@system"
+    ],
+    "endline" : 1740,
+    "endchar" : 1
    }
   ]
  },
