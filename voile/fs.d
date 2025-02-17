@@ -6,6 +6,7 @@ module voile.fs;
 import std.file, std.path, std.exception, std.stdio, std.datetime, std.regex, std.json, std.traits;
 import std.process;
 import voile.handler;
+import core.internal.utf;
 
 
 
@@ -124,9 +125,9 @@ else
 
 version (Windows)
 {
-	enum SYMBOLIC_LINK_FLAG_DIRECTORY = 0x00000001;
-	enum SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x00000002;
-	extern (Windows) imported!"core.sys.windows.windows".BOOL CreateSymbolicLinkW(
+	private enum SYMBOLIC_LINK_FLAG_DIRECTORY = 0x00000001;
+	private enum SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x00000002;
+	private extern (Windows) imported!"core.sys.windows.windows".BOOL CreateSymbolicLinkW(
 		imported!"core.sys.windows.windows".LPCWSTR,
 		imported!"core.sys.windows.windows".LPCWSTR,
 		imported!"core.sys.windows.windows".DWORD);
@@ -160,7 +161,186 @@ struct FileSystem
 	Handler!(bool delegate(string target, Exception e))             onRemoveFailed;
 	/// インスタンスが破棄される際に呼ばれる
 	Handler!(void delegate(string target))                          onDestroyed;
+	/// ディレクトリ監視時、変化が発生した際に呼ばれる。監視用別スレッドから呼ばれる可能性がある。
+	Handler!(void delegate(string target) shared)                   onWatcherChanged;
 	
+private:
+	version (Windows)
+	{
+		imported!"voile.sync".SyncEvent _evWatcherFinish;
+		imported!"voile.sync".SyncEvent _evWatcherStart;
+		imported!"core.thread".Thread   _thWatcher;
+		void _watcherEntry() shared
+		{
+			import core.sys.windows.windows;
+			import voile.sync: SyncEvent;
+			HANDLE hEvChanged = CreateEvent(NULL, TRUE, FALSE, NULL);
+			HANDLE hDir = CreateFile(
+				(cast()workDir).toUTF16z(), // 監視先
+				FILE_LIST_DIRECTORY,
+				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+				NULL,
+				OPEN_EXISTING,
+				FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, // ReadDirectoryChangesW用
+				NULL);
+			scope (exit)
+				cast(void)CloseHandle(hDir);
+			HANDLE[2] waitfor = [(cast()_evWatcherFinish).handle, hEvChanged];
+			
+			auto buf = new ubyte[1024*8];
+			import std.array: appender;
+			auto notifiedFile = appender!(string[]);
+			while (1)
+			{
+				OVERLAPPED ovl;
+				ovl.hEvent = hEvChanged;
+				ResetEvent(hEvChanged);
+				while (ReadDirectoryChangesW(hDir,
+					buf.ptr, cast(DWORD)buf.length, TRUE,
+					FILE_NOTIFY_CHANGE_FILE_NAME |      // ファイル名の変更
+					FILE_NOTIFY_CHANGE_DIR_NAME |       // ディレクトリ名の変更
+					FILE_NOTIFY_CHANGE_ATTRIBUTES |     // 属性の変更
+					FILE_NOTIFY_CHANGE_SIZE |           // サイズの変更
+					FILE_NOTIFY_CHANGE_LAST_WRITE,      // 最終書き込み日時の変更
+					NULL, &ovl, NULL) == 0)
+				{
+					// 監視終了
+					return;
+				}
+				(cast()_evWatcherStart).signaled = true;
+				final switch (WaitForMultipleObjects(2, waitfor.ptr, FALSE, INFINITE))
+				{
+				case WAIT_OBJECT_0 + 0:
+					// 監視終了
+					CancelIo(hDir);
+					WaitForSingleObject(hEvChanged, INFINITE);
+					return;
+				case WAIT_OBJECT_0 + 1:
+					// 変化あり
+					DWORD retsize = 0;
+					if (!GetOverlappedResult(hDir, &ovl, &retsize, FALSE)) {
+						// 結果取得に失敗した場合監視終了
+						return;
+					}
+					auto pCurrData = cast(FILE_NOTIFY_INFORMATION*)buf.ptr;
+					notifiedFile.shrinkTo(0);
+					while (1)
+					{
+						auto path = pCurrData.FileName[0..pCurrData.FileNameLength/wchar.sizeof].toUTF8();
+						// 特に何もしない
+						final switch (pCurrData.Action)
+						{
+						case FILE_ACTION_ADDED:
+							break;
+						case FILE_ACTION_REMOVED:
+							break;
+						case FILE_ACTION_MODIFIED:
+							break;
+						case FILE_ACTION_RENAMED_OLD_NAME:
+							break;
+						case FILE_ACTION_RENAMED_NEW_NAME:
+							break;
+						}
+						notifiedFile ~= path;
+						if (pCurrData.NextEntryOffset == 0)
+							break;
+						pCurrData = cast(FILE_NOTIFY_INFORMATION*)((cast(ubyte*)pCurrData) + pCurrData.NextEntryOffset);
+					}
+					foreach (i; 0..notifiedFile.data.length)
+					{
+						import std.algorithm: canFind;
+						if (!notifiedFile.data[i+1..$].canFind(notifiedFile.data[i]))
+							onWatcherChanged(notifiedFile.data[i]);
+					}
+					continue;
+				case WAIT_TIMEOUT:
+					// 再度確認
+					break;
+				case WAIT_FAILED:
+					// 再度確認
+					break;
+				}
+			}
+		}
+	}
+	else version (linux)
+	{
+		imported!"core.thread".Thread   _thWatcher;
+		imported!"voile.sync".SyncEvent _evWatcherStart;
+		int                             _fdWatcherNotify;
+		void _watcherEntry() shared
+		{
+			import voile.misc: assumeUnshared;
+			import std.string: toStringz;
+			import core.stdc.errno;
+			import core.sys.linux.sys.inotify;
+			import core.sys.posix.unistd;
+			import core.sys.posix.fcntl;
+			import core.sys.posix.sys.types;
+			import core.sys.posix.sys.select;
+			scope (failure)
+				_evWatcherStart.signaled = true;
+			auto inotifyFd = inotify_init();
+			_fdWatcherNotify.assumeUnshared = inotifyFd;
+			enforce(inotifyFd != -1, "Failed to initialize inotify");
+			auto fs = FileSystem(cast()workDir);
+			auto watchFd = inotify_add_watch(inotifyFd, (fs.absolutePath ~ "/").toStringz(),
+				IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO);
+			enforce(watchFd != -1, "Failed to add watch " ~ fs.workDir);
+			scope (exit)
+				inotify_rm_watch(inotifyFd, watchFd);
+			// 初期化完了。監視開始済み。
+			_evWatcherStart.signaled = true;
+			auto buffer = new ubyte[1024 * 64];
+			while (1)
+			{
+				// ファイルをタイムアウト付きで監視
+				// タイムアウト設定1秒
+				timeval timeout;
+				timeout.tv_sec = 1;
+				timeout.tv_usec = 0;
+				fd_set readFds;
+				FD_ZERO(&readFds);
+				FD_SET(inotifyFd, &readFds);
+				int selectResult = core.sys.posix.sys.select.select(inotifyFd + 1, &readFds, null, null, &timeout);
+				// タイムアウト時はループ継続(何もしない)
+				if (selectResult == 0)
+					continue;
+				if (selectResult == -1)
+					break;
+				
+				// ファイル監視情報読み込み
+				auto length = core.sys.posix.unistd.read(inotifyFd, buffer.ptr, buffer.length);
+				if (length == -1)
+				{
+					// エラー発生(閉じられた/それ以外)
+					if (errno == EBADF)
+						break;
+					else
+						continue;
+				}
+				enforce(length != 0, "Failed to watch " ~ fs.workDir);
+				
+				int offset = 0;
+				while (offset < length)
+				{
+					auto ev = cast(inotify_event*)&buffer[offset];
+					if ((ev.mask & (IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO | IN_ATTRIB)) != 0
+						&& ev.len > 0)
+					{
+						immutable stFileName = offset + inotify_event.sizeof;
+						immutable edFileName = stFileName + ev.len;
+						import std.string: fromStringz;
+						auto file = (cast(char[])buffer[stFileName .. edFileName]).fromStringz().idup;
+						onWatcherChanged(file);
+					}
+					offset += inotify_event.sizeof + ev.len;
+				}
+			}
+		}
+		
+	}
+public:
 	/***************************************************************************
 	 * ムーブの後に呼ばれる
 	 */
@@ -176,6 +356,29 @@ struct FileSystem
 	{
 		if (workDir)
 			onDestroyed(workDir);
+		version (Windows)
+		{
+			if (_thWatcher !is null)
+			{
+				_evWatcherFinish.signaled = true;
+				_thWatcher.join();
+				_thWatcher = null;
+			}
+		}
+		else version (linux)
+		{
+			if (_thWatcher !is null)
+			{
+				if (_fdWatcherNotify != -1)
+				{
+					import core.sys.linux.unistd: close;
+					close(_fdWatcherNotify);
+					_fdWatcherNotify = -1;
+				}
+				_thWatcher.join();
+				_thWatcher = null;
+			}
+		}
 	}
 	
 	/***************************************************************************
@@ -1019,8 +1222,11 @@ struct FileSystem
 				a = v.getValue("a", 123);
 			}
 		}
-		fs.writeJson("a/b/test.json", A(10));
-		assert(fs.readJson!A("a/b/test.json") == A(10));
+		auto jv = A(100).serializeToJson();
+		fs.writeJson("a/b/test1.json", jv);
+		fs.writeJson("a/b/test2.json", A(10));
+		assert(fs.readJson!A("a/b/test1.json") == A(100));
+		assert(fs.readJson!A("a/b/test2.json") == A(10));
 	}
 	
 	/***************************************************************************
@@ -1814,7 +2020,7 @@ struct FileSystem
 		fs.setTimeStamp("src/test4.txt", timAcc, timMod+4.msecs);
 		fs.writeText(   "dst/test3.txt", "3");
 		fs.setTimeStamp("dst/test3.txt", timAcc, timMod+3.msecs);
-		fs.writeText(   "dst/test4.txt", "4x");
+		fs.writeText(   "dst/test4.txt", "4");
 		fs.setTimeStamp("dst/test4.txt", timAcc, timMod+8.msecs);
 		fs.writeText(   "src/test5-11.txt", "5");
 		fs.setTimeStamp("src/test5-11.txt", timAcc, timMod+10.msecs);
@@ -2042,6 +2248,94 @@ struct FileSystem
 		auto result = fs.execute(cmd, ["Path": fs.absolutePath]);
 		assert(result.output.chomp == "xxx");
 	}
+	
+	/***************************************************************************
+	 * ディレクトリ監視を有効にする
+	 */
+	void enableWatcher()
+	{
+		version (Windows)
+		{
+			import core.thread;
+			import voile.sync;
+			_evWatcherStart = new SyncEvent;
+			_evWatcherFinish = new SyncEvent;
+			_thWatcher = new Thread(cast(void delegate())&((cast(shared)this)._watcherEntry));
+			_thWatcher.start();
+			_evWatcherStart.wait();
+		}
+		else version (linux)
+		{
+			import core.thread;
+			import voile.sync: SyncEvent;
+			_evWatcherStart = new SyncEvent;
+			_thWatcher = new Thread(cast(void delegate())&((cast(shared)this)._watcherEntry));
+			_thWatcher.start();
+			_evWatcherStart.wait();
+		}
+		else
+		{
+			enforce(0, "File watching is not supported on this architecture!");
+		}
+	}
+	/// ditto
+	void disableWatcher()
+	{
+		version (Windows)
+		{
+			if (_thWatcher)
+			{
+				_evWatcherFinish.signaled = true;
+				_thWatcher.join();
+				_evWatcherStart = null;
+				_evWatcherFinish = null;
+				_thWatcher = null;
+			}
+		}
+		else version (linux)
+		{
+			if (_thWatcher !is null)
+			{
+				if (_fdWatcherNotify != -1)
+				{
+					import core.sys.linux.unistd: close;
+					close(_fdWatcherNotify);
+					_fdWatcherNotify = -1;
+				}
+				_thWatcher.join();
+				_thWatcher = null;
+			}
+		}
+	}
+	///
+	@system unittest
+	{
+		version (Windows)
+			enum enableTest = true;
+		else version (linux)
+			enum enableTest = true;
+		else
+			enum enableTest = false;
+		static if (enableTest)
+		{
+			import std.string;
+			auto fs = createDisposableDir();
+			shared string test;
+			import voile.sync: SyncEvent;
+			auto ev = new shared SyncEvent;
+			fs.onWatcherChanged ~= (string path) shared
+			{
+				test = path;
+				ev.signaled = true;
+			};
+			fs.enableWatcher();
+			fs.writeText("test.txt", "aaa");
+			ev.wait();
+			fs.disableWatcher();
+			assert(test == "test.txt");
+		}
+	}
+	
 }
 /// コピー禁止とムーブ、インスタンス削除の例
 @system unittest

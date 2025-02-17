@@ -115,6 +115,12 @@ class SyncEvent
 			_ownHandle = true;
 			_handle = createEvent(firstCondition);
 		}
+		/// ditto
+		this(bool firstCondition = false) shared nothrow @nogc
+		{
+			_ownHandle = true;
+			(cast()this)._handle = createEvent(firstCondition);
+		}
 		/***********************************************************************
 		 * シグナル状態を返す
 		 * 
@@ -126,6 +132,11 @@ class SyncEvent
 		@property bool signaled() nothrow @nogc
 		{
 			return WaitForSingleObject(_handle, 0) == WAIT_OBJECT_0;
+		}
+		/// ditto
+		@property bool signaled() shared nothrow @nogc
+		{
+			return (cast()this).signaled;
 		}
 		/***********************************************************************
 		 * シグナル状態を設定する
@@ -146,6 +157,11 @@ class SyncEvent
 				ResetEvent(_handle);
 			}
 		}
+		/// ditto
+		@property void signaled(bool cond) shared nothrow @nogc
+		{
+			(cast()this).signaled = cond;
+		}
 		/***********************************************************************
 		 * シグナル状態になるまで待つ
 		 * 
@@ -156,6 +172,11 @@ class SyncEvent
 		void wait() nothrow @nogc const
 		{
 			WaitForSingleObject(cast(HANDLE)_handle, INFINITE);
+		}
+		/// ditto
+		void wait() const shared
+		{
+			(cast()this).wait();
 		}
 		/***********************************************************************
 		 * シグナル状態になるまで待つ
@@ -168,6 +189,11 @@ class SyncEvent
 		{
 			return WaitForSingleObject(cast(HANDLE)_handle, cast(uint)dir.total!"msecs")
 				== WAIT_OBJECT_0;
+		}
+		/// ditto
+		bool wait(Duration dur) const shared
+		{
+			return (cast()this).wait(dur);
 		}
 		~this()
 		{
@@ -188,8 +214,7 @@ class SyncEvent
 		 * 
 		 * ただしOS依存する処理をする場合にのみ使用すること
 		 */
-		@property
-		Condition handle()
+		@property Condition handle()
 		{
 			return _condition;
 		}
@@ -204,6 +229,13 @@ class SyncEvent
 			_mutex = new Mutex;
 			_condition = new Condition(_mutex);
 		}
+		/// ditto
+		this(bool firstCondition = false) shared
+		{
+			(cast()this)._signaled = firstCondition;
+			(cast()this)._mutex = new Mutex;
+			(cast()this)._condition = new Condition(cast()_mutex);
+		}
 		/***********************************************************************
 		 * シグナル状態を返す
 		 * 
@@ -212,13 +244,15 @@ class SyncEvent
 		 *     falseなら非シグナル状態で、waitしたらシグナル状態になるか、時間が
 		 *     過ぎるまで制御を返さない状態であることを示す。
 		 */
-		@property
-		bool signaled()
+		@property bool signaled()
 		{
 			synchronized (_mutex)
-			{
 				return _signaled;
-			}
+		}
+		/// ditto
+		@property bool signaled() shared
+		{
+			return (cast()this).signaled;
 		}
 		/***********************************************************************
 		 * シグナル状態を設定する
@@ -228,14 +262,18 @@ class SyncEvent
 		 *     falseなら非シグナル状態で、waitしたらシグナル状態になるまで制御を
 		 *     返さない状態にする。
 		 */
-		@property
-		void signaled(bool cond)
+		@property void signaled(bool cond)
 		{
 			synchronized (_mutex)
 			{
 				_signaled = cond;
 				_condition.notifyAll;
 			}
+		}
+		/// ditto
+		@property void signaled(bool cond) shared
+		{
+			return (cast()this).signaled = cond;
 		}
 		/***********************************************************************
 		 * シグナル状態になるまで待つ
@@ -252,6 +290,11 @@ class SyncEvent
 					(cast()_condition).wait();
 			}
 		}
+		/// ditto
+		void wait() const shared
+		{
+			(cast()this).wait();
+		}
 		/***********************************************************************
 		 * シグナル状態になるまで待つ
 		 * 
@@ -267,6 +310,11 @@ class SyncEvent
 					_condition.wait(dur);
 				return _signaled;
 			}
+		}
+		/// ditto
+		bool wait(Duration dur) const shared
+		{
+			return (cast()this).wait(dur);
 		}
 	}
 }
@@ -509,7 +557,7 @@ public:
 		}
 		else version (Windows)
 		{
-			ReleaseMutex(_handle);
+			cast(void)ReleaseMutex(_handle);
 		}
 	}
 }
