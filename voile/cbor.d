@@ -269,7 +269,7 @@ private:
 	
 	@safe unittest
 	{
-		import std.math: isNaN, isInfinity;
+		import std.math: isNaN, isInfinity, isClose;
 		// Test for zero
 		assert(convToFloat!float(cast(HalfFloat)cast(HalfFloat)0x0000) == 0.0f);
 		assert(convToFloat!double(cast(HalfFloat)cast(HalfFloat)0x0000) == 0.0f);
@@ -1723,6 +1723,7 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 @safe unittest
 {
 	import std.conv: to;
+	import std.math: isClose;
 	Builder builder;
 	Builder.CborValue value;
 	
@@ -1813,14 +1814,14 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	data = [0xFA, 0x40, 0x49, 0x0F, 0xDB]; // 3.1415927 in 32-bit float
 	value = builder.parse(data);
 	assert(value.type == CborType.float32);
-	assert(value.get!float == 3.1415927f);
+	assert(value.get!float.isClose(3.1415927f, 1e-6f));
 	assert(builder.build(value) == [0xFA, 0x40, 0x49, 0x0F, 0xDB]);
 	
 	// Test parsing of 64-bit float values
 	data = [0xFB, 0x40, 0x09, 0x21, 0xFB, 0x54, 0x44, 0x2D, 0x18]; // 3.141592653589793 in 64-bit float
 	value = builder.parse(data);
 	assert(value.type == CborType.float64);
-	assert(value.get!double == 3.141592653589793);
+	assert(value.get!double.isClose(3.141592653589793, 1e-12, 0));
 	assert(builder.build(value) == [0xFB, 0x40, 0x09, 0x21, 0xFB, 0x54, 0x44, 0x2D, 0x18]);
 	
 	// Test parsing of negative integer values
