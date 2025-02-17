@@ -598,7 +598,7 @@ public:
 					return ret;
 				}
 				else
-					return (cast()_instance).match!((ref T v) @trusted => v, (ref _) @trusted => defaultValue);
+					return (() @trusted => (cast()_instance).match!((ref T v) => v, (ref _) => defaultValue))();
 			}
 			catch (Exception e)
 			{
@@ -822,14 +822,14 @@ public:
 		case 2: // Byte string
 			if (argument < data.length)
 				return 0;
-			dst = CborValue(cast(Binary)data[0 .. argument], this);
-			data = data[argument .. $];
+			dst = CborValue(cast(Binary)data[0 .. cast(size_t)argument], this);
+			data = data[cast(size_t)argument .. $];
 			break;
 		case 3: // Text string (UTF-8 encoded)
 			if (argument > data.length)
 				return 0;
-			dst = CborValue(cast(String)cast(string)data[0 .. argument], this);
-			data = data[argument .. $];
+			dst = CborValue(cast(String)cast(string)data[0 .. cast(size_t)argument], this);
+			data = data[cast(size_t)argument .. $];
 			break;
 		case 4: // Array (number of elements given by argument)
 			CborValue.CborArray tmpAry;
