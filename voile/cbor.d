@@ -338,17 +338,16 @@ private:
 	auto allocAry(T)() => Array!T.init;
 	T[] copyMemory(T)(const(T)[] src) const => src.dup;
 	immutable(T)[] copyImmutableMemory(T)(const(T)[] src) const => src.idup;
+	enum DummyMap: Dictionary!(int, int) { init = Dictionary!(int, int).init }
 public:
 	/***************************************************************************
 	 * 
 	 */
 	static struct CborValue
 	{
-		///
+	private:
 		alias CborArray = Array!CborValue;
-		///
-		alias CborMap = Dictionary!(CborValue, CborValue);
-		///
+		alias CborMap = DummyMap;
 		alias CborType = SumType!(
 			Undefined,
 			Null,
@@ -362,6 +361,22 @@ public:
 			Binary,
 			CborArray,
 			CborMap);
+		ref inout(Dictionary!(CborValue, CborValue)) _reqMap() inout @trusted
+		{
+			alias tmp = __traits(getMember, CborType, "get");
+			return *cast(inout(Dictionary!(CborValue, CborValue))*)&(__traits(child, _instance, tmp!CborMap)());
+		}
+		inout(CborValue)[] _reqArray() inout @trusted
+		{
+			alias tmp = __traits(getMember, CborType, "get");
+			return cast(inout(CborValue)[])__traits(child, _instance, tmp!CborArray)();
+		}
+		string _reqStr() inout @trusted
+		{
+			alias tmp = __traits(getMember, CborType, "get");
+			return cast(string)__traits(child, _instance, tmp!String)();
+		}
+	public:
 		///
 		enum Type: ubyte
 		{
@@ -431,7 +446,7 @@ public:
 			}
 			else static if (isArray!T && !is(T == enum))
 			{
-				CborArray ary;
+				auto ary = builder.allocAry!CborValue;
 				foreach (e; value)
 					ary ~= CborValue(e, builder);
 				_instance = ary.move;
@@ -439,15 +454,20 @@ public:
 			}
 			else static if (isAssociativeArray!T)
 			{
-				CborMap map;
+				auto map = builder.allocDic!(CborValue, CborValue);
 				foreach (ref k, ref v; value)
 					map.append(CborValue(k, builder), CborValue(v, builder));
-				_instance = map.move;
+				_instance = (*cast(CborMap*)&map).move;
 				_builder  = &builder;
 			}
 			else static if (is(T == CborValue))
 			{
 				_instance = value._instance;
+				_builder  = &builder;
+			}
+			else static if (is(T == Dictionary!(CborValue, CborValue)))
+			{
+				_instance = (*cast(CborMap*)&value).move;
 				_builder  = &builder;
 			}
 			else
@@ -584,7 +604,7 @@ public:
 				else static if (isArray!T && !is(T == enum))
 				{
 					T ret;
-					foreach (e; _instance.get!(const CborArray))
+					foreach (e; _reqArray)
 						ret ~= e.get!(ElementType!T);
 					return ret;
 				}
@@ -593,7 +613,7 @@ public:
 					T ret;
 					alias V = ValueType!T;
 					alias K = KeyType!T;
-					foreach (e; _instance.get!(const CborMap).byKeyValue)
+					foreach (e; _reqMap.byKeyValue)
 						ret[e.key.get!K] = e.value.get!V;
 					return ret;
 				}
@@ -652,7 +672,7 @@ public:
 			{
 				return _instance.match!(
 					(in CborMap v) @trusted {
-						foreach (ref kv; v.items)
+						foreach (ref kv; _reqMap.items)
 							if (kv.key.get!K == key)
 								return kv.value.get!T;
 						return defaultValue;
@@ -717,10 +737,10 @@ public:
 					dst ~= deepCopy(e);
 				return CborValue(dst, this);
 			},
-			(ref CborValue.CborMap map)
+			(ref CborValue.CborMap map) @trusted
 			{
-				CborValue.CborMap dst;
-				foreach (ref e; map.byKeyValue)
+				auto dst = allocDic!(CborValue, CborValue);
+				foreach (ref e; src._reqMap.byKeyValue)
 					dst.append(deepCopy(e.key), deepCopy(e.value));
 				return CborValue(dst, this);
 			},
@@ -845,7 +865,7 @@ public:
 			dst = CborValue(tmpAry.move, this);
 			break;
 		case 5: // Map (number of key-value pairs given by argument)
-			CborValue.CborMap tmpMap;
+			auto map = allocDic!(CborValue, CborValue);
 			foreach (i; 0 .. argument)
 			{
 				CborValue key;
@@ -858,9 +878,9 @@ public:
 				if (consume == 0)
 					return 0;
 				data = data[consume .. $];
-				tmpMap.append(key, value);
+				map.append(key, value);
 			}
-			dst = CborValue(tmpMap.move, this);
+			(() @trusted => dst = CborValue((*cast(CborValue.CborMap*)&map).move, this))();
 			break;
 		case 6: // Tag
 			return 0;
@@ -1005,10 +1025,10 @@ public:
 			foreach (e; data)
 				build(dst, e);
 		}
-		void writeMap(CborValue.CborMap data) @safe
+		void writeMap(ref CborValue.CborMap data) @trusted
 		{
 			writeUInt(data.items.length, 5);
-			foreach (e; data.items)
+			foreach (e; (*cast(Dictionary!(CborValue, CborValue)*)&data).items)
 			{
 				build(dst, e.key);
 				build(dst, e.value);
@@ -1109,15 +1129,11 @@ public:
 				{
 					static if (isAggregateType!(typeof(e)) && hasKind!(typeof(e)))
 					{
+						alias Map = Dictionary!(CborValue, CborValue);
 						auto map = serialize(e);
-						map._instance.match!(
-							(ref CborValue.CborMap v) @trusted {
-								enum kind = getKind!(typeof(e));
-								v.items = CborValue.CborMap.Item(
-									CborValue(kind.key, this), CborValue(kind.value, this)) ~ v.items;
-							},
-							(ref _) @trusted {}
-						);
+						enum kind = getKind!(typeof(e));
+						map._reqMap.items = Map.Item(CborValue(kind.key, this), CborValue(kind.value, this))
+							~ map._reqMap.items;
 						return map;
 					}
 					else
@@ -1214,9 +1230,8 @@ public:
 		else static if (isArray!T && isSerializable!(ElementType!T))
 		{
 			// 配列
-			auto ary = src.get!(const CborValue.CborArray);
-			dst.length = ary.length;
-			foreach (i, ref e; ary)
+			dst.length = src._reqArray.length;
+			foreach (i, ref e; src._reqArray)
 			{
 				if (!deserialize(e, dst[i]))
 					return false;
@@ -1225,7 +1240,7 @@ public:
 		else static if (isAssociativeArray!T && isSerializable!(KeyType!T) && isSerializable!(ValueType!T))
 		{
 			// 連想配列
-			foreach (e; src.get!(const CborValue.CborMap).byKeyValue)
+			foreach (e; src._reqMap.byKeyValue)
 			{
 				KeyType!T key;
 				ValueType!T value;
@@ -1240,16 +1255,15 @@ public:
 			switch (src.type)
 			{
 			case CborType.map:
-				auto map = src.get!(const CborValue.CborMap);
 				immutable kinds = [staticMap!(getKind, Filter!(isAggregateType, T.Types))];
 				size_t kindIdx = -1;
 				static if (kinds.length)
 				{
-					foreach (i, ref e; map.items)
+					foreach (i, ref e; src._reqMap.items)
 					{
 						foreach (kind; kinds)
 						{
-							if (e.key.get!string == kind.key && e.value.get!string == kind.value)
+							if (e.key._reqStr == kind.key && e.value._reqStr == kind.value)
 							{
 								kindIdx = i;
 								break;
@@ -1351,8 +1365,8 @@ public:
 		{
 			// その他の構造体・クラス
 			static foreach (i, m; dst.tupleof[])
-			{
-				foreach (ref e; src.get!(const CborValue.CborMap).byKeyValue)
+			{{
+				foreach (ref e; src._reqMap.byKeyValue)
 				{
 					static if (isAccessible!m && !hasIgnore!m)
 					{
@@ -1360,7 +1374,7 @@ public:
 							alias getname = () => getName!m;
 						else
 							alias getname = () => m.stringof;
-						if (e.key.get!string == getname())
+						if (e.key._reqStr == getname())
 						{
 							if (!deserialize(e.value, dst.tupleof[i]))
 								return false;
@@ -1370,7 +1384,7 @@ public:
 				}
 				static if (hasEssential!m)
 					return false;
-			}
+			}}
 		}
 		else static if(__traits(compiles, dst = src.get!T))
 			dst = src.get!T;
@@ -1689,7 +1703,7 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	
 	// Test for associative array values
 	value = builder.make(["1_one": 1, "2_two": 2]);
-	auto cborMap = value._instance.get!(Builder.CborValue.CborMap);
+	auto cborMap = value._reqMap;
 	assert(cborMap.items.length == 2);
 	assert(cborMap.items[0].key.get!(Builder.String) == cast(Builder.String)"1_one");
 	assert(cborMap.items[0].value._instance.get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)1);
@@ -1779,7 +1793,7 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	// Test parsing of map values
 	data = [0xA2, 0x61, 'a', 0x01, 0x61, 'b', 0x02]; // {"a": 1, "b": 2}
 	value = builder.parse(data);
-	auto cborMap = value.get!(CborValue.CborMap);
+	auto cborMap = value._reqMap;
 	assert(value.type == CborType.map);
 	assert(cborMap.items.length == 2);
 	assert(cborMap.items[0].key.get!string == "a");
