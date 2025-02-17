@@ -130,6 +130,8 @@
 </div><div class="ddoc_description">ただしOS依存する処理をする場合にのみ使用すること</div>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.this"></span><div class="quickindex" id="quickindex.SyncEvent.this"></div>this(bool <span class="ddoc_param">firstCondition</span> = false);
+<br>
+shared this(bool <span class="ddoc_param">firstCondition</span> = false);
 <br></div></dt>
 <dd><div class="ddoc_summary">コンストラクタ
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -139,6 +141,8 @@
 
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.signaled"></span><div class="quickindex" id="quickindex.SyncEvent.signaled"></div>@property bool <code class="ddoc_psymbol">signaled</code>();
+<br>
+shared @property bool <code class="ddoc_psymbol">signaled</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">シグナル状態を返す
 </div><div class="ddoc_returns"><span class="ddoc_returns_header">Returns:</span>
@@ -147,6 +151,8 @@
      過ぎるまで制御を返さない状態であることを示す。</div>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.signaled.2"></span><div class="quickindex" id="quickindex.SyncEvent.signaled.2"></div>@property void <code class="ddoc_psymbol">signaled</code>(bool <span class="ddoc_param">cond</span>);
+<br>
+shared @property void <code class="ddoc_psymbol">signaled</code>(bool <span class="ddoc_param">cond</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">シグナル状態を設定する
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -160,6 +166,8 @@
 
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.wait"></span><div class="quickindex" id="quickindex.SyncEvent.wait"></div>const void <code class="ddoc_psymbol">wait</code>();
+<br>
+shared const void <code class="ddoc_psymbol">wait</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">シグナル状態になるまで待つ
 </div><div class="ddoc_description">conditionがtrueならシグナル状態であり、すぐに制御が返る。
@@ -167,6 +175,8 @@
  返さない。</div>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".SyncEvent.wait.2"></span><div class="quickindex" id="quickindex.SyncEvent.wait.2"></div>bool <code class="ddoc_psymbol">wait</code>(Duration <span class="ddoc_param">dur</span>);
+<br>
+shared const bool <code class="ddoc_psymbol">wait</code>(Duration <span class="ddoc_param">dur</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">シグナル状態になるまで待つ
 </div><div class="ddoc_description">conditionがtrueならシグナル状態であり、すぐに制御が返る。

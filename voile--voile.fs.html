@@ -176,6 +176,9 @@ string[] msgDestroyed;
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onDestroyed"></span><div class="quickindex" id="quickindex.FileSystem.onDestroyed"></div>Handler!(void delegate(string target)) <code class="ddoc_psymbol">onDestroyed</code>;
 <br></div></dt>
 <dd><div class="ddoc_summary">インスタンスが破棄される際に呼ばれる</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onWatcherChanged"></span><div class="quickindex" id="quickindex.FileSystem.onWatcherChanged"></div>Handler!(void delegate(string target) shared) <code class="ddoc_psymbol">onWatcherChanged</code>;
+<br></div></dt>
+<dd><div class="ddoc_summary">ディレクトリ監視時、変化が発生した際に呼ばれる。監視用別スレッドから呼ばれる可能性がある。</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onPostMove"></span><div class="quickindex" id="quickindex.FileSystem.onPostMove"></div>void <code class="ddoc_psymbol">onPostMove</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">ムーブの後に呼ばれる</div></dd>
@@ -475,8 +478,11 @@ fs.writeJson!<span class="d_keyword">uint</span>(<span class="d_string">"a/b/tes
 		a = v.getValue(<span class="d_string">"a"</span>, 123);
 	}
 }
-fs.writeJson(<span class="d_string">"a/b/test.json"</span>, A(10));
-<span class="d_keyword">assert</span>(fs.<span class="d_psymbol">readJson</span>!A(<span class="d_string">"a/b/test.json"</span>) == A(10));
+<span class="d_keyword">auto</span> jv = A(100).serializeToJson();
+fs.writeJson(<span class="d_string">"a/b/test1.json"</span>, jv);
+fs.writeJson(<span class="d_string">"a/b/test2.json"</span>, A(10));
+<span class="d_keyword">assert</span>(fs.<span class="d_psymbol">readJson</span>!A(<span class="d_string">"a/b/test1.json"</span>) == A(100));
+<span class="d_keyword">assert</span>(fs.<span class="d_psymbol">readJson</span>!A(<span class="d_string">"a/b/test2.json"</span>) == A(10));
 </pre>
 </div>
 </dd>
@@ -646,6 +652,38 @@ tout.close();
 }
 <span class="d_keyword">auto</span> result = fs.<span class="d_psymbol">execute</span>(cmd, [<span class="d_string">"Path"</span>: fs.absolutePath]);
 <span class="d_keyword">assert</span>(result.output.chomp == <span class="d_string">"xxx"</span>);
+</pre>
+</div>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.enableWatcher"></span><div class="quickindex" id="quickindex.FileSystem.enableWatcher"></div>void <code class="ddoc_psymbol">enableWatcher</code>();
+<br>
+<span class="def-anchor" id=".FileSystem.disableWatcher"></span><div class="quickindex" id="quickindex.FileSystem.disableWatcher"></div>void <code class="ddoc_psymbol">disableWatcher</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">ディレクトリ監視を有効にする</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ <pre class="d_code notranslate"><span class="d_keyword">version</span> (Windows)
+	<span class="d_keyword">enum</span> enableTest = <span class="d_keyword">true</span>;
+<span class="d_keyword">else</span> <span class="d_keyword">version</span> (linux)
+	<span class="d_keyword">enum</span> enableTest = <span class="d_keyword">true</span>;
+<span class="d_keyword">else</span>
+	<span class="d_keyword">enum</span> enableTest = <span class="d_keyword">false</span>;
+<span class="d_keyword">static</span> <span class="d_keyword">if</span> (enableTest)
+{
+	<span class="d_keyword">import</span> std.string;
+	<span class="d_keyword">auto</span> fs = createDisposableDir();
+	<span class="d_keyword">shared</span> string test;
+	<span class="d_keyword">import</span> voile.sync: SyncEvent;
+	<span class="d_keyword">auto</span> ev = <span class="d_keyword">new</span> <span class="d_keyword">shared</span> SyncEvent;
+	fs.onWatcherChanged ~= (string path) <span class="d_keyword">shared</span>
+	{
+		test = path;
+		ev.signaled = <span class="d_keyword">true</span>;
+	};
+	fs.<span class="d_psymbol">enableWatcher</span>();
+	fs.writeText(<span class="d_string">"test.txt"</span>, <span class="d_string">"aaa"</span>);
+	ev.wait();
+	fs.<span class="d_psymbol">disableWatcher</span>();
+	<span class="d_keyword">assert</span>(test == <span class="d_string">"test.txt"</span>);
+}
 </pre>
 </div>
 </dd>
