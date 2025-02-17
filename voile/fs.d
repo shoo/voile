@@ -263,12 +263,80 @@ private:
 			}
 		}
 	}
-	version (linux)
+	else version (linux)
 	{
-		import core.sys.linux.sys.inotify;
+		imported!"core.thread".Thread   _thWatcher;
+		imported!"voile.sync".SyncEvent _evWatcherStart;
+		int                             _fdWatcherNotify;
 		void _watcherEntry() shared
 		{
-			
+			import voile.misc: assumeUnshared;
+			import std.string: toStringz;
+			import core.stdc.errno;
+			import core.sys.linux.sys.inotify;
+			import core.sys.posix.unistd;
+			import core.sys.posix.fcntl;
+			import core.sys.posix.sys.types;
+			import core.sys.posix.sys.select;
+			scope (failure)
+				_evWatcherStart.signaled = true;
+			auto inotifyFd = inotify_init();
+			_fdWatcherNotify.assumeUnshared = inotifyFd;
+			enforce(inotifyFd != -1, "Failed to initialize inotify");
+			auto fs = FileSystem(cast()workDir);
+			auto watchFd = inotify_add_watch(inotifyFd, (fs.absolutePath ~ "/").toStringz(),
+				IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO);
+			enforce(watchFd != -1, "Failed to add watch " ~ fs.workDir);
+			scope (exit)
+				inotify_rm_watch(inotifyFd, watchFd);
+			// 初期化完了。監視開始済み。
+			_evWatcherStart.signaled = true;
+			auto buffer = new ubyte[1024 * 64];
+			while (1)
+			{
+				// ファイルをタイムアウト付きで監視
+				// タイムアウト設定1秒
+				timeval timeout;
+				timeout.tv_sec = 1;
+				timeout.tv_usec = 0;
+				fd_set readFds;
+				FD_ZERO(&readFds);
+				FD_SET(inotifyFd, &readFds);
+				int selectResult = core.sys.posix.sys.select.select(inotifyFd + 1, &readFds, null, null, &timeout);
+				// タイムアウト時はループ継続(何もしない)
+				if (selectResult == 0)
+					continue;
+				if (selectResult == -1)
+					break;
+				
+				// ファイル監視情報読み込み
+				auto length = core.sys.posix.unistd.read(inotifyFd, buffer.ptr, buffer.length);
+				if (length == -1)
+				{
+					// エラー発生(閉じられた/それ以外)
+					if (errno == EBADF)
+						break;
+					else
+						continue;
+				}
+				enforce(length != 0, "Failed to watch " ~ fs.workDir);
+				
+				int offset = 0;
+				while (offset < length)
+				{
+					auto ev = cast(inotify_event*)&buffer[offset];
+					if ((ev.mask & (IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO | IN_ATTRIB)) != 0
+						&& ev.len > 0)
+					{
+						immutable stFileName = offset + inotify_event.sizeof;
+						immutable edFileName = stFileName + ev.len;
+						import std.string: fromStringz;
+						auto file = (cast(char[])buffer[stFileName .. edFileName]).fromStringz().idup;
+						onWatcherChanged(file);
+					}
+					offset += inotify_event.sizeof + ev.len;
+				}
+			}
 		}
 		
 	}
@@ -293,6 +361,20 @@ public:
 			if (_thWatcher !is null)
 			{
 				_evWatcherFinish.signaled = true;
+				_thWatcher.join();
+				_thWatcher = null;
+			}
+		}
+		else version (linux)
+		{
+			if (_thWatcher !is null)
+			{
+				if (_fdWatcherNotify != -1)
+				{
+					import core.sys.linux.unistd: close;
+					close(_fdWatcherNotify);
+					_fdWatcherNotify = -1;
+				}
 				_thWatcher.join();
 				_thWatcher = null;
 			}
@@ -1140,8 +1222,11 @@ public:
 				a = v.getValue("a", 123);
 			}
 		}
-		fs.writeJson("a/b/test.json", A(10));
-		assert(fs.readJson!A("a/b/test.json") == A(10));
+		auto jv = A(100).serializeToJson();
+		fs.writeJson("a/b/test1.json", jv);
+		fs.writeJson("a/b/test2.json", A(10));
+		assert(fs.readJson!A("a/b/test1.json") == A(100));
+		assert(fs.readJson!A("a/b/test2.json") == A(10));
 	}
 	
 	/***************************************************************************
@@ -1935,7 +2020,7 @@ public:
 		fs.setTimeStamp("src/test4.txt", timAcc, timMod+4.msecs);
 		fs.writeText(   "dst/test3.txt", "3");
 		fs.setTimeStamp("dst/test3.txt", timAcc, timMod+3.msecs);
-		fs.writeText(   "dst/test4.txt", "4x");
+		fs.writeText(   "dst/test4.txt", "4");
 		fs.setTimeStamp("dst/test4.txt", timAcc, timMod+8.msecs);
 		fs.writeText(   "src/test5-11.txt", "5");
 		fs.setTimeStamp("src/test5-11.txt", timAcc, timMod+10.msecs);
@@ -2179,6 +2264,19 @@ public:
 			_thWatcher.start();
 			_evWatcherStart.wait();
 		}
+		else version (linux)
+		{
+			import core.thread;
+			import voile.sync: SyncEvent;
+			_evWatcherStart = new SyncEvent;
+			_thWatcher = new Thread(cast(void delegate())&((cast(shared)this)._watcherEntry));
+			_thWatcher.start();
+			_evWatcherStart.wait();
+		}
+		else
+		{
+			enforce(0, "File watching is not supported on this architecture!");
+		}
 	}
 	/// ditto
 	void disableWatcher()
@@ -2194,21 +2292,48 @@ public:
 				_thWatcher = null;
 			}
 		}
+		else version (linux)
+		{
+			if (_thWatcher !is null)
+			{
+				if (_fdWatcherNotify != -1)
+				{
+					import core.sys.linux.unistd: close;
+					close(_fdWatcherNotify);
+					_fdWatcherNotify = -1;
+				}
+				_thWatcher.join();
+				_thWatcher = null;
+			}
+		}
 	}
 	///
-	version (Windows) @system unittest
+	@system unittest
 	{
-		import std.string;
-		auto fs = createDisposableDir("ut");
-		shared string test;
-		fs.onWatcherChanged ~= (string path) shared
+		version (Windows)
+			enum enableTest = true;
+		else version (linux)
+			enum enableTest = true;
+		else
+			enum enableTest = false;
+		static if (enableTest)
 		{
-			test = path;
-		};
-		fs.enableWatcher();
-		fs.writeText("test.txt", "aaa");
-		fs.disableWatcher();
-		assert(test == "test.txt");
+			import std.string;
+			auto fs = createDisposableDir();
+			shared string test;
+			import voile.sync: SyncEvent;
+			auto ev = new shared SyncEvent;
+			fs.onWatcherChanged ~= (string path) shared
+			{
+				test = path;
+				ev.signaled = true;
+			};
+			fs.enableWatcher();
+			fs.writeText("test.txt", "aaa");
+			ev.wait();
+			fs.disableWatcher();
+			assert(test == "test.txt");
+		}
 	}
 	
 }
