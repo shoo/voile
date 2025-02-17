@@ -5,7 +5,7 @@ module voile.misc;
 
 
 import core.exception;
-import std.traits, std.typetuple, std.variant;
+import std.traits, std.typetuple, std.variant, std.sumtype;
 
 /*******************************************************************************
  * 
@@ -1701,4 +1701,39 @@ if (isRandomAccessRange!R)
 	foreach (i; 0..ary.length)
 		swap(idx[i], idx[uniform(i, ary.length)]);
 	return indexed(ary, idx);
+}
+
+
+/*******************************************************************************
+ * Check if the SumType contains a value
+ */
+T get(T, ST)(ref ST value, lazy T defaultValue = T.init) @trusted
+if (isSumType!ST)
+{
+	return value.match!(
+		(ref T v) => v,
+		(ref _) => defaultValue
+	);
+}
+/// ditto
+const(T) get(T, ST)(in ST value, lazy T defaultValue = T.init) @trusted
+if (isSumType!ST)
+{
+	return value.match!(
+		(in T v) => v,
+		(in _) => defaultValue
+	);
+}
+
+@system unittest
+{
+	SumType!(int, string, bool) v;
+	assert(v.get!bool == false);
+	v = 10;
+	assert(v.get!int == 10);
+	v = "abc";
+	assert(v.get!string == "abc");
+	v = true;
+	assert(v.get!bool == true);
+	assert(v.get!string("xxx") == "xxx");
 }
