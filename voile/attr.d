@@ -630,7 +630,7 @@ if (canConvTo!(value, Dst))
 		{
 			return proxy.to(v);
 		}
-		static Dst convTo()(auto const ref Val v)
+		static Dst convTo()(const auto ref Val v)
 		{
 			return proxy.to(v);
 		}
@@ -641,7 +641,7 @@ if (canConvTo!(value, Dst))
 		{
 			return proxy.to!Dst(v);
 		}
-		static Dst convTo()(auto const ref Val v)
+		static Dst convTo()(const auto ref Val v)
 		{
 			return proxy.to!Dst(v);
 		}
@@ -652,7 +652,7 @@ if (canConvTo!(value, Dst))
 		{
 			Dst dst = void; proxy.to(v, dst); return dst;
 		}
-		static Dst convTo()(auto const ref Val v)
+		static Dst convTo()(const auto ref Val v)
 		{
 			Dst dst = void; proxy.to(v, dst); return dst;
 		}
@@ -663,7 +663,7 @@ if (canConvTo!(value, Dst))
 		{
 			return proxy(v);
 		}
-		static Dst convTo()(auto const ref Val v)
+		static Dst convTo()(const auto ref Val v)
 		{
 			return proxy(v);
 		}
@@ -674,7 +674,7 @@ if (canConvTo!(value, Dst))
 		{
 			return proxy!Dst(v);
 		}
-		static Dst convTo()(auto const ref Val v)
+		static Dst convTo()(const auto ref Val v)
 		{
 			return proxy!Dst(v);
 		}
@@ -685,7 +685,7 @@ if (canConvTo!(value, Dst))
 		{
 			Dst dst = void; proxy(v, dst); return dst;
 		}
-		static Dst convTo()(auto const ref Val v)
+		static Dst convTo()(const auto ref Val v)
 		{
 			Dst dst = void; proxy(v, dst); return dst;
 		}
@@ -763,7 +763,7 @@ if (canConvFrom!(value, Src))
 		{
 			return proxy.from(v);
 		}
-		static Val convFrom()(auto const ref Src v)
+		static Val convFrom()(const auto ref Src v)
 		{
 			return proxy.from(v);
 		}
@@ -774,7 +774,7 @@ if (canConvFrom!(value, Src))
 		{
 			return proxy.from!Val(v);
 		}
-		static Val convFrom()(auto const ref Src v)
+		static Val convFrom()(const auto ref Src v)
 		{
 			return proxy.from!Val(v);
 		}
@@ -785,7 +785,7 @@ if (canConvFrom!(value, Src))
 		{
 			Val dst = void; proxy.from(v, dst); return dst;
 		}
-		static Val convFrom()(auto const ref Src v)
+		static Val convFrom()(const auto ref Src v)
 		{
 			Val dst = void; proxy.from(v, dst); return dst;
 		}
@@ -796,7 +796,7 @@ if (canConvFrom!(value, Src))
 		{
 			return proxy(v);
 		}
-		static Val convFrom()(auto const ref Src v)
+		static Val convFrom()(const auto ref Src v)
 		{
 			return proxy(v);
 		}
@@ -807,7 +807,7 @@ if (canConvFrom!(value, Src))
 		{
 			return proxy!Val(v);
 		}
-		static Val convFrom()(auto const ref Src v)
+		static Val convFrom()(const auto ref Src v)
 		{
 			return proxy!Val(v);
 		}
@@ -820,7 +820,7 @@ if (canConvFrom!(value, Src))
 			proxy(v, dst);
 			return dst;
 		}
-		static Val convFrom()(auto const ref Src v)
+		static Val convFrom()(const auto ref Src v)
 		{
 			Val dst = void;
 			proxy(v, dst);
@@ -865,7 +865,7 @@ template convertTo(alias value)
 		}
 		else static assert(0);
 	}
-	static void convertTo(Dst)(auto const ref Val src, ref Dst dst)
+	static void convertTo(Dst)(const auto ref Val src, ref Dst dst)
 	if (canConvTo!(value, Dst))
 	{
 		enum convToStyle = getConvToStyle!(value, Dst);
@@ -932,7 +932,7 @@ template convertFrom(alias value)
 		}
 		else static assert(0);
 	}
-	static void convertFrom(Src)(auto const ref Src src, ref Val dst)
+	static void convertFrom(Src)(const auto ref Src src, ref Val dst)
 	if (canConvFrom!(value, Src))
 	{
 		enum convFromStyle = getConvFromStyle!(value, Src);
