@@ -28785,7 +28785,7 @@
        "enum"
       ],
       "deco" : "b",
-      "init" : "catches.length"
+      "init" : "catches.length != 0"
      },
      {
       "name" : "callbackTags",
