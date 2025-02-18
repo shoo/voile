@@ -1141,7 +1141,7 @@ if (isTypeEnum!MU)
 /*******************************************************************************
  * タグを確認する
  */
-TagType!MU tag(MU)(auto const ref MU dat)
+TagType!MU tag(MU)(const auto ref MU dat)
 if (isManagedUnion!MU)
 {
 	return dat.getInstance()._tag;
@@ -1232,7 +1232,7 @@ if (isEndata!MU && !isAvailableTag!(MU, tag)
 /*******************************************************************************
  * データをセットする
  */
-void set(alias tag, MU, T)(ref auto MU dat, auto ref T val) @property
+void set(alias tag, MU, T)(auto ref MU dat, auto ref T val) @property
 if (isManagedUnion!MU && isAvailableTag!(MU, tag))
 {
 	dat.getInstance()._impl.set!tag(val);
@@ -1320,13 +1320,13 @@ if (isTypeEnum!MU && hasType!(MU, T))
 /*******************************************************************************
  * データが入っていることを確認する
  */
-bool check(alias tag, MU)(auto const ref MU dat)
+bool check(alias tag, MU)(const auto ref MU dat)
 if (isManagedUnion!MU && isAvailableTag!(MU, tag))
 {
 	return dat.getInstance()._impl.check!tag();
 }
 /// ditto
-bool check(T, MU)(auto const ref MU dat)
+bool check(T, MU)(const auto ref MU dat)
 if (isTypeEnum!MU && hasType!(MU, T))
 {
 	return dat.getInstance()._implT.check!T();
@@ -1397,7 +1397,7 @@ if (isManagedUnion!MU)
 /*******************************************************************************
  * データがクリアされているか確認する
  */
-bool empty(MU)(auto const ref MU dat)
+bool empty(MU)(const auto ref MU dat)
 if (isManagedUnion!MU)
 {
 	return dat.getInstance()._impl.empty();
@@ -1965,7 +1965,7 @@ if (isManagedUnion!MU)
 	enum bool hasDefault    = defaultIdx != -1;
 	alias callbacks         = Filter!(isCallback, Funcs);
 	alias catches           = Filter!(isCatch, Funcs);
-	enum bool hasCatch      = catches.length;
+	enum bool hasCatch      = catches.length != 0;
 	
 	alias callbackTags                 = staticMap!(getTag, callbacks);
 	enum bool isCallbackTag(TagType t) = staticIndexOf!(t, callbackTags) != -1;

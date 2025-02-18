@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * データ形式向けのバイナリ操作
  */
 module voile.dataformatter;
@@ -446,7 +446,7 @@ void pick(R, E)(R r, ref E e)
 		static if (isInputRange!R)
 		{
 			// Commit to using assignment to front
-			static if (is(typeof(e = r.front, r.popFront())))
+			static if (is(typeof({e = r.front; r.popFront();})))
 			{
 				e = r.front;
 				r.popFront();

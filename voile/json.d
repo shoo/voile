@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * JSONValueのヘルパー、シリアライズ・デシリアライズ
  */
 module voile.json;
@@ -15,7 +15,7 @@ import voile.attr;
 /*******************************************************************************
  * JSONValueデータを得る
  */
-JSONValue json(T)(auto const ref T[] x) @property
+JSONValue json(T)(const auto ref T[] x) @property
 if (isSomeString!(T[]))
 {
 	return JSONValue(to!string(x));
@@ -39,7 +39,7 @@ if (isSomeString!(T[]))
 
 
 /// ditto
-JSONValue json(T)(auto const ref T x) @property
+JSONValue json(T)(const auto ref T x) @property
 if ((isIntegral!T && !is(T == enum))
  || isFloatingPoint!T
  || is(Unqual!T == bool))
@@ -85,7 +85,7 @@ if ((isIntegral!T && !is(T == enum))
 }
 
 /// ditto
-JSONValue json(T)(auto const ref T x) @property
+JSONValue json(T)(const auto ref T x) @property
 if (is(T == enum))
 {
 	return JSONValue(x.to!string());
@@ -104,7 +104,7 @@ if (is(T == enum))
 }
 
 /// ditto
-JSONValue json(T)(auto const ref T[] ary) @property
+JSONValue json(T)(const auto ref T[] ary) @property
 if (!isSomeString!(T[]) && isArray!(T[]))
 {
 	auto app = appender!(JSONValue[])();
@@ -173,7 +173,7 @@ if (!isSomeString!(T[]) && isArray!(T[]))
 }
 
 /// ditto
-JSONValue json(Value, Key)(auto const ref Value[Key] aa) @property
+JSONValue json(Value, Key)(const auto ref Value[Key] aa) @property
 if (isSomeString!Key && is(typeof({auto v = Value.init.json;})))
 {
 	auto ret = JSONValue((JSONValue[string]).init);
@@ -200,7 +200,7 @@ if (isSomeString!Key && is(typeof({auto v = Value.init.json;})))
 
 
 /// ditto
-JSONValue json(JV)(auto const ref JV v) @property
+JSONValue json(JV)(const auto ref JV v) @property
 	if (is(JV: const JSONValue))
 {
 	return cast(JSONValue)v;
