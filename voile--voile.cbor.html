@@ -85,6 +85,32 @@ auto <code class="ddoc_psymbol">kind</code><span class="ddoc_template_param_list
 </div><div class="ddoc_description">Attribute used for serialization of SumType.
  By adding this attribute to all aggregate types used in SumType, they become serializable.</div>
 </dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".converter"></span><div class="quickindex" id="quickindex.converter"></div>auto <code class="ddoc_psymbol">converter</code><span class="ddoc_template_param_list" title="Template parameter list">(T1, T2)</span>(void function(in T2, ref T1) <span class="ddoc_param">from</span>, void function(in T1, ref T2) <span class="ddoc_param">to</span>);
+<br>
+auto <code class="ddoc_psymbol">converter</code><span class="ddoc_template_param_list" title="Template parameter list">(T1, T2)</span>(T1 function(T2) <span class="ddoc_param">from</span>, T2 function(in T1) <span class="ddoc_param">to</span>);
+<br>
+<span class="def-anchor" id=".converterString"></span><div class="quickindex" id="quickindex.converterString"></div>auto <code class="ddoc_psymbol">converterString</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T function(string) <span class="ddoc_param">from</span>, string function(in T) <span class="ddoc_param">to</span>);
+<br>
+<span class="def-anchor" id=".convStr"></span><div class="quickindex" id="quickindex.convStr"></div>alias <code class="ddoc_psymbol">convStr</code> = converterString(T)(T function(string) from, string function(in T) to);
+<br>
+<span class="def-anchor" id=".converterBinary"></span><div class="quickindex" id="quickindex.converterBinary"></div>auto <code class="ddoc_psymbol">converterBinary</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T function(immutable(ubyte)[]) <span class="ddoc_param">from</span>, immutable(ubyte)[] function(in T) <span class="ddoc_param">to</span>);
+<br>
+<span class="def-anchor" id=".convBin"></span><div class="quickindex" id="quickindex.convBin"></div>alias <code class="ddoc_psymbol">convBin</code> = converterBinary(T)(T function(immutable(ubyte)[]) from, immutable(ubyte)[] function(in T) to);
+<br></div></dt>
+<dd><div class="ddoc_summary">Attribute converting method</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".converterSysTime"></span><div class="quickindex" id="quickindex.converterSysTime"></div>auto <code class="ddoc_psymbol">converterSysTime</code>();
+<br>
+<span class="def-anchor" id=".converterDateTime"></span><div class="quickindex" id="quickindex.converterDateTime"></div>auto <code class="ddoc_psymbol">converterDateTime</code>();
+<br>
+<span class="def-anchor" id=".converterDate"></span><div class="quickindex" id="quickindex.converterDate"></div>auto <code class="ddoc_psymbol">converterDate</code>();
+<br>
+<span class="def-anchor" id=".converterTimeOfDay"></span><div class="quickindex" id="quickindex.converterTimeOfDay"></div>auto <code class="ddoc_psymbol">converterTimeOfDay</code>();
+<br>
+<span class="def-anchor" id=".converterUUID"></span><div class="quickindex" id="quickindex.converterUUID"></div>auto <code class="ddoc_psymbol">converterUUID</code>();
+<br>
+<span class="def-anchor" id=".converterDuration"></span><div class="quickindex" id="quickindex.converterDuration"></div>auto <code class="ddoc_psymbol">converterDuration</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Special conveter attributes</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".isSerializableSumType"></span><div class="quickindex" id="quickindex.isSerializableSumType"></div>enum auto <code class="ddoc_psymbol">isSerializableSumType</code>(T);
 <br></div></dt>
 <dd><div class="ddoc_summary">Determines if the SumType can be serialized to CBOR format
@@ -149,8 +175,7 @@ auto <code class="ddoc_psymbol">kind</code><span class="ddoc_template_param_list
 </ul></div>
 <dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue"></span><div class="quickindex" id="quickindex.Builder.CborValue"></div>struct <code class="ddoc_psymbol">CborValue</code>;
 <br></div></dt>
-<dd>
-<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.Type"></span><div class="quickindex" id="quickindex.Builder.CborValue.Type"></div>enum <code class="ddoc_psymbol">Type</code>: <span class="ddoc_enum_basetype">ubyte</span>;
+<dd><div class="ddoc_summary"><code class="ddoc_psymbol">CborValue</code></div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.Type"></span><div class="quickindex" id="quickindex.Builder.CborValue.Type"></div>enum <code class="ddoc_psymbol">Type</code>: <span class="ddoc_enum_basetype">ubyte</span>;
 <br></div></dt>
 <dd>
 </dd>
@@ -160,7 +185,7 @@ auto <code class="ddoc_psymbol">kind</code><span class="ddoc_template_param_list
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.type"></span><div class="quickindex" id="quickindex.Builder.CborValue.type"></div>const pure nothrow @safe Type <code class="ddoc_psymbol">type</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">Type getter</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.opAssign"></span><div class="quickindex" id="quickindex.Builder.CborValue.opAssign"></div>pure nothrow @nogc ref @trusted CborValue <code class="ddoc_psymbol">opAssign</code>(CborValue <span class="ddoc_param">v</span>) return;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.opAssign"></span><div class="quickindex" id="quickindex.Builder.CborValue.opAssign"></div>pure ref @trusted CborValue <code class="ddoc_psymbol">opAssign</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">value</span>) return;
 <br></div></dt>
 <dd><div class="ddoc_summary">Assign operator</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.isNull"></span><div class="quickindex" id="quickindex.Builder.CborValue.isNull"></div>const pure nothrow @safe bool <code class="ddoc_psymbol">isNull</code>();
@@ -209,7 +234,13 @@ auto <code class="ddoc_psymbol">kind</code><span class="ddoc_template_param_list
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.emptyMap"></span><div class="quickindex" id="quickindex.Builder.emptyMap"></div>pure nothrow @safe CborValue <code class="ddoc_psymbol">emptyMap</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">Create a CborValue of empty map.</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.deepCopy"></span><div class="quickindex" id="quickindex.Builder.deepCopy"></div>@safe CborValue <code class="ddoc_psymbol">deepCopy</code>(CborValue <span class="ddoc_param">src</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.nullValue"></span><div class="quickindex" id="quickindex.Builder.nullValue"></div>pure nothrow @safe CborValue <code class="ddoc_psymbol">nullValue</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Create a CborValue of <code class="ddoc_keyword">null</code>.</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.undefinedValue"></span><div class="quickindex" id="quickindex.Builder.undefinedValue"></div>pure nothrow @safe CborValue <code class="ddoc_psymbol">undefinedValue</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Create a CborValue of undefined.</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.deepCopy"></span><div class="quickindex" id="quickindex.Builder.deepCopy"></div>pure @safe CborValue <code class="ddoc_psymbol">deepCopy</code>(CborValue <span class="ddoc_param">src</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">Deep copy a CborValue.</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate">Builder b1;
@@ -264,11 +295,11 @@ Builder b2;
  The data type must be one of the following.
 
 <ul><li>CborValue</li>
-<li>Integral type(int, uint, long, ulong, short, ushort, byte, ubyte)</li>
-<li>Floating point type(float, double)</li>
+<li>Integral type (int, uint, long, ulong, short, ushort, byte, ubyte)</li>
+<li>Floating point type (float, double)</li>
 <li>bool</li>
 <li>string</li>
-<li>binary(immutable(ubyte)[])</li>
+<li>binary (immutable(ubyte)[])</li>
 <li><code class="ddoc_keyword">null</code></li>
 <li>Array
 <ul><li>Recursively serialized</li>
@@ -290,6 +321,7 @@ Builder b2;
 <li>If the @ignoreIf attribute is present, do not <code class="ddoc_psymbol">serialize</code> if the condition is met</li>
 <li>If the @name attribute is present, use that name</li>
 <li>If the @<span class="ddoc_param">value</span> attribute is present, use that <span class="ddoc_param">value</span></li>
+<li>If the @converter attribute is present, use that conversion proxy</li>
 </ul></li>
 <li>toCbor/fromCbor methods, where fromCtor is a static method</li>
 <li>toBinary/fromBinary methods, where fromBinary is a static method</li>
@@ -315,7 +347,45 @@ Builder b2;
 <br>
 @safe T <code class="ddoc_psymbol">deserialize</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(in CborValue <span class="ddoc_param">src</span>);
 <br></div></dt>
-<dd><div class="ddoc_summary">Deserialize a CborValue to a various data.</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+<dd><div class="ddoc_summary">Deserialize a CborValue to a various data.
+</div><div class="ddoc_description">The <code class="ddoc_psymbol">deserialize</code> function generates value from CborValue instance.
+ The data type must be one of the following.
+
+<ul><li>CborValue</li>
+<li>Integral type (int, uint, long, ulong, short, ushort, byte, ubyte)</li>
+<li>Floating point type (float, double)</li>
+<li>bool</li>
+<li>string</li>
+<li>binary (immutable(ubyte)[])</li>
+<li><code class="ddoc_keyword">null</code></li>
+<li>Array
+<ul><li>Recursively deserialized</li>
+</ul></li>
+<li>AssociativeArray
+<ul><li>Recursively deserialized</li>
+</ul></li>
+<li>SumType
+<ul><li>Converted from a map type CborValue
+<ul><li>All types have the @kind attribute</li>
+</ul></li>
+<li>Recursively deserialized</li>
+</ul></li>
+<li>Aggregate type (struct, class, union): meets one of the following conditions
+<ul><li>Composed of simple public member variables
+<ul><li>Converted to a map type CborValue</li>
+<li>Recursively deserialized</li>
+<li>If the @ignore attribute is present, do not <code class="ddoc_psymbol">deserialize</code></li>
+<li>If the @ignoreIf attribute is present, do not <code class="ddoc_psymbol">deserialize</code> if the condition is met</li>
+<li>If the @name attribute is present, use that name</li>
+<li>If the @converter attribute is present, use that conversion proxy</li>
+<li>If the @essential attribute is present, throw an exception if deserialization fails</li>
+</ul></li>
+<li>toCbor/fromCbor methods, where fromCtor is a static method</li>
+<li>toBinary/fromBinary methods, where fromBinary is a static method</li>
+<li>toRepresentation/fromRepresentation methods, where fromRepresentation is a static method</li>
+</ul></li>
+</ul></div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate">Builder b;
 <span class="d_keyword">struct</span> Foo
 {

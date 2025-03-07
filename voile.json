@@ -4677,8 +4677,276 @@
    },
    {
     "kind" : "template",
+    "protection" : "public",
+    "comment" : " Attribute converting method\n",
+    "line" : 61,
+    "char" : 6,
+    "name" : "converter",
+    "parameters" : [
+     {
+      "name" : "T1",
+      "kind" : "type"
+     },
+     {
+      "name" : "T2",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "converter",
+      "kind" : "function",
+      "line" : 61,
+      "char" : 6,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "(void function(in T2, ref T1) from, void function(in T1, ref T2) to)",
+      "parameters" : [
+       {
+        "name" : "from",
+        "type" : "void function(in T2, ref T1)"
+       },
+       {
+        "name" : "to",
+        "type" : "void function(in T1, ref T2)"
+       }
+      ],
+      "endline" : 71,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 73,
+    "char" : 6,
+    "name" : "converter",
+    "parameters" : [
+     {
+      "name" : "T1",
+      "kind" : "type"
+     },
+     {
+      "name" : "T2",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "converter",
+      "kind" : "function",
+      "line" : 73,
+      "char" : 6,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "(T1 function(T2) from, T2 function(in T1) to)",
+      "parameters" : [
+       {
+        "name" : "from",
+        "type" : "T1 function(T2)"
+       },
+       {
+        "name" : "to",
+        "type" : "T2 function(in T1)"
+       }
+      ],
+      "endline" : 83,
+      "endchar" : 1
+     }
+    ]
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 85,
+    "char" : 6,
+    "name" : "converterString",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "converterString",
+      "kind" : "function",
+      "line" : 85,
+      "char" : 6,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "(T function(string) from, string function(in T) to)",
+      "parameters" : [
+       {
+        "name" : "from",
+        "type" : "T function(string)"
+       },
+       {
+        "name" : "to",
+        "type" : "string function(in T)"
+       }
+      ],
+      "endline" : 86,
+      "endchar" : 26
+     }
+    ]
+   },
+   {
+    "name" : "convStr",
+    "kind" : "alias",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 88,
+    "char" : 1,
+    "originalType" : "converterString"
+   },
+   {
+    "kind" : "template",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 90,
+    "char" : 6,
+    "name" : "converterBinary",
+    "parameters" : [
+     {
+      "name" : "T",
+      "kind" : "type"
+     }
+    ],
+    "members" : [
+     {
+      "name" : "converterBinary",
+      "kind" : "function",
+      "line" : 90,
+      "char" : 6,
+      "storageClass" : [
+       "auto"
+      ],
+      "type" : "(T function(immutable(ubyte)[]) from, immutable(ubyte)[] function(in T) to)",
+      "parameters" : [
+       {
+        "name" : "from",
+        "type" : "T function(immutable(ubyte)[])"
+       },
+       {
+        "name" : "to",
+        "type" : "immutable(ubyte)[] function(in T)"
+       }
+      ],
+      "endline" : 91,
+      "endchar" : 26
+     }
+    ]
+   },
+   {
+    "name" : "convBin",
+    "kind" : "alias",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 93,
+    "char" : 1,
+    "originalType" : "converterBinary"
+   },
+   {
+    "name" : "converterSysTime",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : " Special conveter attributes\n",
+    "line" : 98,
+    "char" : 6,
+    "storageClass" : [
+     "auto"
+    ],
+    "deco" : "FNaNbNiNfZS5voile4cbor__T9converterTS3std8datetime7systime7SysTimeTAyaZQBuFPFQkZQBsPFISQByQBxQBrQBmZQBhZ13AttrConverter",
+    "originalType" : "()",
+    "endline" : 104,
+    "endchar" : 1
+   },
+   {
+    "name" : "converterDateTime",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 106,
+    "char" : 6,
+    "storageClass" : [
+     "auto"
+    ],
+    "deco" : "FNaNbNiNfZS5voile4cbor__T9converterTS3std8datetime4date8DateTimeTAyaZQBsFPFQkZQBqPFISQBwQBvQBpQBnZQBhZ13AttrConverter",
+    "originalType" : "()",
+    "endline" : 112,
+    "endchar" : 1
+   },
+   {
+    "name" : "converterDate",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 114,
+    "char" : 6,
+    "storageClass" : [
+     "auto"
+    ],
+    "deco" : "FNaNbNiNfZS5voile4cbor__T9converterTS3std8datetime4date4DateTAyaZQBoFPFQkZQBmPFISQBsQBrQBlQBjZQBhZ13AttrConverter",
+    "originalType" : "()",
+    "endline" : 120,
+    "endchar" : 1
+   },
+   {
+    "name" : "converterTimeOfDay",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 122,
+    "char" : 6,
+    "storageClass" : [
+     "auto"
+    ],
+    "deco" : "FNaNbNiNfZS5voile4cbor__T9converterTS3std8datetime4date9TimeOfDayTAyaZQBtFPFQkZQBrPFISQBxQBwQBqQBoZQBhZ13AttrConverter",
+    "originalType" : "()",
+    "endline" : 128,
+    "endchar" : 1
+   },
+   {
+    "name" : "converterUUID",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 130,
+    "char" : 6,
+    "storageClass" : [
+     "auto"
+    ],
+    "deco" : "FNaNbNiNfZS5voile4cbor__T9converterTS3std4uuid4UUIDTAyaZQBfFPFQkZQBdPFISQBjQBiQBgZQBeZ13AttrConverter",
+    "originalType" : "()",
+    "endline" : 136,
+    "endchar" : 1
+   },
+   {
+    "name" : "converterDuration",
+    "kind" : "function",
+    "protection" : "public",
+    "comment" : "ditto\n",
+    "line" : 138,
+    "char" : 6,
+    "storageClass" : [
+     "auto"
+    ],
+    "deco" : "FNaNbNiNfZS5voile4cbor__T9converterTS4core4time8DurationTSQBvQBs7Builder9CborValueZQCgFPFISQDcQCzQBhQBcKQCqZvPFISQCyQCwQCuKQCoZvZ13AttrConverter",
+    "originalType" : "()",
+    "endline" : 144,
+    "endchar" : 1
+   },
+   {
+    "kind" : "template",
     "protection" : "private",
-    "line" : 58,
+    "line" : 146,
     "char" : 14,
     "name" : "isArrayWithoutBinary",
     "parameters" : [
@@ -4691,7 +4959,7 @@
      {
       "name" : "isArrayWithoutBinary",
       "kind" : "variable",
-      "line" : 58,
+      "line" : 146,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -4704,7 +4972,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " Determines if the SumType can be serialized to CBOR format\n\n This template returns true if the type T meets the following conditions:\n - T is a SumType\n - All members of the SumType are serializable\n - All members of the SumType have the @kind attribute if they are aggregate types\n - There is at most one member of each of the following types:\n   integral, floating point, boolean, string, binary, array, associative array\n\n Params:\n      T = The type to check\n Returns: true if T is a serializable sum type, false otherwise\n",
-    "line" : 74,
+    "line" : 162,
     "char" : 6,
     "name" : "isSerializableSumType",
     "parameters" : [
@@ -4717,7 +4985,7 @@
      {
       "name" : "isSerializableSumType",
       "kind" : "variable",
-      "line" : 74,
+      "line" : 162,
       "char" : 6,
       "storageClass" : [
        "enum"
@@ -4727,22 +4995,22 @@
     ]
    },
    {
-    "name" : "__unittest_L86_C7",
+    "name" : "__unittest_L174_C7",
     "kind" : "function",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 86,
+    "line" : 174,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 106,
+    "endline" : 194,
     "endchar" : 1
    },
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 106,
+    "line" : 194,
     "char" : 14,
     "name" : "hasConvertCborMethodA",
     "parameters" : [
@@ -4755,7 +5023,7 @@
      {
       "name" : "hasConvertCborMethodA",
       "kind" : "variable",
-      "line" : 106,
+      "line" : 194,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -4767,7 +5035,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 108,
+    "line" : 196,
     "char" : 14,
     "name" : "hasConvertCborMethodB",
     "parameters" : [
@@ -4780,7 +5048,7 @@
      {
       "name" : "hasConvertCborMethodB",
       "kind" : "variable",
-      "line" : 108,
+      "line" : 196,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -4792,7 +5060,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 110,
+    "line" : 198,
     "char" : 14,
     "name" : "hasConvertCborMethod",
     "parameters" : [
@@ -4805,7 +5073,7 @@
      {
       "name" : "hasConvertCborMethod",
       "kind" : "variable",
-      "line" : 110,
+      "line" : 198,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -4817,7 +5085,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 111,
+    "line" : 199,
     "char" : 14,
     "name" : "hasConvertCborBinaryMethodA",
     "parameters" : [
@@ -4830,7 +5098,7 @@
      {
       "name" : "hasConvertCborBinaryMethodA",
       "kind" : "variable",
-      "line" : 111,
+      "line" : 199,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -4842,7 +5110,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 113,
+    "line" : 201,
     "char" : 14,
     "name" : "hasConvertCborBinaryMethodB",
     "parameters" : [
@@ -4855,7 +5123,7 @@
      {
       "name" : "hasConvertCborBinaryMethodB",
       "kind" : "variable",
-      "line" : 113,
+      "line" : 201,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -4867,7 +5135,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 115,
+    "line" : 203,
     "char" : 14,
     "name" : "hasConvertCborBinaryMethodC",
     "parameters" : [
@@ -4880,7 +5148,7 @@
      {
       "name" : "hasConvertCborBinaryMethodC",
       "kind" : "variable",
-      "line" : 115,
+      "line" : 203,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -4892,7 +5160,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 117,
+    "line" : 205,
     "char" : 14,
     "name" : "hasConvertCborBinaryMethod",
     "parameters" : [
@@ -4905,7 +5173,7 @@
      {
       "name" : "hasConvertCborBinaryMethod",
       "kind" : "variable",
-      "line" : 117,
+      "line" : 205,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -4917,7 +5185,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 119,
+    "line" : 207,
     "char" : 14,
     "name" : "isSerializableData",
     "parameters" : [
@@ -4930,7 +5198,7 @@
      {
       "name" : "isSerializableData",
       "kind" : "variable",
-      "line" : 119,
+      "line" : 207,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -4942,7 +5210,7 @@
    {
     "kind" : "template",
     "protection" : "private",
-    "line" : 135,
+    "line" : 223,
     "char" : 14,
     "name" : "isAccessible",
     "parameters" : [
@@ -4955,7 +5223,7 @@
      {
       "name" : "isAccessible",
       "kind" : "variable",
-      "line" : 135,
+      "line" : 223,
       "char" : 14,
       "storageClass" : [
        "enum"
@@ -4968,7 +5236,7 @@
     "kind" : "template",
     "protection" : "public",
     "comment" : " Checks if a given type is serializable to CBOR format.\n\n This function determines whether a type can be serialized into the CBOR (Concise Binary Object Representation) format.\n CBOR is a binary data serialization format which aims to provide a more compact representation compared to JSON.\n\n Params:\n   T = The type to check for serializability.\n\n Returns:\n   bool - `true` if the type is serializable to CBOR, `false` otherwise.\n",
-    "line" : 150,
+    "line" : 238,
     "char" : 1,
     "name" : "isSerializable",
     "parameters" : [
@@ -4981,7 +5249,7 @@
      {
       "name" : "isSerializable",
       "kind" : "variable",
-      "line" : 153,
+      "line" : 241,
       "char" : 8,
       "storageClass" : [
        "enum"
@@ -4995,14 +5263,14 @@
     "kind" : "struct",
     "protection" : "public",
     "comment" : " The Builder struct is used to generate and manipulate CBOR (Concise Binary Object Representation) data.\n\n - Use the `make` method to create a `CborValue`.\n - Use the `parse` method to convert binary data to a `CborValue`.\n - Use the `build` method to convert a `CborValue` to binary format.\n - The `serialize` and `deserialize` methods support ORM (Object-Relational Mapping).\n",
-    "line" : 177,
+    "line" : 265,
     "char" : 1,
     "members" : [
      {
       "name" : "String",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 180,
+      "line" : 268,
       "char" : 2,
       "baseDeco" : "Aya",
       "members" : [
@@ -5011,7 +5279,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "null",
-        "line" : 180,
+        "line" : 268,
         "char" : 24
        }
       ]
@@ -5020,7 +5288,7 @@
       "name" : "Binary",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 181,
+      "line" : 269,
       "char" : 2,
       "baseDeco" : "Ayh",
       "members" : [
@@ -5029,7 +5297,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "null",
-        "line" : 181,
+        "line" : 269,
         "char" : 36
        }
       ]
@@ -5038,7 +5306,7 @@
       "name" : "Undefined",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 182,
+      "line" : 270,
       "char" : 2,
       "baseDeco" : "i",
       "members" : [
@@ -5047,7 +5315,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "0",
-        "line" : 182,
+        "line" : 270,
         "char" : 19
        }
       ]
@@ -5056,7 +5324,7 @@
       "name" : "Null",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 183,
+      "line" : 271,
       "char" : 2,
       "baseDeco" : "i",
       "members" : [
@@ -5065,7 +5333,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "0",
-        "line" : 183,
+        "line" : 271,
         "char" : 14
        }
       ]
@@ -5074,7 +5342,7 @@
       "name" : "HalfFloat",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 184,
+      "line" : 272,
       "char" : 2,
       "baseDeco" : "t",
       "members" : [
@@ -5083,7 +5351,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "cast(ushort)0u",
-        "line" : 184,
+        "line" : 272,
         "char" : 27
        },
        {
@@ -5091,7 +5359,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "cast(ushort)32256u",
-        "line" : 184,
+        "line" : 272,
         "char" : 37
        },
        {
@@ -5099,7 +5367,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "cast(ushort)31744u",
-        "line" : 184,
+        "line" : 272,
         "char" : 51
        }
       ]
@@ -5108,7 +5376,7 @@
       "name" : "SingleFloat",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 185,
+      "line" : 273,
       "char" : 2,
       "baseDeco" : "f",
       "members" : [
@@ -5117,7 +5385,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "0.0F",
-        "line" : 185,
+        "line" : 273,
         "char" : 28
        },
        {
@@ -5125,7 +5393,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "nanF",
-        "line" : 185,
+        "line" : 273,
         "char" : 38
        },
        {
@@ -5133,7 +5401,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "infF",
-        "line" : 185,
+        "line" : 273,
         "char" : 55
        }
       ]
@@ -5142,7 +5410,7 @@
       "name" : "DoubleFloat",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 186,
+      "line" : 274,
       "char" : 2,
       "baseDeco" : "d",
       "members" : [
@@ -5151,7 +5419,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "0.0",
-        "line" : 186,
+        "line" : 274,
         "char" : 29
        },
        {
@@ -5159,7 +5427,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "nan",
-        "line" : 186,
+        "line" : 274,
         "char" : 39
        },
        {
@@ -5167,7 +5435,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "inf",
-        "line" : 186,
+        "line" : 274,
         "char" : 57
        }
       ]
@@ -5176,7 +5444,7 @@
       "name" : "PositiveInteger",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 187,
+      "line" : 275,
       "char" : 2,
       "baseDeco" : "m",
       "members" : [
@@ -5185,7 +5453,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "0LU",
-        "line" : 187,
+        "line" : 275,
         "char" : 32
        }
       ]
@@ -5194,7 +5462,7 @@
       "name" : "NegativeInteger",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 188,
+      "line" : 276,
       "char" : 2,
       "baseDeco" : "m",
       "members" : [
@@ -5203,7 +5471,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "0LU",
-        "line" : 188,
+        "line" : 276,
         "char" : 32
        }
       ]
@@ -5212,7 +5480,7 @@
       "name" : "Boolean",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 189,
+      "line" : 277,
       "char" : 2,
       "baseDeco" : "b",
       "members" : [
@@ -5221,7 +5489,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "false",
-        "line" : 189,
+        "line" : 277,
         "char" : 23
        }
       ]
@@ -5229,7 +5497,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 190,
+      "line" : 278,
       "char" : 11,
       "name" : "convToFloat",
       "parameters" : [
@@ -5243,7 +5511,7 @@
        {
         "name" : "convToFloat",
         "kind" : "function",
-        "line" : 190,
+        "line" : 278,
         "char" : 11,
         "type" : "@safe T(HalfFloat fp)",
         "parameters" : [
@@ -5252,7 +5520,7 @@
           "type" : "HalfFloat"
          }
         ],
-        "endline" : 225,
+        "endline" : 313,
         "endchar" : 2
        }
       ]
@@ -5261,7 +5529,7 @@
       "kind" : "template",
       "protection" : "private",
       "comment" : "ditto\n",
-      "line" : 227,
+      "line" : 315,
       "char" : 11,
       "name" : "convToFloat",
       "parameters" : [
@@ -5275,7 +5543,7 @@
        {
         "name" : "convToFloat",
         "kind" : "function",
-        "line" : 227,
+        "line" : 315,
         "char" : 11,
         "type" : "@safe T(HalfFloat fp)",
         "parameters" : [
@@ -5284,7 +5552,7 @@
           "type" : "HalfFloat"
          }
         ],
-        "endline" : 262,
+        "endline" : 350,
         "endchar" : 2
        }
       ]
@@ -5293,7 +5561,7 @@
       "kind" : "template",
       "protection" : "private",
       "comment" : "ditto\n",
-      "line" : 264,
+      "line" : 352,
       "char" : 14,
       "name" : "convToFloat",
       "parameters" : [
@@ -5307,7 +5575,7 @@
        {
         "name" : "convToFloat",
         "kind" : "function",
-        "line" : 264,
+        "line" : 352,
         "char" : 14,
         "type" : "@safe real(HalfFloat fp)",
         "parameters" : [
@@ -5316,27 +5584,27 @@
           "type" : "HalfFloat"
          }
         ],
-        "endline" : 268,
+        "endline" : 356,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "__unittest_L270_C8",
+      "name" : "__unittest_L358_C8",
       "kind" : "function",
       "protection" : "private",
-      "line" : 270,
+      "line" : 358,
       "char" : 8,
       "storageClass" : [
        "@safe"
       ],
-      "endline" : 309,
+      "endline" : 397,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 309,
+      "line" : 397,
       "char" : 9,
       "name" : "Dictionary",
       "parameters" : [
@@ -5354,27 +5622,27 @@
         "name" : "Dictionary",
         "kind" : "struct",
         "protection" : "public",
-        "line" : 309,
+        "line" : 397,
         "char" : 9,
         "members" : [
          {
           "name" : "Item",
           "kind" : "struct",
           "protection" : "public",
-          "line" : 312,
+          "line" : 400,
           "char" : 3,
           "members" : [
            {
             "name" : "key",
             "kind" : "variable",
-            "line" : 314,
+            "line" : 402,
             "char" : 6,
             "type" : "K"
            },
            {
             "name" : "value",
             "kind" : "variable",
-            "line" : 315,
+            "line" : 403,
             "char" : 6,
             "type" : "V"
            }
@@ -5383,7 +5651,7 @@
          {
           "name" : "items",
           "kind" : "variable",
-          "line" : 317,
+          "line" : 405,
           "char" : 10,
           "type" : "Item[]"
          },
@@ -5391,20 +5659,20 @@
           "name" : "byKeyValue",
           "kind" : "function",
           "comment" : "\n",
-          "line" : 320,
+          "line" : 408,
           "char" : 8,
           "storageClass" : [
            "auto"
           ],
           "type" : "inout ()",
-          "endline" : 320,
+          "endline" : 408,
           "endchar" : 35
          },
          {
           "name" : "append",
           "kind" : "function",
           "comment" : "\n",
-          "line" : 322,
+          "line" : 410,
           "char" : 8,
           "storageClass" : [
            "auto"
@@ -5426,14 +5694,14 @@
             ]
            }
           ],
-          "endline" : 322,
+          "endline" : 410,
           "endchar" : 55
          },
          {
           "name" : "append",
           "kind" : "function",
           "comment" : "\n",
-          "line" : 324,
+          "line" : 412,
           "char" : 8,
           "storageClass" : [
            "auto"
@@ -5449,14 +5717,14 @@
             "type" : "V"
            }
           ],
-          "endline" : 324,
+          "endline" : 412,
           "endchar" : 47
          },
          {
           "name" : "get",
           "kind" : "function",
           "comment" : "\n",
-          "line" : 326,
+          "line" : 414,
           "char" : 8,
           "storageClass" : [
            "auto"
@@ -5476,7 +5744,7 @@
             "default" : "V.init"
            }
           ],
-          "endline" : 332,
+          "endline" : 420,
           "endchar" : 3
          }
         ]
@@ -5486,7 +5754,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 334,
+      "line" : 422,
       "char" : 2,
       "name" : "Array",
       "parameters" : [
@@ -5499,7 +5767,7 @@
        {
         "name" : "Array",
         "kind" : "enum",
-        "line" : 334,
+        "line" : 422,
         "char" : 22,
         "base" : "T[]",
         "members" : [
@@ -5507,7 +5775,7 @@
           "name" : "init",
           "kind" : "enum member",
           "value" : "T[].init",
-          "line" : 334,
+          "line" : 422,
           "char" : 40
          }
         ]
@@ -5518,20 +5786,20 @@
       "name" : "allocStr",
       "kind" : "function",
       "protection" : "private",
-      "line" : 336,
+      "line" : 424,
       "char" : 7,
       "storageClass" : [
        "auto"
       ],
       "deco" : "FNaNbNiNfZE5voile4cbor7Builder6String",
       "originalType" : "()",
-      "endline" : 336,
+      "endline" : 424,
       "endchar" : 32
      },
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 337,
+      "line" : 425,
       "char" : 7,
       "name" : "allocDic",
       "parameters" : [
@@ -5548,13 +5816,13 @@
        {
         "name" : "allocDic",
         "kind" : "function",
-        "line" : 337,
+        "line" : 425,
         "char" : 7,
         "storageClass" : [
          "auto"
         ],
         "type" : "()",
-        "endline" : 337,
+        "endline" : 425,
         "endchar" : 49
        }
       ]
@@ -5562,7 +5830,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 338,
+      "line" : 426,
       "char" : 7,
       "name" : "allocAry",
       "parameters" : [
@@ -5575,13 +5843,13 @@
        {
         "name" : "allocAry",
         "kind" : "function",
-        "line" : 338,
+        "line" : 426,
         "char" : 7,
         "storageClass" : [
          "auto"
         ],
         "type" : "()",
-        "endline" : 338,
+        "endline" : 426,
         "endchar" : 36
        }
       ]
@@ -5589,7 +5857,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 339,
+      "line" : 427,
       "char" : 6,
       "name" : "copyMemory",
       "parameters" : [
@@ -5602,7 +5870,7 @@
        {
         "name" : "copyMemory",
         "kind" : "function",
-        "line" : 339,
+        "line" : 427,
         "char" : 6,
         "type" : "const T[](const(T)[] src)",
         "parameters" : [
@@ -5611,7 +5879,7 @@
           "type" : "const(T)[]"
          }
         ],
-        "endline" : 339,
+        "endline" : 427,
         "endchar" : 52
        }
       ]
@@ -5619,7 +5887,7 @@
      {
       "kind" : "template",
       "protection" : "private",
-      "line" : 340,
+      "line" : 428,
       "char" : 17,
       "name" : "copyImmutableMemory",
       "parameters" : [
@@ -5632,7 +5900,7 @@
        {
         "name" : "copyImmutableMemory",
         "kind" : "function",
-        "line" : 340,
+        "line" : 428,
         "char" : 17,
         "type" : "const immutable(T)[](const(T)[] src)",
         "parameters" : [
@@ -5641,7 +5909,7 @@
           "type" : "const(T)[]"
          }
         ],
-        "endline" : 340,
+        "endline" : 428,
         "endchar" : 73
        }
       ]
@@ -5650,7 +5918,7 @@
       "name" : "DummyMap",
       "kind" : "enum",
       "protection" : "private",
-      "line" : 341,
+      "line" : 429,
       "char" : 2,
       "baseDeco" : "S5voile4cbor7Builder__T10DictionaryTiTiZQr",
       "members" : [
@@ -5659,7 +5927,7 @@
         "kind" : "enum member",
         "protection" : "public",
         "value" : "Dictionary(null)",
-        "line" : 341,
+        "line" : 429,
         "char" : 41
        }
       ]
@@ -5668,15 +5936,15 @@
       "name" : "CborValue",
       "kind" : "struct",
       "protection" : "public",
-      "comment" : "\n",
-      "line" : 346,
+      "comment" : " CborValue\n",
+      "line" : 434,
       "char" : 9,
       "members" : [
        {
         "name" : "CborArray",
         "kind" : "alias",
         "protection" : "private",
-        "line" : 349,
+        "line" : 437,
         "char" : 3,
         "deco" : "E5voile4cbor7Builder__T5ArrayTSQBeQBbQz9CborValueZQBb",
         "originalType" : "Array!CborValue"
@@ -5685,7 +5953,7 @@
         "name" : "CborMap",
         "kind" : "alias",
         "protection" : "private",
-        "line" : 350,
+        "line" : 438,
         "char" : 3,
         "deco" : "E5voile4cbor7Builder8DummyMap"
        },
@@ -5693,7 +5961,7 @@
         "name" : "CborType",
         "kind" : "alias",
         "protection" : "private",
-        "line" : 351,
+        "line" : 439,
         "char" : 3,
         "deco" : "S3std7sumtype__T7SumTypeTE5voile4cbor7Builder9UndefinedTEQBfQBcQBa4NullTEQBvQBsQBq7BooleanTEQCoQClQCj15PositiveIntegerTEQDqQDnQDl15NegativeIntegerTEQEsQEpQEn9HalfFloatTEQFnQFkQFi11SingleFloatTEQGlQGiQGg11DoubleFloatTEQHjQHgQHe6StringTEQIbQHyQHw6BinaryTEQItQIqQIo__T5ArrayTSQJnQJkQJi9CborValueZQBcTEQKmQKjQKh8DummyMapZQLp",
         "originalType" : "SumType!(Undefined, Null, Boolean, PositiveInteger, NegativeInteger, HalfFloat, SingleFloat, DoubleFloat, String, Binary, CborArray, CborMap)"
@@ -5702,30 +5970,40 @@
         "name" : "_reqMap",
         "kind" : "function",
         "protection" : "private",
-        "line" : 364,
+        "line" : 452,
         "char" : 48,
-        "deco" : "NgFNcNeZNgS5voile4cbor7Builder__T10DictionaryTSQBkQBhQBf9CborValueTQvZQBl",
-        "endline" : 368,
+        "deco" : "NgFNaNcNeZNgS5voile4cbor7Builder__T10DictionaryTSQBkQBhQBf9CborValueTQvZQBl",
+        "endline" : 456,
         "endchar" : 3
        },
        {
         "name" : "_reqArray",
         "kind" : "function",
         "protection" : "private",
-        "line" : 369,
+        "line" : 457,
         "char" : 22,
-        "deco" : "NgFNeZANgS5voile4cbor7Builder9CborValue",
-        "endline" : 373,
+        "deco" : "NgFNaNeZANgS5voile4cbor7Builder9CborValue",
+        "endline" : 461,
         "endchar" : 3
        },
        {
         "name" : "_reqStr",
         "kind" : "function",
         "protection" : "private",
-        "line" : 374,
+        "line" : 462,
         "char" : 10,
-        "deco" : "NgFNeZAya",
-        "endline" : 378,
+        "deco" : "NgFNaNeZAya",
+        "endline" : 466,
+        "endchar" : 3
+       },
+       {
+        "name" : "_reqBin",
+        "kind" : "function",
+        "protection" : "private",
+        "line" : 467,
+        "char" : 22,
+        "deco" : "NgFNaNeZAyh",
+        "endline" : 471,
         "endchar" : 3
        },
        {
@@ -5733,7 +6011,7 @@
         "kind" : "enum",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 381,
+        "line" : 474,
         "char" : 3,
         "baseDeco" : "h",
         "members" : [
@@ -5742,7 +6020,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "cast(ubyte)0u",
-          "line" : 383,
+          "line" : 476,
           "char" : 4
          },
          {
@@ -5750,7 +6028,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "1",
-          "line" : 384,
+          "line" : 477,
           "char" : 4
          },
          {
@@ -5758,7 +6036,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "2",
-          "line" : 385,
+          "line" : 478,
           "char" : 4
          },
          {
@@ -5766,7 +6044,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "3",
-          "line" : 386,
+          "line" : 479,
           "char" : 4
          },
          {
@@ -5774,7 +6052,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "4",
-          "line" : 387,
+          "line" : 480,
           "char" : 4
          },
          {
@@ -5782,7 +6060,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "5",
-          "line" : 388,
+          "line" : 481,
           "char" : 4
          },
          {
@@ -5790,7 +6068,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "6",
-          "line" : 389,
+          "line" : 482,
           "char" : 4
          },
          {
@@ -5798,7 +6076,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "7",
-          "line" : 390,
+          "line" : 483,
           "char" : 4
          },
          {
@@ -5806,7 +6084,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "8",
-          "line" : 391,
+          "line" : 484,
           "char" : 4
          },
          {
@@ -5814,7 +6092,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "9",
-          "line" : 392,
+          "line" : 485,
           "char" : 4
          },
          {
@@ -5822,7 +6100,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "10",
-          "line" : 393,
+          "line" : 486,
           "char" : 4
          },
          {
@@ -5830,7 +6108,7 @@
           "kind" : "enum member",
           "protection" : "public",
           "value" : "11",
-          "line" : 394,
+          "line" : 487,
           "char" : 4
          }
         ]
@@ -5839,7 +6117,7 @@
         "name" : "_instance",
         "kind" : "variable",
         "protection" : "private",
-        "line" : 397,
+        "line" : 490,
         "char" : 12,
         "deco" : "S3std7sumtype__T7SumTypeTE5voile4cbor7Builder9UndefinedTEQBfQBcQBa4NullTEQBvQBsQBq7BooleanTEQCoQClQCj15PositiveIntegerTEQDqQDnQDl15NegativeIntegerTEQEsQEpQEn9HalfFloatTEQFnQFkQFi11SingleFloatTEQGlQGiQGg11DoubleFloatTEQHjQHgQHe6StringTEQIbQHyQHw6BinaryTEQItQIqQIo__T5ArrayTSQJnQJkQJi9CborValueZQBcTEQKmQKjQKh8DummyMapZQLp",
         "originalType" : "CborType",
@@ -5849,7 +6127,7 @@
         "name" : "_builder",
         "kind" : "variable",
         "protection" : "private",
-        "line" : 398,
+        "line" : 491,
         "char" : 12,
         "deco" : "PS5voile4cbor7Builder",
         "offset" : 24
@@ -5858,7 +6136,7 @@
         "kind" : "template",
         "protection" : "public",
         "comment" : " Constructor\n",
-        "line" : 403,
+        "line" : 496,
         "char" : 3,
         "name" : "this",
         "parameters" : [
@@ -5871,7 +6149,7 @@
          {
           "name" : "this",
           "kind" : "constructor",
-          "line" : 403,
+          "line" : 496,
           "char" : 3,
           "type" : "@trusted (T value, ref Builder builder)",
           "parameters" : [
@@ -5887,7 +6165,7 @@
             ]
            }
           ],
-          "endline" : 478,
+          "endline" : 500,
           "endchar" : 3
          }
         ]
@@ -5897,10 +6175,10 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : " Type getter\n",
-        "line" : 483,
+        "line" : 505,
         "char" : 8,
         "deco" : "xFNaNbNfZE5voile4cbor7Builder9CborValue4Type",
-        "endline" : 486,
+        "endline" : 508,
         "endchar" : 3
        },
        {
@@ -5908,38 +6186,52 @@
         "kind" : "destructor",
         "protection" : "public",
         "comment" : " Destructor\n",
-        "line" : 491,
+        "line" : 513,
         "char" : 3,
         "deco" : "FNaNbNiNfZv",
-        "endline" : 493,
+        "endline" : 515,
         "endchar" : 3
        },
        {
-        "name" : "opAssign",
-        "kind" : "function",
+        "kind" : "template",
         "protection" : "public",
         "comment" : " Assign operator\n",
-        "line" : 497,
+        "line" : 520,
         "char" : 17,
-        "deco" : "FNaNbNcNiNjNeS5voile4cbor7Builder9CborValueZQBf",
+        "name" : "opAssign",
         "parameters" : [
          {
-          "name" : "v",
-          "deco" : "S5voile4cbor7Builder9CborValue"
+          "name" : "T",
+          "kind" : "type"
          }
         ],
-        "endline" : 502,
-        "endchar" : 3
+        "members" : [
+         {
+          "name" : "opAssign",
+          "kind" : "function",
+          "line" : 520,
+          "char" : 17,
+          "type" : "pure ref @trusted CborValue(T value) return",
+          "parameters" : [
+           {
+            "name" : "value",
+            "type" : "T"
+           }
+          ],
+          "endline" : 564,
+          "endchar" : 3
+         }
+        ]
        },
        {
         "name" : "isNull",
         "kind" : "function",
         "protection" : "public",
         "comment" : " Null check\n",
-        "line" : 507,
+        "line" : 569,
         "char" : 8,
         "deco" : "xFNaNbNfZb",
-        "endline" : 511,
+        "endline" : 573,
         "endchar" : 3
        },
        {
@@ -5947,10 +6239,10 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : " Undefined check\n",
-        "line" : 516,
+        "line" : 578,
         "char" : 8,
         "deco" : "xFNaNbNfZb",
-        "endline" : 520,
+        "endline" : 582,
         "endchar" : 3
        },
        {
@@ -5958,17 +6250,17 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : " Overflow number check\n\n CBOR supports signed integers, but the range it can handle differs from D's long type.\n This function determines whether a CBOR signed integer exceeds the range of D's long type.\n Specifically, the range of CBOR integers is -ulong.max(-1-2^64) to ulong.max(2^64).\n In contrast, the range of D's long type is long.min(-1-2^63) to long.max(2^63),\n and the range of the ulong type is 0 to ulong.max(2^64).\n",
-        "line" : 531,
+        "line" : 593,
         "char" : 8,
         "deco" : "xFNaNbNeZb",
-        "endline" : 537,
+        "endline" : 599,
         "endchar" : 3
        },
        {
         "kind" : "template",
         "protection" : "public",
         "comment" : " Retrieve the value as a D language type\n\n Since the types handled by CBOR may not match the types in the D language, conversion is performed.\n Specify the type with T or a default value, and return the converted type.\n For example, if the long type is specified, CBOR's positive and negative integers,\n as well as floating-point numbers, are cast and converted to the long type. Strings are also\n parsed and converted to integers.\n",
-        "line" : 548,
+        "line" : 610,
         "char" : 5,
         "name" : "get",
         "parameters" : [
@@ -5981,7 +6273,7 @@
          {
           "name" : "get",
           "kind" : "function",
-          "line" : 548,
+          "line" : 610,
           "char" : 5,
           "type" : "const nothrow @safe T(lazy T defaultValue = T.init)",
           "parameters" : [
@@ -5994,7 +6286,7 @@
             "default" : "T.init"
            }
           ],
-          "endline" : 630,
+          "endline" : 692,
           "endchar" : 3
          }
         ]
@@ -6003,7 +6295,7 @@
         "kind" : "template",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 635,
+        "line" : 697,
         "char" : 9,
         "name" : "require",
         "parameters" : [
@@ -6020,7 +6312,7 @@
          {
           "name" : "require",
           "kind" : "function",
-          "line" : 635,
+          "line" : 697,
           "char" : 9,
           "type" : "nothrow ref T(K key)",
           "parameters" : [
@@ -6029,7 +6321,7 @@
             "type" : "K"
            }
           ],
-          "endline" : 664,
+          "endline" : 726,
           "endchar" : 3
          }
         ]
@@ -6038,7 +6330,7 @@
         "kind" : "template",
         "protection" : "public",
         "comment" : "\n",
-        "line" : 669,
+        "line" : 731,
         "char" : 5,
         "name" : "getValue",
         "parameters" : [
@@ -6055,7 +6347,7 @@
          {
           "name" : "getValue",
           "kind" : "function",
-          "line" : 669,
+          "line" : 731,
           "char" : 5,
           "type" : "const nothrow T(K key, lazy T defaultValue = T.init)",
           "parameters" : [
@@ -6072,7 +6364,7 @@
             "default" : "T.init"
            }
           ],
-          "endline" : 690,
+          "endline" : 752,
           "endchar" : 3
          }
         ]
@@ -6082,10 +6374,10 @@
         "kind" : "function",
         "protection" : "public",
         "comment" : " Get the builder instance.\n",
-        "line" : 695,
+        "line" : 757,
         "char" : 15,
         "deco" : "FNaNbNcNfZS5voile4cbor7Builder",
-        "endline" : 698,
+        "endline" : 760,
         "endchar" : 3
        },
        {
@@ -6099,7 +6391,7 @@
       "kind" : "template",
       "protection" : "public",
       "comment" : " Create a CborValue from a given value.\n",
-      "line" : 704,
+      "line" : 766,
       "char" : 12,
       "name" : "make",
       "parameters" : [
@@ -6112,7 +6404,7 @@
        {
         "name" : "make",
         "kind" : "function",
-        "line" : 704,
+        "line" : 766,
         "char" : 12,
         "type" : "@safe CborValue(T value)",
         "parameters" : [
@@ -6121,7 +6413,7 @@
           "type" : "T"
          }
         ],
-        "endline" : 707,
+        "endline" : 769,
         "endchar" : 2
        }
       ]
@@ -6131,10 +6423,10 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " Create a CborValue of empty array.\n",
-      "line" : 712,
+      "line" : 774,
       "char" : 12,
       "deco" : "FNaNbNfZS5voile4cbor7Builder9CborValue",
-      "endline" : 715,
+      "endline" : 777,
       "endchar" : 2
      },
      {
@@ -6142,10 +6434,32 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " Create a CborValue of empty map.\n",
-      "line" : 720,
+      "line" : 782,
       "char" : 12,
       "deco" : "FNaNbNfZS5voile4cbor7Builder9CborValue",
-      "endline" : 723,
+      "endline" : 785,
+      "endchar" : 2
+     },
+     {
+      "name" : "nullValue",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : " Create a CborValue of null.\n",
+      "line" : 790,
+      "char" : 12,
+      "deco" : "FNaNbNfZS5voile4cbor7Builder9CborValue",
+      "endline" : 793,
+      "endchar" : 2
+     },
+     {
+      "name" : "undefinedValue",
+      "kind" : "function",
+      "protection" : "public",
+      "comment" : " Create a CborValue of undefined.\n",
+      "line" : 798,
+      "char" : 12,
+      "deco" : "FNaNbNfZS5voile4cbor7Builder9CborValue",
+      "endline" : 801,
       "endchar" : 2
      },
      {
@@ -6153,41 +6467,41 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " Deep copy a CborValue.\n",
-      "line" : 728,
+      "line" : 806,
       "char" : 12,
-      "deco" : "FNfS5voile4cbor7Builder9CborValueZQBf",
+      "deco" : "FNaNfS5voile4cbor7Builder9CborValueZQBf",
       "parameters" : [
        {
         "name" : "src",
         "deco" : "S5voile4cbor7Builder9CborValue"
        }
       ],
-      "endline" : 751,
+      "endline" : 829,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L754_C8",
+      "name" : "__unittest_L832_C8",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 754,
+      "line" : 832,
       "char" : 8,
       "storageClass" : [
        "@safe"
       ],
-      "endline" : 768,
+      "endline" : 846,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L768_C8",
+      "name" : "__unittest_L846_C8",
       "kind" : "function",
       "protection" : "public",
-      "line" : 768,
+      "line" : 846,
       "char" : 8,
       "storageClass" : [
        "@safe"
       ],
-      "endline" : 786,
+      "endline" : 864,
       "endchar" : 2
      },
      {
@@ -6195,7 +6509,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : " Parse a binary CBOR data to a CborValue.\n",
-      "line" : 786,
+      "line" : 864,
       "char" : 9,
       "deco" : "FNfKS5voile4cbor7Builder9CborValueAyhZm",
       "originalType" : "@safe size_t(ref CborValue dst, immutable(ubyte)[] src)",
@@ -6212,14 +6526,14 @@
         "deco" : "Ayh"
        }
       ],
-      "endline" : 910,
+      "endline" : 988,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 912,
+      "line" : 990,
       "char" : 7,
       "name" : "parse",
       "parameters" : [
@@ -6232,7 +6546,7 @@
        {
         "name" : "parse",
         "kind" : "function",
-        "line" : 912,
+        "line" : 990,
         "char" : 7,
         "type" : "@safe bool(ref OutputRange dst, immutable(ubyte)[] src)",
         "parameters" : [
@@ -6248,7 +6562,7 @@
           "type" : "immutable(ubyte)[]"
          }
         ],
-        "endline" : 928,
+        "endline" : 1006,
         "endchar" : 2
        }
       ]
@@ -6258,7 +6572,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 930,
+      "line" : 1008,
       "char" : 12,
       "deco" : "FNfKAyhZS5voile4cbor7Builder9CborValue",
       "parameters" : [
@@ -6270,7 +6584,7 @@
         ]
        }
       ],
-      "endline" : 938,
+      "endline" : 1016,
       "endchar" : 2
      },
      {
@@ -6278,7 +6592,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 940,
+      "line" : 1018,
       "char" : 12,
       "deco" : "FNeKAhZS5voile4cbor7Builder9CborValue",
       "parameters" : [
@@ -6290,27 +6604,27 @@
         ]
        }
       ],
-      "endline" : 949,
+      "endline" : 1027,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L952_C8",
+      "name" : "__unittest_L1030_C8",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 952,
+      "line" : 1030,
       "char" : 8,
       "storageClass" : [
        "@safe"
       ],
-      "endline" : 967,
+      "endline" : 1045,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "public",
       "comment" : " Build a CborValue to a binary CBOR data.\n",
-      "line" : 967,
+      "line" : 1045,
       "char" : 7,
       "name" : "build",
       "parameters" : [
@@ -6324,7 +6638,7 @@
        {
         "name" : "build",
         "kind" : "function",
-        "line" : 967,
+        "line" : 1045,
         "char" : 7,
         "type" : "@safe void(ref OutputRange dst, CborValue src)",
         "parameters" : [
@@ -6340,7 +6654,7 @@
           "type" : "CborValue"
          }
         ],
-        "endline" : 1051,
+        "endline" : 1129,
         "endchar" : 2
        }
       ]
@@ -6350,7 +6664,7 @@
       "kind" : "function",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1053,
+      "line" : 1131,
       "char" : 21,
       "deco" : "FNfS5voile4cbor7Builder9CborValueZAyh",
       "parameters" : [
@@ -6359,27 +6673,27 @@
         "deco" : "S5voile4cbor7Builder9CborValue"
        }
       ],
-      "endline" : 1058,
+      "endline" : 1136,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1061_C8",
+      "name" : "__unittest_L1139_C8",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1061,
+      "line" : 1139,
       "char" : 8,
       "storageClass" : [
        "@safe"
       ],
-      "endline" : 1102,
+      "endline" : 1181,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "public",
-      "comment" : " Serialize a various data to CborValue.\n\n The serialize function generates a CborValue instance from the given data.\n The data type must be one of the following.\n\n - CborValue\n - Integral type(int, uint, long, ulong, short, ushort, byte, ubyte)\n - Floating point type(float, double)\n - bool\n - string\n - binary(immutable(ubyte)[])\n - null\n - Array\n   - Recursively serialized\n - AssociativeArray\n   - Recursively serialized\n - SumType\n   - Converted to a map type CborValue\n     - All types have the @kind attribute\n   - Recursively serialized\n - Aggregate type (struct, class, union): meets one of the following conditions\n   - Composed of simple public member variables\n     - Converted to a map type CborValue\n     - Recursively serialized\n     - If the @ignore attribute is present, do not serialize\n     - If the @ignoreIf attribute is present, do not serialize if the condition is met\n     - If the @name attribute is present, use that name\n     - If the @value attribute is present, use that value\n   - toCbor/fromCbor methods, where fromCtor is a static method\n   - toBinary/fromBinary methods, where fromBinary is a static method\n   - toRepresentation/fromRepresentation methods, where fromRepresentation is a static method\n",
-      "line" : 1102,
+      "comment" : " Serialize a various data to CborValue.\n\n The serialize function generates a CborValue instance from the given data.\n The data type must be one of the following.\n\n - CborValue\n - Integral type (int, uint, long, ulong, short, ushort, byte, ubyte)\n - Floating point type (float, double)\n - bool\n - string\n - binary (immutable(ubyte)[])\n - null\n - Array\n   - Recursively serialized\n - AssociativeArray\n   - Recursively serialized\n - SumType\n   - Converted to a map type CborValue\n     - All types have the @kind attribute\n   - Recursively serialized\n - Aggregate type (struct, class, union): meets one of the following conditions\n   - Composed of simple public member variables\n     - Converted to a map type CborValue\n     - Recursively serialized\n     - If the @ignore attribute is present, do not serialize\n     - If the @ignoreIf attribute is present, do not serialize if the condition is met\n     - If the @name attribute is present, use that name\n     - If the @value attribute is present, use that value\n     - If the @converter attribute is present, use that conversion proxy\n   - toCbor/fromCbor methods, where fromCtor is a static method\n   - toBinary/fromBinary methods, where fromBinary is a static method\n   - toRepresentation/fromRepresentation methods, where fromRepresentation is a static method\n",
+      "line" : 1181,
       "char" : 12,
       "name" : "serialize",
       "parameters" : [
@@ -6392,7 +6706,7 @@
        {
         "name" : "serialize",
         "kind" : "function",
-        "line" : 1102,
+        "line" : 1181,
         "char" : 12,
         "type" : "@safe CborValue(T value)",
         "parameters" : [
@@ -6401,29 +6715,29 @@
           "type" : "T"
          }
         ],
-        "endline" : 1203,
+        "endline" : 1283,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "__unittest_L1206_C8",
+      "name" : "__unittest_L1286_C8",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1206,
+      "line" : 1286,
       "char" : 8,
       "storageClass" : [
        "@safe"
       ],
-      "endline" : 1224,
+      "endline" : 1335,
       "endchar" : 2
      },
      {
       "kind" : "template",
       "protection" : "public",
-      "comment" : " Deserialize a CborValue to a various data.\n",
-      "line" : 1224,
+      "comment" : " Deserialize a CborValue to a various data.\n\n The deserialize function generates value from CborValue instance.\n The data type must be one of the following.\n\n - CborValue\n - Integral type (int, uint, long, ulong, short, ushort, byte, ubyte)\n - Floating point type (float, double)\n - bool\n - string\n - binary (immutable(ubyte)[])\n - null\n - Array\n   - Recursively deserialized\n - AssociativeArray\n   - Recursively deserialized\n - SumType\n   - Converted from a map type CborValue\n     - All types have the @kind attribute\n   - Recursively deserialized\n - Aggregate type (struct, class, union): meets one of the following conditions\n   - Composed of simple public member variables\n     - Converted to a map type CborValue\n     - Recursively deserialized\n     - If the @ignore attribute is present, do not deserialize\n     - If the @ignoreIf attribute is present, do not deserialize if the condition is met\n     - If the @name attribute is present, use that name\n     - If the @converter attribute is present, use that conversion proxy\n     - If the @essential attribute is present, throw an exception if deserialization fails\n   - toCbor/fromCbor methods, where fromCtor is a static method\n   - toBinary/fromBinary methods, where fromBinary is a static method\n   - toRepresentation/fromRepresentation methods, where fromRepresentation is a static method\n",
+      "line" : 1335,
       "char" : 7,
       "name" : "deserialize",
       "parameters" : [
@@ -6436,7 +6750,7 @@
        {
         "name" : "deserialize",
         "kind" : "function",
-        "line" : 1224,
+        "line" : 1335,
         "char" : 7,
         "type" : "@safe bool(in CborValue src, ref T dst)",
         "parameters" : [
@@ -6455,7 +6769,7 @@
           ]
          }
         ],
-        "endline" : 1395,
+        "endline" : 1530,
         "endchar" : 2
        }
       ]
@@ -6464,7 +6778,7 @@
       "kind" : "template",
       "protection" : "public",
       "comment" : "ditto\n",
-      "line" : 1397,
+      "line" : 1532,
       "char" : 4,
       "name" : "deserialize",
       "parameters" : [
@@ -6477,7 +6791,7 @@
        {
         "name" : "deserialize",
         "kind" : "function",
-        "line" : 1397,
+        "line" : 1532,
         "char" : 4,
         "type" : "@safe T(in CborValue src)",
         "parameters" : [
@@ -6489,34 +6803,34 @@
           ]
          }
         ],
-        "endline" : 1403,
+        "endline" : 1538,
         "endchar" : 2
        }
       ]
      },
      {
-      "name" : "__unittest_L1405_C8",
+      "name" : "__unittest_L1540_C8",
       "kind" : "function",
       "protection" : "public",
       "comment" : "\n",
-      "line" : 1405,
+      "line" : 1540,
       "char" : 8,
       "storageClass" : [
        "@safe"
       ],
-      "endline" : 1419,
+      "endline" : 1554,
       "endchar" : 2
      },
      {
-      "name" : "__unittest_L1419_C8",
+      "name" : "__unittest_L1554_C8",
       "kind" : "function",
       "protection" : "public",
-      "line" : 1419,
+      "line" : 1554,
       "char" : 8,
       "storageClass" : [
        "@safe"
       ],
-      "endline" : 1567,
+      "endline" : 1746,
       "endchar" : 1
      }
     ]
@@ -6526,7 +6840,7 @@
     "kind" : "alias",
     "protection" : "public",
     "comment" : " CBOR data type\n",
-    "line" : 1572,
+    "line" : 1751,
     "char" : 1,
     "deco" : "S5voile4cbor7Builder9CborValue",
     "originalType" : "Builder.CborValue"
@@ -6536,7 +6850,7 @@
     "kind" : "alias",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1574,
+    "line" : 1753,
     "char" : 1,
     "deco" : "E5voile4cbor7Builder9CborValue4Type",
     "originalType" : "Builder.CborValue.Type"
@@ -6546,7 +6860,7 @@
     "kind" : "alias",
     "protection" : "public",
     "comment" : " CBOR builder\n",
-    "line" : 1579,
+    "line" : 1758,
     "char" : 1,
     "deco" : "S5voile4cbor7Builder"
    },
@@ -6555,7 +6869,7 @@
     "kind" : "alias",
     "protection" : "public",
     "comment" : "ditto\n",
-    "line" : 1581,
+    "line" : 1760,
     "char" : 1,
     "deco" : "S5voile4cbor7Builder"
    },
@@ -6564,7 +6878,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " Perse CBOR data\n",
-    "line" : 1587,
+    "line" : 1766,
     "char" : 11,
     "deco" : "FNeAyhZS5voile4cbor7Builder9CborValue",
     "parameters" : [
@@ -6573,7 +6887,7 @@
       "deco" : "Ayh"
      }
     ],
-    "endline" : 1591,
+    "endline" : 1770,
     "endchar" : 1
    },
    {
@@ -6581,7 +6895,7 @@
     "kind" : "function",
     "protection" : "public",
     "comment" : " Perse CBOR data\n",
-    "line" : 1596,
+    "line" : 1775,
     "char" : 20,
     "deco" : "FNeS5voile4cbor7Builder9CborValueZAyh",
     "parameters" : [
@@ -6590,31 +6904,31 @@
       "deco" : "S5voile4cbor7Builder9CborValue"
      }
     ],
-    "endline" : 1599,
+    "endline" : 1778,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1602_C7",
+    "name" : "__unittest_L1781_C7",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1602,
+    "line" : 1781,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1723,
+    "endline" : 1909,
     "endchar" : 1
    },
    {
-    "name" : "__unittest_L1723_C7",
+    "name" : "__unittest_L1909_C7",
     "kind" : "function",
     "protection" : "public",
-    "line" : 1723,
+    "line" : 1909,
     "char" : 7,
     "storageClass" : [
      "@safe"
     ],
-    "endline" : 1854,
+    "endline" : 2040,
     "endchar" : 1
    }
   ]
