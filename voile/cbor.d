@@ -55,6 +55,94 @@ auto kind(string value)()
 private enum hasKind(T) = hasValue!(T, Kind);
 private enum getKind(T) = getValues!(T, Kind)[0];
 
+/*******************************************************************************
+ * Attribute converting method
+ */
+auto converter(T1, T2)(void function(in T2, ref T1) from, void function(in T1, ref T2) to)
+{
+	alias FnFrom = typeof(from);
+	alias FnTo   = typeof(to);
+	static struct AttrConverter
+	{
+		FnFrom from;
+		FnTo   to;
+	}
+	return AttrConverter(from, to);
+}
+/// ditto
+auto converter(T1, T2)(T1 function(T2) from, T2 function(in T1) to)
+{
+	alias FnFrom = typeof(from);
+	alias FnTo   = typeof(to);
+	static struct AttrConverter
+	{
+		FnFrom from;
+		FnTo   to;
+	}
+	return AttrConverter(from, to);
+}
+/// ditto
+auto converterString(T)(T function(string) from, string function(in T) to)
+	=> converter!T(from, to);
+/// ditto
+alias convStr = converterString;
+/// ditto
+auto converterBinary(T)(T function(immutable(ubyte)[]) from, immutable(ubyte)[] function(in T) to)
+	=> converter!T(from, to);
+/// ditto
+alias convBin = converterBinary;
+
+/*******************************************************************************
+ * Special conveter attributes
+ */
+auto converterSysTime()
+{
+	import std.datetime;
+	return convStr!SysTime(
+		src => SysTime.fromISOExtString(src),
+		src => src.toISOExtString());
+}
+/// ditto
+auto converterDateTime()
+{
+	import std.datetime;
+	return convStr!DateTime(
+		src => DateTime.fromISOExtString(src),
+		src => src.toISOExtString());
+}
+/// ditto
+auto converterDate()
+{
+	import std.datetime;
+	return convStr!Date(
+		src => Date.fromISOExtString(src),
+		src => src.toISOExtString());
+}
+/// ditto
+auto converterTimeOfDay()
+{
+	import std.datetime;
+	return convStr!TimeOfDay(
+		src => TimeOfDay.fromISOExtString(src),
+		src => src.toISOExtString());
+}
+/// ditto
+auto converterUUID()
+{
+	import std.uuid;
+	return convStr!UUID(
+		src => UUID(src),
+		src => src.toString());
+}
+/// ditto
+auto converterDuration()
+{
+	import core.time;
+	return converter!(Duration, CborValue)(
+		(in CborValue src, ref Duration dst) { dst = src.get!long.hnsecs; },
+		(in Duration src, ref CborValue dst) { dst = src.total!"hnsecs"(); });
+}
+
 private enum isArrayWithoutBinary(T) = isArray!T && !isBinary!T;
 
 /*******************************************************************************
@@ -341,7 +429,7 @@ private:
 	enum DummyMap: Dictionary!(int, int) { init = Dictionary!(int, int).init }
 public:
 	/***************************************************************************
-	 * 
+	 * CborValue
 	 */
 	static struct CborValue
 	{
@@ -361,20 +449,25 @@ public:
 			Binary,
 			CborArray,
 			CborMap);
-		ref inout(Dictionary!(CborValue, CborValue)) _reqMap() inout @trusted
+		ref inout(Dictionary!(CborValue, CborValue)) _reqMap() pure inout @trusted
 		{
 			alias tmp = __traits(getMember, CborType, "get");
 			return *cast(inout(Dictionary!(CborValue, CborValue))*)&(__traits(child, _instance, tmp!CborMap)());
 		}
-		inout(CborValue)[] _reqArray() inout @trusted
+		inout(CborValue)[] _reqArray() pure inout @trusted
 		{
 			alias tmp = __traits(getMember, CborType, "get");
 			return cast(inout(CborValue)[])__traits(child, _instance, tmp!CborArray)();
 		}
-		string _reqStr() inout @trusted
+		string _reqStr() pure inout @trusted
 		{
 			alias tmp = __traits(getMember, CborType, "get");
 			return cast(string)__traits(child, _instance, tmp!String)();
+		}
+		immutable(ubyte)[] _reqBin() pure inout @trusted
+		{
+			alias tmp = __traits(getMember, CborType, "get");
+			return cast(immutable(ubyte)[])__traits(child, _instance, tmp!Binary)();
 		}
 	public:
 		///
@@ -402,79 +495,8 @@ public:
 		 */
 		this(T)(T value, ref Builder builder) @trusted
 		{
-			static if (isIntegral!T && isSigned!T && !is(T == enum))
-			{
-				_instance = value < 0
-					? CborType(cast(NegativeInteger)cast(ulong)(-1-value))
-					: CborType(cast(PositiveInteger)cast(ulong)value);
-				_builder  = &builder;
-			}
-			else static if (isIntegral!T && isUnsigned!T && !is(T == enum))
-			{
-				_instance = cast(PositiveInteger)value;
-				_builder  = &builder;
-			}
-			else static if (is(T == bool))
-			{
-				_instance = cast(Boolean)value;
-				_builder  = &builder;
-			}
-			else static if (is(T == float))
-			{
-				_instance = cast(SingleFloat)value;
-				_builder  = &builder;
-			}
-			else static if (is(T == double))
-			{
-				_instance = cast(DoubleFloat)value;
-				_builder  = &builder;
-			}
-			else static if (isSomeString!T)
-			{
-				_instance = cast(String)value;
-				_builder  = &builder;
-			}
-			else static if (isBinary!T)
-			{
-				_instance = cast(Binary)value;
-				_builder  = &builder;
-			}
-			else static if (is(T == typeof(null)))
-			{
-				_instance = Null.init;
-				_builder  = &builder;
-			}
-			else static if (isArray!T && !is(T == enum))
-			{
-				auto ary = builder.allocAry!CborValue;
-				foreach (e; value)
-					ary ~= CborValue(e, builder);
-				_instance = ary.move;
-				_builder  = &builder;
-			}
-			else static if (isAssociativeArray!T)
-			{
-				auto map = builder.allocDic!(CborValue, CborValue);
-				foreach (ref k, ref v; value)
-					map.append(CborValue(k, builder), CborValue(v, builder));
-				_instance = (*cast(CborMap*)&map).move;
-				_builder  = &builder;
-			}
-			else static if (is(T == CborValue))
-			{
-				_instance = value._instance;
-				_builder  = &builder;
-			}
-			else static if (is(T == Dictionary!(CborValue, CborValue)))
-			{
-				_instance = (*cast(CborMap*)&value).move;
-				_builder  = &builder;
-			}
-			else
-			{
-				_instance = value;
-				_builder  = &builder;
-			}
+			_builder = &builder;
+			opAssign(value);
 		}
 		
 		/***********************************************************************
@@ -491,13 +513,53 @@ public:
 		~this() pure nothrow @nogc @safe
 		{
 		}
+		
 		/***********************************************************************
 		 * Assign operator
 		 */
-		ref CborValue opAssign(CborValue v) pure nothrow @nogc return @trusted
+		ref CborValue opAssign(T)(T value) pure return @trusted
 		{
-			_instance = v._instance;
-			_builder  = v._builder;
+			static if (is(T == CborValue))
+			{
+				_instance = value._instance;
+				_builder  = value._builder;
+			}
+			else static if (isIntegral!T && isSigned!T && !is(T == enum))
+				_instance = value < 0
+					? CborType(cast(NegativeInteger)cast(ulong)(-1-value))
+					: CborType(cast(PositiveInteger)cast(ulong)value);
+			else static if (isIntegral!T && isUnsigned!T && !is(T == enum))
+				_instance = cast(PositiveInteger)value;
+			else static if (is(T == bool))
+				_instance = cast(Boolean)value;
+			else static if (is(T == float))
+				_instance = cast(SingleFloat)value;
+			else static if (is(T == double))
+				_instance = cast(DoubleFloat)value;
+			else static if (isSomeString!T)
+				_instance = cast(String)value;
+			else static if (isBinary!T)
+				_instance = cast(Binary)value;
+			else static if (is(T == typeof(null)))
+				_instance = Null.init;
+			else static if (isArray!T && !is(T == enum))
+			{
+				auto ary = builder.allocAry!CborValue;
+				foreach (e; value)
+					ary ~= CborValue(e, builder);
+				_instance = ary.move;
+			}
+			else static if (isAssociativeArray!T)
+			{
+				auto map = builder.allocDic!(CborValue, CborValue);
+				foreach (ref k, ref v; value)
+					map.append(CborValue(k, builder), CborValue(v, builder));
+				_instance = (*cast(CborMap*)&map).move;
+			}
+			else static if (is(T == Dictionary!(CborValue, CborValue)))
+				_instance = (*cast(CborMap*)&value).move;
+			else
+				_instance = value;
 			return this;
 		}
 		
@@ -723,9 +785,25 @@ public:
 	}
 	
 	/***************************************************************************
+	 * Create a CborValue of null.
+	 */
+	CborValue nullValue() pure nothrow @safe
+	{
+		return CborValue(null, this);
+	}
+	
+	/***************************************************************************
+	 * Create a CborValue of undefined.
+	 */
+	CborValue undefinedValue() pure nothrow @safe
+	{
+		return CborValue(Undefined.init, this);
+	}
+	
+	/***************************************************************************
 	 * Deep copy a CborValue.
 	 */
-	CborValue deepCopy(CborValue src) @safe
+	CborValue deepCopy(CborValue src) pure @safe
 	{
 		if (src._builder is &this)
 			return src;
@@ -1073,11 +1151,11 @@ public:
 	 * The data type must be one of the following.
 	 * 
 	 * - CborValue
-	 * - Integral type(int, uint, long, ulong, short, ushort, byte, ubyte)
-	 * - Floating point type(float, double)
+	 * - Integral type (int, uint, long, ulong, short, ushort, byte, ubyte)
+	 * - Floating point type (float, double)
 	 * - bool
 	 * - string
-	 * - binary(immutable(ubyte)[])
+	 * - binary (immutable(ubyte)[])
 	 * - null
 	 * - Array
 	 *   - Recursively serialized
@@ -1095,6 +1173,7 @@ public:
 	 *     - If the @ignoreIf attribute is present, do not serialize if the condition is met
 	 *     - If the @name attribute is present, use that name
 	 *     - If the @value attribute is present, use that value
+	 *     - If the @converter attribute is present, use that conversion proxy
 	 *   - toCbor/fromCbor methods, where fromCtor is a static method
 	 *   - toBinary/fromBinary methods, where fromBinary is a static method
 	 *   - toRepresentation/fromRepresentation methods, where fromRepresentation is a static method
@@ -1163,34 +1242,35 @@ public:
 				// @ignoreIf属性が付与されている場合はその条件に合致する場合はシリアライズしない
 				// @name属性が付与されている場合はその名前を使用する
 				// @value属性が付与されている場合はその値を使用する
+				// @converter属性が付与されている場合はその関数による変換値を使用する
 				static if (isAccessible!e && !hasIgnore!e)
 				{{
-					static if (hasIgnoreIf!e)
-					{
-						if (!getPredIgnoreIf!e(value.tupleof[i]))
-						{
-							static if (hasName!e)
-								alias getname = () => CborValue(getName!e, this);
-							else
-								alias getname = () => CborValue(e.stringof, this);
-							static if (hasValue!e)
-								alias getval = () => serialzie(getValue!e);
-							else
-								alias getval = () => serialize(value.tupleof[i]);
-							map.append(getname(), getval());
-						}
-					}
-					else
+					alias appendMap = ()
 					{
 						static if (hasName!e)
 							alias getname = () => CborValue(getName!e, this);
 						else
 							alias getname = () => CborValue(e.stringof, this);
-						static if (hasValue!e)
+						static if (hasConvBy!e && canConvTo!(e, string))
+							alias getval = () @trusted => make(convTo!(e, string)(value.tupleof[i]));
+						else static if (hasConvBy!e && canConvTo!(e, immutable(ubyte)[]))
+							alias getval = () @trusted => CborValue(convTo!(e, immutable(ubyte)[])(value.tupleof[i]), this);
+						else static if (hasConvBy!e && canConvTo!(e, CborValue))
+							alias getval = () @trusted { auto cv = nullValue; convertTo!e(value.tupleof[i], cv); return cv; };
+						else static if (hasValue!e)
 							alias getval = () => serialzie(getValue!e);
 						else
 							alias getval = () => serialize(value.tupleof[i]);
 						map.append(getname(), getval());
+					};
+					static if (hasIgnoreIf!e)
+					{
+						if (!getPredIgnoreIf!e(value.tupleof[i]))
+							appendMap();
+					}
+					else
+					{
+						appendMap();
 					}
 				}}
 			}
@@ -1220,6 +1300,37 @@ public:
 	
 	/***************************************************************************
 	 * Deserialize a CborValue to a various data.
+	 * 
+	 * The deserialize function generates value from CborValue instance.
+	 * The data type must be one of the following.
+	 * 
+	 * - CborValue
+	 * - Integral type (int, uint, long, ulong, short, ushort, byte, ubyte)
+	 * - Floating point type (float, double)
+	 * - bool
+	 * - string
+	 * - binary (immutable(ubyte)[])
+	 * - null
+	 * - Array
+	 *   - Recursively deserialized
+	 * - AssociativeArray
+	 *   - Recursively deserialized
+	 * - SumType
+	 *   - Converted from a map type CborValue
+	 *     - All types have the @kind attribute
+	 *   - Recursively deserialized
+	 * - Aggregate type (struct, class, union): meets one of the following conditions
+	 *   - Composed of simple public member variables
+	 *     - Converted to a map type CborValue
+	 *     - Recursively deserialized
+	 *     - If the @ignore attribute is present, do not deserialize
+	 *     - If the @ignoreIf attribute is present, do not deserialize if the condition is met
+	 *     - If the @name attribute is present, use that name
+	 *     - If the @converter attribute is present, use that conversion proxy
+	 *     - If the @essential attribute is present, throw an exception if deserialization fails
+	 *   - toCbor/fromCbor methods, where fromCtor is a static method
+	 *   - toBinary/fromBinary methods, where fromBinary is a static method
+	 *   - toRepresentation/fromRepresentation methods, where fromRepresentation is a static method
 	 */
 	bool deserialize(T)(in CborValue src, ref T dst) @safe
 	{
@@ -1366,24 +1477,48 @@ public:
 			// その他の構造体・クラス
 			static foreach (i, m; dst.tupleof[])
 			{{
-				foreach (ref e; src._reqMap.byKeyValue)
+				// メンバー変数をデシリアライズ
+				// @ignore属性が付与されている場合はデシリアライズしない
+				// @ignoreIf属性が付与されている場合はその条件に合致する場合はシリアライズしない
+				// @name属性が付与されている場合はその名前を使用する
+				// @converter属性が付与されている場合はその関数による変換値を使用する
+				// @essential属性が付与されている場合は変換できない場合に例外を投げる
+				static if (hasEssential!m)
+					bool found = false;
+				static if (isAccessible!m && !hasIgnore!m)
 				{
-					static if (isAccessible!m && !hasIgnore!m)
+					static if (hasIgnoreIf!m)
+						bool isIgnored = getPredIgnoreIf!m(value.tupleof[i]);
+					else
+						enum isIgnored = false;
+					if (!isIgnored) foreach (ref e; src._reqMap.byKeyValue)
 					{
 						static if (hasName!m)
-							alias getname = () => getName!m;
+							enum memberName = getName!m;
 						else
-							alias getname = () => m.stringof;
-						if (e.key._reqStr == getname())
+							enum memberName = m.stringof;
+						
+						if (e.key._reqStr == memberName)
 						{
-							if (!deserialize(e.value, dst.tupleof[i]))
-								return false;
+							static if (hasConvBy!m && canConvFrom!(m, string))
+								dst.tupleof[i] = (() @trusted => convFrom!(m, string)(e.value.get!string))();
+							else static if (hasConvBy!m && canConvFrom!(m, immutable(ubyte)[]))
+								dst.tupleof[i] = (() @trusted => convFrom!(m, immutable(ubyte)[])(e.value._reqBin))();
+							else static if (hasConvBy!m && canConvFrom!(m, CborValue))
+								(() @trusted => dst.tupleof[i] = convFrom!(m, CborValue)(e.value))();
+							else
+							{
+								if (!deserialize(e.value, dst.tupleof[i]))
+									return false;
+							}
+							static if (hasEssential!m)
+								found = true;
 							break;
 						}
 					}
 				}
 				static if (hasEssential!m)
-					return false;
+					enforce(found, "Essential member[" ~ m.stringof ~ "] is not found.");
 			}}
 		}
 		else static if(__traits(compiles, dst = src.get!T))
@@ -1562,6 +1697,50 @@ public:
 		cborValue = b.serialize(test5);
 		assert(cborValue.type == CborType.map);
 		assert(b.deserialize!Test5(cborValue) == test5);
+		
+		import std.datetime, std.uuid;
+		// converter付きのメンバの例
+		static struct Test6
+		{
+			int x;
+			@converterSysTime SysTime time;
+			@converter!SysTime((immutable(ubyte)[] src) => SysTime.fromISOExtString(cast(string)src),
+			                   (in SysTime src)         => cast(immutable(ubyte)[])src.toISOExtString())
+			SysTime time2;
+			@converter!SysTime((in CborValue src, ref SysTime dst) { dst = SysTime.fromISOExtString(src.get!string); },
+			                   (in SysTime src, ref CborValue dst) { dst = src.toISOExtString(); })
+			SysTime time3;
+			@converterUUID      UUID uuid;
+			@converterDateTime  DateTime datetime1;
+			@converterDate      Date date1;
+			@converterTimeOfDay TimeOfDay tod1;
+			@converterDuration  Duration dur1;
+		}
+		static assert(hasConvBy!(Test6.time));
+		static assert(canConvFrom!(Test6.time, string));
+		static assert(canConvTo!(Test6.time, string));
+		Test6 test6 = Test6(
+			42,
+			SysTime(DateTime(1999, 12, 31)),
+			SysTime(DateTime(2020, 1, 1, 11, 12, 13)),
+			SysTime(DateTime(2021, 2, 2, 1, 2, 3)),
+			UUID("00010002-0001-0002-0003-000400050006"),
+			DateTime(2022, 3, 3, 4, 5, 6),
+			Date(2022, 4, 4),
+			TimeOfDay(6, 7, 8),
+			1234.msecs);
+		cborValue = b.serialize(test6);
+		assert(cborValue.type == CborType.map);
+		assert(cborValue.getValue!int("x") == 42);
+		assert(cborValue.getValue!string("time") == "1999-12-31T00:00:00");
+		assert(cborValue.getValue!(immutable(ubyte)[])("time2") == cast(immutable(ubyte)[])"2020-01-01T11:12:13");
+		assert(cborValue.getValue!string("time3") == "2021-02-02T01:02:03");
+		assert(cborValue.getValue!string("uuid") == "00010002-0001-0002-0003-000400050006");
+		assert(cborValue.getValue!string("datetime1") == "2022-03-03T04:05:06");
+		assert(cborValue.getValue!string("date1") == "2022-04-04");
+		assert(cborValue.getValue!string("tod1") == "06:07:08");
+		assert(cborValue.getValue!long("dur1") == 1234.msecs.total!"hnsecs");
+		assert(b.deserialize!Test6(cborValue) == test6);
 	}
 	
 }
@@ -1607,6 +1786,13 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	
 	assert(value.isUndefined);
 	assert(!value.isNull);
+	assert(!value._builder);
+	assert(&(value.builder()) is null);
+	
+	value = builder.undefinedValue;
+	assert(value.isUndefined);
+	assert(value._builder);
+	assert(&(value.builder()) !is null);
 	
 	value = builder.emptyArray;
 	assert(value.type == CborType.array);
