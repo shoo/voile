@@ -127,10 +127,11 @@ version (Windows)
 {
 	private enum SYMBOLIC_LINK_FLAG_DIRECTORY = 0x00000001;
 	private enum SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x00000002;
-	private extern (Windows) imported!"core.sys.windows.windows".BOOL CreateSymbolicLinkW(
-		imported!"core.sys.windows.windows".LPCWSTR,
-		imported!"core.sys.windows.windows".LPCWSTR,
-		imported!"core.sys.windows.windows".DWORD);
+	private static import core.sys.windows.windows;
+	private extern (Windows) core.sys.windows.windows.BOOL CreateSymbolicLinkW(
+		core.sys.windows.windows.LPCWSTR,
+		core.sys.windows.windows.LPCWSTR,
+		core.sys.windows.windows.DWORD);
 }
 
 /*******************************************************************************
@@ -167,9 +168,11 @@ struct FileSystem
 private:
 	version (Windows)
 	{
-		imported!"voile.sync".SyncEvent _evWatcherFinish;
-		imported!"voile.sync".SyncEvent _evWatcherStart;
-		imported!"core.thread".Thread   _thWatcher;
+		static import voile.sync;
+		static import core.thread;
+		voile.sync.SyncEvent _evWatcherFinish;
+		voile.sync.SyncEvent _evWatcherStart;
+		core.thread.Thread   _thWatcher;
 		void _watcherEntry() shared
 		{
 			import core.sys.windows.windows;
@@ -265,9 +268,11 @@ private:
 	}
 	else version (linux)
 	{
-		imported!"core.thread".Thread   _thWatcher;
-		imported!"voile.sync".SyncEvent _evWatcherStart;
-		int                             _fdWatcherNotify;
+		static import voile.sync;
+		static import core.thread;
+		core.thread.Thread   _thWatcher;
+		voile.sync.SyncEvent _evWatcherStart;
+		int                  _fdWatcherNotify;
 		void _watcherEntry() shared
 		{
 			import voile.misc: assumeUnshared;
