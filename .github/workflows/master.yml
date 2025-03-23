@@ -264,8 +264,7 @@ jobs:
       - name: Install D compiler
         uses: dlang-community/setup-dlang@v2
         with:
-          #compiler: dmd-master ... change to beta tempolarily
-          compiler: dmd-beta
+          compiler: dmd-master
       - name: Run unit tests
         run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
       - name: Run integration tests
