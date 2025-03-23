@@ -8,8 +8,6 @@
     "importPaths": ["."],
     "sourcePaths": ["voile"],
     "authors": [ "P.Knowledge", "SHOO" ],
-    "dependencies": {
-    },
     "configurations": [
         {
             "name": "default",
@@ -19,14 +17,22 @@
             "name": "unittest-debug",
             "targetType": "executable",
             "targetName": "voile-ut",
-            "sourceFiles": ["ci/ut.d"],
-            "dflags": ["-main", "-mixin=.dub/mixin.d"]
+            "dflags": ["-main", "-mixin=.dub/mixin.d"],
+            "dependencies": {
+                "openssl-static": "~>1.0.5+3.0.8"
+            }
         },
         {
             "name": "unittest",
             "targetType": "library",
-            "sourceFiles": ["ci/ut.d"],
-            "dflags": ["-mixin=.dub/mixin.d"]
+            "dflags": ["-mixin=.dub/mixin.d"],
+            "dependencies": {
+                "openssl-static": "~>1.0.5+3.0.8"
+            }
         }
-    ]
+    ],
+    "buildTypes": {
+        "vscode-debug": { "buildOptions": ["debugMode", "debugInfoC", "unittests"] },
+        "vscode-debug-cov": { "buildOptions": ["debugMode", "coverage", "debugInfoC", "unittests"] }
+    }
 }
