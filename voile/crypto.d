@@ -566,6 +566,17 @@ private struct SemVer
 			return 1;
 		return 0;
 	}
+	
+	size_t toHash() const @nogc @safe pure nothrow
+	{
+		size_t hash;
+		hashOf(major, hash);
+		hashOf(minor, hash);
+		hashOf(patch, hash);
+		hashOf(prerelease, hash);
+		hashOf(buildmetadata, hash);
+		return hash;
+	}
 }
 @safe unittest
 {
@@ -1268,7 +1279,7 @@ version (all)
 				pipe.stdin.close();
 				auto app = appender!string;
 				pipe.stdout.byChunk(4096).copy(app);
-				enforce(pipe.pid.wait() == 0, "Cannot create RSA 4096 private key.");
+				enforce(pipe.pid.wait() == 0, "Cannot create private key.");
 				return PrivateKey(app.data);
 			}
 			/*******************************************************************
@@ -1359,13 +1370,13 @@ version (all)
 				isCommandExisting(cmd).enforce("OpenSSL command line interface cannot find.");
 				auto dir = createDisposableDir(prefix: "openssl-");
 				auto prvKeyPath = dir.write("prvkey.pem", prvKey._pem);
-				auto pipe = pipeProcess([cmd, "ec", "-inform", "PEM", "-in", prvKeyPath,
+				auto pipe = pipeProcess([cmd, "rsa", "-inform", "PEM", "-in", prvKeyPath,
 					"-pubout", "-outform", "PEM", "-out", "-"]);
 				auto app = appender!(ubyte[]);
 				pipe.stdin.flush();
 				pipe.stdin.close();
 				pipe.stdout.byChunk(4096).copy(app);
-				enforce(pipe.pid.wait() == 0, "Cannot create ECDSA public key.");
+				enforce(pipe.pid.wait() == 0, "Cannot create public key.");
 				return PublicKey(cast(string)app.data);
 			}
 			/*******************************************************************
@@ -1983,43 +1994,21 @@ version (Have_openssl)
 		 */
 		immutable(ubyte)[] sign(in ubyte[] message, in PrivateKey prvKey)
 		{
-			version (none)
-			{
-				// 初期化
-				auto ctxSign = EVP_PKEY_CTX_new(cast(EVP_PKEY*)prvKey._key, null);
-				scope (exit)
-					ctxSign.EVP_PKEY_CTX_free();
-				ctxSign.EVP_PKEY_sign_init()
-					.enforce("OpenSSL Ed25519 sign failed.");
-				
-				// 署名のサイズを取得してバッファを作成
-				size_t signLen;
-				ctxSign.EVP_PKEY_sign(null, &signLen, null, 0);
-				auto signData = new ubyte[signLen];
-				
-				// 署名
-				ctxSign.EVP_PKEY_sign(signData.ptr, &signLen, message.ptr, message.length)
-					.enforce("OpenSSL Ed25519 sign failed.");
-				return signData[0..signLen].assumeUnique;
-			}
-			else
-			{
-				// 初期化
-				auto ctxSign = EVP_MD_CTX_new().enforce("OpenSSL Ed25519 sign failed.");
-				scope (exit)
-					ctxSign.EVP_MD_CTX_free();
-				ctxSign.EVP_DigestSignInit(null, null, null, cast(EVP_PKEY*)prvKey._key)
-					.enforce("OpenSSL Ed25519 sign failed.");
-				
-				// 署名のサイズを取得してバッファを作成
-				size_t signLen;
-				ctxSign.EVP_DigestSign(null, &signLen, null, 0);
-				auto signData = new ubyte[signLen];
-				
-				// 署名のためのハッシュ計算
-				ctxSign.EVP_DigestSign(signData.ptr, &signLen, message.ptr, message.length);
-				return signData[0..signLen].assumeUnique;
-			}
+			// 初期化
+			auto ctxSign = EVP_MD_CTX_new().enforce("OpenSSL Ed25519 sign failed.");
+			scope (exit)
+				ctxSign.EVP_MD_CTX_free();
+			ctxSign.EVP_DigestSignInit(null, null, null, cast(EVP_PKEY*)prvKey._key)
+				.enforce("OpenSSL Ed25519 sign failed.");
+			
+			// 署名のサイズを取得してバッファを作成
+			size_t signLen;
+			ctxSign.EVP_DigestSign(null, &signLen, null, 0);
+			auto signData = new ubyte[signLen];
+			
+			// 署名のためのハッシュ計算
+			ctxSign.EVP_DigestSign(signData.ptr, &signLen, message.ptr, message.length);
+			return signData[0..signLen].assumeUnique;
 		}
 		
 		/***********************************************************************
@@ -2027,33 +2016,16 @@ version (Have_openssl)
 		 */
 		bool verify(in ubyte[] message, in ubyte[] signature, in PublicKey pubKey)
 		{
-			version (none)
-			{
-				// 初期化
-				auto ctxVerify = EVP_PKEY_CTX_new(cast(EVP_PKEY*)pubKey._key, null);
-				scope (exit)
-					ctxVerify.EVP_PKEY_CTX_free();
-				ctxVerify.EVP_PKEY_verify_init()
-					.enforce("OpenSSL Ed25519 verify failed.");
-				
-				// 検証
-				auto res = ctxVerify.EVP_PKEY_verify(signature.ptr, signature.length,
-					cast(ubyte*)message.ptr, message.length);
-				return res != 0;
-			}
-			else
-			{
-				// 初期化
-				auto ctxVerify = EVP_MD_CTX_new();
-				scope (exit)
-					ctxVerify.EVP_MD_CTX_free();
-				
-				// 署名のためのハッシュ計算
-				ctxVerify.EVP_DigestVerifyInit(null, null, null, cast(EVP_PKEY*)pubKey._key);
-				auto res = ctxVerify.EVP_DigestVerify(signature.ptr, signature.length,
-					cast(ubyte*)message.ptr, message.length);
-				return res != 0;
-			}
+			// 初期化
+			auto ctxVerify = EVP_MD_CTX_new();
+			scope (exit)
+				ctxVerify.EVP_MD_CTX_free();
+			
+			// 署名のためのハッシュ計算
+			ctxVerify.EVP_DigestVerifyInit(null, null, null, cast(EVP_PKEY*)pubKey._key);
+			auto res = ctxVerify.EVP_DigestVerify(signature.ptr, signature.length,
+				cast(ubyte*)message.ptr, message.length);
+			return res != 0;
 		}
 	}
 	
@@ -2395,26 +2367,6 @@ version (Have_openssl)
 			ctxSign.EVP_PKEY_sign(signData.ptr, &signLen, message.ptr, message.length)
 				.enforce("OpenSSL ECDSA P256 sign failed.");
 			return signData[0..signLen].assumeUnique;
-			
-			// EVP_DigestSignの場合以下だが、messageはプリハッシュしていないデータ前提
-			version (none)
-			{
-				// 初期化
-				auto ctxSign = EVP_MD_CTX_new().enforce("OpenSSL ECDSA P256 sign failed.");
-				scope (exit)
-					ctxSign.EVP_MD_CTX_free();
-				ctxSign.EVP_DigestSignInit(null, null, null, cast(EVP_PKEY*)prvKey._key)
-					.enforce("OpenSSL ECDSA P256 sign failed.");
-				
-				// 署名のサイズを取得してバッファを作成
-				size_t signLen;
-				ctxSign.EVP_DigestSign(null, &signLen, null, 0);
-				auto signData = new ubyte[signLen];
-				
-				// ハッシュ計算して署名
-				ctxSign.EVP_DigestSign(signData.ptr, &signLen, message.ptr, message.length);
-				return signData[0..signLen].assumeUnique;
-			}
 		}
 		
 		/***********************************************************************
@@ -2433,20 +2385,6 @@ version (Have_openssl)
 			auto res = ctxVerify.EVP_PKEY_verify(signature.ptr, signature.length,
 				cast(ubyte*)message.ptr, message.length);
 			return res != 0;
-			// EVP_DigestVerifyの場合以下だが、messageはプリハッシュしていないデータ前提
-			version (none)
-			{
-				// 初期化
-				auto ctxVerify = EVP_MD_CTX_new();
-				scope (exit)
-					ctxVerify.EVP_MD_CTX_free();
-				
-				// ハッシュ計算して検証
-				ctxVerify.EVP_DigestVerifyInit(null, null, null, cast(EVP_PKEY*)pubKey._key);
-				auto res = ctxVerify.EVP_DigestVerify(signature.ptr, signature.length,
-					cast(ubyte*)message.ptr, message.length);
-				return res != 0;
-			}
 		}
 	}
 	
