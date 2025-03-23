@@ -71,7 +71,6 @@ import std.range, std.array;
 import std.algorithm: move;
 import std.digest.sha: SHA256, SHA512;
 import std.string: representation;
-import voile.bindat;
 
 //##############################################################################
 //##### Common functions
@@ -234,8 +233,6 @@ string der2pem(in ubyte[] der, string name) @safe
 		~ "-----END CERTIFICATE-----\r\n");
 }
 
-
-
 /*******************************************************************************
  * HKDFを計算するヘルパ
  */
@@ -292,7 +289,6 @@ immutable(ubyte)[] calcHKDF(DigestEngine = SHA256)(
 	auto result3 = calcHKDF(sampleSecret3, 280);
 	assert(result3 == sample3);
 }
-
 
 /*******************************************************************************
  * HKDFを計算するヘルパ
@@ -649,13 +645,45 @@ private SemVer getOpenSSLCmdVerseion(string cmd) @safe
 	return result.output.parseOpenSSLCmdVersionString();
 }
 
+version (all)
+{
+	private enum enableOpenSSLCmdEngines = true;
+}
+else
+{
+	private enum enableOpenSSLCmdEngines = false;
+}
+
+version (Have_openssl)
+{
+	version (X86)
+	{
+		private enum enableOpenSSLEngines = false;
+	}
+	else
+	{
+		private enum enableOpenSSLEngines = true;
+	}
+}
+else
+{
+	private enum enableOpenSSLEngines = false;
+}
+
+version (Windows)
+{
+	private enum enableBcryptEngines = true;
+}
+else
+{
+	private enum enableBcryptEngines = false;
+}
 
 //##############################################################################
 //##### OpenSSL command line Engine
 //##############################################################################
-version (all)
+static if (enableOpenSSLCmdEngines)
 {
-	private enum enableOpenSSLCmdEngines = true;
 	version (Windows)
 	{
 		private enum defaultOpenSSLCommand = "openssl.exe";
@@ -1573,16 +1601,12 @@ version (all)
 		}
 	}
 }
-else
-{
-	private enum enableOpenSSLCmdEngines = false;
-}
+
 //##############################################################################
 //##### OpenSSL Engines
 //##############################################################################
-version (Have_openssl)
+static if (enableOpenSSLEngines)
 {
-	private enum enableOpenSSLEngines = true;
 	import deimos.openssl.evp;
 	///
 	private struct OpenSSLAESCBCEncryptEngine
@@ -2771,16 +2795,12 @@ version (Have_openssl)
 		}
 	}
 }
-else
-{
-	private enum enableOpenSSLEngines = false;
-}
+
 //##############################################################################
 //##### Windows Bcrypt Engines
 //##############################################################################
-version (Windows)
+static if (enableBcryptEngines)
 {
-	private enum enableBcryptEngines = true;
 	private extern (Windows)
 	{
 		import core.sys.windows.windows;
@@ -4365,10 +4385,6 @@ version (Windows)
 		}
 	}
 }
-else
-{
-	private enum enableBcryptEngines = false;
-}
 
 //##############################################################################
 //##### Helpers
@@ -4497,7 +4513,7 @@ enum bool isECDHEngine(T) = isOpenSSLCmdECDHP256Engine!T
 	|| isOpenSSLECDHP256Engine!T
 	|| isBcryptECDHP256Engine!T;
 
-version (Have_openssl)
+static if (enableOpenSSLEngines)
 {
 	///
 	alias DefaultAES128CBCEncryptEngine = OpenSSLAES128CBCEncryptEngine;
@@ -4516,7 +4532,7 @@ version (Have_openssl)
 	///
 	alias DefaultECDHEngine = OpenSSLCmdRSA4096Engine;
 }
-else version (Windows)
+else static if (enableBcryptEngines)
 {
 	///
 	alias DefaultAES128CBCEncryptEngine = BcryptAES128CBCEncryptEngine;
@@ -4681,7 +4697,7 @@ public:
 alias AES256CBCEncrypter = Encrypter!DefaultAES256CBCEncryptEngine;
 
 // AES256CBC Encrypt for OpenSSL
-version (Have_openssl) @system unittest
+static if (enableOpenSSLEngines) @system unittest
 {
 	auto key = cast(immutable(ubyte)[])"0123456789ABCDEF0123456789ABCDEF";
 	auto iv = cast(immutable(ubyte)[])"0123456789ABCDEF";
@@ -4697,7 +4713,7 @@ version (Have_openssl) @system unittest
 		~ x"979CE7F69DA3C7171B0ADE10D456A63BB48CA033BEAA27D8E49EE1CBA03D064C");
 }
 // AES256CBC Encrypt for Windows
-version (Windows) @system unittest
+static if (enableBcryptEngines) @system unittest
 {
 	auto key = cast(immutable(ubyte)[])"0123456789ABCDEF0123456789ABCDEF";
 	auto iv = cast(immutable(ubyte)[])"0123456789ABCDEF";
@@ -4713,7 +4729,7 @@ version (Windows) @system unittest
 		~ x"979CE7F69DA3C7171B0ADE10D456A63BB48CA033BEAA27D8E49EE1CBA03D064C");
 }
 // AES256CBC Encrypt for OpenSSL Command line
-@system unittest
+static if (enableOpenSSLCmdEngines) @system unittest
 {
 	if (!isCommandExisting(defaultOpenSSLCommand))
 		return;
@@ -4862,7 +4878,7 @@ alias AES256CBCDecrypter = Decrypter!DefaultAES256CBCDecryptEngine;
 alias RSA4096Decrypter = Decrypter!DefaultRSA4096DecryptEngine;
 
 // AES256CBC Encrypt/Decrypt for OpenSSL
-version (Have_openssl) @system unittest
+static if (enableOpenSSLEngines) @system unittest
 {
 	auto key = cast(immutable(ubyte)[])"0123456789ABCDEF0123456789ABCDEF";
 	auto iv = cast(immutable(ubyte)[])"0123456789ABCDEF";
@@ -4878,7 +4894,7 @@ version (Have_openssl) @system unittest
 	assert(cast(string)dec.data == "Hello, World!Hello, World! Hello, World!Hello, World!");
 }
 // AES256CBC Encrypt/Decrypt for Bcrypt
-version (Windows) @system unittest
+static if (enableBcryptEngines) @system unittest
 {
 	auto key = cast(immutable(ubyte)[])"0123456789ABCDEF0123456789ABCDEF";
 	auto iv = cast(immutable(ubyte)[])"0123456789ABCDEF";
@@ -4894,7 +4910,7 @@ version (Windows) @system unittest
 	assert(cast(string)dec.data == "Hello, World!Hello, World! Hello, World!Hello, World!");
 }
 // AES256CBC Encrypt/Decrypt for OpenSSL Command line
-@system unittest
+static if (enableOpenSSLCmdEngines) @system unittest
 {
 	if (!isCommandExisting(defaultOpenSSLCommand))
 		return;
@@ -5153,7 +5169,7 @@ alias ECDSAP256Verifier(DigestEngine = void) = Verifier!(DefaultECDSAP256Engine,
 alias RSA4096Verifier(DigestEngine = void) = Verifier!(DefaultRSA4096Engine, DigestEngine);
 
 // Ed25519 Sign/Verify
-version (Have_openssl) @system unittest
+static if (enableOpenSSLEngines) @system unittest
 {
 	auto prvKey = OpenSSLEd25519Engine.PrivateKey.createKey();
 	auto pubKey = OpenSSLEd25519Engine.PublicKey.createKey(prvKey);
@@ -5167,7 +5183,7 @@ version (Have_openssl) @system unittest
 	assert(result);
 }
 // Ed25519 Sign/Verify
-version (Have_openssl) @system unittest
+static if (enableOpenSSLEngines) @system unittest
 {
 	auto prvKey = OpenSSLEd25519Engine.PrivateKey.fromBinary(
 		x"6BD57B7C2FDA227E75C30F02590D63F3CFC26E6DA59024C305E5044BE21CF632");
@@ -5194,9 +5210,8 @@ version (Have_openssl) @system unittest
 	verifier2.update(message.representation);
 	assert(verifier2.verify(signature2));
 }
-
 // Ed25519 Sign/Verify for OpenSSL Command line
-@system unittest
+static if (enableOpenSSLCmdEngines) @system unittest
 {
 	if (!isCommandExisting(defaultOpenSSLCommand))
 		return;
@@ -5213,7 +5228,7 @@ version (Have_openssl) @system unittest
 	assert(verifier.verify(signature));
 }
 // Ed25519 Sign/Verify for OpenSSL Command line
-@system unittest
+static if (enableOpenSSLCmdEngines) @system unittest
 {
 	if (!isCommandExisting(defaultOpenSSLCommand))
 		return;
@@ -5235,8 +5250,8 @@ version (Have_openssl) @system unittest
 	verifier.update(message.representation);
 	assert(verifier.verify(signature));
 }
-// ECDSA Sign/Verify for Window
-version (Windows) @system unittest
+// ECDSA P256 Sign/Verify for Window
+static if (enableBcryptEngines) @system unittest
 {
 	import std.string;
 	enum prvKeyBin = cast(immutable(ubyte)[32])x"8ba5532db91d5e2f3d188f5e4b23c36223ecb14da4f10ac21b68f2274dfc1689";
@@ -5321,8 +5336,8 @@ version (Windows) @system unittest
 	assert(verifier2.verify(signaturePhSHA256Example1));
 	assert(verifier2.verify(signaturePhSHA256Example2));
 }
-// ECDSA Sign/Verify for OpenSSL
-version (Have_openssl) @system unittest
+// ECDSA P256 Sign/Verify for OpenSSL
+static if (enableOpenSSLEngines) @system unittest
 {
 	import std.string;
 	enum prvKeyBin = cast(immutable(ubyte)[32])x"8ba5532db91d5e2f3d188f5e4b23c36223ecb14da4f10ac21b68f2274dfc1689";
@@ -5405,8 +5420,8 @@ version (Have_openssl) @system unittest
 	assert(verifier2.verify(signaturePhSHA256Example1));
 	assert(verifier2.verify(signaturePhSHA256Example2));
 }
-// ECDSA Sign/Verify for OpenSSL Command line
-@system unittest
+// ECDSA P256 Sign/Verify for OpenSSL Command line
+static if (enableOpenSSLCmdEngines) @system unittest
 {
 	if (!isCommandExisting(defaultOpenSSLCommand))
 		return;
@@ -5508,8 +5523,8 @@ version (Have_openssl) @system unittest
 	assert(verifier2.verify(signaturePhSHA256Example2));
 }
 
-// RSA for OpenSSL
-version (Have_openssl) @system unittest
+// RSA 4096 for OpenSSL
+static if (enableOpenSSLEngines) @system unittest
 {
 	import std.string;
 	// openssl genrsa 4096 2>/dev/null
@@ -5927,8 +5942,8 @@ version (Have_openssl) @system unittest
 	auto decrypted1 = decrypter.decrypt(encrypted1);
 	assert(decrypted1 == message.representation);
 }
-// RSA for OpenSSL
-version (Windows) @system unittest
+// RSA 4096 for OpenSSL
+static if (enableBcryptEngines) @system unittest
 {
 	import std, std.file;
 	import std.string;
@@ -6348,8 +6363,8 @@ version (Windows) @system unittest
 	auto decrypted1 = decrypter.decrypt(encrypted1);
 	assert(decrypted1 == message.representation);
 }
-// RSA for OpenSSL Command line
-@system unittest
+// RSA 4096 for OpenSSL Command line
+static if (enableOpenSSLCmdEngines) @system unittest
 {
 	import std.string;
 	if (!isCommandExisting(defaultOpenSSLCommand))
@@ -6918,7 +6933,7 @@ public:
 }
 
 // ECDH KeyExchange for OpenSSL Command line
-@system unittest
+static if (enableOpenSSLCmdEngines) @system unittest
 {
 	if (!isCommandExisting(defaultOpenSSLCommand))
 		return;
@@ -6968,7 +6983,7 @@ public:
 	assert(ssValueB == sharedSecretExample);
 }
 // ECDH KeyExchange for OpenSSL
-version (Have_openssl) @system unittest
+static if (enableOpenSSLEngines) @system unittest
 {
 	// openssl ecparam -name prime256v1 -genkey -noout -out -
 	enum prvKeyPemA = "-----BEGIN EC PRIVATE KEY-----\r\n"
@@ -7016,7 +7031,7 @@ version (Have_openssl) @system unittest
 	assert(ssValueB == sharedSecretExample);
 }
 // ECDH KeyExchange for Windows
-version (Windows) @system unittest
+static if (enableBcryptEngines) @system unittest
 {
 	import std.string;
 	// openssl ecparam -name prime256v1 -genkey -noout -out -
