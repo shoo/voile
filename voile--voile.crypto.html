@@ -1,0 +1,471 @@
+
+<!DOCTYPE html>
+<html>    <head>        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link rel="stylesheet" type="text/css" href="css/proj_docs.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="js/sidebar.js"></script>
+        <script type="text/javascript" src="js/listanchors.js"></script>
+        <title>voile.crypto</title>
+        
+        
+    </head>
+    <body>        
+        <div class="container">            
+<div class="sidebar-underbar"></div>
+<div class="sidebar">    <div class="head">        <h2>voile</h2>
+        <p><span class="smallprint"><b>version:</b> ~master <span class="separator"><br></span>
+            </span>
+        </p>
+        <p><a href="index.html">overview</a></p>
+    </div>
+    
+    <ul>
+			<li class="expand-container open"><a title='Voile The Magic Library
+		' class='expand-toggle' href='#'><span >voile</span></a><ul><li><a title='Voile The Magic Library
+		' href="			voile--voile.html"><span >package</span></a></li>			
+	<li><a title="UDA" href="voile--voile.attr.html"><span >attr</span></a></li>
+
+	<li><a title="性能評価に関するモジュール" href="voile--voile.benchmark.html"><span >benchmark</span></a></li>
+
+	<li><a title="Binary data serializer/deserializer" href="voile--voile.bindat.html"><span >bindat</span></a></li>
+
+	<li><a title="CBOR data module" href="voile--voile.cbor.html"><span >cbor</span></a></li>
+
+	<li><a title="Crypto" href="voile--voile.crypto.html"><span >crypto</span></a></li>
+
+	<li><a title="データ形式向けのバイナリ操作" href="voile--voile.dataformatter.html"><span >dataformatter</span></a></li>
+
+	<li><a title="ファイルシステムヘルパー" href="voile--voile.fs.html"><span >fs</span></a></li>
+
+	<li><a title="Common Handler type" href="voile--voile.handler.html"><span >handler</span></a></li>
+
+	<li><a title="JSONValueのヘルパー、シリアライズ・デシリアライズ" href="voile--voile.json.html"><span >json</span></a></li>
+
+	<li><a title="judgement モジュール" href="voile--voile.judge.html"><span >judge</span></a></li>
+
+	<li><a title="ログ取得のためのユーティリティモジュール" href="voile--voile.log.html"><span >log</span></a></li>
+
+	<li><a title="便利関数" href="voile--voile.misc.html"><span >misc</span></a></li>
+
+	<li><a title="管理された共用体を提供する" href="voile--voile.munion.html"><span >munion</span></a></li>
+
+	<li><a title="コマンドライン引数のパーサー" href="voile--voile.parseopt.html"><span >parseopt</span></a></li>
+
+	<li><a title="参照カウンタ" href="voile--voile.refcnt.html"><span >refcnt</span></a></li>
+
+	<li><a title="sync モジュール" href="voile--voile.sync.html"><span >sync</span></a></li>
+
+	<li><a title="Unique" href="voile--voile.unique.html"><span >unique</span></a></li>
+</ul></li>
+	
+
+</ul>
+</div>
+            <div class="content">                <h1>voile.crypto</h1>
+                
+                <div class="quickindex" id="quickindex"></div>
+                
+                <div class="ddoc_summary">Crypto
+</div><div class="ddoc_description">This module provides cryptographic functions for voile.
+ Supported architecture:
+<ul><li>OpenSSL (Apache License 2.0): Enabled when dependent on Deimos OpenSSL library
+<ul><li>[x] AES256 encrypt/decrypt
+           OpenSSLAESCBCEncryptEngine,
+           OpenSSLAES128CBCEncryptEngine, OpenSSLAES192CBCEncryptEngine, OpenSSLAES256CBCEncryptEngine,
+           OpenSSLAESCBCDecryptEngine,
+           OpenSSLAES128CBCDecryptEngine, OpenSSLAES192CBCDecryptEngine, OpenSSLAES256CBCDecryptEngine,</li>
+<li>[x] Ed25519 sign/verify
+           OpenSSLEd25519Engine</li>
+<li>[x] ECDSA P256 sign/verify
+           OpenSSLECDSAP256Engine</li>
+<li>[x] RSA 4096 sign/verify/encrypt/decrypt
+           OpenSSLRSA4096Engine</li>
+<li>[x] ECDH P256 key exchange
+           OpenSSLECDHP256Engine</li>
+</ul></li>
+<li>Bcrypt (BSD-1.0): Enabled on Windows
+<ul><li>[x] AES256 encrypt/decrypt
+           BcryptAESCBCEncryptEngine,
+           BcryptAES128CBCEncryptEngine, BcryptAES192CBCEncryptEngine, BcryptAES256CBCEncryptEngine,
+           BcryptAESCBCDecryptEngine,
+           BcryptAES128CBCDecryptEngine, BcryptAES192CBCDecryptEngine, BcryptAES256CBCDecryptEngine,</li>
+<li>[ ] Ed25519 sign/verify - Not Supported
+           BcryptEd25519Engine</li>
+<li>[x] ECDSA P256 sign/verify
+           BcryptECDSAP256Engine</li>
+<li>[x] RSA 4096 sign/verify/encrypt/decrypt
+           BcryptRSA4096Engine</li>
+<li>[x] ECDH P256 key exchange
+           BcryptECDHP256Engine</li>
+</ul></li>
+<li>OpenSSL Command Line Interface (BSD-1.0): Does not work if the command is not available
+<ul><li>[x] AES256 encrypt/decrypt
+           OpenSSLCmdAESCBCEncryptEngine,
+           OpenSSLCmdAES128CBCEncryptEngine, OpenSSLCmdAES192CBCEncryptEngine, OpenSSLCmdAES256CBCEncryptEngine,
+           OpenSSLCmdAESCBCDecryptEngine,
+           OpenSSLCmdAES128CBCDecryptEngine, OpenSSLCmdAES192CBCDecryptEngine, OpenSSLCmdAES256CBCDecryptEngine,</li>
+<li>[x] Ed25519 sign/verify
+           OpenSSLCmdEd25519Engine</li>
+<li>[x] ECDSA P256 sign/verify
+           OpenSSLCmdECDSAP256Engine</li>
+<li>[x] RSA 4096 sign/verify/encrypt/decrypt
+           OpenSSLCmdRSA4096Engine</li>
+<li>[x] ECDH P256 key exchange
+           OpenSSLCmdECDHP256Engine</li>
+</ul></li>
+</ul>
+</div>
+<div class="ddoc_section_nonstandard"><span class="ddoc_section_nonstandard_header">Engines:</span>
+
+<ul><li>DefaultAES256EncryptEngine</li>
+<li>DefaultAES256DecryptEngine</li>
+<li>DefaultEd25519Engine</li>
+<li>DefaultECDSAP256Engine</li>
+<li>DefaultRSA4096Engine</li>
+<li>DefaultECDHP256Engine</li>
+</ul>
+</div>
+<div class="ddoc_section_nonstandard"><span class="ddoc_section_nonstandard_header">Helpers:</span>
+
+<ul><li>Encrypter
+     AES256 (with CommonKey, IV), RSA4096 (with PublicKey)</li>
+<li>Decrypter
+     AES256, RSA4096 (with PrivateKey)</li>
+<li>Signer (opt: Pre hash)
+     Ed25519 (with PrivateKey), ECDSA P256 (with PrivateKey), RSA4096 (with PrivateKey)</li>
+<li>Verifier (opt: Pre hash)
+     Ed25519 (with PublicKey), ECDSA P256 (with PublicKey), RSA4096 (with PublicKey)</li>
+<li>Other
+     pem2der, der2pem, calcHKDF, calcPBKDF2</li>
+</ul></div>
+<dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".pem2der"></span><div class="quickindex" id="quickindex.pem2der"></div>@safe immutable(ubyte)[] <code class="ddoc_psymbol">pem2der</code>(in char[] <span class="ddoc_param">pem</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">PEMからDER形式に変換するヘルパ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".der2pem"></span><div class="quickindex" id="quickindex.der2pem"></div>@safe string <code class="ddoc_psymbol">der2pem</code>(in ubyte[] <span class="ddoc_param">der</span>, string <span class="ddoc_param">name</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">PEMからDER形式に変換するヘルパ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".calcHKDF"></span><div class="quickindex" id="quickindex.calcHKDF"></div>immutable(ubyte)[] <code class="ddoc_psymbol">calcHKDF</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256)</span>(in ubyte[] <span class="ddoc_param">secret</span>, size_t <span class="ddoc_param">len</span>, in ubyte[] <span class="ddoc_param">salt</span> = null, string <span class="ddoc_param">info</span> = null);
+<br></div></dt>
+<dd><div class="ddoc_summary">HKDFを計算するヘルパ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".calcPBKDF2"></span><div class="quickindex" id="quickindex.calcPBKDF2"></div>immutable(ubyte)[] <code class="ddoc_psymbol">calcPBKDF2</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256)</span>(string <span class="ddoc_param">password</span>, size_t <span class="ddoc_param">len</span>, size_t <span class="ddoc_param">iterations</span>, in ubyte[] <span class="ddoc_param">salt</span> = null);
+<br></div></dt>
+<dd><div class="ddoc_summary">HKDFを計算するヘルパ</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLCmdAESEngine"></span><div class="quickindex" id="quickindex.isOpenSSLCmdAESEngine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLCmdAESEngine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLCmdEd25519Engine"></span><div class="quickindex" id="quickindex.isOpenSSLCmdEd25519Engine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLCmdEd25519Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLCmdECDSAP256Engine"></span><div class="quickindex" id="quickindex.isOpenSSLCmdECDSAP256Engine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLCmdECDSAP256Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLCmdRSA4096Engine"></span><div class="quickindex" id="quickindex.isOpenSSLCmdRSA4096Engine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLCmdRSA4096Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLCmdECDHP256Engine"></span><div class="quickindex" id="quickindex.isOpenSSLCmdECDHP256Engine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLCmdECDHP256Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLAESEngine"></span><div class="quickindex" id="quickindex.isOpenSSLAESEngine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLAESEngine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLEd25519Engine"></span><div class="quickindex" id="quickindex.isOpenSSLEd25519Engine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLEd25519Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLECDSAP256Engine"></span><div class="quickindex" id="quickindex.isOpenSSLECDSAP256Engine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLECDSAP256Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLRSA4096Engine"></span><div class="quickindex" id="quickindex.isOpenSSLRSA4096Engine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLRSA4096Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLECDHP256Engine"></span><div class="quickindex" id="quickindex.isOpenSSLECDHP256Engine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLECDHP256Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isBcryptAESEngine"></span><div class="quickindex" id="quickindex.isBcryptAESEngine"></div>enum bool <code class="ddoc_psymbol">isBcryptAESEngine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isBcryptEd25519Engine"></span><div class="quickindex" id="quickindex.isBcryptEd25519Engine"></div>enum bool <code class="ddoc_psymbol">isBcryptEd25519Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isBcryptECDSAP256Engine"></span><div class="quickindex" id="quickindex.isBcryptECDSAP256Engine"></div>enum bool <code class="ddoc_psymbol">isBcryptECDSAP256Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isBcryptRSA4096Engine"></span><div class="quickindex" id="quickindex.isBcryptRSA4096Engine"></div>enum bool <code class="ddoc_psymbol">isBcryptRSA4096Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isBcryptECDHP256Engine"></span><div class="quickindex" id="quickindex.isBcryptECDHP256Engine"></div>enum bool <code class="ddoc_psymbol">isBcryptECDHP256Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLCmdEngine"></span><div class="quickindex" id="quickindex.isOpenSSLCmdEngine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLCmdEngine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isOpenSSLEngine"></span><div class="quickindex" id="quickindex.isOpenSSLEngine"></div>enum bool <code class="ddoc_psymbol">isOpenSSLEngine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isBcryptEngine"></span><div class="quickindex" id="quickindex.isBcryptEngine"></div>enum bool <code class="ddoc_psymbol">isBcryptEngine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isAESEngine"></span><div class="quickindex" id="quickindex.isAESEngine"></div>enum bool <code class="ddoc_psymbol">isAESEngine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isEd25519Engine"></span><div class="quickindex" id="quickindex.isEd25519Engine"></div>enum bool <code class="ddoc_psymbol">isEd25519Engine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isECDSAEngine"></span><div class="quickindex" id="quickindex.isECDSAEngine"></div>enum bool <code class="ddoc_psymbol">isECDSAEngine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isRSAEngine"></span><div class="quickindex" id="quickindex.isRSAEngine"></div>enum bool <code class="ddoc_psymbol">isRSAEngine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".isECDHEngine"></span><div class="quickindex" id="quickindex.isECDHEngine"></div>enum bool <code class="ddoc_psymbol">isECDHEngine</code>(T);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultAES128CBCEncryptEngine"></span><div class="quickindex" id="quickindex.DefaultAES128CBCEncryptEngine"></div>alias <code class="ddoc_psymbol">DefaultAES128CBCEncryptEngine</code> = OpenSSLCmdAESCBCEncryptEngine;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultAES256CBCEncryptEngine"></span><div class="quickindex" id="quickindex.DefaultAES256CBCEncryptEngine"></div>alias <code class="ddoc_psymbol">DefaultAES256CBCEncryptEngine</code> = OpenSSLCmdAESCBCEncryptEngine;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultAES128CBCDecryptEngine"></span><div class="quickindex" id="quickindex.DefaultAES128CBCDecryptEngine"></div>alias <code class="ddoc_psymbol">DefaultAES128CBCDecryptEngine</code> = OpenSSLCmdAESCBCDecryptEngine;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultAES256CBCDecryptEngine"></span><div class="quickindex" id="quickindex.DefaultAES256CBCDecryptEngine"></div>alias <code class="ddoc_psymbol">DefaultAES256CBCDecryptEngine</code> = OpenSSLCmdAESCBCDecryptEngine;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultEd25519Engine"></span><div class="quickindex" id="quickindex.DefaultEd25519Engine"></div>alias <code class="ddoc_psymbol">DefaultEd25519Engine</code> = OpenSSLCmdEd25519Engine;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultECDSAP256Engine"></span><div class="quickindex" id="quickindex.DefaultECDSAP256Engine"></div>alias <code class="ddoc_psymbol">DefaultECDSAP256Engine</code> = OpenSSLCmdECDSAP256Engine;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultRSA4096DecryptEngine"></span><div class="quickindex" id="quickindex.DefaultRSA4096DecryptEngine"></div>alias <code class="ddoc_psymbol">DefaultRSA4096DecryptEngine</code> = OpenSSLCmdRSA4096Engine;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultECDHEngine"></span><div class="quickindex" id="quickindex.DefaultECDHEngine"></div>alias <code class="ddoc_psymbol">DefaultECDHEngine</code> = OpenSSLCmdRSA4096Engine;
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Encrypter"></span><div class="quickindex" id="quickindex.Encrypter"></div>struct <code class="ddoc_psymbol">Encrypter</code>(Engine);
+<br>
+<span class="def-anchor" id=".AES256CBCEncrypter"></span><div class="quickindex" id="quickindex.AES256CBCEncrypter"></div>alias <code class="ddoc_psymbol">AES256CBCEncrypter</code> = Encrypter!(OpenSSLCmdAESCBCEncryptEngine).Encrypter;
+<br></div></dt>
+<dd><div class="ddoc_summary">Encrypt</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Encrypter.this"></span><div class="quickindex" id="quickindex.Encrypter.this"></div>this(Engine <span class="ddoc_param">engine</span>, bool <span class="ddoc_param">padding</span> = true);
+<br>
+this(immutable(ubyte)[] <span class="ddoc_param">key</span>, immutable(ubyte)[] <span class="ddoc_param">iv</span>, bool <span class="ddoc_param">padding</span> = true, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(immutable(ubyte)[] <span class="ddoc_param">key</span>, immutable(ubyte)[] <span class="ddoc_param">iv</span>, bool <span class="ddoc_param">padding</span> = true);
+<br>
+this(string <span class="ddoc_param">pubKey</span>, bool <span class="ddoc_param">padding</span> = true, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(immutable(ubyte)[] <span class="ddoc_param">pubKey</span>, bool <span class="ddoc_param">padding</span> = true, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this<span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(immutable(ubyte)[N] <span class="ddoc_param">pubKey</span>, bool <span class="ddoc_param">padding</span> = true, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(string <span class="ddoc_param">pubKey</span>, bool <span class="ddoc_param">padding</span> = true);
+<br>
+this(immutable(ubyte)[] <span class="ddoc_param">pubKey</span>, bool <span class="ddoc_param">padding</span> = true);
+<br>
+this<span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(immutable(ubyte)[N] <span class="ddoc_param">pubKey</span>, bool <span class="ddoc_param">padding</span> = true);
+<br></div></dt>
+<dd><div class="ddoc_summary">Constructor</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Encrypter.update"></span><div class="quickindex" id="quickindex.Encrypter.update"></div>void <code class="ddoc_psymbol">update</code>(in ubyte[] <span class="ddoc_param">data</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Update</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Encrypter.data"></span><div class="quickindex" id="quickindex.Encrypter.data"></div>immutable(ubyte)[] <code class="ddoc_psymbol">data</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Data</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Encrypter.encrypt"></span><div class="quickindex" id="quickindex.Encrypter.encrypt"></div>immutable(ubyte)[] <code class="ddoc_psymbol">encrypt</code>(in ubyte[] <span class="ddoc_param">dat</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">OneShot <code class="ddoc_psymbol">encrypt</code></div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Decrypter"></span><div class="quickindex" id="quickindex.Decrypter"></div>struct <code class="ddoc_psymbol">Decrypter</code>(Engine);
+<br>
+<span class="def-anchor" id=".AES256CBCDecrypter"></span><div class="quickindex" id="quickindex.AES256CBCDecrypter"></div>alias <code class="ddoc_psymbol">AES256CBCDecrypter</code> = Decrypter!(OpenSSLCmdAESCBCDecryptEngine).Decrypter;
+<br>
+<span class="def-anchor" id=".RSA4096Decrypter"></span><div class="quickindex" id="quickindex.RSA4096Decrypter"></div>alias <code class="ddoc_psymbol">RSA4096Decrypter</code> = Decrypter!(OpenSSLCmdRSA4096Engine).Decrypter;
+<br></div></dt>
+<dd><div class="ddoc_summary">Decrypt</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Decrypter.this"></span><div class="quickindex" id="quickindex.Decrypter.this"></div>this(Engine <span class="ddoc_param">engine</span>, bool <span class="ddoc_param">padding</span> = true);
+<br>
+this(immutable(ubyte)[] <span class="ddoc_param">key</span>, immutable(ubyte)[] <span class="ddoc_param">iv</span>, bool <span class="ddoc_param">padding</span> = true, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(immutable(ubyte)[] <span class="ddoc_param">key</span>, immutable(ubyte)[] <span class="ddoc_param">iv</span>, bool <span class="ddoc_param">padding</span> = true);
+<br>
+this(string <span class="ddoc_param">pubKey</span>, bool <span class="ddoc_param">padding</span> = true, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(immutable(ubyte)[] <span class="ddoc_param">prvKey</span>, bool <span class="ddoc_param">padding</span> = true, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this<span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(immutable(ubyte)[N] <span class="ddoc_param">prvKey</span>, bool <span class="ddoc_param">padding</span> = true, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(string <span class="ddoc_param">prvKey</span>, bool <span class="ddoc_param">padding</span> = true);
+<br>
+this(immutable(ubyte)[] <span class="ddoc_param">prvKey</span>, bool <span class="ddoc_param">padding</span> = true);
+<br>
+this<span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(immutable(ubyte)[N] <span class="ddoc_param">prvKey</span>, bool <span class="ddoc_param">padding</span> = true);
+<br></div></dt>
+<dd><div class="ddoc_summary">Constructor</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Decrypter.update"></span><div class="quickindex" id="quickindex.Decrypter.update"></div>void <code class="ddoc_psymbol">update</code>(in ubyte[] <span class="ddoc_param">data</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Update</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Decrypter.data"></span><div class="quickindex" id="quickindex.Decrypter.data"></div>immutable(ubyte)[] <code class="ddoc_psymbol">data</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Data</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Decrypter.decrypt"></span><div class="quickindex" id="quickindex.Decrypter.decrypt"></div>immutable(ubyte)[] <code class="ddoc_psymbol">decrypt</code>(in ubyte[] <span class="ddoc_param">dat</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">OneShot <code class="ddoc_psymbol">decrypt</code></div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Signer"></span><div class="quickindex" id="quickindex.Signer"></div>struct <code class="ddoc_psymbol">Signer</code>(Engine, DigestEngine = void);
+<br>
+<span class="def-anchor" id=".Ed25519Signer"></span><div class="quickindex" id="quickindex.Ed25519Signer"></div>template <code class="ddoc_psymbol">Ed25519Signer</code>(DigestEngine = void)<br>
+<span class="def-anchor" id=".Ed25519phSigner"></span><div class="quickindex" id="quickindex.Ed25519phSigner"></div>alias <code class="ddoc_psymbol">Ed25519phSigner</code> = Signer!(OpenSSLCmdEd25519Engine, SHA!(1024u, 512u)).Signer;
+<br>
+<span class="def-anchor" id=".ECDSAP256Signer"></span><div class="quickindex" id="quickindex.ECDSAP256Signer"></div>template <code class="ddoc_psymbol">ECDSAP256Signer</code>(DigestEngine = void)<br>
+<span class="def-anchor" id=".RSA4096Signer"></span><div class="quickindex" id="quickindex.RSA4096Signer"></div>template <code class="ddoc_psymbol">RSA4096Signer</code>(DigestEngine = void)<br></div></dt>
+<dd><div class="ddoc_summary">Sign</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Signer.this"></span><div class="quickindex" id="quickindex.Signer.this"></div>this(Engine <span class="ddoc_param">engine</span>, Engine.PrivateKey <span class="ddoc_param">prvKey</span>);
+<br>
+this(in char[] <span class="ddoc_param">prvKeyPEM</span>, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(in ubyte[] <span class="ddoc_param">prvKeyDER</span>, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this<span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(in ubyte[N] <span class="ddoc_param">prvKeyRaw</span>, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(in char[] <span class="ddoc_param">prvKeyPEM</span>);
+<br>
+this(in ubyte[] <span class="ddoc_param">prvKeyDER</span>);
+<br>
+this<span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(in ubyte[N] <span class="ddoc_param">prvKeyRaw</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Constructor</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Signer.update"></span><div class="quickindex" id="quickindex.Signer.update"></div>void <code class="ddoc_psymbol">update</code>(in ubyte[] <span class="ddoc_param">message</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Update</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Signer.sign"></span><div class="quickindex" id="quickindex.Signer.sign"></div>immutable(ubyte)[] <code class="ddoc_psymbol">sign</code>();
+<br></div></dt>
+<dd><div class="ddoc_summary">Sign</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Signer.sign.2"></span><div class="quickindex" id="quickindex.Signer.sign.2"></div>immutable(ubyte)[] <code class="ddoc_psymbol">sign</code>(in ubyte[] <span class="ddoc_param">data</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Sign</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Verifier"></span><div class="quickindex" id="quickindex.Verifier"></div>struct <code class="ddoc_psymbol">Verifier</code>(Engine, DigestEngine = void);
+<br>
+<span class="def-anchor" id=".Ed25519Verifier"></span><div class="quickindex" id="quickindex.Ed25519Verifier"></div>template <code class="ddoc_psymbol">Ed25519Verifier</code>(DigestEngine = void)<br>
+<span class="def-anchor" id=".Ed25519phVerifier"></span><div class="quickindex" id="quickindex.Ed25519phVerifier"></div>alias <code class="ddoc_psymbol">Ed25519phVerifier</code> = Verifier!(OpenSSLCmdEd25519Engine, SHA!(1024u, 512u)).Verifier;
+<br>
+<span class="def-anchor" id=".ECDSAP256Verifier"></span><div class="quickindex" id="quickindex.ECDSAP256Verifier"></div>template <code class="ddoc_psymbol">ECDSAP256Verifier</code>(DigestEngine = void)<br>
+<span class="def-anchor" id=".RSA4096Verifier"></span><div class="quickindex" id="quickindex.RSA4096Verifier"></div>template <code class="ddoc_psymbol">RSA4096Verifier</code>(DigestEngine = void)<br></div></dt>
+<dd><div class="ddoc_summary">Vefiry</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Verifier.this"></span><div class="quickindex" id="quickindex.Verifier.this"></div>this(Engine <span class="ddoc_param">engine</span>, Engine.PublicKey <span class="ddoc_param">pubKey</span>);
+<br>
+this(in char[] <span class="ddoc_param">pubKeyPEM</span>, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(in ubyte[] <span class="ddoc_param">pubKeyDER</span>, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this<span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(in ubyte[N] <span class="ddoc_param">pubKeyRaw</span>, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(string <span class="ddoc_param">pubKeyPEM</span>);
+<br>
+this(immutable(ubyte)[] <span class="ddoc_param">pubKeyDER</span>);
+<br>
+this<span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(in ubyte[N] <span class="ddoc_param">pubKeyRaw</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Constructor</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Verifier.update"></span><div class="quickindex" id="quickindex.Verifier.update"></div>void <code class="ddoc_psymbol">update</code>(in ubyte[] <span class="ddoc_param">message</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Update</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Verifier.verify"></span><div class="quickindex" id="quickindex.Verifier.verify"></div>bool <code class="ddoc_psymbol">verify</code>(in ubyte[] <span class="ddoc_param">signature</span>);
+<br>
+bool <code class="ddoc_psymbol">verify</code>(in ubyte[] <span class="ddoc_param">signature</span>, in ubyte[] <span class="ddoc_param">message</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Verify</div></dd>
+</div></dl>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".KeyExchanger"></span><div class="quickindex" id="quickindex.KeyExchanger"></div>struct <code class="ddoc_psymbol">KeyExchanger</code>(Engine);
+<br></div></dt>
+<dd><div class="ddoc_summary">Key exchange</div><dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".KeyExchanger.this"></span><div class="quickindex" id="quickindex.KeyExchanger.this"></div>this(Engine <span class="ddoc_param">engine</span>, Engine.PrivateKey <span class="ddoc_param">prvKey</span>);
+<br>
+this(in char[] <span class="ddoc_param">prvKeyPEM</span>, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(in ubyte[] <span class="ddoc_param">prvKeyDER</span>, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this<span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(ubyte[N] <span class="ddoc_param">prvKeyRaw</span>, string <span class="ddoc_param">cmd</span> = defaultOpenSSLCommand);
+<br>
+this(in char[] <span class="ddoc_param">prvKeyPEM</span>);
+<br>
+this(in ubyte[] <span class="ddoc_param">prvKeyDER</span>);
+<br>
+this<span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(ubyte[N] <span class="ddoc_param">prvKeyRaw</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Constructor</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".KeyExchanger.derive"></span><div class="quickindex" id="quickindex.KeyExchanger.derive"></div>immutable(ubyte)[] <code class="ddoc_psymbol">derive</code>(in char[] <span class="ddoc_param">pubKeyPEM</span>);
+<br>
+immutable(ubyte)[] <code class="ddoc_psymbol">derive</code>(in ubyte[] <span class="ddoc_param">pubKeyPEM</span>);
+<br>
+immutable(ubyte)[] <code class="ddoc_psymbol">derive</code><span class="ddoc_template_param_list" title="Template parameter list">(size_t N)</span>(in ubyte[N] <span class="ddoc_param">pubKeyRaw</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Derive</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".KeyExchanger.deriveHKDF"></span><div class="quickindex" id="quickindex.KeyExchanger.deriveHKDF"></div>immutable(ubyte)[] <code class="ddoc_psymbol">deriveHKDF</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256)</span>(in char[] <span class="ddoc_param">pubKeyPEM</span>, size_t <span class="ddoc_param">len</span>, immutable(ubyte)[] <span class="ddoc_param">salt</span> = null, string <span class="ddoc_param">info</span> = null);
+<br>
+immutable(ubyte)[] <code class="ddoc_psymbol">deriveHKDF</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256)</span>(in ubyte[] <span class="ddoc_param">pubKeyDER</span>, size_t <span class="ddoc_param">len</span>, immutable(ubyte)[] <span class="ddoc_param">salt</span> = null, string <span class="ddoc_param">info</span> = null);
+<br>
+immutable(ubyte)[] <code class="ddoc_psymbol">deriveHKDF</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256, size_t N)</span>(in ubyte[N] <span class="ddoc_param">pubKeyRaw</span>, size_t <span class="ddoc_param">len</span>, immutable(ubyte)[] <span class="ddoc_param">salt</span> = null, string <span class="ddoc_param">info</span> = null);
+<br></div></dt>
+<dd><div class="ddoc_summary">Derive with calculate HKDF</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".KeyExchanger.deriveEncrypter"></span><div class="quickindex" id="quickindex.KeyExchanger.deriveEncrypter"></div>auto <code class="ddoc_psymbol">deriveEncrypter</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256)</span>(in char[] <span class="ddoc_param">pubKeyPEM</span>, immutable(ubyte)[] <span class="ddoc_param">salt</span> = null, size_t <span class="ddoc_param">aesKeyBits</span> = 256);
+<br>
+auto <code class="ddoc_psymbol">deriveEncrypter</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256)</span>(in ubyte[] <span class="ddoc_param">pubKeyDER</span>, immutable(ubyte)[] <span class="ddoc_param">salt</span> = null, size_t <span class="ddoc_param">aesKeyBits</span> = 256);
+<br>
+auto <code class="ddoc_psymbol">deriveEncrypter</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256, size_t N)</span>(in ubyte[N] <span class="ddoc_param">pubKeyRaw</span>, immutable(ubyte)[] <span class="ddoc_param">salt</span> = null, size_t <span class="ddoc_param">aesKeyBits</span> = 256);
+<br></div></dt>
+<dd><div class="ddoc_summary">Derive encrypter</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".KeyExchanger.deriveEncrypter.2"></span><div class="quickindex" id="quickindex.KeyExchanger.deriveEncrypter.2"></div>auto <code class="ddoc_psymbol">deriveEncrypter</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256)</span>(in char[] <span class="ddoc_param">pubKeyPEM</span>, immutable(ubyte)[] <span class="ddoc_param">salt</span> = null, size_t <span class="ddoc_param">aesKeyBits</span> = 256);
+<br>
+auto <code class="ddoc_psymbol">deriveEncrypter</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256)</span>(in ubyte[] <span class="ddoc_param">pubKeyDER</span>, immutable(ubyte)[] <span class="ddoc_param">salt</span> = null, size_t <span class="ddoc_param">aesKeyBits</span> = 256);
+<br>
+auto <code class="ddoc_psymbol">deriveEncrypter</code><span class="ddoc_template_param_list" title="Template parameter list">(DigestEngine = SHA256, size_t N)</span>(in ubyte[N] <span class="ddoc_param">pubKeyRaw</span>, immutable(ubyte)[] <span class="ddoc_param">salt</span> = null, size_t <span class="ddoc_param">aesKeyBits</span> = 256);
+<br></div></dt>
+<dd><div class="ddoc_summary">Derive decrypter</div></dd>
+</div></dl>
+</dd>
+</div></dl>
+
+                
+            </div>
+        </div>
+        
+        <script type="text/javascript">jQuery(document).ready(listanchors);</script>
+        
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+     </body>
+</html>
