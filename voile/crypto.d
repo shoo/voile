@@ -71,6 +71,7 @@ import std.range, std.array;
 import std.algorithm: move;
 import std.digest.sha: SHA256, SHA512;
 import std.string: representation;
+import voile.bindat;
 
 //##############################################################################
 //##### Common functions
@@ -520,6 +521,123 @@ private bool isCommandExisting(string cmd)
 		return executeShell("which '" ~ cmd ~ "'").status == 0;
 	}
 }
+
+private struct SemVer
+{
+	uint major;
+	uint minor;
+	uint patch;
+	string prerelease;
+	string buildmetadata;
+	
+	bool opEquals(const SemVer lhs) const @safe
+	{
+		return major == lhs.major
+			&& minor == lhs.minor
+			&& patch == lhs.patch
+			&& prerelease == lhs.prerelease
+			&& buildmetadata == lhs.buildmetadata;
+	}
+	
+	int opCmp(const SemVer lhs) const @safe
+	{
+		import std.string: cmp;
+		if (opEquals(lhs))
+			return 0;
+		if (major < lhs.major)
+			return -1;
+		if (major > lhs.major)
+			return 1;
+		if (minor < lhs.minor)
+			return -1;
+		if (minor > lhs.minor)
+			return 1;
+		if (patch < lhs.patch)
+			return -1;
+		if (patch > lhs.patch)
+			return 1;
+		if (prerelease.cmp(lhs.prerelease) < 0)
+			return -1;
+		if (prerelease.cmp(lhs.prerelease) > 0)
+			return 1;
+		if (buildmetadata.cmp(lhs.buildmetadata) < 0)
+			return -1;
+		if (buildmetadata.cmp(lhs.buildmetadata) > 0)
+			return 1;
+		return 0;
+	}
+}
+@safe unittest
+{
+	assert(SemVer(1, 2, 3) < SemVer(3, 2, 4));
+	assert(SemVer(1, 3, 3) > SemVer(1, 2, 4));
+	assert(SemVer(1, 2, 3) < SemVer(1, 2, 4));
+	assert(SemVer(1, 2, 5) > SemVer(1, 2, 4));
+	assert(SemVer(1, 2, 4) == SemVer(1, 2, 4));
+	assert(SemVer(1, 2, 4, "rc.1") < SemVer(1, 2, 4, "rc.2"));
+}
+
+/*******************************************************************************
+ * SemVer
+ */
+private SemVer getSemVer(string verStr) @safe
+{
+	import std.regex;
+	import std.conv;
+	import std.string;
+	auto rSemVer = regex(r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)"
+		~ r"(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
+		~ r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?"
+		~ r"(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$");
+	if (auto mVer = verStr.matchFirst(rSemVer))
+	{
+		return SemVer(mVer["major"].to!uint,
+			mVer["minor"].to!uint,
+			mVer["patch"].to!uint,
+			mVer["prerelease"],
+			mVer["buildmetadata"]);
+	}
+	auto vers = verStr.split(".");
+	enforce(vers.length >= 3);
+	return SemVer(vers[0].to!uint.ifThrown(0), vers[1].to!uint.ifThrown(0), vers[2].to!uint.ifThrown(0));
+}
+
+@safe unittest
+{
+	assert(getSemVer("1.2.3") == SemVer(1, 2, 3));
+	assert(getSemVer("1.2.3-rc1") == SemVer(1, 2, 3, "rc1"));
+	assert(getSemVer("1.2.3-rc1+abcdef") == SemVer(1, 2, 3, "rc1", "abcdef"));
+	assert(getSemVer("1.2.3+abcdef") == SemVer(1, 2, 3, "", "abcdef"));
+}
+
+private SemVer parseOpenSSLCmdVersionString(string str) @safe
+{
+	import std.string;
+	enforce(str.startsWith("OpenSSL"));
+	auto verstr = str[7..$].stripLeft;
+	auto verstrEdIdx = verstr.indexOf(" ");
+	enforce(verstrEdIdx != -1);
+	return verstr[0..verstrEdIdx].getSemVer();
+}
+@safe unittest
+{
+	enum sampleStr1 = "OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)\n";
+	enum sampleStr2 = "OpenSSL 1.1.1f  31 Mar 2020\n";
+	assert(sampleStr1.parseOpenSSLCmdVersionString() == SemVer(3, 0, 13));
+	assert(sampleStr2.parseOpenSSLCmdVersionString() == SemVer(1, 1, 0));
+}
+
+/*******************************************************************************
+ * コマンドの有無を判定する
+ */
+private SemVer getOpenSSLCmdVerseion(string cmd) @safe
+{
+	import std.process;
+	auto result = execute([cmd, "version"]);
+	enforce(result.status == 0);
+	return result.output.parseOpenSSLCmdVersionString();
+}
+
 
 //##############################################################################
 //##### OpenSSL command line Engine
@@ -5144,6 +5262,8 @@ version (Have_openssl) @system unittest
 {
 	if (!isCommandExisting(defaultOpenSSLCommand))
 		return;
+	if (getOpenSSLCmdVerseion(defaultOpenSSLCommand) < SemVer(3, 1, 1))
+		return;
 	auto prvKey = OpenSSLCmdEd25519Engine.PrivateKey.createKey();
 	auto pubKey = OpenSSLCmdEd25519Engine.PublicKey.createKey(prvKey);
 	auto signer = Signer!OpenSSLCmdEd25519Engine(prvKey.toBinary);
@@ -5158,6 +5278,8 @@ version (Have_openssl) @system unittest
 @system unittest
 {
 	if (!isCommandExisting(defaultOpenSSLCommand))
+		return;
+	if (getOpenSSLCmdVerseion(defaultOpenSSLCommand) < SemVer(3, 0, 1))
 		return;
 	auto prvKey = OpenSSLCmdEd25519Engine.PrivateKey.fromBinary(
 		x"6BD57B7C2FDA227E75C30F02590D63F3CFC26E6DA59024C305E5044BE21CF632");
