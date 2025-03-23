@@ -451,23 +451,32 @@ public:
 			CborMap);
 		ref inout(Dictionary!(CborValue, CborValue)) _reqMap() pure inout @trusted
 		{
-			alias tmp = __traits(getMember, CborType, "get");
-			return *cast(inout(Dictionary!(CborValue, CborValue))*)&(__traits(child, _instance, tmp!CborMap)());
+			//alias tmp = __traits(getMember, CborType, "get");
+			//return *cast(inout(Dictionary!(CborValue, CborValue))*)&(__traits(child, _instance, tmp!CborMap)());
+			enum idx = staticIndexOf!(CborMap, CborType.Types);
+			return *cast(inout(Dictionary!(CborValue, CborValue))*)
+				&(__traits(getMember, _instance, "storage").tupleof[idx]);
 		}
 		inout(CborValue)[] _reqArray() pure inout @trusted
 		{
-			alias tmp = __traits(getMember, CborType, "get");
-			return cast(inout(CborValue)[])__traits(child, _instance, tmp!CborArray)();
+			//alias tmp = __traits(getMember, CborType, "get");
+			//return cast(inout(CborValue)[])__traits(child, _instance, tmp!CborArray)();
+			enum idx = staticIndexOf!(CborArray, CborType.Types);
+			return cast(inout(CborValue)[])__traits(getMember, _instance, "storage").tupleof[idx];
 		}
 		string _reqStr() pure inout @trusted
 		{
-			alias tmp = __traits(getMember, CborType, "get");
-			return cast(string)__traits(child, _instance, tmp!String)();
+			//alias tmp = __traits(getMember, CborType, "get");
+			//return cast(string)__traits(child, _instance, tmp!String)();
+			enum idx = staticIndexOf!(String, CborType.Types);
+			return cast(string)__traits(getMember, _instance, "storage").tupleof[idx];
 		}
 		immutable(ubyte)[] _reqBin() pure inout @trusted
 		{
-			alias tmp = __traits(getMember, CborType, "get");
-			return cast(immutable(ubyte)[])__traits(child, _instance, tmp!Binary)();
+			//alias tmp = __traits(getMember, CborType, "get");
+			//return cast(immutable(ubyte)[])__traits(child, _instance, tmp!Binary)();
+			enum idx = staticIndexOf!(Binary, CborType.Types);
+			return __traits(getMember, _instance, "storage").tupleof[idx];
 		}
 	public:
 		///

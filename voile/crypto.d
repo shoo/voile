@@ -2729,6 +2729,7 @@ version (Windows)
 	{
 		import core.sys.windows.windows;
 		pragma(lib, "Bcrypt");
+		pragma(lib, "User32");
 		alias BCRYPT_HANDLE = void*;
 		alias BCRYPT_ALG_HANDLE = BCRYPT_HANDLE;
 		alias BCRYPT_KEY_HANDLE = BCRYPT_HANDLE;
