@@ -505,7 +505,7 @@ private auto createDisposableDir(string basePath = null, string prefix = "voile-
 /*******************************************************************************
  * コマンドの有無を判定する
  */
-private bool isCommandExisting(string cmd)
+private bool isCommandExisting(string cmd) @safe
 {
 	import std.process;
 	version (Windows)
@@ -1302,7 +1302,9 @@ static if (enableOpenSSLCmdEngines)
 			{
 				import std.algorithm: copy;
 				isCommandExisting(cmd).enforce("OpenSSL command line interface cannot find.");
-				auto pipe = pipeProcess([cmd, "genrsa", "4096", "-out", "-"]);
+				auto pipe = getOpenSSLCmdVerseion(cmd) < SemVer(3, 0, 0)
+					? pipeProcess([cmd, "genrsa", "4096"])
+					: pipeProcess([cmd, "genrsa", "-traditional", "4096"]);
 				pipe.stdin.flush();
 				pipe.stdin.close();
 				auto app = appender!string;
@@ -7198,9 +7200,15 @@ ubyte[DefaultRSA4096Engine.publicKeyBinaryLen] createRSA4096PublicKey(
 	{
 		return Verifier!Engine(pubKey).verify(Signer!Engine(prvKey).sign(msg), msg);
 	}
-	auto prvKey1 = createEd25519PrivateKey();
-	auto pubKey1 = createEd25519PublicKey(prvKey1);
-	assert(signVerifyTest!DefaultEd25519Engine(prvKey1, pubKey1));
+	
+	if (!isOpenSSLCmdEngine!DefaultEd25519Engine
+		|| (isCommandExisting(defaultOpenSSLCommand)
+			&& getOpenSSLCmdVerseion(defaultOpenSSLCommand) >= SemVer(3, 0, 1)))
+	{
+		auto prvKey1 = createEd25519PrivateKey();
+		auto pubKey1 = createEd25519PublicKey(prvKey1);
+		assert(signVerifyTest!DefaultEd25519Engine(prvKey1, pubKey1));
+	}
 	
 	auto prvKey2 = createECDSAP256PrivateKey();
 	auto pubKey2 = createECDSAP256PublicKey(prvKey2);
