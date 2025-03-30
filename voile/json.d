@@ -2262,8 +2262,12 @@ private:
 	import std.digest.sha;
 	import std.exception: enforce;
 	import std.string: representation;
+	import voile.crypto: ECDSAP256Signer, ECDSAP256Verifier;
+	alias ES256Signer   = ECDSAP256Signer!SHA256;
+	alias ES256Verifier = ECDSAP256Verifier!SHA256;
 	immutable(ubyte)[] _key;
-	JSONValue _payload;
+	JSONValue          _payload;
+	JSONValue[string]  _headers;
 public:
 	/***************************************************************************
 	 * 
@@ -2275,7 +2279,7 @@ public:
 	 */
 	enum Algorithm
 	{
-		HS256, HS384, HS512
+		HS256, HS384, HS512, ES256
 	}
 	/// ditto
 	Algorithm algorithm = Algorithm.HS256;
@@ -2303,6 +2307,9 @@ public:
 		case "HS512":
 			algorithm = Algorithm.HS512;
 			break;
+		case "ES256":
+			algorithm = Algorithm.ES256;
+			break;
 		default:
 			enforce(false, "Unsupported algorithm");
 		}
@@ -2318,6 +2325,21 @@ public:
 			break;
 		case Algorithm.HS512:
 			enforce(B64.encode((jwtElms[0] ~ "." ~ jwtElms[1]).representation.hmac!SHA512(key)) == jwtElms[2], verrmsg);
+			break;
+		case Algorithm.ES256:
+			if (auto jwk = "jwk" in header)
+			{
+				enforce(jwk.object["kty"].str == "EC");
+				enforce(jwk.object["crv"].str == "P-256");
+				auto crvX = B64.decode(jwk.object["x"].str);
+				auto crvY = B64.decode(jwk.object["y"].str);
+				enforce(crvX.length == 32);
+				enforce(crvY.length == 32);
+				ubyte[65] pubKey = staticArray!65(cast(ubyte[])[0x04] ~ crvX[0..32] ~ crvY[0..32]);
+				auto message = (jwtElms[0] ~ "." ~ jwtElms[1]).representation;
+				auto signature = B64.decode(jwtElms[2]);
+				enforce(ES256Verifier(pubKey).verify(signature, message), verrmsg);
+			}
 			break;
 		}
 		
@@ -2406,6 +2428,26 @@ public:
 		this(algo, key.representation);
 	}
 	
+	/***************************************************************************
+	 * 
+	 */
+	void addHeader(string name, JSONValue value)
+	{
+		_headers[name] = value;
+	}
+	/// dittp
+	void addHeader(string name, string value)
+	{
+		_headers[name] = JSONValue(value);
+	}
+	
+	/***************************************************************************
+	 * 
+	 */
+	void removeHeader(string name)
+	{
+		_headers.remove(name);
+	}
 	
 	/***************************************************************************
 	 * 
@@ -2452,9 +2494,12 @@ public:
 		string ret;
 		import std.conv: text;
 		import std.base64;
-		alias B64 = Base64Impl!('+', '/', Base64.NoPadding);
+		alias B64 = Base64URLNoPadding;
 		
-		ret ~= B64.encode(text(`{"alg":"`, algorithm, `","typ":"`, type, `"}`).representation);
+		auto header = JSONValue(["alg": algorithm.to!string, "typ": type]);
+		foreach (name, value; _headers)
+			header.object[name] = value;
+		ret ~= B64.encode(header.toString().representation);
 		ret ~= ".";
 		ret ~= B64.encode(_payload.toString().representation);
 		
@@ -2466,6 +2511,9 @@ public:
 			return ret ~ "." ~ cast(string)B64.encode(ret.representation.hmac!SHA384(_key));
 		case Algorithm.HS512:
 			return ret ~ "." ~ cast(string)B64.encode(ret.representation.hmac!SHA512(_key));
+		case Algorithm.ES256:
+			ubyte[32] key = staticArray!32(_key[0..32]);
+			return ret ~ "." ~ cast(string)B64.encode(ES256Signer(key).sign(ret.representation));
 		}
 	}
 }

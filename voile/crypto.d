@@ -1240,7 +1240,7 @@ static if (enableOpenSSLCmdEngines)
 			pipe.stdout.byChunk(4096).copy(app);
 			auto result = pipe.pid.wait();
 			enforce(result == 0, "Cannot sign specified message.");
-			return app.data;
+			return app.data.convECDSAP256SignDer2Bin();
 		}
 		
 		/***********************************************************************
@@ -1254,7 +1254,7 @@ static if (enableOpenSSLCmdEngines)
 			auto dir = createDisposableDir(prefix: "openssl-");
 			auto pubKeyPath = dir.write("pubkey.pem", pubKey._pem);
 			auto msgPath = dir.write("message.bin", message);
-			auto signPath = dir.write("signature.bin", signature);
+			auto signPath = dir.write("signature.bin", signature.convECDSAP256SignBin2Der());
 			auto pipe = pipeProcess([_cmd, "pkeyutl", "-verify", "-in", msgPath,
 				"-sigfile", signPath, "-pubin", "-inkey", pubKeyPath, "-out", "-"]);
 			pipe.stdin.flush();
@@ -2390,7 +2390,7 @@ static if (enableOpenSSLEngines)
 			// 署名
 			ctxSign.EVP_PKEY_sign(signData.ptr, &signLen, message.ptr, message.length)
 				.enforce("OpenSSL ECDSA P256 sign failed.");
-			return signData[0..signLen].assumeUnique;
+			return signData[0..signLen].convECDSAP256SignDer2Bin;
 		}
 		
 		/***********************************************************************
@@ -2406,7 +2406,8 @@ static if (enableOpenSSLEngines)
 				.enforce("OpenSSL ECDSA P256 verify failed.");
 			
 			// 検証
-			auto res = ctxVerify.EVP_PKEY_verify(signature.ptr, signature.length,
+			auto signDat = signature.convECDSAP256SignBin2Der();
+			auto res = ctxVerify.EVP_PKEY_verify(signDat.ptr, signDat.length,
 				cast(ubyte*)message.ptr, message.length);
 			return res != 0;
 		}
@@ -3155,6 +3156,8 @@ static if (enableBcryptEngines)
 					cast(void)BCryptCloseAlgorithmProvider(hAlg, 0);
 				BCryptGenerateKeyPair(hAlg, &hKey, 256, 0)
 					.ntEnforce("Cannot create private key.");
+				BCryptFinalizeKeyPair(hKey, 0)
+					.ntEnforce("Cannot create private key.");
 				return makeInst(hAlg, hKey);
 			}
 			/***********************************************************************
@@ -3422,14 +3425,11 @@ static if (enableBcryptEngines)
 			BCryptSignHash(prvKey._key, null, cast(PUCHAR)message.ptr, cast(ULONG)message.length, null, 0, &len, 0)
 				.ntEnforce("Cannot sign specified message.");
 			assert(len == 64);
-			ubyte[64] signData;
+			auto ret = new ubyte[64];
 			BCryptSignHash(prvKey._key, null, cast(PUCHAR)message.ptr, cast(ULONG)message.length,
-				signData.ptr, cast(ULONG)signData.length, &len, 0)
+				ret.ptr, cast(ULONG)ret.length, &len, 0)
 				.ntEnforce("Cannot sign specified message.");
-			auto ret = cast(immutable(ubyte)[])[0x30, 0x45]
-				~ encasn1bn(signData[0..32].assumeUnique)
-				~ encasn1bn(signData[32..$].assumeUnique);
-			return ret;
+			return ret.assumeUnique;
 		}
 		
 		/***********************************************************************
@@ -3437,22 +3437,8 @@ static if (enableBcryptEngines)
 		 */
 		bool verify(in ubyte[] message, in ubyte[] signature, in PublicKey pubKey)
 		{
-			ubyte[64] signDat;
-			if (signature.length > 64 && signature[0] == 0x30 && signature[1] == 0x45)
-			{
-				auto signDatAsn1 = signature[2 .. $];
-				auto signDatHi = decasn1bn(signDatAsn1);
-				auto signDatLo = decasn1bn(signDatAsn1);
-				enforce(signDatHi.length == 32 && signDatLo.length == 32, "Invalid signature format.");
-				signDat[0..32]  = signDatHi[0..32];
-				signDat[32..64] = signDatLo[0..32];
-			}
-			else
-			{
-				signDat[] = signature[0..64];
-			}
 			auto res = BCryptVerifySignature(pubKey._key, null, cast(PUCHAR)message.ptr, cast(ULONG)message.length,
-				cast(PUCHAR)signDat.ptr, cast(ULONG)signDat.length, 0);
+				cast(PUCHAR)signature.ptr, cast(ULONG)signature.length, 0);
 			return res == 0;
 		}
 	}
@@ -4571,6 +4557,33 @@ else
 	alias DefaultECDHEngine = OpenSSLCmdRSA4096Engine;
 }
 
+
+/*******************************************************************************
+ * Methods of ECDSA P256 Signature format convertion
+ * 
+ * DER format:
+ * - SEQUENCE
+ *   - INTEGER: R
+ *   - INTEGER: S
+ * BIN format:
+ * - ubyte[32]: R
+ * - ubyte[32]: S
+ */
+immutable(ubyte)[] convECDSAP256SignDer2Bin(in ubyte[] der)
+{
+	const(ubyte)[] dat = der[];
+	auto seq = decasn1seq(dat);
+	auto s = decasn1bn(seq, 32);
+	auto r = decasn1bn(seq, 32);
+	return (s ~ r).assumeUnique;
+}
+/// ditto
+immutable(ubyte)[] convECDSAP256SignBin2Der(in ubyte[] bin)
+{
+	return encasn1seq(encasn1bn(bin[0..32].assumeUnique) ~ encasn1bn(bin[32..$].assumeUnique));
+}
+
+
 /*******************************************************************************
  * Encrypt
  */
@@ -5278,21 +5291,21 @@ static if (enableBcryptEngines) @system unittest
 		~ x"048FA35F141D8D817F6130C068AD1A519BF6D13DFEF693FAE66C139A3A9C703229"
 		~ x"1F7BFA8B54CF9AD76929FD5C309B750AF53766D261BE82A1E3DEC831102FEABF");
 	// openssl pkeyutl -sign -inkey private_key.pem -in test.txt -out signature.bin
-	enum signatureExample1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
-		~ x"0220"~x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
+	enum signatureExample1 = cast(immutable(ubyte)[])(x""
+		~ x"e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
+		~ x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
 	// from OpenSSLECDSAP256Engine
-	enum signatureExample2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
-		~ x"0221"~x"00CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
+	enum signatureExample2 = cast(immutable(ubyte)[])(x""
+		~ x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
+		~ x"CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
 	// openssl dgst -sha256 -sign private_key.pem -out signature.bin test.txt
-	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
-		~ x"0220"~x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
+	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x""
+		~ x"841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
+		~ x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
 	// from OpenSSLECDSAP256Engine
-	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
-		~ x"0221"~x"00D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
+	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x""
+		~ x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
+		~ x"D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
 	auto prvKey = BcryptECDSAP256Engine.PrivateKey.fromBinary(prvKeyBin);
 	auto pubKey = BcryptECDSAP256Engine.PublicKey.fromBinary(pubKeyBin);
 	assert(prvKey.toBinary == prvKeyBin);
@@ -5364,19 +5377,19 @@ static if (enableOpenSSLEngines) @system unittest
 		~ x"048FA35F141D8D817F6130C068AD1A519BF6D13DFEF693FAE66C139A3A9C703229"
 		~ x"1F7BFA8B54CF9AD76929FD5C309B750AF53766D261BE82A1E3DEC831102FEABF");
 	// openssl pkeyutl -sign -inkey private_key.pem -in test.txt -out signature.bin
-	enum signatureExample1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
-		~ x"0220"~x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
-	enum signatureExample2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
-		~ x"0221"~x"00CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
+	enum signatureExample1 = cast(immutable(ubyte)[])(x""
+		~ x"e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
+		~ x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
+	enum signatureExample2 = cast(immutable(ubyte)[])(x""
+		~ x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
+		~ x"CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
 	// openssl dgst -sha256 -sign private_key.pem -out signature.bin test.txt
-	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
-		~ x"0220"~x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
-	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
-		~ x"0221"~x"00D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
+	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x""
+		~ x"841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
+		~ x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
+	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x""
+		~ x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
+		~ x"D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
 	auto prvKey = OpenSSLECDSAP256Engine.PrivateKey.fromBinary(prvKeyBin);
 	auto pubKey = OpenSSLECDSAP256Engine.PublicKey.createKey(prvKey);
 	assert(prvKey.toBinary == prvKeyBin);
@@ -5451,18 +5464,18 @@ static if (enableOpenSSLCmdEngines) @system unittest
 		~ x"048FA35F141D8D817F6130C068AD1A519BF6D13DFEF693FAE66C139A3A9C703229"
 		~ x"1F7BFA8B54CF9AD76929FD5C309B750AF53766D261BE82A1E3DEC831102FEABF");
 	// openssl pkeyutl -sign -inkey private_key.pem -in test.txt -out signature.bin
-	enum signatureExample1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
-		~ x"0220"~x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
-	enum signatureExample2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
-		~ x"0221"~x"00CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
-	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
-		~ x"0220"~x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
-	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
-		~ x"0221"~x"00D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
+	enum signatureExample1 = cast(immutable(ubyte)[])(x""
+		~ x"e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
+		~ x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
+	enum signatureExample2 = cast(immutable(ubyte)[])(x""
+		~ x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
+		~ x"CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
+	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x""
+		~ x"841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
+		~ x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
+	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x""
+		~ x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
+		~ x"D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
 	auto prvKey = OpenSSLCmdECDSAP256Engine.PrivateKey.fromPEM(prvKeyPem);
 	assert(prvKey.toPEM.splitLines == prvKeyPem.splitLines);
 	assert(prvKey.toDER == prvKeyDer);
