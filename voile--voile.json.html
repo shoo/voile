@@ -648,6 +648,44 @@ jwt[<span class="d_string">"testkey"</span>] = <span class="d_string">"testvalue
 assertThrown(<span class="d_psymbol">JWTValue</span>(testjwt, <span class="d_string">"testsecret2"</span>));
 </pre>
 </div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">import</span> voile.crypto;
+<span class="d_keyword">import</span> std.base64;
+<span class="d_keyword">import</span> std.exception;
+<span class="d_keyword">auto</span> prvKey = createECDSAP256PrivateKey();
+<span class="d_keyword">auto</span> pubKey = createECDSAP256PublicKey(prvKey);
+<span class="d_keyword">auto</span> jwt = <span class="d_psymbol">JWTValue</span>(<span class="d_psymbol">JWTValue</span>.Algorithm.ES256, prvKey[]);
+jwt[<span class="d_string">"testkey"</span>] = <span class="d_string">"testvalue"</span>;
+jwt.addHeader(<span class="d_string">"jwk"</span>, JSONValue([
+	<span class="d_string">"kty"</span>: <span class="d_string">"EC"</span>,
+	<span class="d_string">"crv"</span>: <span class="d_string">"P-256"</span>,
+	<span class="d_string">"x"</span>: Base64URLNoPadding.encode(pubKey[1..33]),
+	<span class="d_string">"y"</span>: Base64URLNoPadding.encode(pubKey[33..$])]));
+<span class="d_keyword">auto</span> jwt2 = <span class="d_psymbol">JWTValue</span>(jwt.toString(), prvKey[]);
+<span class="d_keyword">assert</span>(jwt2.header[<span class="d_string">"alg"</span>].str == <span class="d_string">"ES256"</span>);
+<span class="d_keyword">assert</span>(jwt2.header[<span class="d_string">"jwk"</span>][<span class="d_string">"kty"</span>].str == <span class="d_string">"EC"</span>);
+</pre>
+</div>
+<div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
+ ditto
+<pre class="d_code notranslate"><span class="d_keyword">import</span> voile.crypto;
+<span class="d_keyword">import</span> std.base64;
+<span class="d_keyword">import</span> std.exception, std.string, std.digest.sha;
+<span class="d_keyword">static</span> <span class="d_keyword">immutable</span> <span class="d_keyword">ubyte</span>[32] prvKey = x"EE86F0FFE640C1B58FDB6CBB627D885B05506C47579F45ACB137EF3830291627";
+<span class="d_keyword">static</span> <span class="d_keyword">immutable</span> <span class="d_keyword">ubyte</span>[65] pubKey = (<span class="d_keyword">cast</span>(<span class="d_keyword">immutable</span> <span class="d_keyword">ubyte</span>[])(x"04F254B59D63B76308B41EC30143E69A1A01924B8937643BC6"
+	~ x"3ECE98FAEBAFFE72EE794E1D2B2A767041F2B4A5FE9794066FACA0B80F39DEDA3698410A4B1BFB2E"))[0..65].staticArray!65;
+<span class="d_keyword">static</span> <span class="d_keyword">immutable</span> testjwt1 = <span class="d_string">"eyJhbGciOiJFUzI1NiIsImp3ayI6eyJjcnYiOiJQLTI1NiIsImt0eSI6I"</span>
+	~ <span class="d_string">"kVDIiwieCI6IjhsUzFuV08zWXdpMEhzTUJRLWFhR2dHU1M0azNaRHZHUHM2WS11dXZfbkkiLCJ5Ijoi"</span>
+	~ <span class="d_string">"N25sT0hTc3FkbkJCOHJTbF9wZVVCbS1zb0xnUE9kN2FOcGhCQ2tzYi15NCJ9LCJ0eXAiOiJKV1QifQ"</span>
+	~ <span class="d_string">".eyJ0ZXN0a2V5IjoidGVzdHZhbHVlIn0"</span>
+	~ <span class="d_string">".ajzqzuj19A8nTAsg-1ar5c1hHj4b1iwi4QIz9ZJjKugkbnQ5JL9TM9zUFwD18iwPnkrAMDiybq41Hd4VTtkUiQ"</span>;
+<span class="d_keyword">auto</span> jwt = <span class="d_psymbol">JWTValue</span>(testjwt1, (<span class="d_keyword">ubyte</span>[]).init);
+<span class="d_keyword">auto</span> msg = testjwt1[0..testjwt1.lastIndexOf('.')];
+<span class="d_keyword">assert</span>(ECDSAP256Verifier!SHA256(pubKey).verify(jwt.signature, msg.representation));
+<span class="d_keyword">assert</span>(jwt[<span class="d_string">"testkey"</span>].str == <span class="d_string">"testvalue"</span>);
+</pre>
+</div>
 <dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.type"></span><div class="quickindex" id="quickindex.JWTValue.type"></div>string <code class="ddoc_psymbol">type</code>;
 <br></div></dt>
 <dd>
@@ -658,7 +696,7 @@ assertThrown(<span class="d_psymbol">JWTValue</span>(testjwt, <span class="d_str
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.this"></span><div class="quickindex" id="quickindex.JWTValue.this"></div>this(const(char)[] <span class="ddoc_param">jwt</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.this"></span><div class="quickindex" id="quickindex.JWTValue.this"></div>this(const(char)[] <span class="ddoc_param">jwt</span>, const(ubyte)[] <span class="ddoc_param">key</span> = null);
 <br>
 this(const(char)[] <span class="ddoc_param">jwt</span>, const(char)[] <span class="ddoc_param">key</span>);
 <br>
@@ -685,6 +723,25 @@ this(const(char)[] <span class="ddoc_param">jwt</span>, const(char)[] <span clas
 @safe this(Algorithm <span class="ddoc_param">algo</span>, const(ubyte)[] <span class="ddoc_param">key</span>);
 <br>
 @safe this(Algorithm <span class="ddoc_param">algo</span>, const(char)[] <span class="ddoc_param">key</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.addHeader"></span><div class="quickindex" id="quickindex.JWTValue.addHeader"></div>void <code class="ddoc_psymbol">addHeader</code>(string <span class="ddoc_param">name</span>, JSONValue <span class="ddoc_param">value</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.addHeader.2"></span><div class="quickindex" id="quickindex.JWTValue.addHeader.2"></div>void <code class="ddoc_psymbol">addHeader</code>(string <span class="ddoc_param">name</span>, string <span class="ddoc_param">value</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">dittp</div></dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.removeHeader"></span><div class="quickindex" id="quickindex.JWTValue.removeHeader"></div>void <code class="ddoc_psymbol">removeHeader</code>(string <span class="ddoc_param">name</span>);
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.header"></span><div class="quickindex" id="quickindex.JWTValue.header"></div>const JSONValue <code class="ddoc_psymbol">header</code>();
+<br></div></dt>
+<dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.signature"></span><div class="quickindex" id="quickindex.JWTValue.signature"></div>const immutable(ubyte)[] <code class="ddoc_psymbol">signature</code>();
 <br></div></dt>
 <dd>
 </dd>

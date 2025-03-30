@@ -267,13 +267,29 @@
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultRSA4096DecryptEngine"></span><div class="quickindex" id="quickindex.DefaultRSA4096DecryptEngine"></div>alias <code class="ddoc_psymbol">DefaultRSA4096DecryptEngine</code> = OpenSSLCmdRSA4096Engine;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultRSA4096Engine"></span><div class="quickindex" id="quickindex.DefaultRSA4096Engine"></div>alias <code class="ddoc_psymbol">DefaultRSA4096Engine</code> = OpenSSLCmdRSA4096Engine;
 <br></div></dt>
 <dd>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".DefaultECDHEngine"></span><div class="quickindex" id="quickindex.DefaultECDHEngine"></div>alias <code class="ddoc_psymbol">DefaultECDHEngine</code> = OpenSSLCmdRSA4096Engine;
 <br></div></dt>
 <dd>
+</dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".convECDSAP256SignDer2Bin"></span><div class="quickindex" id="quickindex.convECDSAP256SignDer2Bin"></div>immutable(ubyte)[] <code class="ddoc_psymbol">convECDSAP256SignDer2Bin</code>(in ubyte[] <span class="ddoc_param">der</span>);
+<br>
+<span class="def-anchor" id=".convECDSAP256SignBin2Der"></span><div class="quickindex" id="quickindex.convECDSAP256SignBin2Der"></div>immutable(ubyte)[] <code class="ddoc_psymbol">convECDSAP256SignBin2Der</code>(in ubyte[] <span class="ddoc_param">bin</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Methods of ECDSA P256 Signature format convertion
+</div><div class="ddoc_description">DER format:
+<ul><li>SEQUENCE
+<ul><li>INTEGER: R</li>
+<li>INTEGER: S</li>
+</ul></li>
+</ul>
+ BIN format:
+<ul><li>ubyte[32]: R</li>
+<li>ubyte[32]: S</li>
+</ul></div>
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Encrypter"></span><div class="quickindex" id="quickindex.Encrypter"></div>struct <code class="ddoc_psymbol">Encrypter</code>(Engine);
 <br>
@@ -457,6 +473,23 @@ auto <code class="ddoc_psymbol">deriveEncrypter</code><span class="ddoc_template
 <dd><div class="ddoc_summary">Derive decrypter</div></dd>
 </div></dl>
 </dd>
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".createPrivateKey"></span><div class="quickindex" id="quickindex.createPrivateKey"></div>@trusted auto <code class="ddoc_psymbol">createPrivateKey</code><span class="ddoc_template_param_list" title="Template parameter list">(Engine)</span>();
+<br>
+<span class="def-anchor" id=".createPublicKey"></span><div class="quickindex" id="quickindex.createPublicKey"></div>@trusted auto <code class="ddoc_psymbol">createPublicKey</code>(Engine, size_t N)(ubyte[N] <span class="ddoc_param">prvKey</span>);
+<br>
+<span class="def-anchor" id=".createEd25519PrivateKey"></span><div class="quickindex" id="quickindex.createEd25519PrivateKey"></div>@safe ubyte[32] <code class="ddoc_psymbol">createEd25519PrivateKey</code>();
+<br>
+<span class="def-anchor" id=".createEd25519PublicKey"></span><div class="quickindex" id="quickindex.createEd25519PublicKey"></div>@safe ubyte[32] <code class="ddoc_psymbol">createEd25519PublicKey</code>(ubyte[32] <span class="ddoc_param">prvKey</span>);
+<br>
+<span class="def-anchor" id=".createECDSAP256PrivateKey"></span><div class="quickindex" id="quickindex.createECDSAP256PrivateKey"></div>@safe ubyte[32] <code class="ddoc_psymbol">createECDSAP256PrivateKey</code>();
+<br>
+<span class="def-anchor" id=".createECDSAP256PublicKey"></span><div class="quickindex" id="quickindex.createECDSAP256PublicKey"></div>@safe ubyte[65] <code class="ddoc_psymbol">createECDSAP256PublicKey</code>(ubyte[32] <span class="ddoc_param">prvKey</span>);
+<br>
+<span class="def-anchor" id=".createRSA4096PrivateKey"></span><div class="quickindex" id="quickindex.createRSA4096PrivateKey"></div>@safe ubyte[DefaultRSA4096Engine.privateKeyBinaryLen] <code class="ddoc_psymbol">createRSA4096PrivateKey</code>();
+<br>
+<span class="def-anchor" id=".createRSA4096PublicKey"></span><div class="quickindex" id="quickindex.createRSA4096PublicKey"></div>@safe ubyte[DefaultRSA4096Engine.publicKeyBinaryLen] <code class="ddoc_psymbol">createRSA4096PublicKey</code>(ubyte[DefaultRSA4096Engine.privateKeyBinaryLen] <span class="ddoc_param">prvKey</span>);
+<br></div></dt>
+<dd><div class="ddoc_summary">Create key</div></dd>
 </div></dl>
 
                 
