@@ -505,7 +505,7 @@ private auto createDisposableDir(string basePath = null, string prefix = "voile-
 /*******************************************************************************
  * コマンドの有無を判定する
  */
-private bool isCommandExisting(string cmd)
+private bool isCommandExisting(string cmd) @safe
 {
 	import std.process;
 	version (Windows)
@@ -1240,7 +1240,7 @@ static if (enableOpenSSLCmdEngines)
 			pipe.stdout.byChunk(4096).copy(app);
 			auto result = pipe.pid.wait();
 			enforce(result == 0, "Cannot sign specified message.");
-			return app.data;
+			return app.data.convECDSAP256SignDer2Bin();
 		}
 		
 		/***********************************************************************
@@ -1254,7 +1254,7 @@ static if (enableOpenSSLCmdEngines)
 			auto dir = createDisposableDir(prefix: "openssl-");
 			auto pubKeyPath = dir.write("pubkey.pem", pubKey._pem);
 			auto msgPath = dir.write("message.bin", message);
-			auto signPath = dir.write("signature.bin", signature);
+			auto signPath = dir.write("signature.bin", signature.convECDSAP256SignBin2Der());
 			auto pipe = pipeProcess([_cmd, "pkeyutl", "-verify", "-in", msgPath,
 				"-sigfile", signPath, "-pubin", "-inkey", pubKeyPath, "-out", "-"]);
 			pipe.stdin.flush();
@@ -1302,7 +1302,9 @@ static if (enableOpenSSLCmdEngines)
 			{
 				import std.algorithm: copy;
 				isCommandExisting(cmd).enforce("OpenSSL command line interface cannot find.");
-				auto pipe = pipeProcess([cmd, "genrsa", "4096", "-out", "-"]);
+				auto pipe = getOpenSSLCmdVerseion(cmd) < SemVer(3, 0, 0)
+					? pipeProcess([cmd, "genrsa", "4096"])
+					: pipeProcess([cmd, "genrsa", "-traditional", "4096"]);
 				pipe.stdin.flush();
 				pipe.stdin.close();
 				auto app = appender!string;
@@ -1608,6 +1610,11 @@ static if (enableOpenSSLCmdEngines)
 static if (enableOpenSSLEngines)
 {
 	import deimos.openssl.evp;
+	
+	private void evpEnforce(int resultValue, string message, string f = __FILE__, size_t l = __LINE__)
+	{
+		cast(void)enforce(resultValue > 0, message, f, l);
+	}
 	///
 	private struct OpenSSLAESCBCEncryptEngine
 	{
@@ -1624,7 +1631,7 @@ static if (enableOpenSSLEngines)
 			// 初期化
 			_ctx.EVP_EncryptInit_ex(
 				key.length == 32 ? EVP_aes_256_cbc() : key.length == 24 ? EVP_aes_192_cbc() : EVP_aes_128_cbc(),
-				null, key.ptr, iv.ptr).enforce("Cannot create cipher context.");
+				null, key.ptr, iv.ptr).evpEnforce("Cannot create cipher context.");
 		}
 		/***********************************************************************
 		 * Destructor
@@ -1646,7 +1653,7 @@ static if (enableOpenSSLEngines)
 				outData.free();
 			int outLen = 0;
 			EVP_EncryptUpdate(_ctx, outData, &outLen, data.ptr, cast(int)data.length)
-				.enforce("OpenSSL AES128 CBC encryption failed.");
+				.evpEnforce("AES128 CBC encryption failed.");
 			dst.put(outData[0 .. outLen]);
 		}
 		/***********************************************************************
@@ -1660,7 +1667,7 @@ static if (enableOpenSSLEngines)
 			ubyte[16] outData;
 			int outLen = 0;
 			EVP_EncryptFinal_ex(_ctx, outData.ptr, &outLen)
-				.enforce("OpenSSL AES128 CBC encryption failed.");
+				.evpEnforce("AES128 CBC encryption failed.");
 			dst.put(outData[0 .. outLen]);
 		}
 	}
@@ -1686,11 +1693,11 @@ static if (enableOpenSSLEngines)
 		 */
 		this(immutable(ubyte)[] key, immutable(ubyte)[] iv) @trusted
 		{
-			_ctx = EVP_CIPHER_CTX_new().enforce("Cannot cretae OpenSSL cipher context.");
+			_ctx = EVP_CIPHER_CTX_new().enforce("Cannot create OpenSSL cipher context.");
 			// 初期化
 			_ctx.EVP_DecryptInit_ex(
 				key.length == 32 ? EVP_aes_256_cbc() : key.length == 24 ? EVP_aes_192_cbc() : EVP_aes_128_cbc(),
-				null, key.ptr, iv.ptr).enforce("Cannot initialize OpenSSL cipher context.");
+				null, key.ptr, iv.ptr).evpEnforce("Cannot initialize cipher context.");
 		}
 		/***********************************************************************
 		 * Destructor
@@ -1723,7 +1730,7 @@ static if (enableOpenSSLEngines)
 				int outLen = 0;
 				
 				EVP_DecryptUpdate(_ctx, outData.ptr, &outLen, _remain.ptr, cast(int)_remain.length)
-					.enforce("OpenSSL AES128 CBC decryption failed.");
+					.evpEnforce("AES128 CBC decryption failed.");
 				_inLen += _remain.length;
 				_outLen += outLen;
 				if (outLen != 0)
@@ -1745,7 +1752,7 @@ static if (enableOpenSSLEngines)
 				outData.free();
 			int outLen = 0;
 			EVP_DecryptUpdate(_ctx, outData, &outLen, src.ptr, cast(int)src.length)
-				.enforce("OpenSSL AES128 CBC decryption failed.");
+				.evpEnforce("AES128 CBC decryption failed.");
 			_inLen += src.length;
 			_outLen += outLen;
 			if (outLen != 0)
@@ -1764,7 +1771,7 @@ static if (enableOpenSSLEngines)
 					ubyte[16] outData;
 					int outLen = 0;
 					EVP_DecryptUpdate(_ctx, outData.ptr, &outLen, null, 0)
-						.enforce("OpenSSL AES128 CBC decryption failed.");
+						.evpEnforce("OpenSSL AES128 CBC decryption failed.");
 					dst.put(outData[0 .. $]);
 					_outLen += 16;
 				}
@@ -1775,9 +1782,9 @@ static if (enableOpenSSLEngines)
 				ubyte[16] outData;
 				int outLen = 0;
 				EVP_DecryptUpdate(_ctx, outData.ptr, &outLen, null, 0)
-					.enforce("OpenSSL AES128 CBC decryption failed.");
+					.evpEnforce("OpenSSL AES128 CBC decryption failed.");
 				EVP_DecryptFinal_ex(_ctx, outData.ptr, &outLen)
-					.enforce("OpenSSL AES128 CBC decryption failed.");
+					.evpEnforce("OpenSSL AES128 CBC decryption failed.");
 				dst.put(outData[0 .. outLen]);
 				_outLen += outLen;
 			}
@@ -1821,12 +1828,12 @@ static if (enableOpenSSLEngines)
 			 */
 			static PrivateKey createKey()
 			{
-				auto ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_ED25519, null).enforce("Cannot cretae private key.");
+				auto ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_ED25519, null).enforce("Cannot create private key.");
 				scope (exit)
 					ctx.EVP_PKEY_CTX_free();
 				ctx.EVP_PKEY_keygen_init();
 				EVP_PKEY* pkey;
-				ctx.EVP_PKEY_keygen(&pkey).enforce("Cannot cretae private key.");
+				ctx.EVP_PKEY_keygen(&pkey).evpEnforce("Cannot create private key.");
 				return makeInst(pkey);
 			}
 			/***********************************************************************
@@ -1838,7 +1845,7 @@ static if (enableOpenSSLEngines)
 				import deimos.openssl.pem;
 				// PEM形式の文字列をBIOメモリストリームに読み込む
 				auto bio = BIO_new_mem_buf(cast(void*)prvKey.ptr, cast(int)prvKey.length)
-					.enforce("Cannot cretae specified private key.");
+					.enforce("Cannot create specified private key.");
 				scope (exit)
 					bio.BIO_free();
 				return makeInst(PEM_read_bio_PrivateKey(bio, null, null, null));
@@ -1873,7 +1880,7 @@ static if (enableOpenSSLEngines)
 					mem.BIO_free();
 				// PEM形式で秘密鍵を書き込む
 				PEM_write_bio_PrivateKey(mem, cast(EVP_PKEY*)_key, null, null, 0, null, null)
-					.enforce("Cannot convert specified private key.");
+					.evpEnforce("Cannot convert specified private key.");
 				// 文字列の取り出し
 				ubyte* pemData = null;
 				auto pemLen = BIO_get_mem_data(mem, &pemData);
@@ -1887,10 +1894,11 @@ static if (enableOpenSSLEngines)
 			immutable(ubyte)[] toDER() const
 			{
 				// 秘密鍵をDER形式に保存
-				auto derlen = i2d_PrivateKey(cast(EVP_PKEY*)_key, null).enforce("Cannot cretae specified private key.");
+				auto derlen = i2d_PrivateKey(cast(EVP_PKEY*)_key, null)
+					.enforce("Cannot create specified private key.");
 				auto derPrvKey = new ubyte[derlen];
 				auto pBuf = derPrvKey.ptr;
-				i2d_PrivateKey(cast(EVP_PKEY*)_key, &pBuf).enforce("Cannot cretae specified private key.");
+				i2d_PrivateKey(cast(EVP_PKEY*)_key, &pBuf).evpEnforce("Cannot create specified private key.");
 				return derPrvKey.assumeUnique;
 			}
 			/***********************************************************************
@@ -1901,11 +1909,11 @@ static if (enableOpenSSLEngines)
 				// 生の鍵を取り出す
 				size_t len;
 				EVP_PKEY_get_raw_private_key(cast(EVP_PKEY*)_key, null, &len)
-					.enforce("Cannot convert specified private key.");
+					.evpEnforce("Cannot convert specified private key.");
 				assert(len == 32);
 				ubyte[32] prvKeyRaw;
 				EVP_PKEY_get_raw_private_key(cast(EVP_PKEY*)_key, prvKeyRaw.ptr, &len)
-					.enforce("Cannot convert specified private key.");
+					.evpEnforce("Cannot convert specified private key.");
 				return prvKeyRaw;
 			}
 		}
@@ -1942,11 +1950,11 @@ static if (enableOpenSSLEngines)
 				// 生の鍵を取り出す
 				size_t len;
 				EVP_PKEY_get_raw_public_key(cast(EVP_PKEY*)prvKey._key, null, &len)
-					.enforce("Cannot create public key.");
+					.evpEnforce("Cannot create public key.");
 				assert(len == 32);
 				ubyte[32] pubKeyRaw;
 				EVP_PKEY_get_raw_public_key(cast(EVP_PKEY*)prvKey._key, pubKeyRaw.ptr, &len)
-					.enforce("Cannot create public key.");
+					.evpEnforce("Cannot create public key.");
 				return makeInst(EVP_PKEY_new_raw_public_key(EVP_PKEY_ED25519, null, pubKeyRaw.ptr, pubKeyRaw.length)
 					.enforce("Cannot create private key."));
 			}
@@ -1956,7 +1964,7 @@ static if (enableOpenSSLEngines)
 				import deimos.openssl.pem;
 				// PEM形式の文字列をBIOメモリストリームに読み込む
 				auto bio = BIO_new_mem_buf(cast(void*)pubKey.ptr, cast(int)pubKey.length)
-					.enforce("Cannot cretae specified private key.");
+					.enforce("Cannot create specified private key.");
 				scope (exit)
 					bio.BIO_free();
 				return makeInst(PEM_read_bio_PUBKEY(bio, null, null, null));
@@ -1982,7 +1990,7 @@ static if (enableOpenSSLEngines)
 				scope (exit)
 					mem.BIO_free();
 				// PEM形式で公開鍵を書き込む
-				PEM_write_bio_PUBKEY(mem, cast(EVP_PKEY*)_key).enforce("Cannot convert specified private key.");
+				PEM_write_bio_PUBKEY(mem, cast(EVP_PKEY*)_key).evpEnforce("Cannot convert specified private key.");
 				// 文字列の取り出し
 				ubyte* pemData = null;
 				auto pemLen = BIO_get_mem_data(mem, &pemData);
@@ -1994,10 +2002,10 @@ static if (enableOpenSSLEngines)
 			{
 				// 公開鍵をDER形式に保存
 				import deimos.openssl.x509;
-				auto derlen = i2d_PUBKEY(cast(EVP_PKEY*)_key, null).enforce("Cannot cretae specified private key.");
+				auto derlen = i2d_PUBKEY(cast(EVP_PKEY*)_key, null).enforce("Cannot create specified private key.");
 				auto derPubKey = new ubyte[derlen];
 				auto pBuf = derPubKey.ptr;
-				i2d_PUBKEY(cast(EVP_PKEY*)_key, &pBuf).enforce("Cannot cretae specified private key.");
+				i2d_PUBKEY(cast(EVP_PKEY*)_key, &pBuf).enforce("Cannot create specified private key.");
 				return derPubKey.assumeUnique;
 			}
 			ubyte[32] toBinary() const
@@ -2005,11 +2013,11 @@ static if (enableOpenSSLEngines)
 				// 生の鍵を取り出す
 				size_t len;
 				EVP_PKEY_get_raw_public_key(cast(EVP_PKEY*)_key, null, &len)
-					.enforce("Cannot convert specified public key.");
+					.evpEnforce("Cannot convert specified public key.");
 				assert(len == 32);
 				ubyte[32] pubKeyRaw;
 				EVP_PKEY_get_raw_public_key(cast(EVP_PKEY*)_key, pubKeyRaw.ptr, &len)
-					.enforce("Cannot convert specified public key.");
+					.evpEnforce("Cannot convert specified public key.");
 				return pubKeyRaw;
 			}
 		}
@@ -2023,7 +2031,7 @@ static if (enableOpenSSLEngines)
 			scope (exit)
 				ctxSign.EVP_MD_CTX_free();
 			ctxSign.EVP_DigestSignInit(null, null, null, cast(EVP_PKEY*)prvKey._key)
-				.enforce("OpenSSL Ed25519 sign failed.");
+				.evpEnforce("OpenSSL Ed25519 sign failed.");
 			
 			// 署名のサイズを取得してバッファを作成
 			size_t signLen;
@@ -2087,12 +2095,22 @@ static if (enableOpenSSLEngines)
 			 */
 			static PrivateKey createKey()
 			{
-				auto ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, null).enforce("Cannot cretae OpenSSL private key.");
+				import deimos.openssl.ec;
+				auto ctxParam = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, null).enforce("Cannot create private key.");
+				EVP_PKEY* params;
+				scope (exit)
+					ctxParam.EVP_PKEY_CTX_free();
+				ctxParam.EVP_PKEY_paramgen_init().evpEnforce("Cannot create private key.");
+				ctxParam.EVP_PKEY_CTX_set_ec_paramgen_curve_nid(NID_X9_62_prime256v1).evpEnforce("Cannot create private key.");
+				ctxParam.EVP_PKEY_paramgen(&params).evpEnforce("Cannot create private key.");
+				scope (exit)
+					params.EVP_PKEY_free();
+				EVP_PKEY* pkey;
+				auto ctx = EVP_PKEY_CTX_new(params, null).enforce("Cannot create private key.");
 				scope (exit)
 					ctx.EVP_PKEY_CTX_free();
-				ctx.EVP_PKEY_keygen_init();
-				EVP_PKEY* pkey;
-				ctx.EVP_PKEY_keygen(&pkey).enforce("Cannot cretae OpenSSL private key.");
+				ctx.EVP_PKEY_keygen_init().evpEnforce("Cannot create private key.");
+				ctx.EVP_PKEY_keygen(&pkey).evpEnforce("Cannot create private key.");
 				return makeInst(pkey);
 			}
 			/***********************************************************************
@@ -2104,7 +2122,7 @@ static if (enableOpenSSLEngines)
 				import deimos.openssl.pem;
 				// PEM形式の文字列をBIOメモリストリームに読み込む
 				auto bio = BIO_new_mem_buf(cast(void*)prvKey.ptr, cast(int)prvKey.length)
-					.enforce("Cannot cretae specified private key.");
+					.enforce("Cannot create specified private key.");
 				scope (exit)
 					bio.BIO_free();
 				return makeInst(PEM_read_bio_PrivateKey(bio, null, null, null));
@@ -2145,8 +2163,9 @@ static if (enableOpenSSLEngines)
 				scope (failure)
 					if (pubPt)
 						EC_POINT_free(pubPt);
-				EC_POINT_mul(ecGroup, pubPt, bnPrv, null, null, null).enforce("Cannot convert specified private key.");
-				EC_KEY_set_public_key(ecKey, pubPt).enforce("Cannot convert specified private key.");
+				EC_POINT_mul(ecGroup, pubPt, bnPrv, null, null, null)
+					.evpEnforce("Cannot convert specified private key.");
+				EC_KEY_set_public_key(ecKey, pubPt).evpEnforce("Cannot convert specified private key.");
 				pubPt = null;
 				
 				auto pkey = EVP_PKEY_new();
@@ -2173,7 +2192,7 @@ static if (enableOpenSSLEngines)
 				// PEM形式で秘密鍵を書き込む
 				auto ecKey = EVP_PKEY_get1_EC_KEY(cast(EVP_PKEY*)_key).enforce("Cannot convert specified private key.");
 				PEM_write_bio_ECPrivateKey(mem, ecKey, null, null, 0, null, null)
-					.enforce("Cannot convert specified private key.");
+					.evpEnforce("Cannot convert specified private key.");
 				// 文字列の取り出し
 				ubyte* pemData = null;
 				auto pemLen = BIO_get_mem_data(mem, &pemData);
@@ -2186,10 +2205,10 @@ static if (enableOpenSSLEngines)
 			 */
 			immutable(ubyte)[] toDER() const
 			{
-				auto derlen = i2d_PrivateKey(cast(EVP_PKEY*)_key, null).enforce("Cannot cretae specified private key.");
+				auto derlen = i2d_PrivateKey(cast(EVP_PKEY*)_key, null).enforce("Cannot create specified private key.");
 				auto derPrvKey = new ubyte[derlen];
 				auto pBuf = derPrvKey.ptr;
-				i2d_PrivateKey(cast(EVP_PKEY*)_key, &pBuf).enforce("Cannot cretae specified private key.");
+				i2d_PrivateKey(cast(EVP_PKEY*)_key, &pBuf).evpEnforce("Cannot create specified private key.");
 				return derPrvKey.assumeUnique;
 			}
 			/***********************************************************************
@@ -2198,11 +2217,11 @@ static if (enableOpenSSLEngines)
 			ubyte[32] toBinary() const
 			{
 				import deimos.openssl.ec;
-				auto ecKey = EVP_PKEY_get1_EC_KEY(cast(EVP_PKEY*)_key).enforce("Cannot cretae specified private key.");
-				auto group = EC_KEY_get0_group(ecKey).enforce("Cannot cretae specified private key.");
-				auto bn = EC_KEY_get0_private_key(ecKey).enforce("Cannot cretae specified private key.");
+				auto ecKey = EVP_PKEY_get1_EC_KEY(cast(EVP_PKEY*)_key).enforce("Cannot create specified private key.");
+				auto group = EC_KEY_get0_group(ecKey).enforce("Cannot create specified private key.");
+				auto bn = EC_KEY_get0_private_key(ecKey).enforce("Cannot create specified private key.");
 				ubyte[32] prvKeyRaw;
-				auto len = BN_bn2bin(bn, prvKeyRaw.ptr).enforce("Cannot cretae specified private key.");
+				auto len = BN_bn2bin(bn, prvKeyRaw.ptr).enforce("Cannot create specified private key.");
 				assert(len == 32);
 				return prvKeyRaw;
 			}
@@ -2241,31 +2260,31 @@ static if (enableOpenSSLEngines)
 			static PublicKey createKey(PrivateKey prvKey)
 			{
 				import deimos.openssl.ec;
-				auto ecKeyPrv = EVP_PKEY_get1_EC_KEY(cast(EVP_PKEY*)prvKey._key).enforce("Cannot cretae public key.");
-				auto ecGroup = EC_KEY_get0_group(ecKeyPrv).enforce("Cannot cretae public key.");
-				auto prvBn = EC_KEY_get0_private_key(ecKeyPrv).enforce("Cannot cretae public key.");
-				auto pubPt = EC_POINT_new(ecGroup).enforce("Cannot cretae public key.");
+				auto ecKeyPrv = EVP_PKEY_get1_EC_KEY(cast(EVP_PKEY*)prvKey._key).enforce("Cannot create public key.");
+				auto ecGroup = EC_KEY_get0_group(ecKeyPrv).enforce("Cannot create public key.");
+				auto prvBn = EC_KEY_get0_private_key(ecKeyPrv).enforce("Cannot create public key.");
+				auto pubPt = EC_POINT_new(ecGroup).enforce("Cannot create public key.");
 				scope (failure)
 					if (pubPt)
 						EC_POINT_free(pubPt);
-				EC_POINT_mul(ecGroup, pubPt, prvBn, null, null, null).enforce("Cannot cretae public key.");
-				auto ecKeyPub = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1).enforce("Cannot cretae public key.");
+				EC_POINT_mul(ecGroup, pubPt, prvBn, null, null, null).evpEnforce("Cannot create public key.");
+				auto ecKeyPub = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1).enforce("Cannot create public key.");
 				scope (failure)
 					if (ecKeyPub)
 						EC_KEY_free(ecKeyPub);
-				EC_KEY_set_public_key(ecKeyPub, pubPt).enforce("Cannot cretae public key.");
+				EC_KEY_set_public_key(ecKeyPub, pubPt).evpEnforce("Cannot create public key.");
 				pubPt = null;
 				
-				//auto ecPubKey = EC_KEY_get0_public_key(ecKey).enforce("Cannot cretae public key.");
-				//auto pubKeyEc = EC_KEY_new().enforce("Cannot cretae public key.");
+				//auto ecPubKey = EC_KEY_get0_public_key(ecKey).enforce("Cannot create public key.");
+				//auto pubKeyEc = EC_KEY_new().enforce("Cannot create public key.");
 				//scope (exit)
 				//	EC_KEY_free(pubKeyEc);
-				//EC_KEY_set_group(pubKeyEc, ecGroup).enforce("Cannot cretae public key.");
-				//EC_KEY_set_public_key(pubKeyEc, ecPubKey).enforce("Cannot cretae public key.");
-				auto pubKey = EVP_PKEY_new().enforce("Cannot cretae public key.");
+				//EC_KEY_set_group(pubKeyEc, ecGroup).enforce("Cannot create public key.");
+				//EC_KEY_set_public_key(pubKeyEc, ecPubKey).enforce("Cannot create public key.");
+				auto pubKey = EVP_PKEY_new().enforce("Cannot create public key.");
 				scope (failure)
 					EVP_PKEY_free(pubKey);
-				EVP_PKEY_assign_EC_KEY(pubKey, ecKeyPub).enforce("Cannot cretae public key.");
+				EVP_PKEY_assign_EC_KEY(pubKey, ecKeyPub).evpEnforce("Cannot create public key.");
 				ecKeyPub = null;
 				return makeInst(pubKey);
 			}
@@ -2278,7 +2297,7 @@ static if (enableOpenSSLEngines)
 				import deimos.openssl.pem;
 				// PEM形式の文字列をBIOメモリストリームに読み込む
 				auto bio = BIO_new_mem_buf(cast(void*)pubKey.ptr, cast(int)pubKey.length)
-					.enforce("Cannot cretae specified private key.");
+					.enforce("Cannot create specified private key.");
 				scope (exit)
 					bio.BIO_free();
 				return makeInst(PEM_read_bio_PUBKEY(bio, null, null, null));
@@ -2292,7 +2311,7 @@ static if (enableOpenSSLEngines)
 				// 公開鍵を読み込み
 				auto pBuf = pubKey.ptr;
 				return makeInst(d2i_PUBKEY(null, &pBuf, cast(int)pubKey.length)
-					.enforce("Cannot cretae specified private key."));
+					.enforce("Cannot create specified private key."));
 			}
 			/***********************************************************************
 			 * Public Key from 256bit binary
@@ -2305,12 +2324,12 @@ static if (enableOpenSSLEngines)
 					if (eckey)
 						EC_KEY_free(eckey);
 				auto pBuf = pubKey.ptr;
-				o2i_ECPublicKey(&eckey, &pBuf, pubKey.length).enforce("Cannot cretae specified private key.");
+				o2i_ECPublicKey(&eckey, &pBuf, pubKey.length).enforce("Cannot create specified private key.");
 				auto pkey = EVP_PKEY_new();
 				scope (failure)
 					if (pkey)
 						EVP_PKEY_free(pkey);
-				EVP_PKEY_assign_EC_KEY(pkey, eckey).enforce("Cannot cretae specified private key.");
+				EVP_PKEY_assign_EC_KEY(pkey, eckey).evpEnforce("Cannot create specified private key.");
 				eckey = null;
 				return makeInst(pkey);
 			}
@@ -2325,7 +2344,7 @@ static if (enableOpenSSLEngines)
 				scope (exit)
 					mem.BIO_free();
 				// PEM形式で公開鍵を書き込む
-				PEM_write_bio_PUBKEY(mem, cast(EVP_PKEY*)_key).enforce("Cannot convert specified private key.");
+				PEM_write_bio_PUBKEY(mem, cast(EVP_PKEY*)_key).evpEnforce("Cannot convert specified private key.");
 				// 文字列の取り出し
 				ubyte* pemData = null;
 				auto pemLen = BIO_get_mem_data(mem, &pemData);
@@ -2340,10 +2359,10 @@ static if (enableOpenSSLEngines)
 			{
 				// 公開鍵をDER形式に保存
 				import deimos.openssl.x509;
-				auto derlen = i2d_PUBKEY(cast(EVP_PKEY*)_key, null).enforce("Cannot cretae specified private key.");
+				auto derlen = i2d_PUBKEY(cast(EVP_PKEY*)_key, null).enforce("Cannot create specified private key.");
 				auto derPrvKey = new ubyte[derlen];
 				auto pBuf = derPrvKey.ptr;
-				i2d_PUBKEY(cast(EVP_PKEY*)_key, &pBuf).enforce("Cannot cretae specified private key.");
+				i2d_PUBKEY(cast(EVP_PKEY*)_key, &pBuf).evpEnforce("Cannot create specified private key.");
 				return derPrvKey.assumeUnique;
 			}
 			/***********************************************************************
@@ -2380,17 +2399,18 @@ static if (enableOpenSSLEngines)
 			scope (exit)
 				ctxSign.EVP_PKEY_CTX_free();
 			ctxSign.EVP_PKEY_sign_init()
-				.enforce("OpenSSL ECDSA P256 sign failed.");
+				.evpEnforce("ECDSA P256 sign failed.");
 			
 			// 署名のサイズを取得してバッファを作成
 			size_t signLen;
-			ctxSign.EVP_PKEY_sign(null, &signLen, null, 0);
+			ctxSign.EVP_PKEY_sign(null, &signLen, null, 0)
+				.evpEnforce("ECDSA P256 sign failed.");
 			auto signData = new ubyte[signLen];
 			
 			// 署名
 			ctxSign.EVP_PKEY_sign(signData.ptr, &signLen, message.ptr, message.length)
-				.enforce("OpenSSL ECDSA P256 sign failed.");
-			return signData[0..signLen].assumeUnique;
+				.evpEnforce("ECDSA P256 sign failed.");
+			return signData[0..signLen].convECDSAP256SignDer2Bin;
 		}
 		
 		/***********************************************************************
@@ -2403,10 +2423,11 @@ static if (enableOpenSSLEngines)
 			scope (exit)
 				ctxVerify.EVP_PKEY_CTX_free();
 			ctxVerify.EVP_PKEY_verify_init()
-				.enforce("OpenSSL ECDSA P256 verify failed.");
+				.evpEnforce("ECDSA P256 verify failed.");
 			
 			// 検証
-			auto res = ctxVerify.EVP_PKEY_verify(signature.ptr, signature.length,
+			auto signDat = signature.convECDSAP256SignBin2Der();
+			auto res = ctxVerify.EVP_PKEY_verify(signDat.ptr, signDat.length,
 				cast(ubyte*)message.ptr, message.length);
 			return res != 0;
 		}
@@ -2465,13 +2486,13 @@ static if (enableOpenSSLEngines)
 			static PrivateKey createKey()
 			{
 				import deimos.openssl.rsa;
-				auto ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, null).enforce("Cannot cretae private key.");
+				auto ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, null).enforce("Cannot create private key.");
 				scope (exit)
 					ctx.EVP_PKEY_CTX_free();
 				ctx.EVP_PKEY_keygen_init();
-				ctx.EVP_PKEY_CTX_set_rsa_keygen_bits(4096).enforce("Cannot cretae private key.");
+				ctx.EVP_PKEY_CTX_set_rsa_keygen_bits(4096).evpEnforce("Cannot create private key.");
 				EVP_PKEY* pkey;
-				ctx.EVP_PKEY_keygen(&pkey).enforce("Cannot cretae private key.");
+				ctx.EVP_PKEY_keygen(&pkey).evpEnforce("Cannot create private key.");
 				return makeInst(pkey);
 			}
 			/***********************************************************************
@@ -2483,7 +2504,7 @@ static if (enableOpenSSLEngines)
 				import deimos.openssl.pem;
 				// PEM形式の文字列をBIOメモリストリームに読み込む
 				auto bio = BIO_new_mem_buf(cast(void*)prvKey.ptr, cast(int)prvKey.length)
-					.enforce("Cannot cretae specified private key.");
+					.enforce("Cannot create specified private key.");
 				scope (exit)
 					bio.BIO_free();
 				return makeInst(PEM_read_bio_PrivateKey(bio, null, null, null));
@@ -2528,7 +2549,7 @@ static if (enableOpenSSLEngines)
 				auto rsa = EVP_PKEY_get1_RSA(cast(EVP_PKEY*)_key);
 				// PEM形式で秘密鍵を書き込む
 				PEM_write_bio_RSAPrivateKey(mem, rsa, null, null, 0, null, null)
-					.enforce("Cannot convert specified private key.");
+					.evpEnforce("Cannot convert specified private key.");
 				// 文字列の取り出し
 				ubyte* pemData = null;
 				auto pemLen = BIO_get_mem_data(mem, &pemData);
@@ -2542,10 +2563,10 @@ static if (enableOpenSSLEngines)
 			immutable(ubyte)[] toDER() const
 			{
 				// 公開鍵をDER形式に保存
-				auto derlen = i2d_PrivateKey(cast(EVP_PKEY*)_key, null).enforce("Cannot cretae specified private key.");
+				auto derlen = i2d_PrivateKey(cast(EVP_PKEY*)_key, null).enforce("Cannot create specified private key.");
 				auto derPrvKey = new ubyte[derlen];
 				auto pBuf = derPrvKey.ptr;
-				i2d_PrivateKey(cast(EVP_PKEY*)_key, &pBuf).enforce("Cannot cretae specified private key.");
+				i2d_PrivateKey(cast(EVP_PKEY*)_key, &pBuf).evpEnforce("Cannot create specified private key.");
 				return derPrvKey.assumeUnique;
 			}
 			/***********************************************************************
@@ -2603,10 +2624,10 @@ static if (enableOpenSSLEngines)
 			static PublicKey createKey(PrivateKey prvKey)
 			{
 				import deimos.openssl.x509;
-				auto derlen = i2d_PUBKEY(cast(EVP_PKEY*)prvKey._key, null).enforce("Cannot cretae specified private key.");
+				auto derlen = i2d_PUBKEY(cast(EVP_PKEY*)prvKey._key, null).enforce("Cannot create specified private key.");
 				auto derPubKey = new ubyte[derlen];
 				auto pBuf = derPubKey.ptr;
-				i2d_PUBKEY(cast(EVP_PKEY*)prvKey._key, &pBuf).enforce("Cannot cretae specified private key.");
+				i2d_PUBKEY(cast(EVP_PKEY*)prvKey._key, &pBuf).evpEnforce("Cannot create specified private key.");
 				return fromDER(derPubKey);
 			}
 			/***********************************************************************
@@ -2618,7 +2639,7 @@ static if (enableOpenSSLEngines)
 				import deimos.openssl.pem;
 				// PEM形式の文字列をBIOメモリストリームに読み込む
 				auto bio = BIO_new_mem_buf(cast(void*)pubKey.ptr, cast(int)pubKey.length)
-					.enforce("Cannot cretae specified private key.");
+					.enforce("Cannot create specified private key.");
 				scope (exit)
 					bio.BIO_free();
 				return makeInst(PEM_read_bio_PUBKEY(bio, null, null, null));
@@ -2657,7 +2678,7 @@ static if (enableOpenSSLEngines)
 				scope (exit)
 					mem.BIO_free();
 				// PEM形式で公開鍵を書き込む
-				PEM_write_bio_PUBKEY(mem, cast(EVP_PKEY*)_key).enforce("Cannot convert specified private key.");
+				PEM_write_bio_PUBKEY(mem, cast(EVP_PKEY*)_key).evpEnforce("Cannot convert specified private key.");
 				// 文字列の取り出し
 				ubyte* pemData = null;
 				auto pemLen = BIO_get_mem_data(mem, &pemData);
@@ -2672,10 +2693,10 @@ static if (enableOpenSSLEngines)
 			{
 				// 公開鍵をDER形式に保存
 				import deimos.openssl.x509;
-				auto derlen = i2d_PUBKEY(cast(EVP_PKEY*)_key, null).enforce("Cannot cretae specified private key.");
+				auto derlen = i2d_PUBKEY(cast(EVP_PKEY*)_key, null).enforce("Cannot create specified private key.");
 				auto derPubKey = new ubyte[derlen];
 				auto pBuf = derPubKey.ptr;
-				i2d_PUBKEY(cast(EVP_PKEY*)_key, &pBuf).enforce("Cannot cretae specified private key.");
+				i2d_PUBKEY(cast(EVP_PKEY*)_key, &pBuf).evpEnforce("Cannot create specified private key.");
 				return derPubKey.assumeUnique;
 			}
 			/***********************************************************************
@@ -2706,7 +2727,7 @@ static if (enableOpenSSLEngines)
 			scope (exit)
 				ctxSign.EVP_PKEY_CTX_free();
 			ctxSign.EVP_PKEY_sign_init()
-				.enforce("OpenSSL RSA 4096 sign failed.");
+				.evpEnforce("RSA 4096 sign failed.");
 			// 署名のサイズを取得してバッファを作成
 			size_t signLen;
 			ctxSign.EVP_PKEY_sign(null, &signLen, null, 0);
@@ -2714,7 +2735,7 @@ static if (enableOpenSSLEngines)
 			
 			// 署名
 			ctxSign.EVP_PKEY_sign(signData.ptr, &signLen, message.ptr, message.length)
-				.enforce("OpenSSL RSA 4096 sign failed.");
+				.evpEnforce("RSA 4096 sign failed.");
 			return signData[0..signLen].assumeUnique;
 		}
 		/***********************************************************************
@@ -2727,7 +2748,7 @@ static if (enableOpenSSLEngines)
 			scope (exit)
 				ctxVerify.EVP_PKEY_CTX_free();
 			ctxVerify.EVP_PKEY_verify_init()
-				.enforce("OpenSSL RSA 4096 verify failed.");
+				.evpEnforce("RSA 4096 verify failed.");
 			
 			// 検証
 			auto ret = ctxVerify.EVP_PKEY_verify(signature.ptr, signature.length,
@@ -2743,14 +2764,14 @@ static if (enableOpenSSLEngines)
 			auto ctxEnc = EVP_PKEY_CTX_new(pubKey._key, null);
 			scope (exit)
 				ctxEnc.EVP_PKEY_CTX_free();
-			ctxEnc.EVP_PKEY_encrypt_init().enforce("OpenSSL RSA 4096 encrypt failed.");
+			ctxEnc.EVP_PKEY_encrypt_init().evpEnforce("RSA 4096 encrypt failed.");
 			
 			// バッファ長取得
 			size_t len;
-			ctxEnc.EVP_PKEY_encrypt(null, &len, data.ptr, data.length).enforce("OpenSSL RSA 4096 encrypt failed.");
+			ctxEnc.EVP_PKEY_encrypt(null, &len, data.ptr, data.length).evpEnforce("RSA 4096 encrypt failed.");
 			// 暗号化
 			auto buf = new ubyte[len];
-			ctxEnc.EVP_PKEY_encrypt(buf.ptr, &len, data.ptr, data.length).enforce("OpenSSL RSA 4096 encrypt failed.");
+			ctxEnc.EVP_PKEY_encrypt(buf.ptr, &len, data.ptr, data.length).evpEnforce("RSA 4096 encrypt failed.");
 			return buf[0..len].assumeUnique();
 		}
 		/***********************************************************************
@@ -2762,14 +2783,14 @@ static if (enableOpenSSLEngines)
 			auto ctxDec = EVP_PKEY_CTX_new(prvKey._key, null);
 			scope (exit)
 				ctxDec.EVP_PKEY_CTX_free();
-			ctxDec.EVP_PKEY_decrypt_init().enforce("OpenSSL RSA 4096 encrypt failed.");
+			ctxDec.EVP_PKEY_decrypt_init().evpEnforce("RSA 4096 encrypt failed.");
 			
 			// バッファ長取得
 			size_t len;
-			ctxDec.EVP_PKEY_decrypt(null, &len, data.ptr, data.length).enforce("OpenSSL RSA 4096 encrypt failed.");
+			ctxDec.EVP_PKEY_decrypt(null, &len, data.ptr, data.length).evpEnforce("RSA 4096 encrypt failed.");
 			// 暗号化
 			auto buf = new ubyte[len];
-			ctxDec.EVP_PKEY_decrypt(buf.ptr, &len, data.ptr, data.length).enforce("OpenSSL RSA 4096 encrypt failed.");
+			ctxDec.EVP_PKEY_decrypt(buf.ptr, &len, data.ptr, data.length).evpEnforce("RSA 4096 encrypt failed.");
 			return buf[0..len].assumeUnique();
 		}
 	}
@@ -2785,11 +2806,11 @@ static if (enableOpenSSLEngines)
 		immutable(ubyte)[] derive(in PrivateKey prvKey, in PublicKey pubKey)
 		{
 			auto ctx = EVP_PKEY_CTX_new(cast(EVP_PKEY*)prvKey._key, null);
-			ctx.EVP_PKEY_derive_init().enforce("Cannot derive shared secret.");
-			ctx.EVP_PKEY_derive_set_peer(cast(EVP_PKEY*)pubKey._key).enforce("Cannot derive shared secret.");
+			ctx.EVP_PKEY_derive_init().evpEnforce("Cannot derive shared secret.");
+			ctx.EVP_PKEY_derive_set_peer(cast(EVP_PKEY*)pubKey._key).evpEnforce("Cannot derive shared secret.");
 			size_t len = 32;
 			auto buf = new ubyte[len];
-			ctx.EVP_PKEY_derive(buf.ptr, &len).enforce("Cannot derive shared secret.");
+			ctx.EVP_PKEY_derive(buf.ptr, &len).evpEnforce("Cannot derive shared secret.");
 			assert(len == 32);
 			return buf[0..len].assumeUnique;
 		}
@@ -3155,6 +3176,8 @@ static if (enableBcryptEngines)
 					cast(void)BCryptCloseAlgorithmProvider(hAlg, 0);
 				BCryptGenerateKeyPair(hAlg, &hKey, 256, 0)
 					.ntEnforce("Cannot create private key.");
+				BCryptFinalizeKeyPair(hKey, 0)
+					.ntEnforce("Cannot create private key.");
 				return makeInst(hAlg, hKey);
 			}
 			/***********************************************************************
@@ -3422,14 +3445,11 @@ static if (enableBcryptEngines)
 			BCryptSignHash(prvKey._key, null, cast(PUCHAR)message.ptr, cast(ULONG)message.length, null, 0, &len, 0)
 				.ntEnforce("Cannot sign specified message.");
 			assert(len == 64);
-			ubyte[64] signData;
+			auto ret = new ubyte[64];
 			BCryptSignHash(prvKey._key, null, cast(PUCHAR)message.ptr, cast(ULONG)message.length,
-				signData.ptr, cast(ULONG)signData.length, &len, 0)
+				ret.ptr, cast(ULONG)ret.length, &len, 0)
 				.ntEnforce("Cannot sign specified message.");
-			auto ret = cast(immutable(ubyte)[])[0x30, 0x45]
-				~ encasn1bn(signData[0..32].assumeUnique)
-				~ encasn1bn(signData[32..$].assumeUnique);
-			return ret;
+			return ret.assumeUnique;
 		}
 		
 		/***********************************************************************
@@ -3437,22 +3457,8 @@ static if (enableBcryptEngines)
 		 */
 		bool verify(in ubyte[] message, in ubyte[] signature, in PublicKey pubKey)
 		{
-			ubyte[64] signDat;
-			if (signature.length > 64 && signature[0] == 0x30 && signature[1] == 0x45)
-			{
-				auto signDatAsn1 = signature[2 .. $];
-				auto signDatHi = decasn1bn(signDatAsn1);
-				auto signDatLo = decasn1bn(signDatAsn1);
-				enforce(signDatHi.length == 32 && signDatLo.length == 32, "Invalid signature format.");
-				signDat[0..32]  = signDatHi[0..32];
-				signDat[32..64] = signDatLo[0..32];
-			}
-			else
-			{
-				signDat[] = signature[0..64];
-			}
 			auto res = BCryptVerifySignature(pubKey._key, null, cast(PUCHAR)message.ptr, cast(ULONG)message.length,
-				cast(PUCHAR)signDat.ptr, cast(ULONG)signDat.length, 0);
+				cast(PUCHAR)signature.ptr, cast(ULONG)signature.length, 0);
 			return res == 0;
 		}
 	}
@@ -4528,7 +4534,7 @@ static if (enableOpenSSLEngines)
 	///
 	alias DefaultECDSAP256Engine = OpenSSLECDSAP256Engine;
 	///
-	alias DefaultRSA4096DecryptEngine = OpenSSLRSA4096Engine;
+	alias DefaultRSA4096Engine = OpenSSLRSA4096Engine;
 	///
 	alias DefaultECDHEngine = OpenSSLCmdRSA4096Engine;
 }
@@ -4547,7 +4553,7 @@ else static if (enableBcryptEngines)
 	///
 	alias DefaultECDSAP256Engine = BcryptECDSAP256Engine;
 	///
-	alias DefaultRSA4096DecryptEngine = BcryptRSA4096Engine;
+	alias DefaultRSA4096Engine = BcryptRSA4096Engine;
 	///
 	alias DefaultECDHEngine = OpenSSLCmdRSA4096Engine;
 }
@@ -4566,10 +4572,37 @@ else
 	///
 	alias DefaultECDSAP256Engine = OpenSSLCmdECDSAP256Engine;
 	///
-	alias DefaultRSA4096DecryptEngine = OpenSSLCmdRSA4096Engine;
+	alias DefaultRSA4096Engine = OpenSSLCmdRSA4096Engine;
 	///
 	alias DefaultECDHEngine = OpenSSLCmdRSA4096Engine;
 }
+
+
+/*******************************************************************************
+ * Methods of ECDSA P256 Signature format convertion
+ * 
+ * DER format:
+ * - SEQUENCE
+ *   - INTEGER: R
+ *   - INTEGER: S
+ * BIN format:
+ * - ubyte[32]: R
+ * - ubyte[32]: S
+ */
+immutable(ubyte)[] convECDSAP256SignDer2Bin(in ubyte[] der)
+{
+	const(ubyte)[] dat = der[];
+	auto seq = decasn1seq(dat);
+	auto s = decasn1bn(seq, 32);
+	auto r = decasn1bn(seq, 32);
+	return (s ~ r).assumeUnique;
+}
+/// ditto
+immutable(ubyte)[] convECDSAP256SignBin2Der(in ubyte[] bin)
+{
+	return encasn1seq(encasn1bn(bin[0..32].assumeUnique) ~ encasn1bn(bin[32..$].assumeUnique));
+}
+
 
 /*******************************************************************************
  * Encrypt
@@ -4875,7 +4908,7 @@ public:
 /// ditto
 alias AES256CBCDecrypter = Decrypter!DefaultAES256CBCDecryptEngine;
 /// ditto
-alias RSA4096Decrypter = Decrypter!DefaultRSA4096DecryptEngine;
+alias RSA4096Decrypter = Decrypter!DefaultRSA4096Engine;
 
 // AES256CBC Encrypt/Decrypt for OpenSSL
 static if (enableOpenSSLEngines) @system unittest
@@ -5278,21 +5311,21 @@ static if (enableBcryptEngines) @system unittest
 		~ x"048FA35F141D8D817F6130C068AD1A519BF6D13DFEF693FAE66C139A3A9C703229"
 		~ x"1F7BFA8B54CF9AD76929FD5C309B750AF53766D261BE82A1E3DEC831102FEABF");
 	// openssl pkeyutl -sign -inkey private_key.pem -in test.txt -out signature.bin
-	enum signatureExample1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
-		~ x"0220"~x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
+	enum signatureExample1 = cast(immutable(ubyte)[])(x""
+		~ x"e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
+		~ x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
 	// from OpenSSLECDSAP256Engine
-	enum signatureExample2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
-		~ x"0221"~x"00CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
+	enum signatureExample2 = cast(immutable(ubyte)[])(x""
+		~ x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
+		~ x"CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
 	// openssl dgst -sha256 -sign private_key.pem -out signature.bin test.txt
-	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
-		~ x"0220"~x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
+	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x""
+		~ x"841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
+		~ x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
 	// from OpenSSLECDSAP256Engine
-	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
-		~ x"0221"~x"00D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
+	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x""
+		~ x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
+		~ x"D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
 	auto prvKey = BcryptECDSAP256Engine.PrivateKey.fromBinary(prvKeyBin);
 	auto pubKey = BcryptECDSAP256Engine.PublicKey.fromBinary(pubKeyBin);
 	assert(prvKey.toBinary == prvKeyBin);
@@ -5364,19 +5397,19 @@ static if (enableOpenSSLEngines) @system unittest
 		~ x"048FA35F141D8D817F6130C068AD1A519BF6D13DFEF693FAE66C139A3A9C703229"
 		~ x"1F7BFA8B54CF9AD76929FD5C309B750AF53766D261BE82A1E3DEC831102FEABF");
 	// openssl pkeyutl -sign -inkey private_key.pem -in test.txt -out signature.bin
-	enum signatureExample1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
-		~ x"0220"~x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
-	enum signatureExample2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
-		~ x"0221"~x"00CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
+	enum signatureExample1 = cast(immutable(ubyte)[])(x""
+		~ x"e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
+		~ x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
+	enum signatureExample2 = cast(immutable(ubyte)[])(x""
+		~ x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
+		~ x"CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
 	// openssl dgst -sha256 -sign private_key.pem -out signature.bin test.txt
-	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
-		~ x"0220"~x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
-	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
-		~ x"0221"~x"00D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
+	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x""
+		~ x"841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
+		~ x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
+	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x""
+		~ x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
+		~ x"D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
 	auto prvKey = OpenSSLECDSAP256Engine.PrivateKey.fromBinary(prvKeyBin);
 	auto pubKey = OpenSSLECDSAP256Engine.PublicKey.createKey(prvKey);
 	assert(prvKey.toBinary == prvKeyBin);
@@ -5451,18 +5484,18 @@ static if (enableOpenSSLCmdEngines) @system unittest
 		~ x"048FA35F141D8D817F6130C068AD1A519BF6D13DFEF693FAE66C139A3A9C703229"
 		~ x"1F7BFA8B54CF9AD76929FD5C309B750AF53766D261BE82A1E3DEC831102FEABF");
 	// openssl pkeyutl -sign -inkey private_key.pem -in test.txt -out signature.bin
-	enum signatureExample1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
-		~ x"0220"~x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
-	enum signatureExample2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
-		~ x"0221"~x"00CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
-	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0221"~x"00841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
-		~ x"0220"~x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
-	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x"3045"
-		~ x"0220"~x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
-		~ x"0221"~x"00D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
+	enum signatureExample1 = cast(immutable(ubyte)[])(x""
+		~ x"e8f9430f24d17213479d541e44dff2a265c8a0a062753b5e11c2774f9219e0b4"
+		~ x"30ce2856ff6d2f44228cb9765b0199543aa4cbc58953e8b97feac6fb426cb7ab");
+	enum signatureExample2 = cast(immutable(ubyte)[])(x""
+		~ x"3C08FAFB8E248C53BCE02E37B0C150DF4C4B1E05EF6D7A6786CCD472950FE203"
+		~ x"CBBF4B97B5C59B7A4B8B275D481E618C5A5874FB1A8C94A477A99A61085BEBF9");
+	enum signaturePhSHA256Example1 = cast(immutable(ubyte)[])(x""
+		~ x"841AB8FFD0D42C50985C7FC1DE88B3FA5D817089C779E3F36D9630EFC3CF39AB"
+		~ x"365E93430E6FEFA1B3970380BF079428AFF5CBFA9E699BD2092921AAEAD70889");
+	enum signaturePhSHA256Example2 = cast(immutable(ubyte)[])(x""
+		~ x"792D01D50A89328DF5733F2A312BCB98AFDBD295A442DED5633FA1351F5D6089"
+		~ x"D0D381F2E29BE8B232746F78F7310035E499DA2A3E71D4A2FD6798AE81589289");
 	auto prvKey = OpenSSLCmdECDSAP256Engine.PrivateKey.fromPEM(prvKeyPem);
 	assert(prvKey.toPEM.splitLines == prvKeyPem.splitLines);
 	assert(prvKey.toDER == prvKeyDer);
@@ -7116,3 +7149,72 @@ static if (enableBcryptEngines) @system unittest
 	assert(ssValueB == sharedSecretExample);
 }
 
+/*******************************************************************************
+ * Create key
+ */
+auto createPrivateKey(Engine)() @trusted
+{
+	return Engine.PrivateKey.createKey().toBinary();
+}
+/// ditto
+auto createPublicKey(Engine, size_t N)(ubyte[N] prvKey) @trusted
+{
+	return Engine.PublicKey.createKey(Engine.PrivateKey.fromBinary(prvKey)).toBinary();
+}
+/// ditto
+ubyte[32] createEd25519PrivateKey() @safe
+{
+	return createPrivateKey!DefaultEd25519Engine();
+}
+/// ditto
+ubyte[32] createEd25519PublicKey(ubyte[32] prvKey) @safe
+{
+	return createPublicKey!DefaultEd25519Engine(prvKey);
+}
+/// ditto
+ubyte[32] createECDSAP256PrivateKey() @safe
+{
+	return createPrivateKey!DefaultECDSAP256Engine();
+}
+/// ditto
+ubyte[65] createECDSAP256PublicKey(ubyte[32] prvKey) @safe
+{
+	return createPublicKey!DefaultECDSAP256Engine(prvKey);
+}
+/// ditto
+ubyte[DefaultRSA4096Engine.privateKeyBinaryLen] createRSA4096PrivateKey() @safe
+{
+	return createPrivateKey!DefaultRSA4096Engine();
+}
+/// ditto
+ubyte[DefaultRSA4096Engine.publicKeyBinaryLen] createRSA4096PublicKey(
+	ubyte[DefaultRSA4096Engine.privateKeyBinaryLen] prvKey) @safe
+{
+	return createPublicKey!DefaultRSA4096Engine(prvKey);
+}
+
+@safe unittest
+{
+	enum msg = "test".representation;
+	bool signVerifyTest(Engine, size_t N1, size_t N2)(ubyte[N1] prvKey, ubyte[N2] pubKey) @trusted
+	{
+		return Verifier!Engine(pubKey).verify(Signer!Engine(prvKey).sign(msg), msg);
+	}
+	
+	if (!isOpenSSLCmdEngine!DefaultEd25519Engine
+		|| (isCommandExisting(defaultOpenSSLCommand)
+			&& getOpenSSLCmdVerseion(defaultOpenSSLCommand) >= SemVer(3, 0, 1)))
+	{
+		auto prvKey1 = createEd25519PrivateKey();
+		auto pubKey1 = createEd25519PublicKey(prvKey1);
+		assert(signVerifyTest!DefaultEd25519Engine(prvKey1, pubKey1));
+	}
+	
+	auto prvKey2 = createECDSAP256PrivateKey();
+	auto pubKey2 = createECDSAP256PublicKey(prvKey2);
+	assert(signVerifyTest!DefaultECDSAP256Engine(prvKey2, pubKey2));
+	
+	auto prvKey3 = createRSA4096PrivateKey();
+	auto pubKey3 = createRSA4096PublicKey(prvKey3);
+	assert(signVerifyTest!DefaultRSA4096Engine(prvKey3, pubKey3));
+}
