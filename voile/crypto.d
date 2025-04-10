@@ -1212,7 +1212,12 @@ static if (enableOpenSSLCmdEngines)
 			 */
 			BinaryKey!prvKeyLen toBinary() const
 			{
-				return staticArray!prvKeyLen(toDER()[7..7+prvKeyLen]);
+				const(ubyte)[] der = toDER();
+				auto seq = decasn1seq(der);
+				auto ver = decasn1bn(seq);
+				auto key = decasn1ostr(seq);
+				assert(key.length == prvKeyLen);
+				return staticArray!prvKeyLen(key[0..prvKeyLen]);
 			}
 		}
 		struct PublicKey
