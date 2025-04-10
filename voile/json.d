@@ -2262,9 +2262,13 @@ private:
 	import std.digest.sha;
 	import std.exception: enforce;
 	import std.string: representation;
-	import voile.crypto: ECDSAP256Signer, ECDSAP256Verifier, createECDSAP256PublicKey;
+	import voile.crypto:
+		ECDSAP256Signer, ECDSAP256Verifier, createECDSAP256PublicKey,
+		ECDSAP256KSigner, ECDSAP256KVerifier, createECDSAP256KPublicKey;
 	alias ES256Signer   = ECDSAP256Signer!SHA256;
 	alias ES256Verifier = ECDSAP256Verifier!SHA256;
+	alias ES256KSigner   = ECDSAP256KSigner!SHA256;
+	alias ES256KVerifier = ECDSAP256KVerifier!SHA256;
 	immutable(ubyte)[] _key;
 	JSONValue          _payload;
 	JSONValue[string]  _headers;
@@ -2280,7 +2284,7 @@ public:
 	 */
 	enum Algorithm
 	{
-		HS256, HS384, HS512, ES256
+		HS256, HS384, HS512, ES256, ES256K
 	}
 	/// ditto
 	Algorithm algorithm = Algorithm.HS256;
@@ -2312,6 +2316,9 @@ public:
 			break;
 		case "ES256":
 			algorithm = Algorithm.ES256;
+			break;
+		case "ES256K":
+			algorithm = Algorithm.ES256K;
 			break;
 		default:
 			enforce(false, "Unsupported algorithm");
@@ -2354,6 +2361,26 @@ public:
 				auto pubKey = createECDSAP256PublicKey(key[0..32].staticArray!32);
 				auto sign = B64.decode(jwtElms[2]);
 				enforce(ES256Verifier(pubKey).verify(sign, signedMessage), verrmsg);
+			}
+			break;
+		case Algorithm.ES256K:
+			if (auto jwk = "jwk" in header)
+			{
+				enforce(jwk.object["kty"].str == "EC");
+				enforce(jwk.object["crv"].str == "P-256K");
+				auto crvX = B64.decode(jwk.object["x"].str);
+				auto crvY = B64.decode(jwk.object["y"].str);
+				enforce(crvX.length == 32);
+				enforce(crvY.length == 32);
+				ubyte[65] pubKey = staticArray!65(cast(ubyte[])[0x04] ~ crvX[0..32] ~ crvY[0..32]);
+				auto sign = B64.decode(jwtElms[2]);
+				enforce(ES256KVerifier(pubKey).verify(sign, signedMessage), verrmsg);
+			}
+			if (key !is null)
+			{
+				auto pubKey = createECDSAP256KPublicKey(key[0..32].staticArray!32);
+				auto sign = B64.decode(jwtElms[2]);
+				enforce(ES256KVerifier(pubKey).verify(sign, signedMessage), verrmsg);
 			}
 			break;
 		}
@@ -2546,6 +2573,9 @@ public:
 		case Algorithm.ES256:
 			ubyte[32] key = staticArray!32(_key[0..32]);
 			return ret ~ "." ~ cast(string)B64.encode(ES256Signer(key).sign(ret.representation));
+		case Algorithm.ES256K:
+			ubyte[32] key = staticArray!32(_key[0..32]);
+			return ret ~ "." ~ cast(string)B64.encode(ES256KSigner(key).sign(ret.representation));
 		}
 	}
 }
@@ -2606,6 +2636,26 @@ public:
 	auto msg = testjwt1[0..testjwt1.lastIndexOf('.')];
 	assert(ECDSAP256Verifier!SHA256(pubKey).verify(jwt.signature, msg.representation));
 	assert(jwt["testkey"].str == "testvalue");
+}
+
+@system unittest
+{
+	import voile.crypto;
+	import std.base64;
+	import std.exception;
+	auto prvKey = createECDSAP256KPrivateKey();
+	auto pubKey = createECDSAP256KPublicKey(prvKey);
+	auto jwt = JWTValue(JWTValue.Algorithm.ES256K, prvKey[]);
+	jwt["testkey"] = "testvalue";
+	jwt.addHeader("jwk", JSONValue([
+		"kty": "EC",
+		"crv": "P-256K",
+		"x": Base64URLNoPadding.encode(pubKey[1..33]),
+		"y": Base64URLNoPadding.encode(pubKey[33..$])]));
+	auto jwt2 = JWTValue(jwt.toString(), prvKey[]);
+	assert(jwt2.header["alg"].str == "ES256K");
+	assert(jwt2.header["jwk"]["kty"].str == "EC");
+	assert(jwt2.header["jwk"]["crv"].str == "P-256K");
 }
 
 /*******************************************************************************

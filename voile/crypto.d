@@ -11,8 +11,8 @@
  *           OpenSSLAES128CBCDecryptEngine, OpenSSLAES192CBCDecryptEngine, OpenSSLAES256CBCDecryptEngine,
  *     - [x] Ed25519 sign/verify
  *           OpenSSLEd25519Engine
- *     - [x] ECDSA P256 sign/verify
- *           OpenSSLECDSAP256Engine
+ *     - [x] ECDSA sign/verify
+ *           OpenSSLECDSAP256Engine, OpenSSLECDSAP256KEngine, OpenSSLECDSAP384Engine, OpenSSLECDSAP521Engine
  *     - [x] RSA 4096 sign/verify/encrypt/decrypt
  *           OpenSSLRSA4096Engine
  *     - [x] ECDH P256 key exchange
@@ -25,8 +25,8 @@
  *           BcryptAES128CBCDecryptEngine, BcryptAES192CBCDecryptEngine, BcryptAES256CBCDecryptEngine,
  *     - [ ] Ed25519 sign/verify - Not Supported
  *           BcryptEd25519Engine
- *     - [x] ECDSA P256 sign/verify
- *           BcryptECDSAP256Engine
+ *     - [x] ECDSA sign/verify
+ *           BcryptECDSAP256Engine, BcryptECDSAP256KEngine, BcryptECDSAP384Engine, BcryptECDSAP521Engine
  *     - [x] RSA 4096 sign/verify/encrypt/decrypt
  *           BcryptRSA4096Engine
  *     - [x] ECDH P256 key exchange
@@ -39,8 +39,8 @@
  *           OpenSSLCmdAES128CBCDecryptEngine, OpenSSLCmdAES192CBCDecryptEngine, OpenSSLCmdAES256CBCDecryptEngine,
  *     - [x] Ed25519 sign/verify
  *           OpenSSLCmdEd25519Engine
- *     - [x] ECDSA P256 sign/verify
- *           OpenSSLCmdECDSAP256Engine
+ *     - [x] ECDSA sign/verify
+ *           OpenSSLCmdECDSAP256Engine, OpenSSLCmdECDSAP256KEngine, OpenSSLCmdECDSAP384Engine, OpenSSLCmdECDSAP521Engine
  *     - [x] RSA 4096 sign/verify/encrypt/decrypt
  *           OpenSSLCmdRSA4096Engine
  *     - [x] ECDH P256 key exchange
@@ -73,13 +73,37 @@ import std.digest.sha: SHA256, SHA512;
 import std.string: representation;
 
 //##############################################################################
+//##### Common Types
+//##############################################################################
+
+/*******************************************************************************
+ * DER format binary
+ */
+alias DERBinary = immutable(ubyte)[];
+
+/*******************************************************************************
+ * PEM format string
+ */
+alias PEMString = string;
+
+/*******************************************************************************
+ * Raw binary format
+ */
+alias BinaryKey(size_t N) = ubyte[N];
+
+/*******************************************************************************
+ * Binary data
+ */
+alias bin_t = immutable(ubyte)[];
+
+//##############################################################################
 //##### Common functions
 //##############################################################################
 
 /*******************************************************************************
  * PEMからDER形式に変換するヘルパ
  */
-immutable(ubyte)[] pem2der(in char[] pem) @safe
+DERBinary pem2der(in char[] pem) @safe
 {
 	import std.base64: Base64;
 	import std.string;
@@ -162,7 +186,7 @@ immutable(ubyte)[] pem2der(in char[] pem) @safe
 /*******************************************************************************
  * PEMからDER形式に変換するヘルパ
  */
-string der2pem(in ubyte[] der, string name) @safe
+PEMString der2pem(in ubyte[] der, string name) @safe
 {
 	import std.algorithm: map;
 	import std.base64: Base64;
@@ -236,13 +260,13 @@ string der2pem(in ubyte[] der, string name) @safe
 /*******************************************************************************
  * HKDFを計算するヘルパ
  */
-immutable(ubyte)[] calcHKDF(DigestEngine = SHA256)(
+bin_t calcHKDF(DigestEngine = SHA256)(
 	in ubyte[] secret, size_t len, in ubyte[] salt = null, string info = null)
 {
 	import std.digest.hmac;
 	auto prk = secret.hmac!DigestEngine(salt);
 	ulong cnt = 1;
-	auto app = appender!(immutable(ubyte)[]);
+	auto app = appender!bin_t;
 	app.reserve(len);
 	auto t = hmac!DigestEngine(prk[]);
 	while (app.data.length < len)
@@ -265,22 +289,22 @@ immutable(ubyte)[] calcHKDF(DigestEngine = SHA256)(
 {
 	// openssl kdf -keylen 32 -kdfopt digest:sha256 -kdfopt salt:test -kdfopt info:aes_key
 	//                        -kdfopt "key:Hello, World!" HKDF
-	enum sampleSalt1 = cast(immutable(ubyte)[])"test";
-	enum sampleSecret1 = cast(immutable(ubyte)[])"Hello, World!";
+	enum sampleSalt1 = "test".representation;
+	enum sampleSecret1 = "Hello, World!".representation;
 	enum sampleInfo1 = "aes_key";
-	enum sample1 = cast(immutable(ubyte)[])x"0AE651F7225F01DE4D7B5EED6F405664710618F9B3FC6F8C13FA161AAE0C6FEE";
+	enum sample1 = x"0AE651F7225F01DE4D7B5EED6F405664710618F9B3FC6F8C13FA161AAE0C6FEE".bin;
 	auto result1 = calcHKDF(sampleSecret1, 32, sampleSalt1, sampleInfo1);
 	assert(result1 == sample1);
 	// openssl kdf -keylen 48 -kdfopt digest:sha256 -kdfopt info:aes_key -kdfopt "key:Hello, World!" HKDF
-	enum sampleSecret2 = cast(immutable(ubyte)[])"Hello, World!";
+	enum sampleSecret2 = "Hello, World!".representation;
 	enum sampleInfo2 = "aes_key";
-	enum sample2 = cast(immutable(ubyte)[])(x"ED6E11E0A8EBE2B138E3B3761CB5506D80C2288034714F0EF3F6"
+	enum sample2 = representation(x"ED6E11E0A8EBE2B138E3B3761CB5506D80C2288034714F0EF3F6"
 		~ x"D37A3AA8F4001737FA86655CDE47F09CCAF57F67182C");
 	auto result2 = calcHKDF(sampleSecret2, 48, null, sampleInfo2);
 	assert(result2 == sample2);
 	// openssl kdf -keylen 280 -kdfopt digest:sha256 -kdfopt "key:Hello, World!" HKDF
-	enum sampleSecret3 = cast(immutable(ubyte)[])"Hello, World!";
-	enum sample3 = cast(immutable(ubyte)[])(x"657197A35AE37605DC6754D22051FF6F73D126C18AAF421C2BEC80A2A6F0A245"
+	enum sampleSecret3 = "Hello, World!".representation;
+	enum sample3 = representation(x"657197A35AE37605DC6754D22051FF6F73D126C18AAF421C2BEC80A2A6F0A245"
 		~ x"1034804BD5E19F311060E88E41B10EA6EB7F8E01AFA9D052E66C3C5DC9CBCE786D6416BFBDC74F3AC3BC3AF277DC0B437B82"
 		~ x"DA3A4DB824518FC33220BB1546D545116F85E4469994EAC39ED95DBDAEB53E8AD219E4E1453281349F41EA5085E7A864543D"
 		~ x"D7BB15289D5197F2CFBF3C26462CD805C8D737A04E75E7F1BA876D2F4448B4B0B964D4C2DB393E705679085A7A8323EBA942"
@@ -293,7 +317,7 @@ immutable(ubyte)[] calcHKDF(DigestEngine = SHA256)(
 /*******************************************************************************
  * HKDFを計算するヘルパ
  */
-immutable(ubyte)[] calcPBKDF2(DigestEngine = SHA256)(
+bin_t calcPBKDF2(DigestEngine = SHA256)(
 	string password, size_t len, size_t iterations, in ubyte[] salt = null)
 {
 	import std.digest.hmac;
@@ -302,7 +326,7 @@ immutable(ubyte)[] calcPBKDF2(DigestEngine = SHA256)(
 	auto prfs = prf;
 	prf.start();
 	size_t cnt = 1;
-	auto app = appender!(immutable(ubyte)[]);
+	auto app = appender!bin_t;
 	app.reserve(len);
 	while (app.data.length < len)
 	{
@@ -344,7 +368,7 @@ immutable(ubyte)[] calcPBKDF2(DigestEngine = SHA256)(
 	assert(result2 == sampleResult2);
 }
 
-private immutable(ubyte)[] bin(immutable(ubyte)[] x) => x;
+private bin_t bin(bin_t x) => x;
 
 version (unittest) debug private void dispBin(in ubyte[] dat) @trusted
 {
@@ -352,15 +376,15 @@ version (unittest) debug private void dispBin(in ubyte[] dat) @trusted
 	writefln("%(%02X%)", dat);
 }
 
-private immutable(ubyte)[] encasn1(ubyte type, in ubyte[] bn, bool padding = false)
+private bin_t encasn1(ubyte type, in ubyte[] data, bool padding = false)
 {
-	auto leLen = (padding && (bn[0] & 0x80) != 0) ? bn.length + 1 : bn.length;
-	immutable(ubyte)[] header;
+	auto leLen = (padding && (data[0] & 0x80) != 0) ? data.length + 1 : data.length;
+	bin_t header;
 	if (leLen < 128)
 	{
-		header = (padding && (bn[0] & 0x80) != 0) != 0
-			? cast(immutable(ubyte)[])[type, cast(ubyte)leLen, 0x00]
-			: cast(immutable(ubyte)[])[type, cast(ubyte)leLen];
+		header = (padding && (data[0] & 0x80) != 0) != 0
+			? cast(bin_t)[type, cast(ubyte)leLen, 0x00]
+			: cast(bin_t)[type, cast(ubyte)leLen];
 	}
 	else
 	{
@@ -370,22 +394,26 @@ private immutable(ubyte)[] encasn1(ubyte type, in ubyte[] bn, bool padding = fal
 		assert(lenfield.length == size_t.sizeof);
 		while (lenfield[0] == 0)
 			lenfield = lenfield[1..$];
-		header = cast(immutable(ubyte)[])[type, 0x80 + cast(ubyte)lenfield.length] ~ lenfield;
-		if (padding && (bn[0] & 0x80) != 0)
+		header = cast(bin_t)[type, 0x80 + cast(ubyte)lenfield.length] ~ lenfield;
+		if (padding && (data[0] & 0x80) != 0)
 			header ~= 0x00;
 	}
-	return assumeUnique(header ~ bn);
+	return assumeUnique(header ~ data);
 }
 
-private immutable(ubyte)[] encasn1str(in ubyte[] str)
+private bin_t encasn1ostr(in ubyte[] str)
 {
-	return encasn1(0x03, cast(immutable(ubyte)[])[0x00] ~ str, false);
+	return encasn1(0x04, str, false);
 }
-private immutable(ubyte)[] encasn1seq(in ubyte[] seq)
+private bin_t encasn1str(in ubyte[] str)
+{
+	return encasn1(0x03, cast(bin_t)[0x00] ~ str, false);
+}
+private bin_t encasn1seq(in ubyte[] seq)
 {
 	return encasn1(0x30, seq, false);
 }
-private immutable(ubyte)[] encasn1bn(in ubyte[] bn)
+private bin_t encasn1bn(in ubyte[] bn)
 {
 	auto bnsrc = bn[];
 	while (bnsrc.length > 0 && bnsrc[0] == 0x00)
@@ -419,6 +447,10 @@ private const(ubyte)[] decasn1(ubyte type, ref const(ubyte)[] dat, bool padding 
 private const(ubyte)[] decasn1seq(ref const(ubyte)[] dat)
 {
 	return decasn1(0x30, dat, false);
+}
+private const(ubyte)[] decasn1ostr(ref const(ubyte)[] dat)
+{
+	return decasn1(0x04, dat, false);
 }
 private const(ubyte)[] decasn1str(ref const(ubyte)[] dat)
 {
@@ -644,6 +676,29 @@ private SemVer getOpenSSLCmdVerseion(string cmd) @safe
 	enforce(result.status == 0);
 	return result.output.parseOpenSSLCmdVersionString();
 }
+
+/*******************************************************************************
+ * ECDSA Curve Types
+ */
+private enum ECDSAType
+{
+	/// Curve of secp256r1/NIST P-256
+	p256,
+	/// Curve of secp256k1
+	p256k,
+	/// Curve of secp384r1/NIST P-384
+	p384,
+	/// Curve of secp521r1/NIST P-521
+	p521
+}
+
+/// OID
+private enum bin_t getOid(ECDSAType type) = false ? x"".bin
+	: type == ECDSAType.p256  ? x"2A8648CE3D030107".bin     // OID: 1.2.840.10045.3.1.7 (P-256)
+	: type == ECDSAType.p256k ? x"2B8104000A".bin           // OID: 1.3.132.0.10 (P-256K)
+	: type == ECDSAType.p384  ? x"2B81040022".bin           // OID: 1.3.132.0.34 (P-384)
+	: type == ECDSAType.p521  ? x"2B81040023".bin           // OID: 1.3.132.0.35 (P-521)
+	: x"2A8648CE3D030107".bin;                              // OID: 1.2.840.10045.3.1.7 (P-256)
 
 version (all)
 {
@@ -880,6 +935,8 @@ static if (enableOpenSSLCmdEngines)
 	
 	private struct OpenSSLCmdEd25519Engine
 	{
+		enum prvKeyLen = 32;
+		enum pubKeyLen = 32;
 		import std.process;
 		struct PrivateKey
 		{
@@ -913,7 +970,7 @@ static if (enableOpenSSLCmdEngines)
 			/***********************************************************************
 			 * Private Key from 256bit binary
 			 */
-			static PrivateKey fromBinary(in ubyte[32] prvKey)
+			static PrivateKey fromBinary(in BinaryKey!32 prvKey)
 			{
 				return fromDER(cast(ubyte[])[
 					0x30, 0x2E,       // SEQUENCE: SubjectPrivateKeyInfo (46 bytes)
@@ -926,21 +983,21 @@ static if (enableOpenSSLCmdEngines)
 			/***********************************************************************
 			 * Private Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return _pem;
 			}
 			/***********************************************************************
 			 * Private Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				return _pem.pem2der();
 			}
 			/***********************************************************************
 			 * Private Key to 256bit binary
 			 */
-			ubyte[32] toBinary() const
+			BinaryKey!32 toBinary() const
 			{
 				return staticArray!32(toDER()[$-32..$]);
 			}
@@ -974,7 +1031,7 @@ static if (enableOpenSSLCmdEngines)
 			{
 				return PublicKey(pubKey.der2pem("PUBLIC KEY"));
 			}
-			static PublicKey fromBinary(in ubyte[32] pubKey)
+			static PublicKey fromBinary(in BinaryKey!32 pubKey)
 			{
 				return fromDER(cast(ubyte[])[
 					0x30, 0x2A,       // SEQUENCE: SubjectPublicKeyInfo (42 bytes)
@@ -983,15 +1040,15 @@ static if (enableOpenSSLCmdEngines)
 					  0x03, 0x21,       // BIT STRING (33 bytes)
 					    0x00] ~ pubKey[0..32]); // 秘密鍵 (32 bytes)
 			}
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return _pem;
 			}
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				return _pem.pem2der();
 			}
-			ubyte[32] toBinary() const
+			BinaryKey!32 toBinary() const
 			{
 				return staticArray!32(toDER()[$-32..$]);
 			}
@@ -1011,7 +1068,7 @@ static if (enableOpenSSLCmdEngines)
 		/***********************************************************************
 		 * 署名
 		 */
-		immutable(ubyte)[] sign(in ubyte[] message, in PrivateKey prvKey)
+		bin_t sign(in ubyte[] message, in PrivateKey prvKey)
 		{
 			import std.algorithm: copy;
 			isCommandExisting(_cmd).enforce("OpenSSL command line interface cannot find.");
@@ -1022,7 +1079,7 @@ static if (enableOpenSSLCmdEngines)
 				"-inkey", prvKeyPath, "-out", "-"]);
 			pipe.stdin.flush();
 			pipe.stdin.close();
-			auto app = appender!(immutable(ubyte)[]);
+			auto app = appender!bin_t;
 			pipe.stdout.byChunk(4096).copy(app);
 			auto result = pipe.pid.wait();
 			enforce(result == 0, "Cannot sign specified message.");
@@ -1053,23 +1110,44 @@ static if (enableOpenSSLCmdEngines)
 		}
 	}
 	
-	private struct OpenSSLCmdECDSAP256Engine
+	private struct OpenSSLCmdECDSAEngine(ECDSAType type = ECDSAType.p256)
 	{
 		import std.process;
+		enum ECDSAType cipherType = type;
+		enum size_t cntBits = type == ECDSAType.p256 ? 256
+			: type == ECDSAType.p256k ? 256
+			: type == ECDSAType.p384 ? 384
+			: type == ECDSAType.p521 ? 521
+			: 256;
+		enum size_t prvKeyLen = type == ECDSAType.p256 ? 32
+			: type == ECDSAType.p256k ? 32
+			: type == ECDSAType.p384 ? 48
+			: type == ECDSAType.p521 ? 66
+			: 32;
+		enum size_t pubKeyLen = type == ECDSAType.p256 ? 65
+			: type == ECDSAType.p256k ? 65
+			: type == ECDSAType.p384 ? 97
+			: type == ECDSAType.p521 ? 133
+			: 65;
 		struct PrivateKey
 		{
 		private:
-			string _pem;
+			PEMString _pem;
 		public:
 			/*******************************************************************
 			 * Create new Private Key
 			 */
 			static PrivateKey createKey(string cmd = defaultOpenSSLCommand)
 			{
+				enum curveName = type == ECDSAType.p256 ? "prime256v1"
+					: type == ECDSAType.p256k ? "secp256k1"
+					: type == ECDSAType.p384 ? "secp384r1"
+					: type == ECDSAType.p521 ? "secp521r1"
+					: "prime256v1";
 				isCommandExisting(cmd).enforce("OpenSSL command line interface cannot find.");
-				auto result = execute([cmd, "ecparam", "-name", "prime256v1", "-genkey", "-noout",
+				auto result = execute([cmd, "ecparam", "-name", curveName, "-genkey", "-noout",
 					"-out", "-"]);
-				enforce(result.status == 0, "Cannot create Ed25519 private key.");
+				enforce(result.status == 0, "Cannot create private key.");
 				return PrivateKey(result.output);
 			}
 			/*******************************************************************
@@ -1091,18 +1169,15 @@ static if (enableOpenSSLCmdEngines)
 			/*******************************************************************
 			 * Private Key from 256bit binary
 			 */
-			static PrivateKey fromBinary(in ubyte[32] prvKey,
+			static PrivateKey fromBinary(in BinaryKey!prvKeyLen prvKey,
 				string cmd = defaultOpenSSLCommand)
 			{
 				import std.algorithm: copy;
 				isCommandExisting(cmd).enforce("OpenSSL Command is not found.");
-				auto der = cast(ubyte[])[0x30, 0x31, // SEQUENCE
-					0x02, 0x01, 0x01, // INTEGER  VERSION(1)
-					0x04, 0x20] ~ prvKey[0..32] ~ cast(ubyte[])[ // OCTET STRING (Private Key)
-					0xA0, 0x0A, // [0] EXPLICIT EC PARAMETERS
-						// OID: 1.2.840.10045.3.1.7 (P-256)
-						0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07,
-					];
+				auto seq = [0x02, 0x01, 0x01].bin               // INTEGER  VERSION(1)
+					~ encasn1ostr(prvKey[0..prvKeyLen])         // OCTET STRING (Private Key)
+					~ encasn1(0xA0, encasn1(0x06, getOid!type));// [0] EXPLICIT EC PARAMETERS OID
+				auto der = encasn1seq(seq);                     // SEQUENCE
 				auto dir = createDisposableDir(prefix: "openssl-");
 				auto prvKeyPath = dir.write("prvkey.der", der);
 				auto pipe = pipeProcess([cmd, "ec", "-inform", "DER", "-in", prvKeyPath, "-pubout",
@@ -1112,30 +1187,37 @@ static if (enableOpenSSLCmdEngines)
 				auto app = appender!(ubyte[]);
 				pipe.stdout.byChunk(4096).copy(app);
 				auto result = pipe.pid.wait();
-				enforce(result == 0 && app.data.length == 91, "Cannot create private key.");
-				return fromDER(cast(ubyte[])[0x30, 0x77] ~ der[2..$]
-					~ cast(ubyte[])[0xA1, 0x44] ~ app.data[23..$]);
+				enforce(result == 0, "Cannot create private key.");
+				const(ubyte)[] pubder = app.data;
+				auto pubdat = decasn1seq(pubder);
+				auto pubseq = decasn1seq(pubdat);
+				return fromDER(encasn1seq(seq ~ encasn1(0xA1, pubdat)));
 			}
 			/*******************************************************************
 			 * Private Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return _pem;
 			}
 			/*******************************************************************
 			 * Private Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				return _pem.pem2der();
 			}
 			/*******************************************************************
-			 * Private Key to 256bit binary
+			 * Private Key to raw binary
 			 */
-			ubyte[32] toBinary() const
+			BinaryKey!prvKeyLen toBinary() const
 			{
-				return staticArray!32(toDER()[7..7+32]);
+				const(ubyte)[] der = toDER();
+				auto seq = decasn1seq(der);
+				auto ver = decasn1bn(seq);
+				auto key = decasn1ostr(seq);
+				assert(key.length == prvKeyLen);
+				return staticArray!prvKeyLen(key[0..prvKeyLen]);
 			}
 		}
 		struct PublicKey
@@ -1159,7 +1241,7 @@ static if (enableOpenSSLCmdEngines)
 				pipe.stdin.flush();
 				pipe.stdin.close();
 				pipe.stdout.byChunk(4096).copy(app);
-				enforce(pipe.pid.wait() == 0, "Cannot create ECDSA public key.");
+				enforce(pipe.pid.wait() == 0, "Cannot create public key.");
 				return PublicKey(cast(string)app.data);
 			}
 			/*******************************************************************
@@ -1179,34 +1261,34 @@ static if (enableOpenSSLCmdEngines)
 			/*******************************************************************
 			 * Public Key from 256bit binary
 			 */
-			static PublicKey fromBinary(in ubyte[65] pubKey)
+			static PublicKey fromBinary(in BinaryKey!pubKeyLen pubKey)
 			{
-				return fromDER(cast(ubyte[])[0x30, 0x59, // SEQUENCE
-					0x30, 0x13, // SEQUENCE
-					  0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01,       // OID: 1.2.840.10045.2.1 (EC Public Key)
-					  0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, // OID: 1.2.840.10045.3.1.7 (P-256)
-					0x03, 0x42, 0x00] ~ pubKey[0..65]); // 公開鍵 (65 bytes)
+				return fromDER(encasn1seq(                      // SEQUENCE
+					encasn1seq(                                 // SEQUENCE
+						encasn1(0x06, x"2A8648CE3D0201".bin)    // OID: 1.2.840.10045.2.1 (EC Public Key)
+						~ encasn1(0x06, getOid!type))           // OID: Curve type / ex) 1.2.840.10045.3.1.7 (P-256)
+					~ encasn1str(pubKey[0..pubKeyLen])));       // 公開鍵 (65 bytes)
 			}
 			/*******************************************************************
 			 * Public Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return _pem;
 			}
 			/*******************************************************************
 			 * Public Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				return _pem.pem2der();
 			}
 			/*******************************************************************
 			 * Public Key to 256bit binary
 			 */
-			ubyte[65] toBinary() const
+			BinaryKey!pubKeyLen toBinary() const
 			{
-				return staticArray!65(toDER()[$-65..$]);
+				return staticArray!pubKeyLen(toDER()[$-pubKeyLen..$]);
 			}
 		}
 		
@@ -1225,7 +1307,7 @@ static if (enableOpenSSLCmdEngines)
 		/***********************************************************************
 		 * 署名
 		 */
-		immutable(ubyte)[] sign(in ubyte[] message, in PrivateKey prvKey)
+		bin_t sign(in ubyte[] message, in PrivateKey prvKey)
 		{
 			import std.algorithm: copy;
 			isCommandExisting(_cmd).enforce("OpenSSL command line interface cannot find.");
@@ -1240,7 +1322,7 @@ static if (enableOpenSSLCmdEngines)
 			pipe.stdout.byChunk(4096).copy(app);
 			auto result = pipe.pid.wait();
 			enforce(result == 0, "Cannot sign specified message.");
-			return app.data.convECDSAP256SignDer2Bin();
+			return app.data.convECDSASignDer2Bin();
 		}
 		
 		/***********************************************************************
@@ -1254,7 +1336,7 @@ static if (enableOpenSSLCmdEngines)
 			auto dir = createDisposableDir(prefix: "openssl-");
 			auto pubKeyPath = dir.write("pubkey.pem", pubKey._pem);
 			auto msgPath = dir.write("message.bin", message);
-			auto signPath = dir.write("signature.bin", signature.convECDSAP256SignBin2Der());
+			auto signPath = dir.write("signature.bin", signature.convECDSASignBin2Der());
 			auto pipe = pipeProcess([_cmd, "pkeyutl", "-verify", "-in", msgPath,
 				"-sigfile", signPath, "-pubin", "-inkey", pubKeyPath, "-out", "-"]);
 			pipe.stdin.flush();
@@ -1265,6 +1347,15 @@ static if (enableOpenSSLCmdEngines)
 			return result == 0;
 		}
 	}
+	
+	///
+	alias OpenSSLCmdECDSAP256Engine = OpenSSLCmdECDSAEngine!(ECDSAType.p256);
+	///
+	alias OpenSSLCmdECDSAP256KEngine = OpenSSLCmdECDSAEngine!(ECDSAType.p256k);
+	///
+	alias OpenSSLCmdECDSAP384Engine = OpenSSLCmdECDSAEngine!(ECDSAType.p384);
+	///
+	alias OpenSSLCmdECDSAP521Engine = OpenSSLCmdECDSAEngine!(ECDSAType.p521);
 	
 	private struct OpenSSLCmdRSA4096Engine
 	{
@@ -1285,8 +1376,8 @@ static if (enableOpenSSLCmdEngines)
 			ubyte[512] modulus;             // n
 			ubyte[4]   publicExponent;      // e
 		}
-		enum privateKeyBinaryLen = PrvDat.sizeof;
-		enum publicKeyBinaryLen = PubDat.sizeof;
+		enum prvKeyLen = PrvDat.sizeof;
+		enum pubKeyLen = PubDat.sizeof;
 		/***********************************************************************
 		 * RSA4096 Private Key
 		 */
@@ -1331,7 +1422,7 @@ static if (enableOpenSSLCmdEngines)
 			/***********************************************************************
 			 * Private Key from raw binary
 			 */
-			static PrivateKey fromBinary(in ubyte[privateKeyBinaryLen] prvKey,
+			static PrivateKey fromBinary(in BinaryKey!prvKeyLen prvKey,
 				string cmd = defaultOpenSSLCommand)
 			{
 				auto prvKeyDat = cast(PrvDat*)prvKey.ptr;
@@ -1349,23 +1440,23 @@ static if (enableOpenSSLCmdEngines)
 			/***********************************************************************
 			 * Private Key to PEM string
 			 */
-			string toPEM(string cmd = defaultOpenSSLCommand) const
+			PEMString toPEM(string cmd = defaultOpenSSLCommand) const
 			{
 				return _pem;
 			}
 			/***********************************************************************
 			 * Private Key to DER binary
 			 */
-			immutable(ubyte)[] toDER(string cmd = defaultOpenSSLCommand) const
+			DERBinary toDER(string cmd = defaultOpenSSLCommand) const
 			{
 				return _pem.pem2der();
 			}
 			/***********************************************************************
 			 * Private Key to raw binary
 			 */
-			ubyte[privateKeyBinaryLen] toBinary(string cmd = defaultOpenSSLCommand) const
+			BinaryKey!prvKeyLen toBinary(string cmd = defaultOpenSSLCommand) const
 			{
-				ubyte[privateKeyBinaryLen] ret;
+				BinaryKey!prvKeyLen ret;
 				auto dat = cast(PrvDat*)ret.ptr;
 				const(ubyte)[] derall = toDER();
 				auto der = decasn1seq(derall);
@@ -1426,7 +1517,7 @@ static if (enableOpenSSLCmdEngines)
 			/*******************************************************************
 			 * Public Key from raw binary
 			 */
-			static PublicKey fromBinary(in ubyte[publicKeyBinaryLen] pubKey)
+			static PublicKey fromBinary(in BinaryKey!pubKeyLen pubKey)
 			{
 				auto pubKeyDat = cast(PrvDat*)pubKey.ptr;
 				return fromDER(encasn1seq(
@@ -1438,23 +1529,23 @@ static if (enableOpenSSLCmdEngines)
 			/***********************************************************************
 			 * Public Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return _pem;
 			}
 			/***********************************************************************
 			 * Public Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				return _pem.pem2der();
 			}
 			/***********************************************************************
 			 * Public Key to raw binary
 			 */
-			ubyte[publicKeyBinaryLen] toBinary() const
+			BinaryKey!pubKeyLen toBinary() const
 			{
-				ubyte[publicKeyBinaryLen] ret;
+				BinaryKey!pubKeyLen ret;
 				auto dat = cast(PubDat*)ret.ptr;
 				const(ubyte)[] derall = toDER();
 				auto derseq = decasn1seq(derall);
@@ -1482,7 +1573,7 @@ static if (enableOpenSSLCmdEngines)
 		/***********************************************************************
 		 * 署名
 		 */
-		immutable(ubyte)[] sign(in ubyte[] message, in PrivateKey prvKey)
+		bin_t sign(in ubyte[] message, in PrivateKey prvKey)
 		{
 			// openssl pkeyutl -sign -inkey private_key_rsa4096.pem -in test.txt -out -
 			import std.algorithm: copy;
@@ -1524,7 +1615,7 @@ static if (enableOpenSSLCmdEngines)
 		/***********************************************************************
 		 * 暗号化
 		 */
-		immutable(ubyte)[] encrypt(in ubyte[] data, in PublicKey pubKey)
+		bin_t encrypt(in ubyte[] data, in PublicKey pubKey)
 		{
 			import std.algorithm: copy;
 			auto dir = createDisposableDir(prefix: "openssl-");
@@ -1545,7 +1636,7 @@ static if (enableOpenSSLCmdEngines)
 		/***********************************************************************
 		 * 復号
 		 */
-		immutable(ubyte)[] decrypt(in ubyte[] data, in PrivateKey prvKey)
+		bin_t decrypt(in ubyte[] data, in PrivateKey prvKey)
 		{
 			import std.algorithm: copy;
 			import std.file, std.path;
@@ -1566,6 +1657,8 @@ static if (enableOpenSSLCmdEngines)
 	
 	private struct OpenSSLCmdECDHP256Engine
 	{
+		enum prvKeyLen = 32;
+		enum pubKeyLen = 65;
 		import std.process;
 		alias PrivateKey = OpenSSLCmdECDSAP256Engine.PrivateKey;
 		alias PublicKey  = OpenSSLCmdECDSAP256Engine.PublicKey;
@@ -1584,7 +1677,7 @@ static if (enableOpenSSLCmdEngines)
 		/***********************************************************************
 		 * Derive shared secret
 		 */
-		immutable(ubyte)[] derive(in PrivateKey prvKey, in PublicKey pubKey)
+		bin_t derive(in PrivateKey prvKey, in PublicKey pubKey)
 		{
 			import std.algorithm: copy;
 			isCommandExisting(_cmd).enforce("OpenSSL command line interface cannot find.");
@@ -1625,7 +1718,7 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(immutable(ubyte)[] key, immutable(ubyte)[] iv) @trusted
+		this(in ubyte[] key, in ubyte[] iv) @trusted
 		{
 			_ctx = EVP_CIPHER_CTX_new().enforce("Cannot create cipher context.");
 			// 初期化
@@ -1691,7 +1784,7 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(immutable(ubyte)[] key, immutable(ubyte)[] iv) @trusted
+		this(in ubyte[] key, in ubyte[] iv) @trusted
 		{
 			_ctx = EVP_CIPHER_CTX_new().enforce("Cannot create OpenSSL cipher context.");
 			// 初期化
@@ -1799,6 +1892,8 @@ static if (enableOpenSSLEngines)
 	///
 	private struct OpenSSLEd25519Engine
 	{
+		enum prvKeyLen = 32;
+		enum pubKeyLen = 32;
 		struct PrivateKey
 		{
 		private:
@@ -1863,7 +1958,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key from 256bit binary
 			 */
-			static PrivateKey fromBinary(in ubyte[32] prvKey)
+			static PrivateKey fromBinary(in BinaryKey!32 prvKey)
 			{
 				return makeInst(EVP_PKEY_new_raw_private_key(EVP_PKEY_ED25519, null, prvKey.ptr, prvKey.length)
 					.enforce("Cannot convert specified private key."));
@@ -1871,7 +1966,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				import deimos.openssl.pem;
 				// BIOメモリバッファを作成
@@ -1891,7 +1986,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				// 秘密鍵をDER形式に保存
 				auto derlen = i2d_PrivateKey(cast(EVP_PKEY*)_key, null)
@@ -1904,14 +1999,14 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key to 256bit binary
 			 */
-			ubyte[32] toBinary() const
+			BinaryKey!32 toBinary() const
 			{
 				// 生の鍵を取り出す
 				size_t len;
 				EVP_PKEY_get_raw_private_key(cast(EVP_PKEY*)_key, null, &len)
 					.evpEnforce("Cannot convert specified private key.");
 				assert(len == 32);
-				ubyte[32] prvKeyRaw;
+				BinaryKey!32 prvKeyRaw;
 				EVP_PKEY_get_raw_private_key(cast(EVP_PKEY*)_key, prvKeyRaw.ptr, &len)
 					.evpEnforce("Cannot convert specified private key.");
 				return prvKeyRaw;
@@ -1977,12 +2072,12 @@ static if (enableOpenSSLEngines)
 				return makeInst(d2i_PUBKEY(null, &pBuf, cast(int)pubKey.length)
 					.enforce("Cannot convert specified private key."));
 			}
-			static PublicKey fromBinary(in ubyte[32] pubKey)
+			static PublicKey fromBinary(in BinaryKey!32 pubKey)
 			{
 				return makeInst(EVP_PKEY_new_raw_public_key(EVP_PKEY_ED25519, null, pubKey.ptr, pubKey.length)
 					.enforce("Cannot convert specified private key."));
 			}
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				import deimos.openssl.pem;
 				// BIOメモリバッファを作成
@@ -1998,7 +2093,7 @@ static if (enableOpenSSLEngines)
 				pemStr[0..pemLen] = cast(char[])pemData[0..pemLen];
 				return pemStr.assumeUnique;
 			}
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				// 公開鍵をDER形式に保存
 				import deimos.openssl.x509;
@@ -2008,14 +2103,14 @@ static if (enableOpenSSLEngines)
 				i2d_PUBKEY(cast(EVP_PKEY*)_key, &pBuf).enforce("Cannot create specified private key.");
 				return derPubKey.assumeUnique;
 			}
-			ubyte[32] toBinary() const
+			BinaryKey!32 toBinary() const
 			{
 				// 生の鍵を取り出す
 				size_t len;
 				EVP_PKEY_get_raw_public_key(cast(EVP_PKEY*)_key, null, &len)
 					.evpEnforce("Cannot convert specified public key.");
 				assert(len == 32);
-				ubyte[32] pubKeyRaw;
+				BinaryKey!32 pubKeyRaw;
 				EVP_PKEY_get_raw_public_key(cast(EVP_PKEY*)_key, pubKeyRaw.ptr, &len)
 					.evpEnforce("Cannot convert specified public key.");
 				return pubKeyRaw;
@@ -2024,7 +2119,7 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * 署名
 		 */
-		immutable(ubyte)[] sign(in ubyte[] message, in PrivateKey prvKey)
+		bin_t sign(in ubyte[] message, in PrivateKey prvKey)
 		{
 			// 初期化
 			auto ctxSign = EVP_MD_CTX_new().enforce("OpenSSL Ed25519 sign failed.");
@@ -2061,10 +2156,31 @@ static if (enableOpenSSLEngines)
 		}
 	}
 	
-	private struct OpenSSLECDSAP256Engine
+	private struct OpenSSLECDSAEngine(ECDSAType type)
 	{
+		enum ECDSAType cipherType = type;
+		enum size_t cntBits = type == ECDSAType.p256 ? 256
+			: type == ECDSAType.p256k ? 256
+			: type == ECDSAType.p384 ? 384
+			: type == ECDSAType.p521 ? 521
+			: 256;
+		enum size_t prvKeyLen = type == ECDSAType.p256 ? 32
+			: type == ECDSAType.p256k ? 32
+			: type == ECDSAType.p384 ? 48
+			: type == ECDSAType.p521 ? 66
+			: 32;
+		enum size_t pubKeyLen = type == ECDSAType.p256 ? 65
+			: type == ECDSAType.p256k ? 65
+			: type == ECDSAType.p384 ? 97
+			: type == ECDSAType.p521 ? 133
+			: 65;
+		private enum curveName = type == ECDSAType.p256 ? NID_X9_62_prime256v1
+			: type == ECDSAType.p256k ? NID_secp256k1
+			: type == ECDSAType.p384 ? NID_secp384r1
+			: type == ECDSAType.p521 ? NID_secp521r1
+			: NID_X9_62_prime256v1;
 		/***********************************************************************
-		 * ECDSA P256 Private Key
+		 * ECDSA Private Key
 		 */
 		struct PrivateKey
 		{
@@ -2101,7 +2217,7 @@ static if (enableOpenSSLEngines)
 				scope (exit)
 					ctxParam.EVP_PKEY_CTX_free();
 				ctxParam.EVP_PKEY_paramgen_init().evpEnforce("Cannot create private key.");
-				ctxParam.EVP_PKEY_CTX_set_ec_paramgen_curve_nid(NID_X9_62_prime256v1).evpEnforce("Cannot create private key.");
+				ctxParam.EVP_PKEY_CTX_set_ec_paramgen_curve_nid(curveName).evpEnforce("Cannot create private key.");
 				ctxParam.EVP_PKEY_paramgen(&params).evpEnforce("Cannot create private key.");
 				scope (exit)
 					params.EVP_PKEY_free();
@@ -2140,7 +2256,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key from 256bit binary
 			 */
-			static PrivateKey fromBinary(in ubyte[32] prvKey)
+			static PrivateKey fromBinary(in BinaryKey!prvKeyLen prvKey)
 			{
 				import deimos.openssl.ec;
 				import deimos.openssl.ecdsa;
@@ -2149,7 +2265,7 @@ static if (enableOpenSSLEngines)
 				scope (failure)
 					if (bn)
 						BN_free(bn);
-				auto ecKey = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1)
+				auto ecKey = EC_KEY_new_by_curve_name(curveName)
 					.enforce("Cannot convert specified private key.");
 				scope (failure)
 					if (ecKey)
@@ -2180,7 +2296,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				import deimos.openssl.pem;
 				import deimos.openssl.bio;
@@ -2203,7 +2319,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				auto derlen = i2d_PrivateKey(cast(EVP_PKEY*)_key, null).enforce("Cannot create specified private key.");
 				auto derPrvKey = new ubyte[derlen];
@@ -2214,21 +2330,23 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key to 256bit binary
 			 */
-			ubyte[32] toBinary() const
+			BinaryKey!prvKeyLen toBinary() const
 			{
 				import deimos.openssl.ec;
 				auto ecKey = EVP_PKEY_get1_EC_KEY(cast(EVP_PKEY*)_key).enforce("Cannot create specified private key.");
 				auto group = EC_KEY_get0_group(ecKey).enforce("Cannot create specified private key.");
 				auto bn = EC_KEY_get0_private_key(ecKey).enforce("Cannot create specified private key.");
-				ubyte[32] prvKeyRaw;
+				ubyte[prvKeyLen] prvKeyRaw;
 				auto len = BN_bn2bin(bn, prvKeyRaw.ptr).enforce("Cannot create specified private key.");
-				assert(len == 32);
+				import std.algorithm: bringToFront;
+				bringToFront(prvKeyRaw[0..len], prvKeyRaw[len..$]);
+				assert(len <= prvKeyLen);
 				return prvKeyRaw;
 			}
 		}
 		
 		/***********************************************************************
-		 * ECDSA P256 Public Key
+		 * ECDSA Public Key
 		 */
 		struct PublicKey
 		{
@@ -2268,19 +2386,13 @@ static if (enableOpenSSLEngines)
 					if (pubPt)
 						EC_POINT_free(pubPt);
 				EC_POINT_mul(ecGroup, pubPt, prvBn, null, null, null).evpEnforce("Cannot create public key.");
-				auto ecKeyPub = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1).enforce("Cannot create public key.");
+				auto ecKeyPub = EC_KEY_new_by_curve_name(curveName).enforce("Cannot create public key.");
 				scope (failure)
 					if (ecKeyPub)
 						EC_KEY_free(ecKeyPub);
 				EC_KEY_set_public_key(ecKeyPub, pubPt).evpEnforce("Cannot create public key.");
 				pubPt = null;
 				
-				//auto ecPubKey = EC_KEY_get0_public_key(ecKey).enforce("Cannot create public key.");
-				//auto pubKeyEc = EC_KEY_new().enforce("Cannot create public key.");
-				//scope (exit)
-				//	EC_KEY_free(pubKeyEc);
-				//EC_KEY_set_group(pubKeyEc, ecGroup).enforce("Cannot create public key.");
-				//EC_KEY_set_public_key(pubKeyEc, ecPubKey).enforce("Cannot create public key.");
 				auto pubKey = EVP_PKEY_new().enforce("Cannot create public key.");
 				scope (failure)
 					EVP_PKEY_free(pubKey);
@@ -2316,10 +2428,10 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Public Key from 256bit binary
 			 */
-			static PublicKey fromBinary(in ubyte[65] pubKey)
+			static PublicKey fromBinary(in BinaryKey!pubKeyLen pubKey)
 			{
 				import deimos.openssl.ec;
-				auto eckey = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+				auto eckey = EC_KEY_new_by_curve_name(curveName);
 				scope (failure)
 					if (eckey)
 						EC_KEY_free(eckey);
@@ -2336,7 +2448,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Public Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				import deimos.openssl.pem;
 				// BIOメモリバッファを作成
@@ -2355,7 +2467,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Public Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				// 公開鍵をDER形式に保存
 				import deimos.openssl.x509;
@@ -2368,7 +2480,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Public Key to 256bit binary
 			 */
-			ubyte[65] toBinary() const
+			BinaryKey!pubKeyLen toBinary() const
 			{
 				import deimos.openssl.ec;
 				// EC_KEY 型を取得
@@ -2379,13 +2491,11 @@ static if (enableOpenSSLEngines)
 				auto point = EC_KEY_get0_public_key(ecKey).enforce("Cannot export private key.");
 				
 				// バイナリ形式に変換
-				ubyte[65] ret;
+				BinaryKey!pubKeyLen ret;
 				enum keyType = point_conversion_form_t.POINT_CONVERSION_UNCOMPRESSED;
 				auto len = EC_POINT_point2oct(group, point, keyType, ret.ptr, ret.length, null)
 					.enforce("Cannot export private key.");
-				assert(len == 65);
-				//auto pBuf = ret.ptr;
-				//i2o_ECPublicKey(ecKey, &pBuf).enforce("Cannot export private key.");
+				assert(len == pubKeyLen);
 				return ret;
 			}
 		}
@@ -2393,24 +2503,24 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * 署名
 		 */
-		immutable(ubyte)[] sign(in ubyte[] message, in PrivateKey prvKey)
+		bin_t sign(in ubyte[] message, in PrivateKey prvKey)
 		{
 			auto ctxSign = EVP_PKEY_CTX_new(cast(EVP_PKEY*)prvKey._key, null);
 			scope (exit)
 				ctxSign.EVP_PKEY_CTX_free();
 			ctxSign.EVP_PKEY_sign_init()
-				.evpEnforce("ECDSA P256 sign failed.");
+				.evpEnforce("ECDSA sign failed.");
 			
 			// 署名のサイズを取得してバッファを作成
 			size_t signLen;
 			ctxSign.EVP_PKEY_sign(null, &signLen, null, 0)
-				.evpEnforce("ECDSA P256 sign failed.");
+				.evpEnforce("ECDSA sign failed.");
 			auto signData = new ubyte[signLen];
 			
 			// 署名
 			ctxSign.EVP_PKEY_sign(signData.ptr, &signLen, message.ptr, message.length)
-				.evpEnforce("ECDSA P256 sign failed.");
-			return signData[0..signLen].convECDSAP256SignDer2Bin;
+				.evpEnforce("ECDSA sign failed.");
+			return signData[0..signLen].convECDSASignDer2Bin;
 		}
 		
 		/***********************************************************************
@@ -2423,15 +2533,23 @@ static if (enableOpenSSLEngines)
 			scope (exit)
 				ctxVerify.EVP_PKEY_CTX_free();
 			ctxVerify.EVP_PKEY_verify_init()
-				.evpEnforce("ECDSA P256 verify failed.");
+				.evpEnforce("ECDSA verify failed.");
 			
 			// 検証
-			auto signDat = signature.convECDSAP256SignBin2Der();
+			auto signDat = signature.convECDSASignBin2Der();
 			auto res = ctxVerify.EVP_PKEY_verify(signDat.ptr, signDat.length,
 				cast(ubyte*)message.ptr, message.length);
 			return res != 0;
 		}
 	}
+	///
+	alias OpenSSLECDSAP256Engine = OpenSSLECDSAEngine!(ECDSAType.p256);
+	///
+	alias OpenSSLECDSAP256KEngine = OpenSSLECDSAEngine!(ECDSAType.p256k);
+	///
+	alias OpenSSLECDSAP384Engine = OpenSSLECDSAEngine!(ECDSAType.p384);
+	///
+	alias OpenSSLECDSAP521Engine = OpenSSLECDSAEngine!(ECDSAType.p521);
 	
 	private struct OpenSSLRSA4096Engine
 	{
@@ -2451,8 +2569,8 @@ static if (enableOpenSSLEngines)
 			ubyte[512] modulus;             // n
 			ubyte[4]   publicExponent;      // e
 		}
-		enum privateKeyBinaryLen = PrvDat.sizeof;
-		enum publicKeyBinaryLen = PubDat.sizeof;
+		enum prvKeyLen = PrvDat.sizeof;
+		enum pubKeyLen = PubDat.sizeof;
 		/***********************************************************************
 		 * RSA4096 Private Key
 		 */
@@ -2522,7 +2640,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key from raw binary
 			 */
-			static PrivateKey fromBinary(in ubyte[privateKeyBinaryLen] prvKey)
+			static PrivateKey fromBinary(in BinaryKey!prvKeyLen prvKey)
 			{
 				auto prvKeyDat = cast(PrvDat*)prvKey.ptr;
 				auto derseq = cast(immutable(ubyte)[])[0x02, 0x01, 0x00]
@@ -2539,7 +2657,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				import deimos.openssl.pem;
 				// BIOメモリバッファを作成
@@ -2560,7 +2678,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				// 公開鍵をDER形式に保存
 				auto derlen = i2d_PrivateKey(cast(EVP_PKEY*)_key, null).enforce("Cannot create specified private key.");
@@ -2572,9 +2690,9 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Private Key to raw binary
 			 */
-			ubyte[privateKeyBinaryLen] toBinary() const
+			BinaryKey!prvKeyLen toBinary() const
 			{
-				ubyte[privateKeyBinaryLen] ret;
+				ubyte[prvKeyLen] ret;
 				auto dat = cast(PrvDat*)ret.ptr;
 				const(ubyte)[] derall = toDER();
 				auto der = decasn1seq(derall);
@@ -2658,7 +2776,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Public Key from raw binary
 			 */
-			static PublicKey fromBinary(in ubyte[publicKeyBinaryLen] pubKey)
+			static PublicKey fromBinary(in BinaryKey!pubKeyLen pubKey)
 			{
 				auto pubKeyDat = cast(PrvDat*)pubKey.ptr;
 				return fromDER(encasn1seq(
@@ -2670,7 +2788,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Public Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				import deimos.openssl.pem;
 				// BIOメモリバッファを作成
@@ -2689,7 +2807,7 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Public Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				// 公開鍵をDER形式に保存
 				import deimos.openssl.x509;
@@ -2702,9 +2820,9 @@ static if (enableOpenSSLEngines)
 			/***********************************************************************
 			 * Public Key to raw binary
 			 */
-			ubyte[publicKeyBinaryLen] toBinary() const
+			BinaryKey!pubKeyLen toBinary() const
 			{
-				ubyte[publicKeyBinaryLen] ret;
+				ubyte[pubKeyLen] ret;
 				auto dat = cast(PubDat*)ret.ptr;
 				const(ubyte)[] derall = toDER();
 				auto derseq = decasn1seq(derall);
@@ -2719,7 +2837,7 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * 署名
 		 */
-		immutable(ubyte)[] sign(in ubyte[] message, PrivateKey prvKey)
+		bin_t sign(in ubyte[] message, PrivateKey prvKey)
 		{
 			import deimos.openssl.rsa;
 			// 初期化
@@ -2758,7 +2876,7 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * 暗号化
 		 */
-		immutable(ubyte)[] encrypt(in ubyte[] data, PublicKey pubKey)
+		bin_t encrypt(in ubyte[] data, PublicKey pubKey)
 		{
 			// 初期化
 			auto ctxEnc = EVP_PKEY_CTX_new(pubKey._key, null);
@@ -2777,7 +2895,7 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * 復号
 		 */
-		immutable(ubyte)[] decrypt(in ubyte[] data, PrivateKey prvKey)
+		bin_t decrypt(in ubyte[] data, PrivateKey prvKey)
 		{
 			// 初期化
 			auto ctxDec = EVP_PKEY_CTX_new(prvKey._key, null);
@@ -2797,13 +2915,15 @@ static if (enableOpenSSLEngines)
 	
 	private struct OpenSSLECDHP256Engine
 	{
+		enum prvKeyLen = 32;
+		enum pubKeyLen = 65;
 		alias PrivateKey = OpenSSLECDSAP256Engine.PrivateKey;
 		alias PublicKey  = OpenSSLECDSAP256Engine.PublicKey;
 	public:
 		/***********************************************************************
 		 * Derive shared secret
 		 */
-		immutable(ubyte)[] derive(in PrivateKey prvKey, in PublicKey pubKey)
+		bin_t derive(in PrivateKey prvKey, in PublicKey pubKey)
 		{
 			auto ctx = EVP_PKEY_CTX_new(cast(EVP_PKEY*)prvKey._key, null);
 			ctx.EVP_PKEY_derive_init().evpEnforce("Cannot derive shared secret.");
@@ -2836,6 +2956,8 @@ static if (enableBcryptEngines)
 			LPCWSTR pszImplementation, ULONG dwFlags);
 		NTSTATUS BCryptSetProperty(BCRYPT_HANDLE hObject, LPCWSTR pszProperty,
 			PUCHAR pbInput, ULONG cbInput, ULONG dwFlags);
+		NTSTATUS BCryptGetProperty(BCRYPT_HANDLE hObject, LPCWSTR pszProperty,
+			PUCHAR pbOutput, ULONG cbOutput, ULONG* pcbResult, ULONG dwFlags);
 		NTSTATUS BCryptGenerateKeyPair(BCRYPT_ALG_HANDLE hAlgorithm, BCRYPT_KEY_HANDLE* phKey, ULONG dwLength,
 			ULONG dwFlags);
 		NTSTATUS BCryptGenerateSymmetricKey(BCRYPT_ALG_HANDLE hAlgorithm, BCRYPT_KEY_HANDLE* phKey, PUCHAR pbKeyObject,
@@ -2902,7 +3024,7 @@ static if (enableBcryptEngines)
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(immutable(ubyte)[] key, immutable(ubyte)[] iv) @trusted
+		this(in ubyte[] key, in ubyte[] iv) @trusted
 		{
 			_hAlg = BCRYPT_ALG_HANDLE.init;
 			_hKey = BCRYPT_KEY_HANDLE.init;
@@ -3011,7 +3133,7 @@ static if (enableBcryptEngines)
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(immutable(ubyte)[] key, immutable(ubyte)[] iv)
+		this(in ubyte[] key, in ubyte[] iv)
 		{
 			_iv[] = iv[0..16];
 			BCryptOpenAlgorithmProvider(&_hAlg, "AES", null, 0).ntEnforce("Cannot open algorithm provider.");
@@ -3126,12 +3248,70 @@ static if (enableBcryptEngines)
 			}
 		}
 	}
+	///
 	alias BcryptAES128CBCDecryptEngine = BcryptAESCBCDecryptEngine;
+	///
 	alias BcryptAES192CBCDecryptEngine = BcryptAESCBCDecryptEngine;
+	///
 	alias BcryptAES256CBCDecryptEngine = BcryptAESCBCDecryptEngine;
 	///
-	private struct BcryptECDSAP256Engine
+	private struct BcryptECDSAEngine(ECDSAType type)
 	{
+		enum ECDSAType cipherType = type;
+		enum size_t cntBits = type == ECDSAType.p256 ? 256
+			: type == ECDSAType.p256k ? 256
+			: type == ECDSAType.p384 ? 384
+			: type == ECDSAType.p521 ? 521
+			: 32;
+		enum size_t prvKeyLen = type == ECDSAType.p256 ? 32
+			: type == ECDSAType.p256k ? 32
+			: type == ECDSAType.p384 ? 48
+			: type == ECDSAType.p521 ? 66
+			: 32;
+		enum size_t pubKeyLen = type == ECDSAType.p256 ? 65
+			: type == ECDSAType.p256k ? 65
+			: type == ECDSAType.p384 ? 97
+			: type == ECDSAType.p521 ? 133
+			: 65;
+		private enum algorithmName = type == ECDSAType.p256 ? "ECDSA_P256"
+			: type == ECDSAType.p256k ? "ECDSA"
+			: type == ECDSAType.p384 ? "ECDSA_P384"
+			: type == ECDSAType.p521 ? "ECDSA_P521"
+			: "ECDSA_P256";
+		private enum prvKeyMagicValue = type == ECDSAType.p256 ? BCRYPT_ECDSA_PRIVATE_P256_MAGIC
+			: type == ECDSAType.p256k ? BCRYPT_ECDSA_PRIVATE_GENERIC_MAGIC
+			: type == ECDSAType.p384 ? BCRYPT_ECDSA_PRIVATE_P384_MAGIC
+			: type == ECDSAType.p521 ? BCRYPT_ECDSA_PRIVATE_P521_MAGIC
+			: BCRYPT_ECDSA_PRIVATE_P256_MAGIC;
+		private enum pubKeyMagicValue = type == ECDSAType.p256 ? BCRYPT_ECDSA_PUBLIC_P256_MAGIC
+			: type == ECDSAType.p256k ? BCRYPT_ECDSA_PUBLIC_GENERIC_MAGIC
+			: type == ECDSAType.p384 ? BCRYPT_ECDSA_PUBLIC_P384_MAGIC
+			: type == ECDSAType.p521 ? BCRYPT_ECDSA_PUBLIC_P521_MAGIC
+			: BCRYPT_ECDSA_PUBLIC_P256_MAGIC;
+		private static void setCurveParameters(BCRYPT_ALG_HANDLE hAlg)
+		{
+			static if (type == ECDSAType.p256k)
+			{
+				static immutable ubyte[] eccParameters = x"".bin
+					~ x"01000000".bin // BCRYPT_ECC_PARAMETERS_V1
+					~ x"01000000".bin // BCRYPT_ECC_PRIME_CURVE
+					~ x"00000000".bin // dwCurveGenerationAlgId = 0: Custom
+					~ x"20000000".bin // cbFieldLength = 32
+					~ x"20000000".bin // cbSubgroupOrder = 32
+					~ x"01000000".bin // cbCofactor = 1
+					~ x"00000000".bin // seed = 0
+					~ x"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F".bin // Prime
+					~ x"0000000000000000000000000000000000000000000000000000000000000000".bin // A
+					~ x"0000000000000000000000000000000000000000000000000000000000000007".bin // B
+					~ x"79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798".bin // x
+					~ x"483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8".bin // y
+					~ x"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141".bin // n
+					~ x"01".bin;
+				BCryptSetProperty(hAlg, "ECCParameters", cast(PUCHAR)eccParameters.ptr, eccParameters.length, 0)
+					.ntEnforce("Cannot setup crypto.");
+			}
+		}
+		
 		struct PrivateKey
 		{
 		private:
@@ -3170,11 +3350,12 @@ static if (enableBcryptEngines)
 			{
 				BCRYPT_ALG_HANDLE hAlg;
 				BCRYPT_KEY_HANDLE hKey;
-				BCryptOpenAlgorithmProvider(&hAlg, "ECDSA_P256", null, 0)
+				BCryptOpenAlgorithmProvider(&hAlg, algorithmName, null, 0)
 					.ntEnforce("Cannot create private key.");
 				scope (failure)
 					cast(void)BCryptCloseAlgorithmProvider(hAlg, 0);
-				BCryptGenerateKeyPair(hAlg, &hKey, 256, 0)
+				setCurveParameters(hAlg);
+				BCryptGenerateKeyPair(hAlg, &hKey, cntBits, 0)
 					.ntEnforce("Cannot create private key.");
 				BCryptFinalizeKeyPair(hKey, 0)
 					.ntEnforce("Cannot create private key.");
@@ -3192,37 +3373,36 @@ static if (enableBcryptEngines)
 			 */
 			static PrivateKey fromDER(in ubyte[] prvKey)
 			{
-				switch (prvKey.length)
-				{
-				case 121:
-					enforce(prvKey[0 .. 7] == [0x30, 0x77, 0x02, 0x01, 0x01, 0x04, 0x20], "Unsupported DER format.");
-					return fromBinary(prvKey[7..7+32]);
-				default:
-					enforce(0, "Unsupported DER format.");
-				}
-				return PrivateKey.init;
+				const(ubyte)[] der = prvKey[];
+				auto seq = decasn1seq(der);
+				auto ver = decasn1bn(seq);
+				auto prvKeyData = decasn1ostr(seq);
+				enforce(prvKeyData.length == prvKeyLen, "Unsupported DER format.");
+				return fromBinary(prvKeyData[0..prvKeyLen]);
 			}
 			/***********************************************************************
 			 * Private Key from 256bit binary
 			 */
-			static PrivateKey fromBinary(in ubyte[32] prvKey)
+			static PrivateKey fromBinary(in BinaryKey!prvKeyLen prvKey)
 			{
 				BCRYPT_ALG_HANDLE hAlg;
 				BCRYPT_KEY_HANDLE hKey;
-				BCryptOpenAlgorithmProvider(&hAlg, "ECDSA_P256", null, 0)
+				BCryptOpenAlgorithmProvider(&hAlg, algorithmName, null, 0)
 					.ntEnforce("Cannot create private key.");
 				scope (failure)
 					cast(void)BCryptCloseAlgorithmProvider(hAlg, 0);
+				setCurveParameters(hAlg);
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
-					BYTE[64] XY; // Public Key
-					BYTE[32] d;  // Private Key
+					BYTE[pubKeyLen-1] XY; // Public Key
+					BYTE[prvKeyLen] d;  // Private Key
 				}
 				BcryptKeyPair keyPair;
-				keyPair.dwMagic = BCRYPT_ECDSA_PRIVATE_P256_MAGIC;
-				keyPair.cbKey = 32;
+				keyPair.dwMagic = prvKeyMagicValue;
+				keyPair.cbKey = prvKeyLen;
 				keyPair.XY[] = 0;
 				keyPair.d[] = prvKey[];
 				BCryptImportKeyPair(hAlg, null, "ECCPRIVATEBLOB", &hKey, cast(ubyte*)&keyPair, keyPair.sizeof,
@@ -3233,56 +3413,56 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return toDER().der2pem("EC PRIVATE KEY");
 			}
 			/***********************************************************************
 			 * Private Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
-					BYTE[64] XY; // Public Key
-					BYTE[32] d;  // Private key
+					BYTE[pubKeyLen-1] XY; // Public Key
+					BYTE[prvKeyLen] d;  // Private key
 				}
 				BcryptKeyPair keyPair;
-				keyPair.dwMagic = BCRYPT_ECDSA_PRIVATE_P256_MAGIC;
-				keyPair.cbKey = 32;
+				keyPair.dwMagic = prvKeyMagicValue;
+				keyPair.cbKey = prvKeyLen;
 				ULONG res;
 				BCryptExportKey(_key, null, "ECCPRIVATEBLOB", cast(ubyte*)&keyPair, keyPair.sizeof, &res, 0)
 					.ntEnforce("Cannot export private key.");
-				return assumeUnique(cast(ubyte[])[0x30, 0x77, // SEQUENCE
-					0x02, 0x01, 0x01, // INTEGER  VERSION(1)
-					0x04, 0x20] ~ keyPair.d[0..32] ~ cast(ubyte[])[ // OCTET STRING (Private Key)
-					0xA0, 0x0A, // [0] EC PARAMETERS
-						0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, // OID: 1.2.840.10045.3.1.7 (P-256)
-					0xA1, 0x44, // [1] EC PUBLIC
-						0x03, 0x42, 0x00, 0x04] ~ keyPair.XY[0..64]); // BIT STRING (Public Key)
+				return encasn1seq(                                              // SEQUENCE
+					[0x02, 0x01, 0x01].bin                                      //   INTEGER  VERSION(1)
+					~ encasn1ostr(keyPair.d[])                                  //   OCTET STRING (Private Key)
+					~ encasn1(0xA0, encasn1(0x06, getOid!type))                 //   [0] EC PARAMETERS: OID
+					~ encasn1(0xA1, encasn1str([0x04].bin ~ keyPair.XY[])));    //   [1] EC PUBLIC: BIT STRING (Public Key)
 			}
 			/***********************************************************************
 			 * Private Key to 256bit binary
 			 */
-			ubyte[32] toBinary() const
+			BinaryKey!prvKeyLen toBinary() const
 			{
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
-					BYTE[64] XY; // Public Key
-					BYTE[32] d;  // Private key
+					BYTE[pubKeyLen-1] XY; // Public Key
+					BYTE[prvKeyLen] d;    // Private key
 				}
 				BcryptKeyPair keyPair;
-				keyPair.dwMagic = BCRYPT_ECDSA_PRIVATE_P256_MAGIC;
-				keyPair.cbKey = 32;
+				keyPair.dwMagic = prvKeyMagicValue;
+				keyPair.cbKey = prvKeyLen;
 				ULONG res;
 				BCryptExportKey(_key, null, "ECCPRIVATEBLOB", cast(ubyte*)&keyPair, keyPair.sizeof, &res, 0)
 					.ntEnforce("Cannot export private key.");
 				assert(res == keyPair.sizeof);
-				return keyPair.d[0..32];
+				return keyPair.d[0..prvKeyLen];
 			}
 		}
 		struct PublicKey
@@ -3323,18 +3503,19 @@ static if (enableBcryptEngines)
 			{
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
-					BYTE[64] XY; // Public Key
+					BYTE[pubKeyLen-1] XY; // Public Key
 				}
 				KeyBlob keyBlob;
-				keyBlob.dwMagic = BCRYPT_ECDSA_PUBLIC_P256_MAGIC;
-				keyBlob.cbKey = 32;
+				keyBlob.dwMagic = pubKeyMagicValue;
+				keyBlob.cbKey = (pubKeyLen-1)/2;
 				ULONG res;
 				BCryptExportKey(prvKey._key, null, "ECCPUBLICBLOB", cast(ubyte*)&keyBlob, keyBlob.sizeof, &res, 0)
 					.ntEnforce("Cannot export private key.");
 				assert(res == keyBlob.sizeof);
-				return fromBinary(staticArray!65([ubyte(0x04)] ~ keyBlob.XY[0..64]));
+				return fromBinary(staticArray!pubKeyLen([ubyte(0x04)] ~ keyBlob.XY[0..pubKeyLen-1]));
 			}
 			/***********************************************************************
 			 * Private Key from PEM string
@@ -3348,43 +3529,39 @@ static if (enableBcryptEngines)
 			 */
 			static PublicKey fromDER(in ubyte[] pubKey)
 			{
-				switch (pubKey.length)
-				{
-				case 91:
-					enforce(pubKey[0 .. 4] == [0x30, 0x59, 0x30, 0x13], "Unsupported DER format.");
-					enforce(pubKey[4 .. 13] == [0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01],
-						"Unsupported DER format.");
-					enforce(pubKey[13 .. 23] == [0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07],
-						"Unsupported DER format.");
-					enforce(pubKey[23 .. 25] == [0x03, 0x42],
-						"Unsupported DER format.");
-					return fromBinary(pubKey[26..26+65]);
-				default:
-					enforce(0, "Unsupported DER format.");
-				}
-				return PublicKey.init;
+				const(ubyte)[] der = pubKey[];
+				auto seq = decasn1seq(der);
+				auto oids = decasn1seq(seq);
+				enforce(decasn1(0x06, oids) == [0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01].bin,
+					"Unsupported DER format.");
+				enforce(decasn1(0x06, oids) == getOid!type, "Unsupported DER format.");
+				auto pubKeyValue = decasn1str(seq);
+				enforce(pubKeyValue.length == pubKeyLen, "Miss match key type.");
+				return fromBinary(pubKeyValue[0..pubKeyLen]);
 			}
 			/***********************************************************************
 			 * Private Key from 256bit binary
 			 */
-			static PublicKey fromBinary(in ubyte[65] pubKey)
+			static PublicKey fromBinary(in BinaryKey!pubKeyLen pubKey)
 			{
 				BCRYPT_ALG_HANDLE hAlg;
 				BCRYPT_KEY_HANDLE hKey;
 				enforce(pubKey[0] == 0x04, "Invalid public key format.");
-				BCryptOpenAlgorithmProvider(&hAlg, "ECDSA_P256", null, 0)
+				BCryptOpenAlgorithmProvider(&hAlg, algorithmName, null, 0)
 					.ntEnforce("Cannot create private key.");
 				scope (failure)
 					cast(void)BCryptCloseAlgorithmProvider(hAlg, 0);
+				setCurveParameters(hAlg);
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
-					BYTE[64] XY; // Public Key
+					BYTE[pubKeyLen-1] XY; // Public Key
 				}
 				KeyBlob keyBlob;
-				keyBlob.dwMagic = BCRYPT_ECDSA_PUBLIC_P256_MAGIC;
-				keyBlob.cbKey = 32;
+				keyBlob.dwMagic = pubKeyMagicValue;
+				keyBlob.cbKey = (pubKeyLen-1)/2;
 				keyBlob.XY[] = pubKey[1..$];
 				BCryptImportKeyPair(hAlg, null, "ECCPUBLICBLOB", &hKey, cast(ubyte*)&keyBlob, keyBlob.sizeof,
 					BCRYPT_NO_KEY_VALIDATION)
@@ -3394,40 +3571,41 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Public Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return toDER().der2pem("PUBLIC KEY");
 			}
 			/***********************************************************************
 			 * Public Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
-				return assumeUnique(cast(ubyte[])[0x30, 0x59, // SEQUENCE
-					0x30, 0x13, // SEQUENCE
-					0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01,       // OID: 1.2.840.10045.2.1 (EC Public Key)
-					0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, // OID: 1.2.840.10045.3.1.7 (P-256)
-					0x03, 0x42, 0x00] ~ toBinary[0..65]); // BIT STRING (Public Key)
+				return encasn1seq( // SEQUENCE
+					encasn1seq( // SEQUENCE
+						encasn1(0x06, [0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01].bin)   // OID: 1.2.840.10045.2.1 (EC Public Key)
+						~ encasn1(0x06, getOid!type)                                    // OID: ex) 1.2.840.10045.3.1.7 (P-256)
+					) ~ encasn1str(toBinary[])); // BIT STRING (Public Key)
 			}
 			/***********************************************************************
-			 * Private Key to 256bit binary
+			 * Private Key to raw binary
 			 */
-			ubyte[65] toBinary() const
+			BinaryKey!pubKeyLen toBinary() const
 			{
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
-					BYTE[64] XY; // Public Key
+					BYTE[pubKeyLen-1] XY; // Public Key
 				}
 				KeyBlob keyBlob;
-				keyBlob.dwMagic = BCRYPT_ECDSA_PUBLIC_P256_MAGIC;
-				keyBlob.cbKey = 32;
+				keyBlob.dwMagic = pubKeyMagicValue;
+				keyBlob.cbKey = (pubKeyLen-1)/2;
 				ULONG res;
 				BCryptExportKey(_key, null, "ECCPUBLICBLOB", cast(ubyte*)&keyBlob, keyBlob.sizeof, &res, 0)
 					.ntEnforce("Cannot export private key.");
 				assert(res == keyBlob.sizeof);
-				return staticArray!65([ubyte(0x04)] ~ keyBlob.XY[0..64]);
+				return staticArray!pubKeyLen([0x04].bin ~ keyBlob.XY[]);
 			}
 		}
 		
@@ -3435,17 +3613,13 @@ static if (enableBcryptEngines)
 		/***********************************************************************
 		 * 署名
 		 */
-		immutable(ubyte)[] sign(in ubyte[] message, in PrivateKey prvKey)
+		bin_t sign(in ubyte[] message, in PrivateKey prvKey)
 		{
 			ULONG len;
-			// SHA256 digest;
-			// digest.start();
-			// digest.put(message);
-			// auto hash = digest.finish();
 			BCryptSignHash(prvKey._key, null, cast(PUCHAR)message.ptr, cast(ULONG)message.length, null, 0, &len, 0)
 				.ntEnforce("Cannot sign specified message.");
-			assert(len == 64);
-			auto ret = new ubyte[64];
+			assert(len == prvKeyLen*2);
+			auto ret = new ubyte[prvKeyLen*2];
 			BCryptSignHash(prvKey._key, null, cast(PUCHAR)message.ptr, cast(ULONG)message.length,
 				ret.ptr, cast(ULONG)ret.length, &len, 0)
 				.ntEnforce("Cannot sign specified message.");
@@ -3462,6 +3636,14 @@ static if (enableBcryptEngines)
 			return res == 0;
 		}
 	}
+	///
+	alias BcryptECDSAP256Engine = BcryptECDSAEngine!(ECDSAType.p256);
+	///
+	alias BcryptECDSAP256KEngine = BcryptECDSAEngine!(ECDSAType.p256k);
+	///
+	alias BcryptECDSAP384Engine = BcryptECDSAEngine!(ECDSAType.p384);
+	///
+	alias BcryptECDSAP521Engine = BcryptECDSAEngine!(ECDSAType.p521);
 	///
 	private struct BcryptRSA4096Engine
 	{
@@ -3481,8 +3663,8 @@ static if (enableBcryptEngines)
 			ubyte[512] modulus;             // n
 			ubyte[4]   publicExponent;      // e
 		}
-		enum privateKeyBinaryLen = PrvDat.sizeof;
-		enum publicKeyBinaryLen = PubDat.sizeof;
+		enum prvKeyLen = PrvDat.sizeof;
+		enum pubKeyLen = PubDat.sizeof;
 		struct PrivateKey
 		{
 		private:
@@ -3595,7 +3777,7 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key from 256bit binary
 			 */
-			static PrivateKey fromBinary(in ubyte[privateKeyBinaryLen] prvKey)
+			static PrivateKey fromBinary(in BinaryKey!prvKeyLen prvKey)
 			{
 				BCRYPT_ALG_HANDLE hAlg;
 				BCRYPT_KEY_HANDLE hKey;
@@ -3643,14 +3825,14 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return toDER().der2pem("RSA PRIVATE KEY");
 			}
 			/***********************************************************************
 			 * Private Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				struct RSAPrivateBlob
 				{
@@ -3700,9 +3882,9 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key to 256bit binary
 			 */
-			ubyte[privateKeyBinaryLen] toBinary() const
+			BinaryKey!prvKeyLen toBinary() const
 			{
-				ubyte[privateKeyBinaryLen] ret;
+				BinaryKey!prvKeyLen ret;
 				struct RSAPrivateBlob
 				{
 					ULONG     Magic;
@@ -3864,7 +4046,7 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key from 256bit binary
 			 */
-			static PublicKey fromBinary(in ubyte[publicKeyBinaryLen] pubKey)
+			static PublicKey fromBinary(in BinaryKey!pubKeyLen pubKey)
 			{
 				BCRYPT_ALG_HANDLE hAlg;
 				BCRYPT_KEY_HANDLE hKey;
@@ -3900,14 +4082,14 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Public Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return toDER().der2pem("PUBLIC KEY");
 			}
 			/***********************************************************************
 			 * Public Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				struct RSAPublicBlob
 				{
@@ -3943,9 +4125,9 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key to 256bit binary
 			 */
-			ubyte[publicKeyBinaryLen] toBinary() const
+			BinaryKey!pubKeyLen toBinary() const
 			{
-				ubyte[publicKeyBinaryLen] ret;
+				BinaryKey!pubKeyLen ret;
 				struct RSAPublicBlob
 				{
 					ULONG     Magic;
@@ -3987,7 +4169,7 @@ static if (enableBcryptEngines)
 		/***********************************************************************
 		 * 署名
 		 */
-		immutable(ubyte)[] sign(in ubyte[] message, in PrivateKey prvKey)
+		bin_t sign(in ubyte[] message, in PrivateKey prvKey)
 		{
 			import std.range;
 			enforce(message.length <= 512 - 4, "Cannot sign specified message.");
@@ -4030,7 +4212,7 @@ static if (enableBcryptEngines)
 		/***********************************************************************
 		 * 暗号化
 		 */
-		immutable(ubyte)[] encrypt(in ubyte[] data, in PublicKey pubKey)
+		bin_t encrypt(in ubyte[] data, in PublicKey pubKey)
 		{
 			enforce(data.length <= 512 - 4, "Cannot encrypt specified data.");
 			// PKCS#1 v1.5 Padding
@@ -4050,7 +4232,7 @@ static if (enableBcryptEngines)
 		/***********************************************************************
 		 * 復号
 		 */
-		immutable(ubyte)[] decrypt(in ubyte[] data, in PrivateKey prvKey)
+		bin_t decrypt(in ubyte[] data, in PrivateKey prvKey)
 		{
 			import std.algorithm: find;
 			enforce(data.length == 512, "Cannot decrypt specified data.");
@@ -4071,6 +4253,8 @@ static if (enableBcryptEngines)
 	///
 	private struct BcryptECDHP256Engine
 	{
+		enum prvKeyLen = 32;
+		enum pubKeyLen = 65;
 		struct PrivateKey
 		{
 		private:
@@ -4144,7 +4328,7 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key from 256bit binary
 			 */
-			static PrivateKey fromBinary(in ubyte[32] prvKey)
+			static PrivateKey fromBinary(in BinaryKey!32 prvKey)
 			{
 				BCRYPT_ALG_HANDLE hAlg;
 				BCRYPT_KEY_HANDLE hKey;
@@ -4154,6 +4338,7 @@ static if (enableBcryptEngines)
 					cast(void)BCryptCloseAlgorithmProvider(hAlg, 0);
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4172,17 +4357,18 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return toDER().der2pem("EC PRIVATE KEY");
 			}
 			/***********************************************************************
 			 * Private Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4205,10 +4391,11 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key to 256bit binary
 			 */
-			ubyte[32] toBinary() const
+			BinaryKey!32 toBinary() const
 			{
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4262,6 +4449,7 @@ static if (enableBcryptEngines)
 			{
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4306,7 +4494,7 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key from 256bit binary
 			 */
-			static PublicKey fromBinary(in ubyte[65] pubKey)
+			static PublicKey fromBinary(in BinaryKey!65 pubKey)
 			{
 				BCRYPT_ALG_HANDLE hAlg;
 				BCRYPT_KEY_HANDLE hKey;
@@ -4317,6 +4505,7 @@ static if (enableBcryptEngines)
 					cast(void)BCryptCloseAlgorithmProvider(hAlg, 0);
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4333,14 +4522,14 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Public Key to PEM string
 			 */
-			string toPEM() const
+			PEMString toPEM() const
 			{
 				return toDER().der2pem("PUBLIC KEY");
 			}
 			/***********************************************************************
 			 * Public Key to DER binary
 			 */
-			immutable(ubyte)[] toDER() const
+			DERBinary toDER() const
 			{
 				return assumeUnique(cast(ubyte[])[0x30, 0x59, // SEQUENCE
 					0x30, 0x13, // SEQUENCE
@@ -4351,10 +4540,11 @@ static if (enableBcryptEngines)
 			/***********************************************************************
 			 * Private Key to 256bit binary
 			 */
-			ubyte[65] toBinary() const
+			BinaryKey!65 toBinary() const
 			{
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4372,7 +4562,7 @@ static if (enableBcryptEngines)
 		/***********************************************************************
 		 * Derive shared secret
 		 */
-		immutable(ubyte)[] derive(in PrivateKey prvKey, in PublicKey pubKey)
+		bin_t derive(in PrivateKey prvKey, in PublicKey pubKey)
 		{
 			BCRYPT_SECRET_HANDLE hSecret;
 			BCryptSecretAgreement(prvKey._key, pubKey._key, &hSecret, 0)
@@ -4399,12 +4589,25 @@ static if (enableBcryptEngines)
 static if (enableOpenSSLCmdEngines)
 {
 	///
-	enum bool isOpenSSLCmdAESEngine(T) = is(T == OpenSSLCmdAESCBCEncryptEngine)
+	enum bool isOpenSSLCmdAESEngine(T) = false
+		|| is(T == OpenSSLCmdAESCBCEncryptEngine)
 		|| is(T == OpenSSLCmdAESCBCDecryptEngine);
 	///
 	enum bool isOpenSSLCmdEd25519Engine(T) = is(T == OpenSSLCmdEd25519Engine);
 	///
 	enum bool isOpenSSLCmdECDSAP256Engine(T) = is(T == OpenSSLCmdECDSAP256Engine);
+	///
+	enum bool isOpenSSLCmdECDSAP256KEngine(T) = is(T == OpenSSLCmdECDSAP256KEngine);
+	///
+	enum bool isOpenSSLCmdECDSAP384Engine(T) = is(T == OpenSSLCmdECDSAP384Engine);
+	///
+	enum bool isOpenSSLCmdECDSAP521Engine(T) = is(T == OpenSSLCmdECDSAP521Engine);
+	///
+	enum bool isOpenSSLCmdECDSAEngine(T) = false
+		|| isOpenSSLCmdECDSAP256Engine!T
+		|| isOpenSSLCmdECDSAP256KEngine!T
+		|| isOpenSSLCmdECDSAP384Engine!T
+		|| isOpenSSLCmdECDSAP521Engine!T;
 	///
 	enum bool isOpenSSLCmdRSA4096Engine(T) = is(T == OpenSSLCmdRSA4096Engine);
 	///
@@ -4418,6 +4621,14 @@ else
 	enum bool isOpenSSLCmdEd25519Engine(T) = false;
 	///
 	enum bool isOpenSSLCmdECDSAP256Engine(T) = false;
+	///
+	enum bool isOpenSSLCmdECDSAP256KEngine(T) = false;
+	///
+	enum bool isOpenSSLCmdECDSAP384Engine(T) = false;
+	///
+	enum bool isOpenSSLCmdECDSAP521Engine(T) = false;
+	///
+	enum bool isOpenSSLCmdECDSAEngine(T) = false;
 	///
 	enum bool isOpenSSLCmdRSA4096Engine(T) = false;
 	///
@@ -4434,6 +4645,18 @@ static if (enableOpenSSLEngines)
 	///
 	enum bool isOpenSSLECDSAP256Engine(T) = is(T == OpenSSLECDSAP256Engine);
 	///
+	enum bool isOpenSSLECDSAP256KEngine(T) = is(T == OpenSSLECDSAP256KEngine);
+	///
+	enum bool isOpenSSLECDSAP384Engine(T) = is(T == OpenSSLECDSAP384Engine);
+	///
+	enum bool isOpenSSLECDSAP521Engine(T) = is(T == OpenSSLECDSAP521Engine);
+	///
+	enum bool isOpenSSLECDSAEngine(T) = false
+		|| isOpenSSLECDSAP256Engine!T
+		|| isOpenSSLECDSAP256KEngine!T
+		|| isOpenSSLECDSAP384Engine!T
+		|| isOpenSSLECDSAP521Engine!T;
+	///
 	enum bool isOpenSSLRSA4096Engine(T) = is(T == OpenSSLRSA4096Engine);
 	///
 	enum bool isOpenSSLECDHP256Engine(T) = is(T == OpenSSLECDHP256Engine);
@@ -4446,6 +4669,14 @@ else
 	enum bool isOpenSSLEd25519Engine(T) = false;
 	///
 	enum bool isOpenSSLECDSAP256Engine(T) = false;
+	///
+	enum bool isOpenSSLECDSAP256KEngine(T) = false;
+	///
+	enum bool isOpenSSLECDSAP384Engine(T) = false;
+	///
+	enum bool isOpenSSLECDSAP521Engine(T) = false;
+	///
+	enum bool isOpenSSLECDSAEngine(T) = false;
 	///
 	enum bool isOpenSSLRSA4096Engine(T) = false;
 	///
@@ -4462,6 +4693,18 @@ static if (enableBcryptEngines)
 	///
 	enum bool isBcryptECDSAP256Engine(T) = is(T == BcryptECDSAP256Engine);
 	///
+	enum bool isBcryptECDSAP256KEngine(T) = is(T == BcryptECDSAP256KEngine);
+	///
+	enum bool isBcryptECDSAP384Engine(T) = is(T == BcryptECDSAP384Engine);
+	///
+	enum bool isBcryptECDSAP521Engine(T) = is(T == BcryptECDSAP521Engine);
+	///
+	enum bool isBcryptECDSAEngine(T) = false
+		|| isBcryptECDSAP256Engine!T
+		|| isBcryptECDSAP256KEngine!T
+		|| isBcryptECDSAP384Engine!T
+		|| isBcryptECDSAP521Engine!T;
+	///
 	enum bool isBcryptRSA4096Engine(T) = is(T == BcryptRSA4096Engine);
 	///
 	enum bool isBcryptECDHP256Engine(T) = is(T == BcryptECDHP256Engine);
@@ -4474,6 +4717,14 @@ else
 	enum bool isBcryptEd25519Engine(T) = false;
 	///
 	enum bool isBcryptECDSAP256Engine(T) = false;
+	///
+	enum bool isBcryptECDSAP256KEngine(T) = false;
+	///
+	enum bool isBcryptECDSAP384Engine(T) = false;
+	///
+	enum bool isBcryptECDSAP521Engine(T) = false;
+	///
+	enum bool isBcryptECDSAEngine(T) = false;
 	///
 	enum bool isBcryptRSA4096Engine(T) = false;
 	///
@@ -4507,9 +4758,25 @@ enum bool isEd25519Engine(T) = isOpenSSLCmdEd25519Engine!T
 	|| isOpenSSLEd25519Engine!T
 	|| isBcryptEd25519Engine!T;
 ///
-enum bool isECDSAEngine(T) = isOpenSSLCmdECDSAP256Engine!T
+enum bool isECDSAP256Engine(T) = isOpenSSLCmdECDSAP256Engine!T
 	|| isOpenSSLECDSAP256Engine!T
 	|| isBcryptECDSAP256Engine!T;
+///
+enum bool isECDSAP256KEngine(T) = isOpenSSLCmdECDSAP256KEngine!T
+	|| isOpenSSLECDSAP256KEngine!T
+	|| isBcryptECDSAP256KEngine!T;
+///
+enum bool isECDSAP384Engine(T) = isOpenSSLCmdECDSAP384Engine!T
+	|| isOpenSSLECDSAP384Engine!T
+	|| isBcryptECDSAP384Engine!T;
+///
+enum bool isECDSAP521Engine(T) = isOpenSSLCmdECDSAP521Engine!T
+	|| isOpenSSLECDSAP521Engine!T
+	|| isBcryptECDSAP521Engine!T;
+///
+enum bool isECDSAEngine(T) = isOpenSSLCmdECDSAEngine!T
+	|| isOpenSSLECDSAEngine!T
+	|| isBcryptECDSAEngine!T;
 ///
 enum bool isRSAEngine(T) = isOpenSSLCmdRSA4096Engine!T
 	|| isOpenSSLRSA4096Engine!T
@@ -4534,9 +4801,15 @@ static if (enableOpenSSLEngines)
 	///
 	alias DefaultECDSAP256Engine = OpenSSLECDSAP256Engine;
 	///
+	alias DefaultECDSAP256KEngine = OpenSSLECDSAP256KEngine;
+	///
+	alias DefaultECDSAP384Engine = OpenSSLECDSAP384Engine;
+	///
+	alias DefaultECDSAP521Engine = OpenSSLECDSAP521Engine;
+	///
 	alias DefaultRSA4096Engine = OpenSSLRSA4096Engine;
 	///
-	alias DefaultECDHEngine = OpenSSLCmdRSA4096Engine;
+	alias DefaultECDHP256Engine = OpenSSLCmdECDHP256Engine;
 }
 else static if (enableBcryptEngines)
 {
@@ -4553,9 +4826,15 @@ else static if (enableBcryptEngines)
 	///
 	alias DefaultECDSAP256Engine = BcryptECDSAP256Engine;
 	///
+	alias DefaultECDSAP256KEngine = BcryptECDSAP256KEngine;
+	///
+	alias DefaultECDSAP384Engine = BcryptECDSAP384Engine;
+	///
+	alias DefaultECDSAP521Engine = BcryptECDSAP521Engine;
+	///
 	alias DefaultRSA4096Engine = BcryptRSA4096Engine;
 	///
-	alias DefaultECDHEngine = OpenSSLCmdRSA4096Engine;
+	alias DefaultECDHP256Engine = BcryptECDHP256Engine;
 }
 else
 {
@@ -4572,35 +4851,15 @@ else
 	///
 	alias DefaultECDSAP256Engine = OpenSSLCmdECDSAP256Engine;
 	///
+	alias DefaultECDSAP256KEngine = OpenSSLCmdECDSAP256KEngine;
+	///
+	alias DefaultECDSAP384Engine = OpenSSLCmdECDSAP384Engine;
+	///
+	alias DefaultECDSAP521Engine = OpenSSLCmdECDSAP521Engine;
+	///
 	alias DefaultRSA4096Engine = OpenSSLCmdRSA4096Engine;
 	///
-	alias DefaultECDHEngine = OpenSSLCmdRSA4096Engine;
-}
-
-
-/*******************************************************************************
- * Methods of ECDSA P256 Signature format convertion
- * 
- * DER format:
- * - SEQUENCE
- *   - INTEGER: R
- *   - INTEGER: S
- * BIN format:
- * - ubyte[32]: R
- * - ubyte[32]: S
- */
-immutable(ubyte)[] convECDSAP256SignDer2Bin(in ubyte[] der)
-{
-	const(ubyte)[] dat = der[];
-	auto seq = decasn1seq(dat);
-	auto s = decasn1bn(seq, 32);
-	auto r = decasn1bn(seq, 32);
-	return (s ~ r).assumeUnique;
-}
-/// ditto
-immutable(ubyte)[] convECDSAP256SignBin2Der(in ubyte[] bin)
-{
-	return encasn1seq(encasn1bn(bin[0..32].assumeUnique) ~ encasn1bn(bin[32..$].assumeUnique));
+	alias DefaultECDHP256Engine = OpenSSLCmdECDHP256Engine;
 }
 
 
@@ -4637,54 +4896,54 @@ public:
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine && isAESEngine!Engine)
-	this(immutable(ubyte)[] key, immutable(ubyte)[] iv, bool padding = true, string cmd = defaultOpenSSLCommand)
+	this(in ubyte[] key, in ubyte[] iv, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
 		this(Engine(key, iv, cmd), padding);
 	}
 	/// ditto
 	static if ((isOpenSSLEngine!Engine || isBcryptEngine!Engine) && isAESEngine!Engine)
-	this(immutable(ubyte)[] key, immutable(ubyte)[] iv, bool padding = true)
+	this(in ubyte[] key, in ubyte[] iv, bool padding = true)
 	{
 		this(Engine(key, iv), padding);
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
-	this(string pubKey, bool padding = true, string cmd = defaultOpenSSLCommand)
+	this(in char[] pubKey, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
 		_key = Engine.PublicKey.fromPEM(pubKey);
 		this(Engine(cmd), padding);
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
-	this(immutable(ubyte)[] pubKey, bool padding = true, string cmd = defaultOpenSSLCommand)
+	this(in ubyte[] pubKey, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
 		_key = Engine.PublicKey.fromDER(pubKey);
 		this(cmd, padding);
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
-	this(size_t N)(immutable(ubyte)[N] pubKey, bool padding = true, string cmd = defaultOpenSSLCommand)
+	this(in BinaryKey!(Engine.pubKeyLen) pubKey, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
-		_key = Engine.PublicKey.fromBianry(pubKey);
+		_key = Engine.PublicKey.fromBinary(pubKey);
 		this(cmd, padding);
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
-	this(string pubKey, bool padding = true)
+	this(in char[] pubKey, bool padding = true)
 	{
 		_key = Engine.PublicKey.fromPEM(pubKey);
 		this(Engine(), padding);
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
-	this(immutable(ubyte)[] pubKey, bool padding = true)
+	this(in ubyte[] pubKey, bool padding = true)
 	{
 		_key = Engine.PublicKey.fromDER(pubKey);
 		this(Engine(), padding);
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
-	this(size_t N)(immutable(ubyte)[N] pubKey, bool padding = true)
+	this(BinaryKey!(Engine.pubKeyLen) pubKey, bool padding = true)
 	{
 		_key = Engine.PublicKey.fromBinary(pubKey);
 		this(Engine(), padding);
@@ -4701,7 +4960,7 @@ public:
 	/***************************************************************************
 	 * Data
 	 */
-	static if (!_onlyOneShot) immutable(ubyte)[] data()
+	static if (!_onlyOneShot) bin_t data()
 	{
 		if (!_finalized)
 		{
@@ -4713,7 +4972,7 @@ public:
 	/***************************************************************************
 	 * OneShot encrypt
 	 */
-	immutable(ubyte)[] encrypt(in ubyte[] dat)
+	bin_t encrypt(in ubyte[] dat)
 	{
 		static if (_onlyOneShot)
 		{
@@ -4970,7 +5229,7 @@ private:
 	Engine _engine;
 	static if (is(DigestEngine == void))
 	{
-		Appender!(immutable(ubyte)[]) _message;
+		Appender!bin_t _message;
 	}
 	else
 	{
@@ -4978,58 +5237,62 @@ private:
 	}
 	Engine.PrivateKey _prvKey;
 public:
+	~this() @trusted
+	{
+		_prvKey.move();
+	}
 	/***************************************************************************
 	 * Constructor
 	 */
-	this(Engine engine, Engine.PrivateKey prvKey)
+	this(Engine engine, Engine.PrivateKey prvKey) @trusted
 	{
 		_engine = engine.move();
 		_prvKey = prvKey.move();
 		static if (is(DigestEngine == void))
-			_message = appender!(immutable(ubyte)[]);
+			_message = appender!bin_t;
 		else
 			_digest.start();
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine)
-	this(in char[] prvKeyPEM, string cmd = defaultOpenSSLCommand)
+	this(in char[] prvKeyPEM, string cmd = defaultOpenSSLCommand) @trusted
 	{
 		this(Engine(cmd), Engine.PrivateKey.fromPEM(prvKeyPEM));
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine)
-	this(in ubyte[] prvKeyDER, string cmd = defaultOpenSSLCommand)
+	this(in ubyte[] prvKeyDER, string cmd = defaultOpenSSLCommand) @trusted
 	{
 		this(Engine(cmd), Engine.PrivateKey.fromDER(prvKeyDER));
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine)
-	this(size_t N)(in ubyte[N] prvKeyRaw, string cmd = defaultOpenSSLCommand)
+	this(in BinaryKey!(Engine.prvKeyLen) prvKeyRaw, string cmd = defaultOpenSSLCommand) @trusted
 	{
 		this(Engine(cmd), Engine.PrivateKey.fromBinary(prvKeyRaw));
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine)
-	this(in char[] prvKeyPEM)
+	this(in char[] prvKeyPEM) @trusted
 	{
 		this(Engine(), Engine.PrivateKey.fromPEM(prvKeyPEM));
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine)
-	this(in ubyte[] prvKeyDER)
+	this(in ubyte[] prvKeyDER) @trusted
 	{
 		this(Engine(), Engine.PrivateKey.fromDER(prvKeyDER));
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine)
-	this(size_t N)(in ubyte[N] prvKeyRaw)
+	this(in BinaryKey!(Engine.prvKeyLen) prvKeyRaw) @trusted
 	{
 		this(Engine(), Engine.PrivateKey.fromBinary(prvKeyRaw));
 	}
 	/***************************************************************************
 	 * Update
 	 */
-	void update(in ubyte[] message)
+	void update(in ubyte[] message) @safe
 	{
 		static if (is(DigestEngine == void))
 		{
@@ -5043,7 +5306,7 @@ public:
 	/***************************************************************************
 	 * Sign
 	 */
-	immutable(ubyte)[] sign()
+	bin_t sign() @trusted
 	{
 		static if (is(DigestEngine == void))
 		{
@@ -5059,7 +5322,7 @@ public:
 	/***************************************************************************
 	 * Sign
 	 */
-	immutable(ubyte)[] sign(in ubyte[] data)
+	bin_t sign(in ubyte[] data) @trusted
 	{
 		static if (is(DigestEngine == void))
 		{
@@ -5080,6 +5343,12 @@ alias Ed25519phSigner = Ed25519Signer!SHA512;
 /// ditto
 alias ECDSAP256Signer(DigestEngine = void) = Signer!(DefaultECDSAP256Engine, DigestEngine);
 /// ditto
+alias ECDSAP256KSigner(DigestEngine = void) = Signer!(DefaultECDSAP256KEngine, DigestEngine);
+/// ditto
+alias ECDSAP384Signer(DigestEngine = void) = Signer!(DefaultECDSAP384Engine, DigestEngine);
+/// ditto
+alias ECDSAP521Signer(DigestEngine = void) = Signer!(DefaultECDSAP521Engine, DigestEngine);
+/// ditto
 alias RSA4096Signer(DigestEngine = void) = Signer!(DefaultRSA4096Engine, DigestEngine);
 
 
@@ -5092,7 +5361,7 @@ private:
 	Engine _engine;
 	static if (is(DigestEngine == void))
 	{
-		Appender!(immutable(ubyte)[]) _message;
+		Appender!bin_t _message;
 	}
 	else
 	{
@@ -5103,7 +5372,7 @@ public:
 	/***************************************************************************
 	 * Constructor
 	 */
-	this(Engine engine, Engine.PublicKey pubKey)
+	this(Engine engine, Engine.PublicKey pubKey) @trusted
 	{
 		_engine = engine.move;
 		_pubKey = pubKey.move;
@@ -5112,44 +5381,44 @@ public:
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine)
-	this(in char[] pubKeyPEM, string cmd = defaultOpenSSLCommand)
+	this(in char[] pubKeyPEM, string cmd = defaultOpenSSLCommand) @trusted
 	{
 		this(Engine(cmd), Engine.PublicKey.fromPEM(pubKeyPEM));
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine)
-	this(in ubyte[] pubKeyDER, string cmd = defaultOpenSSLCommand)
+	this(in ubyte[] pubKeyDER, string cmd = defaultOpenSSLCommand) @trusted
 	{
 		this(Engine(cmd), Engine.PublicKey.fromDER(pubKeyDER));
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine)
-	this(size_t N)(in ubyte[N] pubKeyRaw, string cmd = defaultOpenSSLCommand)
+	this(in BinaryKey!(Engine.pubKeyLen) pubKeyRaw, string cmd = defaultOpenSSLCommand) @trusted
 	{
 		this(Engine(cmd), Engine.PublicKey.fromBinary(pubKeyRaw));
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine)
-	this(immutable(char)[] pubKeyPEM)
+	this(in char[] pubKeyPEM) @trusted
 	{
 		this(Engine(), Engine.PublicKey.fromPEM(pubKeyPEM));
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine)
-	this(immutable(ubyte)[] pubKeyDER)
+	this(in ubyte[] pubKeyDER) @trusted
 	{
 		this(Engine(), Engine.PublicKey.fromDER(pubKeyDER));
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine)
-	this(size_t N)(in ubyte[N] pubKeyRaw)
+	this(in BinaryKey!(Engine.pubKeyLen) pubKeyRaw) @trusted
 	{
 		this(Engine(), Engine.PublicKey.fromBinary(pubKeyRaw));
 	}
 	/***************************************************************************
 	 * Update
 	 */
-	void update(in ubyte[] message)
+	void update(in ubyte[] message) @safe
 	{
 		static if (is(DigestEngine == void))
 		{
@@ -5163,7 +5432,7 @@ public:
 	/***************************************************************************
 	 * Verify
 	 */
-	bool verify(in ubyte[] signature)
+	bool verify(in ubyte[] signature) @trusted
 	{
 		static if (is(DigestEngine == void))
 		{
@@ -5177,7 +5446,7 @@ public:
 		}
 	}
 	/// ditto
-	bool verify(in ubyte[] signature, in ubyte[] message)
+	bool verify(in ubyte[] signature, in ubyte[] message) @trusted
 	{
 		static if (is(DigestEngine == void))
 		{
@@ -5198,6 +5467,12 @@ alias Ed25519Verifier(DigestEngine = void) = Verifier!(DefaultEd25519Engine, Dig
 alias Ed25519phVerifier = Ed25519Verifier!SHA512;
 /// ditto
 alias ECDSAP256Verifier(DigestEngine = void) = Verifier!(DefaultECDSAP256Engine, DigestEngine);
+/// ditto
+alias ECDSAP256KVerifier(DigestEngine = void) = Verifier!(DefaultECDSAP256KEngine, DigestEngine);
+/// ditto
+alias ECDSAP384Verifier(DigestEngine = void) = Verifier!(DefaultECDSAP384Engine, DigestEngine);
+/// ditto
+alias ECDSAP521Verifier(DigestEngine = void) = Verifier!(DefaultECDSAP521Engine, DigestEngine);
 /// ditto
 alias RSA4096Verifier(DigestEngine = void) = Verifier!(DefaultRSA4096Engine, DigestEngine);
 
@@ -5554,6 +5829,134 @@ static if (enableOpenSSLCmdEngines) @system unittest
 	assert(verifier2.verify(signature2));
 	assert(verifier2.verify(signaturePhSHA256Example1));
 	assert(verifier2.verify(signaturePhSHA256Example2));
+}
+
+// Sign/Verify for Any Engine
+@system unittest
+{
+	alias PrvKeyDer = DERBinary;
+	alias PubKeyDer = DERBinary;
+	alias SignData  = bin_t;
+	PrvKeyDer[][ECDSAType] prvKeyDers;
+	PubKeyDer[PrvKeyDer][ECDSAType] pubKeyDers;
+	SignData[][PrvKeyDer][ECDSAType] signs;
+	enum message = "Hello, World!".representation;
+	
+	void test1(Engine)()
+	{
+		// 鍵の生成
+		auto prvKey = Engine.PrivateKey.createKey();
+		auto pubKey = Engine.PublicKey.createKey(prvKey);
+		auto prvKeyDer = prvKey.toDER();
+		prvKeyDers[Engine.cipherType] ~= prvKeyDer;
+		if (auto pkd = Engine.cipherType in pubKeyDers)
+			(*pkd)[prvKeyDer] = pubKey.toDER();
+		else
+			pubKeyDers[Engine.cipherType] = [prvKeyDer: pubKey.toDER()];
+	}
+	
+	void test2(Engine)()
+	{
+		// 各エンジンが生成した秘密鍵×各エンジンでの署名
+		foreach (prvKeyDer; prvKeyDers[Engine.cipherType])
+		{
+			auto prvKey = Engine.PrivateKey.fromDER(prvKeyDer);
+			if (auto singElm = Engine.cipherType in signs)
+				(*singElm)[prvKeyDer] ~= Signer!Engine(prvKeyDer).sign(message);
+			else
+				signs[Engine.cipherType] = [prvKeyDer: [Signer!Engine(prvKeyDer).sign(message)]];
+		}
+	}
+	
+	void test3(Engine)()
+	{
+		// 各エンジンが生成した秘密鍵×各エンジンで生成した秘密鍵
+		foreach (prvKeyDer; prvKeyDers[Engine.cipherType])
+		{
+			auto prvKey = Engine.PrivateKey.fromDER(prvKeyDer);
+			auto pubKey = Engine.PublicKey.createKey(prvKey);
+			assert(pubKey.toDER() == pubKeyDers[Engine.cipherType][prvKeyDer]);
+		}
+		// 各エンジンが生成した署名×各エンジンでの検証
+		foreach (prvKeyDer, signlist; signs[Engine.cipherType])
+		{
+			auto pubKeyDer = pubKeyDers[Engine.cipherType][prvKeyDer];
+			foreach (sign; signlist)
+				assert(Verifier!Engine(pubKeyDer).verify(sign, message));
+		}
+	}
+	
+	static if (enableOpenSSLCmdEngines) if (isCommandExisting(defaultOpenSSLCommand))
+	{
+		test1!(OpenSSLCmdECDSAEngine!(ECDSAType.p256))();
+		test1!(OpenSSLCmdECDSAEngine!(ECDSAType.p256k))();
+		test1!(OpenSSLCmdECDSAEngine!(ECDSAType.p384))();
+		test1!(OpenSSLCmdECDSAEngine!(ECDSAType.p521))();
+	}
+	
+	static if (enableOpenSSLEngines)
+	{
+		test1!(OpenSSLECDSAEngine!(ECDSAType.p256))();
+		test1!(OpenSSLECDSAEngine!(ECDSAType.p256k))();
+		test1!(OpenSSLECDSAEngine!(ECDSAType.p384))();
+		test1!(OpenSSLECDSAEngine!(ECDSAType.p521))();
+	}
+	
+	static if (enableBcryptEngines)
+	{
+		test1!(BcryptECDSAEngine!(ECDSAType.p256))();
+		test1!(BcryptECDSAEngine!(ECDSAType.p256k))();
+		test1!(BcryptECDSAEngine!(ECDSAType.p384))();
+		test1!(BcryptECDSAEngine!(ECDSAType.p521))();
+	}
+	
+	static if (enableOpenSSLCmdEngines) if (isCommandExisting(defaultOpenSSLCommand))
+	{
+		test2!(OpenSSLCmdECDSAEngine!(ECDSAType.p256))();
+		test2!(OpenSSLCmdECDSAEngine!(ECDSAType.p256k))();
+		test2!(OpenSSLCmdECDSAEngine!(ECDSAType.p384))();
+		test2!(OpenSSLCmdECDSAEngine!(ECDSAType.p521))();
+	}
+	
+	static if (enableOpenSSLEngines)
+	{
+		test2!(OpenSSLECDSAEngine!(ECDSAType.p256))();
+		test2!(OpenSSLECDSAEngine!(ECDSAType.p256k))();
+		test2!(OpenSSLECDSAEngine!(ECDSAType.p384))();
+		test2!(OpenSSLECDSAEngine!(ECDSAType.p521))();
+	}
+	
+	static if (enableBcryptEngines)
+	{
+		test2!(BcryptECDSAEngine!(ECDSAType.p256))();
+		test2!(BcryptECDSAEngine!(ECDSAType.p256k))();
+		test2!(BcryptECDSAEngine!(ECDSAType.p384))();
+		test2!(BcryptECDSAEngine!(ECDSAType.p521))();
+	}
+	
+	static if (enableOpenSSLCmdEngines) if (isCommandExisting(defaultOpenSSLCommand))
+	{
+		test3!(OpenSSLCmdECDSAEngine!(ECDSAType.p256))();
+		test3!(OpenSSLCmdECDSAEngine!(ECDSAType.p256k))();
+		test3!(OpenSSLCmdECDSAEngine!(ECDSAType.p384))();
+		test3!(OpenSSLCmdECDSAEngine!(ECDSAType.p521))();
+	}
+	
+	static if (enableOpenSSLEngines)
+	{
+		test3!(OpenSSLECDSAEngine!(ECDSAType.p256))();
+		test3!(OpenSSLECDSAEngine!(ECDSAType.p256k))();
+		test3!(OpenSSLECDSAEngine!(ECDSAType.p384))();
+		test3!(OpenSSLECDSAEngine!(ECDSAType.p521))();
+	}
+	
+	static if (enableBcryptEngines)
+	{
+		test3!(BcryptECDSAEngine!(ECDSAType.p256))();
+		test3!(BcryptECDSAEngine!(ECDSAType.p256k))();
+		test3!(BcryptECDSAEngine!(ECDSAType.p384))();
+		test3!(BcryptECDSAEngine!(ECDSAType.p521))();
+	}
 }
 
 // RSA 4096 for OpenSSL
@@ -7152,43 +7555,73 @@ static if (enableBcryptEngines) @system unittest
 /*******************************************************************************
  * Create key
  */
-auto createPrivateKey(Engine)() @trusted
+BinaryKey!(Engine.prvKeyLen) createPrivateKey(Engine)() @trusted
 {
 	return Engine.PrivateKey.createKey().toBinary();
 }
 /// ditto
-auto createPublicKey(Engine, size_t N)(ubyte[N] prvKey) @trusted
+BinaryKey!(Engine.pubKeyLen) createPublicKey(Engine)(in BinaryKey!(Engine.prvKeyLen) prvKey) @trusted
 {
 	return Engine.PublicKey.createKey(Engine.PrivateKey.fromBinary(prvKey)).toBinary();
 }
 /// ditto
-ubyte[32] createEd25519PrivateKey() @safe
+BinaryKey!32 createEd25519PrivateKey() @safe
 {
 	return createPrivateKey!DefaultEd25519Engine();
 }
 /// ditto
-ubyte[32] createEd25519PublicKey(ubyte[32] prvKey) @safe
+BinaryKey!32 createEd25519PublicKey(BinaryKey!32 prvKey) @safe
 {
 	return createPublicKey!DefaultEd25519Engine(prvKey);
 }
 /// ditto
-ubyte[32] createECDSAP256PrivateKey() @safe
+BinaryKey!32 createECDSAP256PrivateKey() @safe
 {
 	return createPrivateKey!DefaultECDSAP256Engine();
 }
 /// ditto
-ubyte[65] createECDSAP256PublicKey(ubyte[32] prvKey) @safe
+BinaryKey!65 createECDSAP256PublicKey(BinaryKey!32 prvKey) @safe
 {
 	return createPublicKey!DefaultECDSAP256Engine(prvKey);
 }
 /// ditto
-ubyte[DefaultRSA4096Engine.privateKeyBinaryLen] createRSA4096PrivateKey() @safe
+BinaryKey!32 createECDSAP256KPrivateKey() @safe
+{
+	return createPrivateKey!DefaultECDSAP256KEngine();
+}
+/// ditto
+BinaryKey!65 createECDSAP256KPublicKey(BinaryKey!32 prvKey) @safe
+{
+	return createPublicKey!DefaultECDSAP256KEngine(prvKey);
+}
+/// ditto
+BinaryKey!48 createECDSAP384PrivateKey() @safe
+{
+	return createPrivateKey!DefaultECDSAP384Engine();
+}
+/// ditto
+BinaryKey!97 createECDSAP384PublicKey(BinaryKey!48 prvKey) @safe
+{
+	return createPublicKey!DefaultECDSAP384Engine(prvKey);
+}
+/// ditto
+BinaryKey!66 createECDSAP521PrivateKey() @safe
+{
+	return createPrivateKey!DefaultECDSAP521Engine();
+}
+/// ditto
+BinaryKey!133 createECDSAP521PublicKey(BinaryKey!66 prvKey) @safe
+{
+	return createPublicKey!DefaultECDSAP521Engine(prvKey);
+}
+/// ditto
+ubyte[DefaultRSA4096Engine.prvKeyLen] createRSA4096PrivateKey() @safe
 {
 	return createPrivateKey!DefaultRSA4096Engine();
 }
 /// ditto
-ubyte[DefaultRSA4096Engine.publicKeyBinaryLen] createRSA4096PublicKey(
-	ubyte[DefaultRSA4096Engine.privateKeyBinaryLen] prvKey) @safe
+ubyte[DefaultRSA4096Engine.pubKeyLen] createRSA4096PublicKey(
+	ubyte[DefaultRSA4096Engine.prvKeyLen] prvKey) @safe
 {
 	return createPublicKey!DefaultRSA4096Engine(prvKey);
 }
@@ -7205,16 +7638,413 @@ ubyte[DefaultRSA4096Engine.publicKeyBinaryLen] createRSA4096PublicKey(
 		|| (isCommandExisting(defaultOpenSSLCommand)
 			&& getOpenSSLCmdVerseion(defaultOpenSSLCommand) >= SemVer(3, 0, 1)))
 	{
-		auto prvKey1 = createEd25519PrivateKey();
-		auto pubKey1 = createEd25519PublicKey(prvKey1);
-		assert(signVerifyTest!DefaultEd25519Engine(prvKey1, pubKey1));
+		auto prvKeyEd25519 = createEd25519PrivateKey();
+		auto pubKeyEd25519 = createEd25519PublicKey(prvKeyEd25519);
+		assert(signVerifyTest!DefaultEd25519Engine(prvKeyEd25519, pubKeyEd25519));
 	}
 	
-	auto prvKey2 = createECDSAP256PrivateKey();
-	auto pubKey2 = createECDSAP256PublicKey(prvKey2);
-	assert(signVerifyTest!DefaultECDSAP256Engine(prvKey2, pubKey2));
+	auto prvKeyECDSAP256 = createECDSAP256PrivateKey();
+	auto pubKeyECDSAP256 = createECDSAP256PublicKey(prvKeyECDSAP256);
+	assert(signVerifyTest!DefaultECDSAP256Engine(prvKeyECDSAP256, pubKeyECDSAP256));
 	
-	auto prvKey3 = createRSA4096PrivateKey();
-	auto pubKey3 = createRSA4096PublicKey(prvKey3);
-	assert(signVerifyTest!DefaultRSA4096Engine(prvKey3, pubKey3));
+	auto prvKeyECDSAP256K = createECDSAP256KPrivateKey();
+	auto pubKeyECDSAP256K = createECDSAP256KPublicKey(prvKeyECDSAP256K);
+	assert(signVerifyTest!DefaultECDSAP256KEngine(prvKeyECDSAP256K, pubKeyECDSAP256K));
+	
+	auto prvKeyECDSAP384 = createECDSAP384PrivateKey();
+	auto pubKeyECDSAP384 = createECDSAP384PublicKey(prvKeyECDSAP384);
+	assert(signVerifyTest!DefaultECDSAP384Engine(prvKeyECDSAP384, pubKeyECDSAP384));
+	
+	auto prvKeyECDSAP521 = createECDSAP521PrivateKey();
+	auto pubKeyECDSAP521 = createECDSAP521PublicKey(prvKeyECDSAP521);
+	assert(signVerifyTest!DefaultECDSAP521Engine(prvKeyECDSAP521, pubKeyECDSAP521));
+	
+	auto prvKeyRSA4096 = createRSA4096PrivateKey();
+	auto pubKeyRSA4096 = createRSA4096PublicKey(prvKeyRSA4096);
+	assert(signVerifyTest!DefaultRSA4096Engine(prvKeyRSA4096, pubKeyRSA4096));
+}
+
+/*******************************************************************************
+ * Conversion of key formats
+ */
+PEMString convPrivateKeyToPEM(Engine)(in BinaryKey!(Engine.prvKeyLen) prvKey) @trusted
+{
+	return Engine.PrivateKey.fromBinary(prvKey).toPEM();
+}
+/// ditto
+BinaryKey!(Engine.prvKeyLen) convPrivateKeyFromPEM(Engine)(in char[] pem) @trusted
+{
+	return Engine.PrivateKey.fromPEM(pem).toBinary();
+}
+/// ditto
+DERBinary convPrivateKeyToDER(Engine)(in BinaryKey!(Engine.prvKeyLen) prvKey) @trusted
+{
+	return Engine.PrivateKey.fromBinary(prvKey).toDER();
+}
+/// ditto
+BinaryKey!(Engine.prvKeyLen) convPrivateKeyFromDER(Engine)(in ubyte[] der) @trusted
+{
+	return Engine.PrivateKey.fromDER(der).toBinary();
+}
+
+/// ditto
+PEMString convPublicKeyToPEM(Engine)(in BinaryKey!(Engine.pubKeyLen) pubKey) @trusted
+{
+	return Engine.PublicKey.fromBinary(pubKey).toPEM();
+}
+/// ditto
+BinaryKey!(Engine.pubKeyLen) convPublicKeyFromPEM(Engine)(in char[] pem) @trusted
+{
+	return Engine.PublicKey.fromPEM(pem).toBinary();
+}
+/// ditto
+DERBinary convPublicKeyToDER(Engine)(in BinaryKey!(Engine.pubKeyLen) pubKey) @trusted
+{
+	return Engine.PublicKey.fromBinary(pubKey).toDER();
+}
+/// ditto
+BinaryKey!(Engine.pubKeyLen) convPublicKeyFromDER(Engine)(in ubyte[] der) @trusted
+{
+	return Engine.PublicKey.fromDER(der).toBinary();
+}
+
+
+/// ditto
+PEMString convEd25519PrivateKeyToPEM(in BinaryKey!32 prvKey) @safe
+{
+	return convPrivateKeyToPEM!DefaultEd25519Engine(prvKey);
+}
+/// ditto
+BinaryKey!32 convEd25519PrivateKeyFromPEM(in char[] pem) @safe
+{
+	return convPrivateKeyFromPEM!DefaultEd25519Engine(pem);
+}
+/// ditto
+DERBinary convEd25519PrivateKeyToDER(in BinaryKey!32 prvKey) @safe
+{
+	return convPrivateKeyToDER!DefaultEd25519Engine(prvKey);
+}
+/// ditto
+BinaryKey!32 convEd25519PrivateKeyFromDER(in ubyte[] der) @safe
+{
+	return convPrivateKeyFromDER!DefaultEd25519Engine(der);
+}
+
+/// ditto
+PEMString convEd25519PublicKeyToPEM(in BinaryKey!32 pubKey) @safe
+{
+	return convPublicKeyToPEM!DefaultEd25519Engine(pubKey);
+}
+/// ditto
+BinaryKey!32 convEd25519PublicKeyFromPEM(in char[] pem) @safe
+{
+	return convPublicKeyFromPEM!DefaultEd25519Engine(pem);
+}
+/// ditto
+DERBinary convEd25519PublicKeyToDER(in BinaryKey!32 pubKey) @safe
+{
+	return convPublicKeyToDER!DefaultEd25519Engine(pubKey);
+}
+/// ditto
+BinaryKey!32 convEd25519PublicKeyFromDER(in ubyte[] der) @safe
+{
+	return convPublicKeyFromDER!DefaultEd25519Engine(der);
+}
+
+
+/// ditto
+PEMString convECDSAP256PrivateKeyToPEM(in BinaryKey!32 prvKey) @safe
+{
+	return convPrivateKeyToPEM!DefaultECDSAP256Engine(prvKey);
+}
+/// ditto
+BinaryKey!32 convECDSAP256PrivateKeyFromPEM(in char[] pem) @safe
+{
+	return convPrivateKeyFromPEM!DefaultECDSAP256Engine(pem);
+}
+/// ditto
+DERBinary convECDSAP256PrivateKeyToDER(in BinaryKey!32 prvKey) @safe
+{
+	return convPrivateKeyToDER!DefaultECDSAP256Engine(prvKey);
+}
+/// ditto
+BinaryKey!32 convECDSAP256PrivateKeyFromDER(in ubyte[] der) @safe
+{
+	return convPrivateKeyFromDER!DefaultECDSAP256Engine(der);
+}
+
+/// ditto
+PEMString convECDSAP256PublicKeyToPEM(in BinaryKey!65 pubKey) @safe
+{
+	return convPublicKeyToPEM!DefaultECDSAP256Engine(pubKey);
+}
+/// ditto
+BinaryKey!65 convECDSAP256PublicKeyFromPEM(in char[] pem) @safe
+{
+	return convPublicKeyFromPEM!DefaultECDSAP256Engine(pem);
+}
+/// ditto
+DERBinary convECDSAP256PublicKeyToDER(in BinaryKey!65 pubKey) @safe
+{
+	return convPublicKeyToDER!DefaultECDSAP256Engine(pubKey);
+}
+/// ditto
+BinaryKey!65 convECDSAP256PublicKeyFromDER(in ubyte[] der) @safe
+{
+	return convPublicKeyFromDER!DefaultECDSAP256Engine(der);
+}
+
+
+/// ditto
+PEMString convECDSAP256KPrivateKeyToPEM(in BinaryKey!32 prvKey) @safe
+{
+	return convPrivateKeyToPEM!DefaultECDSAP256KEngine(prvKey);
+}
+/// ditto
+BinaryKey!32 convECDSAP256KPrivateKeyFromPEM(in char[] pem) @safe
+{
+	return convPrivateKeyFromPEM!DefaultECDSAP256KEngine(pem);
+}
+/// ditto
+DERBinary convECDSAP256KPrivateKeyToDER(in BinaryKey!32 prvKey) @safe
+{
+	return convPrivateKeyToDER!DefaultECDSAP256KEngine(prvKey);
+}
+/// ditto
+BinaryKey!32 convECDSAP256KPrivateKeyFromDER(in ubyte[] der) @safe
+{
+	return convPrivateKeyFromDER!DefaultECDSAP256KEngine(der);
+}
+
+/// ditto
+PEMString convECDSAP256KPublicKeyToPEM(in BinaryKey!65 pubKey) @safe
+{
+	return convPublicKeyToPEM!DefaultECDSAP256KEngine(pubKey);
+}
+/// ditto
+BinaryKey!65 convECDSAP256KPublicKeyFromPEM(in char[] pem) @safe
+{
+	return convPublicKeyFromPEM!DefaultECDSAP256KEngine(pem);
+}
+/// ditto
+DERBinary convECDSAP256KPublicKeyToDER(in BinaryKey!65 pubKey) @safe
+{
+	return convPublicKeyToDER!DefaultECDSAP256KEngine(pubKey);
+}
+/// ditto
+BinaryKey!65 convECDSAP256KPublicKeyFromDER(in ubyte[] der) @safe
+{
+	return convPublicKeyFromDER!DefaultECDSAP256KEngine(der);
+}
+
+
+/// ditto
+PEMString convECDSAP384PrivateKeyToPEM(in BinaryKey!48 prvKey) @safe
+{
+	return convPrivateKeyToPEM!DefaultECDSAP384Engine(prvKey);
+}
+/// ditto
+BinaryKey!48 convECDSAP384PrivateKeyFromPEM(in char[] pem) @safe
+{
+	return convPrivateKeyFromPEM!DefaultECDSAP384Engine(pem);
+}
+/// ditto
+DERBinary convECDSAP384PrivateKeyToDER(in BinaryKey!48 prvKey) @safe
+{
+	return convPrivateKeyToDER!DefaultECDSAP384Engine(prvKey);
+}
+/// ditto
+BinaryKey!48 convECDSAP384PrivateKeyFromDER(in ubyte[] der) @safe
+{
+	return convPrivateKeyFromDER!DefaultECDSAP384Engine(der);
+}
+
+/// ditto
+PEMString convECDSAP384PublicKeyToPEM(in BinaryKey!97 pubKey) @safe
+{
+	return convPublicKeyToPEM!DefaultECDSAP384Engine(pubKey);
+}
+/// ditto
+BinaryKey!97 convECDSAP384PublicKeyFromPEM(in char[] pem) @safe
+{
+	return convPublicKeyFromPEM!DefaultECDSAP384Engine(pem);
+}
+/// ditto
+DERBinary convECDSAP384PublicKeyToDER(in BinaryKey!97 pubKey) @safe
+{
+	return convPublicKeyToDER!DefaultECDSAP384Engine(pubKey);
+}
+/// ditto
+BinaryKey!97 convECDSAP384PublicKeyFromDER(in ubyte[] der) @safe
+{
+	return convPublicKeyFromDER!DefaultECDSAP384Engine(der);
+}
+
+
+/// ditto
+PEMString convECDSAP521PrivateKeyToPEM(in BinaryKey!66 prvKey) @safe
+{
+	return convPrivateKeyToPEM!DefaultECDSAP521Engine(prvKey);
+}
+/// ditto
+BinaryKey!66 convECDSAP521PrivateKeyFromPEM(in char[] pem) @safe
+{
+	return convPrivateKeyFromPEM!DefaultECDSAP521Engine(pem);
+}
+/// ditto
+DERBinary convECDSAP521PrivateKeyToDER(in BinaryKey!66 prvKey) @safe
+{
+	return convPrivateKeyToDER!DefaultECDSAP521Engine(prvKey);
+}
+/// ditto
+BinaryKey!66 convECDSAP521PrivateKeyFromDER(in ubyte[] der) @safe
+{
+	return convPrivateKeyFromDER!DefaultECDSAP521Engine(der);
+}
+
+/// ditto
+PEMString convECDSAP521PublicKeyToPEM(in BinaryKey!133 pubKey) @safe
+{
+	return convPublicKeyToPEM!DefaultECDSAP521Engine(pubKey);
+}
+/// ditto
+BinaryKey!133 convECDSAP521PublicKeyFromPEM(in char[] pem) @safe
+{
+	return convPublicKeyFromPEM!DefaultECDSAP521Engine(pem);
+}
+/// ditto
+DERBinary convECDSAP521PublicKeyToDER(in BinaryKey!133 pubKey) @safe
+{
+	return convPublicKeyToDER!DefaultECDSAP521Engine(pubKey);
+}
+/// ditto
+BinaryKey!133 convECDSAP521PublicKeyFromDER(in ubyte[] der) @safe
+{
+	return convPublicKeyFromDER!DefaultECDSAP521Engine(der);
+}
+
+@safe unittest
+{
+	enum testMsg = "Hello, World!".representation;
+	void test(alias createPrv, alias createPub,
+		alias raw2pemPrv, alias raw2derPrv, alias pem2rawPrv, alias der2rawPrv,
+		alias raw2pemPub, alias raw2derPub, alias pem2rawPub, alias der2rawPub,
+		alias TestSigner, alias TestVerifier)() @trusted
+	{
+		auto prv = createPrv();
+		auto pub = createPub(prv);
+		auto prvPem = raw2pemPrv(prv);
+		auto pubPem = raw2pemPub(pub);
+		auto prvDer = raw2derPrv(prv);
+		auto pubDer = raw2derPub(pub);
+		auto sign1 = TestSigner(prv).sign(testMsg);
+		auto sign2 = TestSigner(prvDer).sign(testMsg);
+		auto sign3 = TestSigner(prvPem).sign(testMsg);
+		auto sign4 = TestSigner(pem2rawPrv(prvPem)).sign(testMsg);
+		auto sign5 = TestSigner(der2rawPrv(prvDer)).sign(testMsg);
+		assert(TestVerifier(pub).verify(sign1, testMsg));
+		assert(TestVerifier(pubDer).verify(sign1, testMsg));
+		assert(TestVerifier(pubPem).verify(sign1, testMsg));
+		assert(TestVerifier(pub).verify(sign2, testMsg));
+		assert(TestVerifier(pubDer).verify(sign2, testMsg));
+		assert(TestVerifier(pubPem).verify(sign2, testMsg));
+		assert(TestVerifier(pub).verify(sign3, testMsg));
+		assert(TestVerifier(pubDer).verify(sign3, testMsg));
+		assert(TestVerifier(pubPem).verify(sign3, testMsg));
+		assert(TestVerifier(pem2rawPub(pubPem)).verify(sign4, testMsg));
+		assert(TestVerifier(der2rawPub(pubDer)).verify(sign5, testMsg));
+	}
+	
+	if (!isOpenSSLCmdEngine!DefaultEd25519Engine
+		|| (isCommandExisting(defaultOpenSSLCommand)
+			&& getOpenSSLCmdVerseion(defaultOpenSSLCommand) >= SemVer(3, 0, 1)))
+	{
+		test!(createEd25519PrivateKey, createEd25519PublicKey,
+			convEd25519PrivateKeyToPEM, convEd25519PrivateKeyToDER,
+			convEd25519PrivateKeyFromPEM, convEd25519PrivateKeyFromDER,
+			convEd25519PublicKeyToPEM, convEd25519PublicKeyToDER,
+			convEd25519PublicKeyFromPEM, convEd25519PublicKeyFromDER,
+			Ed25519Signer!(), Ed25519Verifier!())();
+	}
+	
+	test!(createECDSAP256PrivateKey, createECDSAP256PublicKey,
+		convECDSAP256PrivateKeyToPEM, convECDSAP256PrivateKeyToDER,
+		convECDSAP256PrivateKeyFromPEM, convECDSAP256PrivateKeyFromDER,
+		convECDSAP256PublicKeyToPEM, convECDSAP256PublicKeyToDER,
+		convECDSAP256PublicKeyFromPEM, convECDSAP256PublicKeyFromDER,
+		ECDSAP256Signer!(), ECDSAP256Verifier!())();
+	
+	test!(createECDSAP256KPrivateKey, createECDSAP256KPublicKey,
+		convECDSAP256KPrivateKeyToPEM, convECDSAP256KPrivateKeyToDER,
+		convECDSAP256KPrivateKeyFromPEM, convECDSAP256KPrivateKeyFromDER,
+		convECDSAP256KPublicKeyToPEM, convECDSAP256KPublicKeyToDER,
+		convECDSAP256KPublicKeyFromPEM, convECDSAP256KPublicKeyFromDER,
+		ECDSAP256KSigner!(), ECDSAP256KVerifier!())();
+	
+	test!(createECDSAP384PrivateKey, createECDSAP384PublicKey,
+		convECDSAP384PrivateKeyToPEM, convECDSAP384PrivateKeyToDER,
+		convECDSAP384PrivateKeyFromPEM, convECDSAP384PrivateKeyFromDER,
+		convECDSAP384PublicKeyToPEM, convECDSAP384PublicKeyToDER,
+		convECDSAP384PublicKeyFromPEM, convECDSAP384PublicKeyFromDER,
+		ECDSAP384Signer!(), ECDSAP384Verifier!())();
+	
+	test!(createECDSAP521PrivateKey, createECDSAP521PublicKey,
+		convECDSAP521PrivateKeyToPEM, convECDSAP521PrivateKeyToDER,
+		convECDSAP521PrivateKeyFromPEM, convECDSAP521PrivateKeyFromDER,
+		convECDSAP521PublicKeyToPEM, convECDSAP521PublicKeyToDER,
+		convECDSAP521PublicKeyFromPEM, convECDSAP521PublicKeyFromDER,
+		ECDSAP521Signer!(), ECDSAP521Verifier!())();
+}
+
+/*******************************************************************************
+ * Methods of ECDSA P256 Signature format convertion
+ * 
+ * DER format:
+ * - SEQUENCE
+ *   - INTEGER: R
+ *   - INTEGER: S
+ * BIN format:
+ * - ubyte[32]: R
+ * - ubyte[32]: S
+ */
+bin_t convECDSASignDer2Bin(in ubyte[] der)
+{
+	const(ubyte)[] dat = der[];
+	auto seq = decasn1seq(dat);
+	if (der.length <= 72)
+	{
+		auto r = decasn1bn(seq, 32);
+		auto s = decasn1bn(seq, 32);
+		return (r ~ s).assumeUnique;
+	}
+	else if (der.length <= 104)
+	{
+		auto r = decasn1bn(seq, 48);
+		auto s = decasn1bn(seq, 48);
+		return (r ~ s).assumeUnique;
+	}
+	else if (der.length <= 142)
+	{
+		auto r = decasn1bn(seq, 66);
+		auto s = decasn1bn(seq, 66);
+		return (r ~ s).assumeUnique;
+	}
+	else enforce(false, "Unsupported signature");
+	return null;
+}
+/// ditto
+bin_t convECDSASignBin2Der(in ubyte[] bin)
+{
+	switch (bin.length)
+	{
+	case 64:
+		return encasn1seq(encasn1bn(bin[0..32].assumeUnique) ~ encasn1bn(bin[32..$].assumeUnique));
+	case 96:
+		return encasn1seq(encasn1bn(bin[0..48].assumeUnique) ~ encasn1bn(bin[48..$].assumeUnique));
+	case 132:
+		return encasn1seq(encasn1bn(bin[0..66].assumeUnique) ~ encasn1bn(bin[66..$].assumeUnique));
+	default:
+		enforce(false, "Unsupported signature");
+	}
+	return null;
 }
