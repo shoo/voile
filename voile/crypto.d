@@ -3389,6 +3389,7 @@ static if (enableBcryptEngines)
 				setCurveParameters(hAlg);
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[pubKeyLen-1] XY; // Public Key
@@ -3418,6 +3419,7 @@ static if (enableBcryptEngines)
 			{
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[pubKeyLen-1] XY; // Public Key
@@ -3442,6 +3444,7 @@ static if (enableBcryptEngines)
 			{
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[pubKeyLen-1] XY; // Public Key
@@ -3495,6 +3498,7 @@ static if (enableBcryptEngines)
 			{
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[pubKeyLen-1] XY; // Public Key
@@ -3545,6 +3549,7 @@ static if (enableBcryptEngines)
 				setCurveParameters(hAlg);
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[pubKeyLen-1] XY; // Public Key
@@ -3583,6 +3588,7 @@ static if (enableBcryptEngines)
 			{
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[pubKeyLen-1] XY; // Public Key
@@ -4327,6 +4333,7 @@ static if (enableBcryptEngines)
 					cast(void)BCryptCloseAlgorithmProvider(hAlg, 0);
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4356,6 +4363,7 @@ static if (enableBcryptEngines)
 			{
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4382,6 +4390,7 @@ static if (enableBcryptEngines)
 			{
 				struct BcryptKeyPair
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4435,6 +4444,7 @@ static if (enableBcryptEngines)
 			{
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4490,6 +4500,7 @@ static if (enableBcryptEngines)
 					cast(void)BCryptCloseAlgorithmProvider(hAlg, 0);
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
@@ -4528,6 +4539,7 @@ static if (enableBcryptEngines)
 			{
 				struct KeyBlob
 				{
+				align(1):
 					ULONG dwMagic;
 					ULONG cbKey;
 					BYTE[64] XY; // Public Key
