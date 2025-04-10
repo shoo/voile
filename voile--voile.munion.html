@@ -111,13 +111,13 @@ set!<span class="d_keyword">int</span>(dat, 5);
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".TypeEnum.opAssign"></span><div class="quickindex" id="quickindex.TypeEnum.opAssign"></div>void <code class="ddoc_psymbol">opAssign</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref T <span class="ddoc_param">val</span>)<br><span class="ddoc_constraint">if(_inst.isAssignable!T)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">代入</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TypeEnum.opCast"></span><div class="quickindex" id="quickindex.TypeEnum.opCast"></div>inout inout<span class="ddoc_template_param_list" title="Template parameter list">(T)</span> <code class="ddoc_psymbol">opCast</code>(T)()<br><span class="ddoc_constraint">if(_inst.isAssignable!T)</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TypeEnum.opCast"></span><div class="quickindex" id="quickindex.TypeEnum.opCast"></div>inout<span class="ddoc_template_param_list" title="Template parameter list">(T)</span> <code class="ddoc_psymbol">opCast</code>(T)() inout<br><span class="ddoc_constraint">if(_inst.isAssignable!T)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">キャスト</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TypeEnum.opEquals"></span><div class="quickindex" id="quickindex.TypeEnum.opEquals"></div>const bool <code class="ddoc_psymbol">opEquals</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(TypeEnum <span class="ddoc_param">rhs</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TypeEnum.opEquals"></span><div class="quickindex" id="quickindex.TypeEnum.opEquals"></div>bool <code class="ddoc_psymbol">opEquals</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(TypeEnum <span class="ddoc_param">rhs</span>) const;
 <br></div></dt>
 <dd><div class="ddoc_summary">等号演算子オーバーロード</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TypeEnum.toHash"></span><div class="quickindex" id="quickindex.TypeEnum.toHash"></div>const size_t <code class="ddoc_psymbol">toHash</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".TypeEnum.toHash"></span><div class="quickindex" id="quickindex.TypeEnum.toHash"></div>size_t <code class="ddoc_psymbol">toHash</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">ハッシュ</div></dd>
 </div></dl>
@@ -145,10 +145,10 @@ dat.str = <span class="d_string">"xxx"</span>;
 <span class="d_keyword">assert</span>(dat.str == <span class="d_string">"xxx"</span>);
 </pre>
 </div>
-<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Tagged.opEquals"></span><div class="quickindex" id="quickindex.Tagged.opEquals"></div>const bool <code class="ddoc_psymbol">opEquals</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Tagged <span class="ddoc_param">rhs</span>);
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Tagged.opEquals"></span><div class="quickindex" id="quickindex.Tagged.opEquals"></div>bool <code class="ddoc_psymbol">opEquals</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Tagged <span class="ddoc_param">rhs</span>) const;
 <br></div></dt>
 <dd><div class="ddoc_summary">等号演算子オーバーロード</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Tagged.toHash"></span><div class="quickindex" id="quickindex.Tagged.toHash"></div>const size_t <code class="ddoc_psymbol">toHash</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Tagged.toHash"></span><div class="quickindex" id="quickindex.Tagged.toHash"></div>size_t <code class="ddoc_psymbol">toHash</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">ハッシュ</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Tagged.opDispatch"></span><div class="quickindex" id="quickindex.Tagged.opDispatch"></div>ref auto <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_param_list" title="Template parameter list">(string member)</span>()<br><span class="ddoc_constraint">if(hasMember!(TaggedImpl!U.Instance, member))</span>;
@@ -223,10 +223,10 @@ dat.set!id = 5;
 </span><span class="d_keyword">static</span> <span class="d_keyword">assert</span>(!<span class="d_keyword">__traits</span>(compiles, dat.set!ignored(0)));
 </pre>
 </div>
-<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata.opEquals"></span><div class="quickindex" id="quickindex.Endata.opEquals"></div>const bool <code class="ddoc_psymbol">opEquals</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Endata <span class="ddoc_param">rhs</span>);
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata.opEquals"></span><div class="quickindex" id="quickindex.Endata.opEquals"></div>bool <code class="ddoc_psymbol">opEquals</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>(Endata <span class="ddoc_param">rhs</span>) const;
 <br></div></dt>
 <dd><div class="ddoc_summary">等号演算子オーバーロード</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata.toHash"></span><div class="quickindex" id="quickindex.Endata.toHash"></div>const size_t <code class="ddoc_psymbol">toHash</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata.toHash"></span><div class="quickindex" id="quickindex.Endata.toHash"></div>size_t <code class="ddoc_psymbol">toHash</code><span class="ddoc_template_param_list" title="Template parameter list">()</span>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">ハッシュ</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Endata.opDispatch"></span><div class="quickindex" id="quickindex.Endata.opDispatch"></div>ref auto <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_param_list" title="Template parameter list">(string member)</span>()<br><span class="ddoc_constraint">if(hasMember!(EndataImpl!E.Instance, member))</span>;
@@ -358,7 +358,7 @@ void <code class="ddoc_psymbol">opDispatch</code><span class="ddoc_template_para
 </dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".isTypeAssignable"></span><div class="quickindex" id="quickindex.isTypeAssignable"></div>template <code class="ddoc_psymbol">isTypeAssignable</code>(MU, T) if (isTypeEnum!MU)<br></div></dt>
 <dd><div class="ddoc_summary">型が代入可能か</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".tag"></span><div class="quickindex" id="quickindex.tag"></div>TagType!MU <code class="ddoc_psymbol">tag</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto const ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU)</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".tag"></span><div class="quickindex" id="quickindex.tag"></div>TagType!MU <code class="ddoc_psymbol">tag</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto ref const MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">タグを確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = TypeEnum!(<span class="d_keyword">int</span>, string);
@@ -453,9 +453,9 @@ ED <span class="d_param">dat</span>;
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".get"></span><div class="quickindex" id="quickindex.get"></div>ref auto <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU)</span>(auto inout ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU &amp;&amp; isAvailableTag!(MU, tag))</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".get"></span><div class="quickindex" id="quickindex.get"></div>ref auto <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU)</span>(auto ref inout MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU &amp;&amp; isAvailableTag!(MU, tag))</span>;
 <br>
-ref auto <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU)</span>(auto inout ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isTypeEnum!MU &amp;&amp; hasType!(MU, T))</span>;
+ref auto <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU)</span>(auto ref inout MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isTypeEnum!MU &amp;&amp; hasType!(MU, T))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">データを取得する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">import</span> core.exception: AssertError;
@@ -483,9 +483,9 @@ ED <span class="d_param">dat</span>;
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".check"></span><div class="quickindex" id="quickindex.check"></div>bool <code class="ddoc_psymbol">check</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU)</span>(auto const ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU &amp;&amp; isAvailableTag!(MU, tag))</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".check"></span><div class="quickindex" id="quickindex.check"></div>bool <code class="ddoc_psymbol">check</code><span class="ddoc_template_param_list" title="Template parameter list">(alias tag, MU)</span>(auto ref const MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU &amp;&amp; isAvailableTag!(MU, tag))</span>;
 <br>
-bool <code class="ddoc_psymbol">check</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU)</span>(auto const ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isTypeEnum!MU &amp;&amp; hasType!(MU, T))</span>;
+bool <code class="ddoc_psymbol">check</code><span class="ddoc_template_param_list" title="Template parameter list">(T, MU)</span>(auto ref const MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isTypeEnum!MU &amp;&amp; hasType!(MU, T))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">データが入っていることを確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = TypeEnum!(<span class="d_keyword">int</span>, string);
@@ -540,7 +540,7 @@ ED <span class="d_param">dat</span>;
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".empty"></span><div class="quickindex" id="quickindex.empty"></div>bool <code class="ddoc_psymbol">empty</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto const ref MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU)</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".empty"></span><div class="quickindex" id="quickindex.empty"></div>bool <code class="ddoc_psymbol">empty</code><span class="ddoc_template_param_list" title="Template parameter list">(MU)</span>(auto ref const MU <span class="ddoc_param">dat</span>)<br><span class="ddoc_constraint">if(isManagedUnion!MU)</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">データがクリアされているか確認する</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate"><span class="d_keyword">alias</span> MU = TypeEnum!(<span class="d_keyword">int</span>, string);

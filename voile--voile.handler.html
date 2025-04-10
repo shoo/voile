@@ -151,9 +151,9 @@ h(200);
 </div>
 <dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.emit"></span><div class="quickindex" id="quickindex.Handler.emit"></div>RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>);
 <br>
-const RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>);
+RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>) const;
 <br>
-shared const RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>);
+RetType <code class="ddoc_psymbol">emit</code>(Args <span class="ddoc_param">args</span>) shared const;
 <br>
 <span class="def-anchor" id=".Handler.opCall"></span><div class="quickindex" id="quickindex.Handler.opCall"></div>alias <code class="ddoc_psymbol">opCall</code> = emit;
 <br></div></dt>
@@ -220,7 +220,7 @@ if (!tmp.empty)
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.opCast"></span><div class="quickindex" id="quickindex.Handler.opCast"></div>const pure nothrow bool <code class="ddoc_psymbol">opCast</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>()<br><span class="ddoc_constraint">if(is(T == bool))</span>;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Handler.opCast"></span><div class="quickindex" id="quickindex.Handler.opCast"></div>pure nothrow bool <code class="ddoc_psymbol">opCast</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>() const<br><span class="ddoc_constraint">if(is(T == bool))</span>;
 <br></div></dt>
 <dd>
 </dd>

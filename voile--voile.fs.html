@@ -184,15 +184,15 @@ string[] msgDestroyed;
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.onPostMove"></span><div class="quickindex" id="quickindex.FileSystem.onPostMove"></div>void <code class="ddoc_psymbol">onPostMove</code>();
 <br></div></dt>
 <dd><div class="ddoc_summary">ムーブの後に呼ばれる</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.absolutePath"></span><div class="quickindex" id="quickindex.FileSystem.absolutePath"></div>const @safe string <code class="ddoc_psymbol">absolutePath</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.absolutePath"></span><div class="quickindex" id="quickindex.FileSystem.absolutePath"></div>@safe string <code class="ddoc_psymbol">absolutePath</code>() const;
 <br>
-const @safe string <code class="ddoc_psymbol">absolutePath</code>(string <span class="ddoc_param">target</span>);
+@safe string <code class="ddoc_psymbol">absolutePath</code>(string <span class="ddoc_param">target</span>) const;
 <br>
-const @safe string <code class="ddoc_psymbol">absolutePath</code>(string[] <span class="ddoc_param">targetPath</span>);
+@safe string <code class="ddoc_psymbol">absolutePath</code>(string[] <span class="ddoc_param">targetPath</span>) const;
 <br>
-const @safe string <code class="ddoc_psymbol">absolutePath</code>(string <span class="ddoc_param">target</span>, string <span class="ddoc_param">base</span>);
+@safe string <code class="ddoc_psymbol">absolutePath</code>(string <span class="ddoc_param">target</span>, string <span class="ddoc_param">base</span>) const;
 <br>
-const @safe string <code class="ddoc_psymbol">absolutePath</code>(string[] <span class="ddoc_param">targetPath</span>, string <span class="ddoc_param">base</span>);
+@safe string <code class="ddoc_psymbol">absolutePath</code>(string[] <span class="ddoc_param">targetPath</span>, string <span class="ddoc_param">base</span>) const;
 <br></div></dt>
 <dd><div class="ddoc_summary">絶対パスに変換する
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -205,16 +205,16 @@ const @safe string <code class="ddoc_psymbol">absolutePath</code>(string[] <span
 </table></div>
 
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.actualPath"></span><div class="quickindex" id="quickindex.FileSystem.actualPath"></div>const @safe string <code class="ddoc_psymbol">actualPath</code>(string <span class="ddoc_param">path</span> = ".");
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.actualPath"></span><div class="quickindex" id="quickindex.FileSystem.actualPath"></div>@safe string <code class="ddoc_psymbol">actualPath</code>(string <span class="ddoc_param">path</span> = ".") const;
 <br></div></dt>
 <dd><div class="ddoc_summary">実際のパス名に修正する</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.relativePath"></span><div class="quickindex" id="quickindex.FileSystem.relativePath"></div>const @safe string <code class="ddoc_psymbol">relativePath</code>(string <span class="ddoc_param">target</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.relativePath"></span><div class="quickindex" id="quickindex.FileSystem.relativePath"></div>@safe string <code class="ddoc_psymbol">relativePath</code>(string <span class="ddoc_param">target</span>) const;
 <br>
-const @safe string <code class="ddoc_psymbol">relativePath</code>(string[] <span class="ddoc_param">targetPath</span>);
+@safe string <code class="ddoc_psymbol">relativePath</code>(string[] <span class="ddoc_param">targetPath</span>) const;
 <br>
-const @safe string <code class="ddoc_psymbol">relativePath</code>(string <span class="ddoc_param">target</span>, string <span class="ddoc_param">base</span>);
+@safe string <code class="ddoc_psymbol">relativePath</code>(string <span class="ddoc_param">target</span>, string <span class="ddoc_param">base</span>) const;
 <br>
-const @safe string <code class="ddoc_psymbol">relativePath</code>(string[] <span class="ddoc_param">targetPath</span>, string <span class="ddoc_param">base</span>);
+@safe string <code class="ddoc_psymbol">relativePath</code>(string[] <span class="ddoc_param">targetPath</span>, string <span class="ddoc_param">base</span>) const;
 <br></div></dt>
 <dd><div class="ddoc_summary">相対パスに変換する
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -227,11 +227,11 @@ const @safe string <code class="ddoc_psymbol">relativePath</code>(string[] <span
 </table></div>
 
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildSplittedPath"></span><div class="quickindex" id="quickindex.FileSystem.buildSplittedPath"></div>const @safe string[] <code class="ddoc_psymbol">buildSplittedPath</code>(string <span class="ddoc_param">path</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildSplittedPath"></span><div class="quickindex" id="quickindex.FileSystem.buildSplittedPath"></div>@safe string[] <code class="ddoc_psymbol">buildSplittedPath</code>(string <span class="ddoc_param">path</span>) const;
 <br>
-const @safe string[] <code class="ddoc_psymbol">buildSplittedPath</code>(string[] <span class="ddoc_param">paths</span>);
+@safe string[] <code class="ddoc_psymbol">buildSplittedPath</code>(string[] <span class="ddoc_param">paths</span>) const;
 <br>
-const @safe string[] <code class="ddoc_psymbol">buildSplittedPath</code>();
+@safe string[] <code class="ddoc_psymbol">buildSplittedPath</code>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">パスをパンくず表現に変換
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -242,11 +242,11 @@ const @safe string[] <code class="ddoc_psymbol">buildSplittedPath</code>();
 </table></div>
 
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildPosixPath"></span><div class="quickindex" id="quickindex.FileSystem.buildPosixPath"></div>const @safe string <code class="ddoc_psymbol">buildPosixPath</code>(string <span class="ddoc_param">path</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildPosixPath"></span><div class="quickindex" id="quickindex.FileSystem.buildPosixPath"></div>@safe string <code class="ddoc_psymbol">buildPosixPath</code>(string <span class="ddoc_param">path</span>) const;
 <br>
-const @safe string <code class="ddoc_psymbol">buildPosixPath</code>(string[] <span class="ddoc_param">paths</span>);
+@safe string <code class="ddoc_psymbol">buildPosixPath</code>(string[] <span class="ddoc_param">paths</span>) const;
 <br>
-const @safe string <code class="ddoc_psymbol">buildPosixPath</code>();
+@safe string <code class="ddoc_psymbol">buildPosixPath</code>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">パスをPosix表現に変換
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -268,11 +268,11 @@ const @safe string <code class="ddoc_psymbol">buildPosixPath</code>();
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildWindowsPath"></span><div class="quickindex" id="quickindex.FileSystem.buildWindowsPath"></div>const @safe string <code class="ddoc_psymbol">buildWindowsPath</code>(string <span class="ddoc_param">path</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildWindowsPath"></span><div class="quickindex" id="quickindex.FileSystem.buildWindowsPath"></div>@safe string <code class="ddoc_psymbol">buildWindowsPath</code>(string <span class="ddoc_param">path</span>) const;
 <br>
-const @safe string <code class="ddoc_psymbol">buildWindowsPath</code>(string[] <span class="ddoc_param">paths</span>);
+@safe string <code class="ddoc_psymbol">buildWindowsPath</code>(string[] <span class="ddoc_param">paths</span>) const;
 <br>
-const @safe string <code class="ddoc_psymbol">buildWindowsPath</code>();
+@safe string <code class="ddoc_psymbol">buildWindowsPath</code>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">パスをWindows表現に変換
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -291,11 +291,11 @@ const @safe string <code class="ddoc_psymbol">buildWindowsPath</code>();
 </pre>
 </div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildNormalizedSplittedPath"></span><div class="quickindex" id="quickindex.FileSystem.buildNormalizedSplittedPath"></div>const @safe string[] <code class="ddoc_psymbol">buildNormalizedSplittedPath</code>(string <span class="ddoc_param">path</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.buildNormalizedSplittedPath"></span><div class="quickindex" id="quickindex.FileSystem.buildNormalizedSplittedPath"></div>@safe string[] <code class="ddoc_psymbol">buildNormalizedSplittedPath</code>(string <span class="ddoc_param">path</span>) const;
 <br>
-const @safe string[] <code class="ddoc_psymbol">buildNormalizedSplittedPath</code>(string[] <span class="ddoc_param">paths</span>);
+@safe string[] <code class="ddoc_psymbol">buildNormalizedSplittedPath</code>(string[] <span class="ddoc_param">paths</span>) const;
 <br>
-const @safe string[] <code class="ddoc_psymbol">buildNormalizedSplittedPath</code>();
+@safe string[] <code class="ddoc_psymbol">buildNormalizedSplittedPath</code>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">パスを正規化して分解してパンくずリストにする
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -357,7 +357,7 @@ string <code class="ddoc_psymbol">buildNormalizedWindowsPath</code>();
 <span class="def-anchor" id=".FileSystem.buildNormalizedNativePath"></span><div class="quickindex" id="quickindex.FileSystem.buildNormalizedNativePath"></div>alias <code class="ddoc_psymbol">buildNormalizedNativePath</code> = buildNormalizedPosixPath;
 <br></div></dt>
 <dd><div class="ddoc_summary">In Posix</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.exists"></span><div class="quickindex" id="quickindex.FileSystem.exists"></div>const @safe bool <code class="ddoc_psymbol">exists</code>(string <span class="ddoc_param">target</span> = ".");
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.exists"></span><div class="quickindex" id="quickindex.FileSystem.exists"></div>@safe bool <code class="ddoc_psymbol">exists</code>(string <span class="ddoc_param">target</span> = ".") const;
 <br></div></dt>
 <dd><div class="ddoc_summary">パスが存在するか確認する
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -366,7 +366,7 @@ string <code class="ddoc_psymbol">buildNormalizedWindowsPath</code>();
 </table></div>
 
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.isFile"></span><div class="quickindex" id="quickindex.FileSystem.isFile"></div>const @safe bool <code class="ddoc_psymbol">isFile</code>(string <span class="ddoc_param">target</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.isFile"></span><div class="quickindex" id="quickindex.FileSystem.isFile"></div>@safe bool <code class="ddoc_psymbol">isFile</code>(string <span class="ddoc_param">target</span>) const;
 <br></div></dt>
 <dd><div class="ddoc_summary">パスがファイルかどうか確認する
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -375,7 +375,7 @@ string <code class="ddoc_psymbol">buildNormalizedWindowsPath</code>();
 </table></div>
 
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.isDir"></span><div class="quickindex" id="quickindex.FileSystem.isDir"></div>const @safe bool <code class="ddoc_psymbol">isDir</code>(string <span class="ddoc_param">target</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.isDir"></span><div class="quickindex" id="quickindex.FileSystem.isDir"></div>@safe bool <code class="ddoc_psymbol">isDir</code>(string <span class="ddoc_param">target</span>) const;
 <br></div></dt>
 <dd><div class="ddoc_summary">パスがファイルかどうか確認する
 </div><div class="ddoc_params"><span class="ddoc_params_header">Parameters:</span>
@@ -496,7 +496,7 @@ fs.writeJson(<span class="d_string">"a/b/test2.json"</span>, A(10));
 <dd><div class="ddoc_summary">ファイルを開く
 </div><div class="ddoc_description">ファイルがなければ新しく作成して開く</div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.clearReadonly"></span><div class="quickindex" id="quickindex.FileSystem.clearReadonly"></div>const bool <code class="ddoc_psymbol">clearReadonly</code>(string <span class="ddoc_param">target</span>);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.clearReadonly"></span><div class="quickindex" id="quickindex.FileSystem.clearReadonly"></div>bool <code class="ddoc_psymbol">clearReadonly</code>(string <span class="ddoc_param">target</span>) const;
 <br></div></dt>
 <dd>
 </dd>
@@ -573,7 +573,7 @@ void <code class="ddoc_psymbol">getTimeStamp</code>(string <span class="ddoc_par
 SysTime <code class="ddoc_psymbol">getTimeStamp</code>(string <span class="ddoc_param">target</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">タイムスタンプを変更/取得する</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.searchPath"></span><div class="quickindex" id="quickindex.FileSystem.searchPath"></div>const @trusted string <code class="ddoc_psymbol">searchPath</code>(in char[] <span class="ddoc_param">executable</span>, in string[] <span class="ddoc_param">additional</span> = null);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.searchPath"></span><div class="quickindex" id="quickindex.FileSystem.searchPath"></div>@trusted string <code class="ddoc_psymbol">searchPath</code>(in char[] <span class="ddoc_param">executable</span>, in string[] <span class="ddoc_param">additional</span> = null) const;
 <br></div></dt>
 <dd><div class="ddoc_summary">パスを検索する</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".FileSystem.spawnProcess"></span><div class="quickindex" id="quickindex.FileSystem.spawnProcess"></div>auto <code class="ddoc_psymbol">spawnProcess</code>(string[] <span class="ddoc_param">args</span>, string[string] <span class="ddoc_param">env</span> = null, std.process.Config <span class="ddoc_param">cfg</span> = std.process.Config.none);

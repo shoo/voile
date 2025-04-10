@@ -184,19 +184,19 @@ auto <code class="ddoc_psymbol">converter</code><span class="ddoc_template_param
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.this"></span><div class="quickindex" id="quickindex.Builder.CborValue.this"></div>@trusted this<span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">value</span>, ref Builder <span class="ddoc_param">builder</span>);
 <br></div></dt>
 <dd><div class="ddoc_summary">Constructor</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.type"></span><div class="quickindex" id="quickindex.Builder.CborValue.type"></div>const pure nothrow @safe Type <code class="ddoc_psymbol">type</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.type"></span><div class="quickindex" id="quickindex.Builder.CborValue.type"></div>pure nothrow @safe Type <code class="ddoc_psymbol">type</code>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">Type getter</div></dd>
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.opAssign"></span><div class="quickindex" id="quickindex.Builder.CborValue.opAssign"></div>pure ref @trusted CborValue <code class="ddoc_psymbol">opAssign</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(T <span class="ddoc_param">value</span>) return;
 <br></div></dt>
 <dd><div class="ddoc_summary">Assign operator</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.isNull"></span><div class="quickindex" id="quickindex.Builder.CborValue.isNull"></div>const pure nothrow @safe bool <code class="ddoc_psymbol">isNull</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.isNull"></span><div class="quickindex" id="quickindex.Builder.CborValue.isNull"></div>pure nothrow @safe bool <code class="ddoc_psymbol">isNull</code>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">Null check</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.isUndefined"></span><div class="quickindex" id="quickindex.Builder.CborValue.isUndefined"></div>const pure nothrow @safe bool <code class="ddoc_psymbol">isUndefined</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.isUndefined"></span><div class="quickindex" id="quickindex.Builder.CborValue.isUndefined"></div>pure nothrow @safe bool <code class="ddoc_psymbol">isUndefined</code>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">Undefined check</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.isOverflowedInteger"></span><div class="quickindex" id="quickindex.Builder.CborValue.isOverflowedInteger"></div>const pure nothrow @trusted bool <code class="ddoc_psymbol">isOverflowedInteger</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.isOverflowedInteger"></span><div class="quickindex" id="quickindex.Builder.CborValue.isOverflowedInteger"></div>pure nothrow @trusted bool <code class="ddoc_psymbol">isOverflowedInteger</code>() const;
 <br></div></dt>
 <dd><div class="ddoc_summary">Overflow number check
 </div><div class="ddoc_description">CBOR supports signed integers, but the range it can handle differs from D's long type.
@@ -205,7 +205,7 @@ auto <code class="ddoc_psymbol">converter</code><span class="ddoc_template_param
  In contrast, the range of D's long type is long.min(-1-2^63) to long.max(2^63),
  and the range of the ulong type is 0 to ulong.max(2^64).</div>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.get"></span><div class="quickindex" id="quickindex.Builder.CborValue.get"></div>const nothrow @safe T <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(lazy T <span class="ddoc_param">defaultValue</span> = T.init);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.get"></span><div class="quickindex" id="quickindex.Builder.CborValue.get"></div>nothrow @safe T <code class="ddoc_psymbol">get</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(lazy T <span class="ddoc_param">defaultValue</span> = T.init) const;
 <br></div></dt>
 <dd><div class="ddoc_summary">Retrieve the value as a D language type
 </div><div class="ddoc_description">Since the types handled by CBOR may not match the types in the D language, conversion is performed.
@@ -218,7 +218,7 @@ auto <code class="ddoc_psymbol">converter</code><span class="ddoc_template_param
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.getValue"></span><div class="quickindex" id="quickindex.Builder.CborValue.getValue"></div>const nothrow T <code class="ddoc_psymbol">getValue</code><span class="ddoc_template_param_list" title="Template parameter list">(T, K)</span>(K <span class="ddoc_param">key</span>, lazy T <span class="ddoc_param">defaultValue</span> = T.init);
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".Builder.CborValue.getValue"></span><div class="quickindex" id="quickindex.Builder.CborValue.getValue"></div>nothrow T <code class="ddoc_psymbol">getValue</code><span class="ddoc_template_param_list" title="Template parameter list">(T, K)</span>(K <span class="ddoc_param">key</span>, lazy T <span class="ddoc_param">defaultValue</span> = T.init) const;
 <br></div></dt>
 <dd>
 </dd>

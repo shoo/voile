@@ -66,21 +66,21 @@
                 
                 <div class="quickindex" id="quickindex"></div>
                 
-                <div class="ddoc_summary">JSONValueのヘルパー、シリアライズ・デシリアライズ</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".json"></span><div class="quickindex" id="quickindex.json"></div>@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T[] <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isSomeString!(T[]))</span>;
+                <div class="ddoc_summary">JSONValueのヘルパー、シリアライズ・デシリアライズ</div><dl class="ddoc_members"><div class="ddoc_module_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".json"></span><div class="quickindex" id="quickindex.json"></div>@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T[] <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isSomeString!(T[]))</span>;
 <br>
-@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isIntegral!T &amp;&amp; !is(T == enum) || isFloatingPoint!T || is(Unqual!T == bool))</span>;
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(isIntegral!T &amp;&amp; !is(T == enum) || isFloatingPoint!T || is(Unqual!T == bool))</span>;
 <br>
-@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(is(T == enum))</span>;
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T <span class="ddoc_param">x</span>)<br><span class="ddoc_constraint">if(is(T == enum))</span>;
 <br>
-@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto const ref T[] <span class="ddoc_param">ary</span>)<br><span class="ddoc_constraint">if(!isSomeString!(T[]) &amp;&amp; isArray!(T[]))</span>;
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(T)</span>(auto ref const T[] <span class="ddoc_param">ary</span>)<br><span class="ddoc_constraint">if(!isSomeString!(T[]) &amp;&amp; isArray!(T[]))</span>;
 <br>
-@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(Value, Key)</span>(auto const ref Value[Key] <span class="ddoc_param">aa</span>)<br><span class="ddoc_constraint">if(isSomeString!Key &amp;&amp; is(typeof(()
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(Value, Key)</span>(auto ref const Value[Key] <span class="ddoc_param">aa</span>)<br><span class="ddoc_constraint">if(isSomeString!Key &amp;&amp; is(typeof(()
 {
 auto v = Value.init.<code class="ddoc_psymbol">json</code>;
 }
 )))</span>;
 <br>
-@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(JV)</span>(auto const ref JV <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(JV : const(JSONValue)))</span>;
+@property JSONValue <code class="ddoc_psymbol">json</code><span class="ddoc_template_param_list" title="Template parameter list">(JV)</span>(auto ref const JV <span class="ddoc_param">v</span>)<br><span class="ddoc_constraint">if(is(JV : const(JSONValue)))</span>;
 <br></div></dt>
 <dd><div class="ddoc_summary">JSONValueデータを得る</div><div class="ddoc_examples"><span class="ddoc_examples_header">Examples:</span>
  <pre class="d_code notranslate">dstring dstr = <span class="d_string">"あいうえお"</span>;
@@ -737,11 +737,11 @@ this(const(char)[] <span class="ddoc_param">jwt</span>, const(char)[] <span clas
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.header"></span><div class="quickindex" id="quickindex.JWTValue.header"></div>const JSONValue <code class="ddoc_psymbol">header</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.header"></span><div class="quickindex" id="quickindex.JWTValue.header"></div>JSONValue <code class="ddoc_psymbol">header</code>() const;
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.signature"></span><div class="quickindex" id="quickindex.JWTValue.signature"></div>const immutable(ubyte)[] <code class="ddoc_psymbol">signature</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.signature"></span><div class="quickindex" id="quickindex.JWTValue.signature"></div>immutable(ubyte)[] <code class="ddoc_psymbol">signature</code>() const;
 <br></div></dt>
 <dd>
 </dd>
@@ -752,7 +752,7 @@ this(const(char)[] <span class="ddoc_param">jwt</span>, const(char)[] <span clas
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.key.2"></span><div class="quickindex" id="quickindex.JWTValue.key.2"></div>void <code class="ddoc_psymbol">key</code>(const(ubyte)[] <code class="ddoc_psymbol">key</code>);
 <br></div></dt>
 <dd><div class="ddoc_summary">dittp</div></dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.opIndex"></span><div class="quickindex" id="quickindex.JWTValue.opIndex"></div>inout ref inout(JSONValue) <code class="ddoc_psymbol">opIndex</code>(string <span class="ddoc_param">name</span>) return;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.opIndex"></span><div class="quickindex" id="quickindex.JWTValue.opIndex"></div>ref inout(JSONValue) <code class="ddoc_psymbol">opIndex</code>(string <span class="ddoc_param">name</span>) inout return;
 <br></div></dt>
 <dd>
 </dd>
@@ -760,11 +760,11 @@ this(const(char)[] <span class="ddoc_param">jwt</span>, const(char)[] <span clas
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.payload"></span><div class="quickindex" id="quickindex.JWTValue.payload"></div>inout ref inout(JSONValue) <code class="ddoc_psymbol">payload</code>() return;
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.payload"></span><div class="quickindex" id="quickindex.JWTValue.payload"></div>ref inout(JSONValue) <code class="ddoc_psymbol">payload</code>() inout return;
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.toString"></span><div class="quickindex" id="quickindex.JWTValue.toString"></div>const string <code class="ddoc_psymbol">toString</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".JWTValue.toString"></span><div class="quickindex" id="quickindex.JWTValue.toString"></div>string <code class="ddoc_psymbol">toString</code>() const;
 <br></div></dt>
 <dd>
 </dd>

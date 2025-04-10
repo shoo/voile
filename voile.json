@@ -1736,7 +1736,7 @@
         "kind" : "function",
         "line" : 633,
         "char" : 14,
-        "type" : "Dst(auto const ref Val v)",
+        "type" : "Dst(auto ref const Val v)",
         "parameters" : [
          {
           "name" : "v",
@@ -1914,7 +1914,7 @@
         "kind" : "function",
         "line" : 766,
         "char" : 14,
-        "type" : "Val(auto const ref Src v)",
+        "type" : "Val(auto ref const Src v)",
         "parameters" : [
          {
           "name" : "v",
@@ -2020,7 +2020,7 @@
         "kind" : "function",
         "line" : 868,
         "char" : 14,
-        "type" : "void(auto const ref Val src, ref Dst dst)",
+        "type" : "void(auto ref const Val src, ref Dst dst)",
         "parameters" : [
          {
           "name" : "src",
@@ -2133,7 +2133,7 @@
         "kind" : "function",
         "line" : 935,
         "char" : 14,
-        "type" : "void(auto const ref Src src, ref Val dst)",
+        "type" : "void(auto ref const Src src, ref Val dst)",
         "parameters" : [
          {
           "name" : "src",
@@ -6381,7 +6381,7 @@
         "endchar" : 3
        },
        {
-        "name" : "__xdtor",
+        "name" : "~this",
         "kind" : "alias",
         "protection" : "public"
        }
@@ -7774,7 +7774,7 @@
         "deco" : "FNeZv"
        },
        {
-        "name" : "__xdtor",
+        "name" : "~this",
         "kind" : "alias",
         "protection" : "public"
        },
@@ -7932,7 +7932,7 @@
       "deco" : "FZv"
      },
      {
-      "name" : "__xdtor",
+      "name" : "~this",
       "kind" : "alias",
       "protection" : "public"
      },
@@ -8085,7 +8085,7 @@
         "deco" : "FNeZv"
        },
        {
-        "name" : "__xdtor",
+        "name" : "~this",
         "kind" : "alias",
         "protection" : "public"
        },
@@ -8243,7 +8243,7 @@
       "deco" : "FZv"
      },
      {
-      "name" : "__xdtor",
+      "name" : "~this",
       "kind" : "alias",
       "protection" : "public"
      },
@@ -18050,7 +18050,7 @@
       "deco" : "FNeZv"
      },
      {
-      "name" : "__xdtor",
+      "name" : "~this",
       "kind" : "alias",
       "protection" : "public"
      },
@@ -21248,7 +21248,7 @@
       "kind" : "function",
       "line" : 18,
       "char" : 11,
-      "type" : "@property JSONValue(auto const ref T[] x)",
+      "type" : "@property JSONValue(auto ref const T[] x)",
       "parameters" : [
        {
         "name" : "x",
@@ -21298,7 +21298,7 @@
       "kind" : "function",
       "line" : 42,
       "char" : 11,
-      "type" : "@property JSONValue(auto const ref T x)",
+      "type" : "@property JSONValue(auto ref const T x)",
       "parameters" : [
        {
         "name" : "x",
@@ -21361,7 +21361,7 @@
       "kind" : "function",
       "line" : 88,
       "char" : 11,
-      "type" : "@property JSONValue(auto const ref T x)",
+      "type" : "@property JSONValue(auto ref const T x)",
       "parameters" : [
        {
         "name" : "x",
@@ -21411,7 +21411,7 @@
       "kind" : "function",
       "line" : 107,
       "char" : 11,
-      "type" : "@property JSONValue(auto const ref T[] ary)",
+      "type" : "@property JSONValue(auto ref const T[] ary)",
       "parameters" : [
        {
         "name" : "ary",
@@ -21491,7 +21491,7 @@
       "kind" : "function",
       "line" : 176,
       "char" : 11,
-      "type" : "@property JSONValue(auto const ref Value[Key] aa)",
+      "type" : "@property JSONValue(auto ref const Value[Key] aa)",
       "parameters" : [
        {
         "name" : "aa",
@@ -21541,7 +21541,7 @@
       "kind" : "function",
       "line" : 203,
       "char" : 11,
-      "type" : "@property JSONValue(auto const ref JV v)",
+      "type" : "@property JSONValue(auto ref const JV v)",
       "parameters" : [
        {
         "name" : "v",
@@ -23994,7 +23994,7 @@
       "line" : 2270,
       "char" : 21,
       "deco" : "HAyaS3std4json9JSONValue",
-      "offset" : 40
+      "offset" : 48
      },
      {
       "name" : "_signature",
@@ -24003,7 +24003,7 @@
       "line" : 2271,
       "char" : 21,
       "deco" : "Ayh",
-      "offset" : 48
+      "offset" : 56
      },
      {
       "name" : "type",
@@ -24013,7 +24013,7 @@
       "line" : 2276,
       "char" : 9,
       "deco" : "Aya",
-      "offset" : 64
+      "offset" : 72
      },
      {
       "name" : "Algorithm",
@@ -24067,7 +24067,7 @@
       "char" : 12,
       "deco" : "E5voile4json8JWTValue9Algorithm",
       "init" : "Algorithm.HS256",
-      "offset" : 80
+      "offset" : 88
      },
      {
       "name" : "this",
@@ -25897,7 +25897,7 @@
       "line" : 15,
       "char" : 1,
       "deco" : "FNaNbNcNiNjNfS5voile3log7LogDataZQu",
-      "originalType" : "pure nothrow ref @safe LogData(LogData p) return",
+      "originalType" : "ref @safe LogData(LogData p) return",
       "parameters" : [
        {
         "name" : "p",
@@ -26913,7 +26913,7 @@
       "deco" : "FNlNeZv"
      },
      {
-      "name" : "__xdtor",
+      "name" : "~this",
       "kind" : "alias",
       "protection" : "public"
      }
@@ -27126,7 +27126,7 @@
       "deco" : "FNlNeZv"
      },
      {
-      "name" : "__xdtor",
+      "name" : "~this",
       "kind" : "alias",
       "protection" : "public"
      }
@@ -27327,7 +27327,7 @@
       "deco" : "FNlNeZv"
      },
      {
-      "name" : "__xdtor",
+      "name" : "~this",
       "kind" : "alias",
       "protection" : "public"
      }
@@ -27528,7 +27528,7 @@
       "deco" : "FNlNeZv"
      },
      {
-      "name" : "__xdtor",
+      "name" : "~this",
       "kind" : "alias",
       "protection" : "public"
      }
@@ -33872,7 +33872,7 @@
       "kind" : "function",
       "line" : 1144,
       "char" : 12,
-      "type" : "TagType!MU(auto const ref MU dat)",
+      "type" : "TagType!MU(auto ref const MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -34252,7 +34252,7 @@
       "storageClass" : [
        "auto"
       ],
-      "type" : "ref (auto inout ref MU dat)",
+      "type" : "ref (auto ref inout MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -34296,7 +34296,7 @@
       "storageClass" : [
        "auto"
       ],
-      "type" : "ref (auto inout ref MU dat)",
+      "type" : "ref (auto ref inout MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -34366,7 +34366,7 @@
       "kind" : "function",
       "line" : 1323,
       "char" : 6,
-      "type" : "bool(auto const ref MU dat)",
+      "type" : "bool(auto ref const MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -34407,7 +34407,7 @@
       "kind" : "function",
       "line" : 1329,
       "char" : 6,
-      "type" : "bool(auto const ref MU dat)",
+      "type" : "bool(auto ref const MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -34541,7 +34541,7 @@
       "kind" : "function",
       "line" : 1400,
       "char" : 6,
-      "type" : "bool(auto const ref MU dat)",
+      "type" : "bool(auto ref const MU dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -37905,7 +37905,7 @@
       "kind" : "function",
       "line" : 542,
       "char" : 6,
-      "type" : "bool(const ref RefCounted!T dat)",
+      "type" : "bool(ref const RefCounted!T dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -37940,7 +37940,7 @@
       "kind" : "function",
       "line" : 562,
       "char" : 6,
-      "type" : "bool(const ref RefCounted!T dat)",
+      "type" : "bool(ref const RefCounted!T dat)",
       "parameters" : [
        {
         "name" : "dat",
@@ -38057,7 +38057,7 @@
       "kind" : "function",
       "line" : 616,
       "char" : 29,
-      "type" : "pure nothrow ref inout(T)(inout ref RefCounted!T rc)",
+      "type" : "pure nothrow ref inout(T)(ref inout RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
@@ -38105,7 +38105,7 @@
       "kind" : "function",
       "line" : 633,
       "char" : 26,
-      "type" : "pure nothrow inout(T)*(inout ref RefCounted!T rc)",
+      "type" : "pure nothrow inout(T)*(ref inout RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
@@ -38516,7 +38516,7 @@
       "kind" : "function",
       "line" : 816,
       "char" : 34,
-      "type" : "pure nothrow @nogc @property ref @safe inout(CountedData!T)(inout ref RefCounted!T rc)",
+      "type" : "pure nothrow @nogc @property ref @safe inout(CountedData!T)(ref inout RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
@@ -38552,7 +38552,7 @@
       "kind" : "function",
       "line" : 833,
       "char" : 16,
-      "type" : "pure nothrow @nogc @property @system inout(ubyte)[](inout ref RefCounted!T rc)",
+      "type" : "pure nothrow @nogc @property @system inout(ubyte)[](ref inout RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
@@ -38601,7 +38601,7 @@
       "kind" : "function",
       "line" : 857,
       "char" : 16,
-      "type" : "pure nothrow @nogc @property @system inout(ubyte)[](inout ref RefCounted!T rc)",
+      "type" : "pure nothrow @nogc @property @system inout(ubyte)[](ref inout RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
@@ -38650,7 +38650,7 @@
       "kind" : "function",
       "line" : 875,
       "char" : 5,
-      "type" : "pure nothrow @nogc @property @safe int(const ref RefCounted!T rc)",
+      "type" : "pure nothrow @nogc @property @safe int(ref const RefCounted!T rc)",
       "parameters" : [
        {
         "name" : "rc",
@@ -39163,7 +39163,7 @@
       ]
      },
      {
-      "name" : "__xdtor",
+      "name" : "~this",
       "kind" : "alias",
       "protection" : "public"
      }
@@ -42389,7 +42389,7 @@
         "line" : 2414,
         "char" : 2,
         "deco" : "FNaNbNcNiNjNfS5voile4sync14MultiTaskQueue8TaskInfoZQBm",
-        "originalType" : "pure nothrow ref @safe TaskInfo(TaskInfo p) return",
+        "originalType" : "ref @safe TaskInfo(TaskInfo p) return",
         "parameters" : [
          {
           "name" : "p",

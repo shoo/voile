@@ -109,7 +109,7 @@
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.json"></span><div class="quickindex" id="quickindex.LogData.json"></div>const nothrow @property @safe JSONValue <code class="ddoc_psymbol">json</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.json"></span><div class="quickindex" id="quickindex.LogData.json"></div>nothrow @property @safe JSONValue <code class="ddoc_psymbol">json</code>() const;
 <br></div></dt>
 <dd>
 </dd>
@@ -117,7 +117,7 @@
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.toString"></span><div class="quickindex" id="quickindex.LogData.toString"></div>const string <code class="ddoc_psymbol">toString</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogData.toString"></span><div class="quickindex" id="quickindex.LogData.toString"></div>string <code class="ddoc_psymbol">toString</code>() const;
 <br></div></dt>
 <dd>
 </dd>
@@ -126,11 +126,11 @@
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInput"></span><div class="quickindex" id="quickindex.LogStorageInput"></div>interface <code class="ddoc_psymbol">LogStorageInput</code>;
 <br></div></dt>
 <dd>
-<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInput.front"></span><div class="quickindex" id="quickindex.LogStorageInput.front"></div>abstract const @property LogData <code class="ddoc_psymbol">front</code>();
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInput.front"></span><div class="quickindex" id="quickindex.LogStorageInput.front"></div>abstract @property LogData <code class="ddoc_psymbol">front</code>() const;
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInput.empty"></span><div class="quickindex" id="quickindex.LogStorageInput.empty"></div>abstract const @property bool <code class="ddoc_psymbol">empty</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInput.empty"></span><div class="quickindex" id="quickindex.LogStorageInput.empty"></div>abstract @property bool <code class="ddoc_psymbol">empty</code>() const;
 <br></div></dt>
 <dd>
 </dd>
@@ -160,11 +160,11 @@
 <dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory"></span><div class="quickindex" id="quickindex.LogStorageInMemory"></div>class <code class="ddoc_psymbol">LogStorageInMemory</code>: <span class="ddoc_psuper_symbol">voile.log.LogStorageInput</span>, <span class="ddoc_psuper_symbol">voile.log.LogStorageOutput</span>;
 <br></div></dt>
 <dd>
-<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.front"></span><div class="quickindex" id="quickindex.LogStorageInMemory.front"></div>const @property @safe LogData <code class="ddoc_psymbol">front</code>();
+<dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.front"></span><div class="quickindex" id="quickindex.LogStorageInMemory.front"></div>@property @safe LogData <code class="ddoc_psymbol">front</code>() const;
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.empty"></span><div class="quickindex" id="quickindex.LogStorageInMemory.empty"></div>const @property @safe bool <code class="ddoc_psymbol">empty</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.empty"></span><div class="quickindex" id="quickindex.LogStorageInMemory.empty"></div>@property @safe bool <code class="ddoc_psymbol">empty</code>() const;
 <br></div></dt>
 <dd>
 </dd>
@@ -184,27 +184,27 @@
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.save"></span><div class="quickindex" id="quickindex.LogStorageInMemory.save"></div>const pure nothrow @safe LogStorageInMemory <code class="ddoc_psymbol">save</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.save"></span><div class="quickindex" id="quickindex.LogStorageInMemory.save"></div>pure nothrow @safe LogStorageInMemory <code class="ddoc_psymbol">save</code>() const;
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.currentIndex"></span><div class="quickindex" id="quickindex.LogStorageInMemory.currentIndex"></div>const pure nothrow @nogc @property @safe size_t <code class="ddoc_psymbol">currentIndex</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.currentIndex"></span><div class="quickindex" id="quickindex.LogStorageInMemory.currentIndex"></div>pure nothrow @nogc @property @safe size_t <code class="ddoc_psymbol">currentIndex</code>() const;
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.length"></span><div class="quickindex" id="quickindex.LogStorageInMemory.length"></div>const pure nothrow @nogc @property @safe size_t <code class="ddoc_psymbol">length</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.length"></span><div class="quickindex" id="quickindex.LogStorageInMemory.length"></div>pure nothrow @nogc @property @safe size_t <code class="ddoc_psymbol">length</code>() const;
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.opSlice"></span><div class="quickindex" id="quickindex.LogStorageInMemory.opSlice"></div>const pure nothrow @safe LogStorageInMemory <code class="ddoc_psymbol">opSlice</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.opSlice"></span><div class="quickindex" id="quickindex.LogStorageInMemory.opSlice"></div>pure nothrow @safe LogStorageInMemory <code class="ddoc_psymbol">opSlice</code>() const;
 <br>
-const pure nothrow @safe LogStorageInMemory <code class="ddoc_psymbol">opSlice</code>(size_t <span class="ddoc_param">begin</span>, size_t <span class="ddoc_param">end</span>);
+pure nothrow @safe LogStorageInMemory <code class="ddoc_psymbol">opSlice</code>(size_t <span class="ddoc_param">begin</span>, size_t <span class="ddoc_param">end</span>) const;
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.slice"></span><div class="quickindex" id="quickindex.LogStorageInMemory.slice"></div>const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".LogStorageInMemory.slice"></span><div class="quickindex" id="quickindex.LogStorageInMemory.slice"></div>pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>() const;
 <br>
-const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <span class="ddoc_param">begin</span>, size_t <span class="ddoc_param">end</span>);
+pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <span class="ddoc_param">begin</span>, size_t <span class="ddoc_param">end</span>) const;
 <br></div></dt>
 <dd>
 </dd>
@@ -256,13 +256,13 @@ input.popFront();
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".InMemoryLogger.logStorage"></span><div class="quickindex" id="quickindex.InMemoryLogger.logStorage"></div>inout pure nothrow @property @safe inout(LogStorageInMemory) <code class="ddoc_psymbol">logStorage</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".InMemoryLogger.logStorage"></span><div class="quickindex" id="quickindex.InMemoryLogger.logStorage"></div>pure nothrow @property @safe inout(LogStorageInMemory) <code class="ddoc_psymbol">logStorage</code>() inout;
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".InMemoryLogger.slice"></span><div class="quickindex" id="quickindex.InMemoryLogger.slice"></div>const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".InMemoryLogger.slice"></span><div class="quickindex" id="quickindex.InMemoryLogger.slice"></div>pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>() const;
 <br>
-const pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <span class="ddoc_param">begin</span>, size_t <span class="ddoc_param">end</span>);
+pure nothrow @safe auto <code class="ddoc_psymbol">slice</code>(size_t <span class="ddoc_param">begin</span>, size_t <span class="ddoc_param">end</span>) const;
 <br></div></dt>
 <dd>
 </dd>
@@ -412,7 +412,7 @@ logger.info(<span class="d_string">"test001"</span>);    <span class="d_comment"
 <dl class="ddoc_members"><div class="ddoc_class_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter"></div>struct <code class="ddoc_psymbol">Filter</code>;
 <br></div></dt>
 <dd>
-<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.file"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.file"></div>inout @property @safe inout(Regex!char) <code class="ddoc_psymbol">file</code>();
+<dl class="ddoc_members"><div class="ddoc_struct_members"><dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.file"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.file"></div>@property @safe inout(Regex!char) <code class="ddoc_psymbol">file</code>() inout;
 <br>
 @property @safe void <code class="ddoc_psymbol">file</code>(string <span class="ddoc_param">pattern</span>);
 <br>
@@ -420,7 +420,7 @@ logger.info(<span class="d_string">"test001"</span>);    <span class="d_comment"
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.moduleName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.moduleName"></div>inout @property @safe inout(Regex!char) <code class="ddoc_psymbol">moduleName</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.moduleName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.moduleName"></div>@property @safe inout(Regex!char) <code class="ddoc_psymbol">moduleName</code>() inout;
 <br>
 @property @safe void <code class="ddoc_psymbol">moduleName</code>(string <span class="ddoc_param">pattern</span>);
 <br>
@@ -428,7 +428,7 @@ logger.info(<span class="d_string">"test001"</span>);    <span class="d_comment"
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.funcName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.funcName"></div>inout @property @safe inout(Regex!char) <code class="ddoc_psymbol">funcName</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.funcName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.funcName"></div>@property @safe inout(Regex!char) <code class="ddoc_psymbol">funcName</code>() inout;
 <br>
 @property @safe void <code class="ddoc_psymbol">funcName</code>(string <span class="ddoc_param">pattern</span>);
 <br>
@@ -436,7 +436,7 @@ logger.info(<span class="d_string">"test001"</span>);    <span class="d_comment"
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.prettyFuncName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.prettyFuncName"></div>inout @property @safe inout(Regex!char) <code class="ddoc_psymbol">prettyFuncName</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.prettyFuncName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.prettyFuncName"></div>@property @safe inout(Regex!char) <code class="ddoc_psymbol">prettyFuncName</code>() inout;
 <br>
 @property @safe void <code class="ddoc_psymbol">prettyFuncName</code>(string <span class="ddoc_param">pattern</span>);
 <br>
@@ -444,7 +444,7 @@ logger.info(<span class="d_string">"test001"</span>);    <span class="d_comment"
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.msg"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.msg"></div>inout @property @safe inout(Regex!char) <code class="ddoc_psymbol">msg</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.msg"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.msg"></div>@property @safe inout(Regex!char) <code class="ddoc_psymbol">msg</code>() inout;
 <br>
 @property @safe void <code class="ddoc_psymbol">msg</code>(string <span class="ddoc_param">pattern</span>);
 <br>
@@ -452,19 +452,19 @@ logger.info(<span class="d_string">"test001"</span>);    <span class="d_comment"
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.targetName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.targetName"></div>inout @property @safe string <code class="ddoc_psymbol">targetName</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.targetName"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.targetName"></div>@property @safe string <code class="ddoc_psymbol">targetName</code>() inout;
 <br>
 @property @safe void <code class="ddoc_psymbol">targetName</code>(string <span class="ddoc_param">name</span>);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.lineMax"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.lineMax"></div>const @property @safe size_t <code class="ddoc_psymbol">lineMax</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.lineMax"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.lineMax"></div>@property @safe size_t <code class="ddoc_psymbol">lineMax</code>() const;
 <br>
 @property @safe void <code class="ddoc_psymbol">lineMax</code>(size_t <span class="ddoc_param">num</span>);
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.lineMin"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.lineMin"></div>const @property @safe size_t <code class="ddoc_psymbol">lineMin</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.lineMin"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.lineMin"></div>@property @safe size_t <code class="ddoc_psymbol">lineMin</code>() const;
 <br>
 @property @safe void <code class="ddoc_psymbol">lineMin</code>(size_t <span class="ddoc_param">num</span>);
 <br>
@@ -472,7 +472,7 @@ logger.info(<span class="d_string">"test001"</span>);    <span class="d_comment"
 <br></div></dt>
 <dd>
 </dd>
-<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.logLevel"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.logLevel"></div>const @property @safe LogLevel <code class="ddoc_psymbol">logLevel</code>();
+<dt class="ddoc_decl"><div ><span class="def-anchor" id=".DispatchLogger.Filter.logLevel"></span><div class="quickindex" id="quickindex.DispatchLogger.Filter.logLevel"></div>@property @safe LogLevel <code class="ddoc_psymbol">logLevel</code>() const;
 <br>
 @property @safe void <code class="ddoc_psymbol">logLevel</code>(LogLevel <span class="ddoc_param">lv</span>);
 <br></div></dt>
@@ -499,9 +499,9 @@ logger.info(<span class="d_string">"test001"</span>);    <span class="d_comment"
 <br>
 this(shared Logger <span class="ddoc_param">logger</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
 <br>
-shared this(Logger <span class="ddoc_param">logger</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+this(Logger <span class="ddoc_param">logger</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all) shared;
 <br>
-shared this(shared Logger <span class="ddoc_param">logger</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all);
+this(shared Logger <span class="ddoc_param">logger</span>, LogLevel <span class="ddoc_param">lv</span> = LogLevel.all) shared;
 <br></div></dt>
 <dd>
 </dd>
