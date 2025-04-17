@@ -13,6 +13,7 @@ import std.sumtype;
 import std.range, std.algorithm, std.array, std.traits, std.meta, std.string;
 import core.lifetime: move;
 import voile.attr;
+alias attr = voile.attr;
 
 
 /*******************************************************************************
@@ -34,22 +35,19 @@ private struct Kind
  */
 auto kind(string name, string value)
 {
-	import voile.attr: v = value;
-	return v(Kind(name, value));
+	return attr.value(Kind(name, value));
 }
 
 /// ditto
 auto kind(string value)
 {
-	import voile.attr: v = value;
-	return v(Kind("$type", value));
+	return attr.value(Kind("$type", value));
 }
 
 /// ditto
 auto kind(string value)()
 {
-	import voile.attr: v = value;
-	return v(Kind("$type", value));
+	return attr.value(Kind("$type", value));
 }
 
 private enum hasKind(T) = hasValue!(T, Kind);
@@ -144,6 +142,21 @@ auto converterDuration()
 }
 
 private enum isArrayWithoutBinary(T) = isArray!T && !isBinary!T;
+
+import std.typecons: Tuple, tuple, isTuple;
+
+/*******************************************************************************
+ * Determines if the Tuple can be serialized to CBOR format
+ * 
+ * This template returns true if the type T meets the following conditions:
+ * - T is a Tuple
+ * - All members of the Tuple are serializable
+ * 
+ * Params:
+ *      T = The type to check
+ * Returns: true if T is a serializable sum type, false otherwise
+ */
+enum isSerializableTuple(T) = isTuple!T && allSatisfy!(isSerializable, T.Types);
 
 /*******************************************************************************
  * Determines if the SumType can be serialized to CBOR format
@@ -242,8 +255,10 @@ template isSerializable(T)
 	else static if (isAssociativeArray!T)
 		enum isSerializable = isSerializable!(KeyType!T) && isSerializable!(ValueType!T);
 	else static if (isSerializableSumType!T)
-		enum isSerializable = isSerializable!(KeyType!T) && isSerializable!(ValueType!T);
-	else static if (isAggregateType!T && !isSumType!T)
+		enum isSerializable = true;
+	else static if (isSerializableTuple!T)
+		enum isSerializable = true;
+	else static if (isAggregateType!T && !isSumType!T && !isInstanceOf!(Tuple, T))
 		enum isSerializable = () {
 			bool ret = true;
 			static foreach (var; Filter!(isAccessible, T.tupleof[]))
@@ -521,6 +536,8 @@ public:
 		 */
 		~this() pure nothrow @nogc @safe
 		{
+			if (_builder)
+				_builder.dispose(this);
 		}
 		
 		/***********************************************************************
@@ -618,11 +635,10 @@ public:
 		 */
 		T get(T)(lazy T defaultValue = T.init) const nothrow @safe
 		{
-			import voile.misc: get;
 			import std.conv: to;
 			try
 			{
-				static if (is(T == CborValue))
+				static if (is(T == const(CborValue)))
 					return this;
 				else static if (isIntegral!T)
 					return _instance.match!(
@@ -767,6 +783,31 @@ public:
 		{
 			return *_builder;
 		}
+		
+		/***********************************************************************
+		 * 
+		 */
+		T getValueAt(T)(size_t idx, lazy T defaultValue = T.init) const nothrow
+		{
+			try
+			{
+				return _instance.match!(
+					(in CborArray v) @trusted {
+						return v[idx].get!T(defaultValue);
+					},
+					(in _) @trusted {
+						return defaultValue;
+					}
+				);
+			}
+			catch (Exception e)
+			{
+				try
+					return defaultValue;
+				catch (Exception e2)
+					return T.init;
+			}
+		}
 	}
 	
 	/***************************************************************************
@@ -775,6 +816,14 @@ public:
 	CborValue make(T)(T value) @safe
 	{
 		return CborValue(value, this);
+	}
+	
+	/***************************************************************************
+	 * Dispose the given CborValue.
+	 */
+	void dispose(ref CborValue v) pure nothrow @nogc @safe
+	{
+		cast(void)v;
 	}
 	
 	/***************************************************************************
@@ -1231,6 +1280,13 @@ public:
 				}
 			);
 		}
+		else static if (isSerializableTuple!T)
+		{
+			auto ary = allocAry!CborValue();
+			static foreach (idx; 0..value[].length)
+				ary ~= serialize(value[idx]);
+			return CborValue(ary, this);
+		}
 		else static if (isAggregateType!T && isSerializable!T && hasConvertCborMethodA!T)
 			return value.toCbor(this);
 		else static if (isAggregateType!T && isSerializable!T && hasConvertCborMethodB!T)
@@ -1475,6 +1531,15 @@ public:
 			default:
 			}
 		}
+		else static if (isSerializableTuple!T)
+		{
+			auto ary = src._reqArray;
+			static foreach (idx; 0..dst.length)
+			{
+				if (!deserialize(ary[idx], dst[idx]))
+					return false;
+			}
+		}
 		else static if (isAggregateType!T && isSerializable!T && hasConvertCborMethod!T)
 			dst = T.fromCbor(src);
 		else static if (isAggregateType!T && isSerializable!T && hasConvertCborBinaryMethodA!T)
@@ -1625,6 +1690,16 @@ public:
 		assert(cborValue.type == CborType.boolean);
 		assert(cborValue.get!bool == true);
 		assert(b.deserialize!ST3(cborValue) == testSumType3);
+		
+		// Tupleの例
+		alias TP1 = Tuple!(int, string);
+		static assert(isSerializableTuple!TP1);
+		auto testTuple1 = tuple(42, "test");
+		cborValue = b.serialize(testTuple1);
+		assert(cborValue.type == CborType.array);
+		assert(cborValue.getValueAt!int(0) == 42);
+		assert(cborValue.getValueAt!string(1) == "test");
+		assert(b.deserialize!TP1(cborValue) == testTuple1);
 		
 		// toCbor/fromCborメソッドを持つ構造体の例1
 		static struct Test1
@@ -1789,7 +1864,14 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 // Test of the CBOR builder
 @safe unittest
 {
-	import voile.misc: get;
+	bool testSumType(T, ST)(ref ST value, T checkValue) @trusted
+	if (isSumType!ST)
+	{
+		return value.match!(
+			(ref T v) => v == checkValue,
+			(ref _) => false
+		);
+	}
 	Builder builder;
 	Builder.CborValue value;
 	
@@ -1818,7 +1900,7 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	
 	// Test for integer values
 	value = builder.make(42);
-	assert(value._instance.get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)42);
+	assert(testSumType(value._instance, cast(Builder.PositiveInteger)42));
 	assert(!value.isUndefined);
 	assert(!value.isNull);
 	assert(value.get!int == 42);
@@ -1832,7 +1914,7 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	
 	// Test for unsigned integer values
 	value = builder.make(42u);
-	assert(value._instance.get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)42);
+	assert(testSumType(value._instance, cast(Builder.PositiveInteger)42));
 	assert(!value.isUndefined);
 	assert(!value.isNull);
 	assert(value.get!int == 42);
@@ -1842,7 +1924,7 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	
 	// Test for negative integer values
 	value = builder.make(-42);
-	assert(value._instance.get!(Builder.NegativeInteger) == cast(Builder.NegativeInteger)41);
+	assert(testSumType(value._instance, cast(Builder.NegativeInteger)41));
 	assert(!value.isUndefined);
 	assert(!value.isNull);
 	assert(value.get!int == -42);
@@ -1852,45 +1934,47 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	
 	// Integer overflow test
 	value = builder.make(long.max);
-	assert(value._instance.get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)long.max);
+	assert(testSumType(value._instance, cast(Builder.PositiveInteger)long.max));
 	assert(value.get!long == long.max);
 	value = builder.make(ulong.max);
-	assert(value._instance.get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)ulong.max);
+	assert(testSumType(value._instance, cast(Builder.PositiveInteger)ulong.max));
 	assert(value.get!ulong == ulong.max);
 	value = builder.make(long.min);
-	assert(value._instance.get!(Builder.NegativeInteger) == cast(Builder.NegativeInteger)0x7FFFFFFFFFFFFFFF);
+	assert(testSumType(value._instance, cast(Builder.NegativeInteger)0x7FFFFFFFFFFFFFFF));
 	assert(value.get!long == long.min);
 	value = builder.make(cast(Builder.NegativeInteger)0xCFFFFFFFFFFFFFFF);
-	assert(value._instance.get!(Builder.NegativeInteger) == cast(Builder.NegativeInteger)0xCFFFFFFFFFFFFFFF);
+	assert(testSumType(value._instance, cast(Builder.NegativeInteger)0xCFFFFFFFFFFFFFFF));
 	assert(value.isOverflowedInteger);
 	assert(value.get!ulong == ulong(0x3000000000000000));
 	
 	// Test for boolean values
 	value = builder.make(true);
-	assert(value._instance.get!(Builder.Boolean) == cast(Builder.Boolean)true);
+	assert(testSumType(value._instance, cast(Builder.Boolean)true));
 	assert(value.get!bool);
 	assert(value.get!string == "true");
 	
 	// Test for float values
 	value = builder.make(3.14f);
-	assert(value._instance.get!(Builder.SingleFloat) == cast(Builder.SingleFloat)3.14f);
+	assert(testSumType(value._instance, cast(Builder.SingleFloat)3.14f));
 	
 	// Test for double values
 	value = builder.make(3.14);
-	assert(value._instance.get!(Builder.DoubleFloat) == cast(Builder.DoubleFloat)3.14);
+	assert(testSumType(value._instance, cast(Builder.DoubleFloat)3.14));
 	
 	// Test for string values
 	value = builder.make("hello");
-	assert(value._instance.get!(Builder.String) == cast(Builder.String)"hello");
+	assert(testSumType(value._instance, cast(Builder.String)"hello"));
 	assert(value.get!string == "hello");
 	
 	// Test for binary values
 	value = builder.make(cast(immutable(ubyte)[])"\x01\x02\x03"c);
-	assert(value._instance.get!(Builder.Binary) == cast(Builder.Binary)"\x01\x02\x03"c);
+	assert(testSumType(value._instance, cast(Builder.Binary)"\x01\x02\x03"c));
 	
 	// Test for array values
 	value = builder.make([1, 2, 3]);
-	auto cborArray = value._instance.get!(Builder.CborValue.CborArray);
+	auto cborArray = value._instance.match!(
+		(ref Builder.CborValue.CborArray v) => v,
+		(ref _) => Builder.CborValue.CborArray.init);
 	assert(cborArray.length == 3);
 	assert(cborArray[0].get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)1);
 	assert(cborArray[1].get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)2);
@@ -1901,9 +1985,9 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	auto cborMap = value._reqMap;
 	assert(cborMap.items.length == 2);
 	assert(cborMap.items[0].key.get!(Builder.String) == cast(Builder.String)"1_one");
-	assert(cborMap.items[0].value._instance.get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)1);
+	assert(testSumType(cborMap.items[0].value._instance, cast(Builder.PositiveInteger)1));
 	assert(cborMap.items[1].key.get!(Builder.String) == cast(Builder.String)"2_two");
-	assert(cborMap.items[1].value._instance.get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)2);
+	assert(testSumType(cborMap.items[1].value._instance, cast(Builder.PositiveInteger)2));
 	assert(value.getValue("1_one", 0) == 1);
 	assert(value.getValue("2_two", 0) == 2);
 	assert(value.getValue("3_three", 333) == 333);
@@ -1911,7 +1995,7 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	
 	// Test for cbor values
 	value = builder.make(cast(Builder.String)"aaa");
-	assert(value._instance.get!(Builder.String) == cast(Builder.String)"aaa");
+	assert(testSumType(value._instance, cast(Builder.String)"aaa"));
 }
 
 // Test of the CBOR parser
