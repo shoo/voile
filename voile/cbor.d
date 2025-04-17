@@ -783,6 +783,31 @@ public:
 		{
 			return *_builder;
 		}
+		
+		/***********************************************************************
+		 * 
+		 */
+		T getValueAt(T)(size_t idx, lazy T defaultValue = T.init) const nothrow
+		{
+			try
+			{
+				return _instance.match!(
+					(in CborArray v) @trusted {
+						return v[idx].get!T(defaultValue);
+					},
+					(in _) @trusted {
+						return defaultValue;
+					}
+				);
+			}
+			catch (Exception e)
+			{
+				try
+					return defaultValue;
+				catch (Exception e2)
+					return T.init;
+			}
+		}
 	}
 	
 	/***************************************************************************
@@ -1672,8 +1697,8 @@ public:
 		auto testTuple1 = tuple(42, "test");
 		cborValue = b.serialize(testTuple1);
 		assert(cborValue.type == CborType.array);
-		assert(cborValue.get!(const(CborValue)[])[0].get!int == 42);
-		assert(cborValue.get!(const(CborValue)[])[1].get!string == "test");
+		assert(cborValue.getValueAt!int(0) == 42);
+		assert(cborValue.getValueAt!string(1) == "test");
 		assert(b.deserialize!TP1(cborValue) == testTuple1);
 		
 		// toCbor/fromCborメソッドを持つ構造体の例1
