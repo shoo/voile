@@ -282,9 +282,23 @@ alias ignoreIf(alias func) = IgnoreIf!func;
 ///
 enum bool isIgnoreIf(alias uda) = isInstanceOf!(IgnoreIf, uda);
 ///
-enum bool hasIgnoreIf(alias symbol) = Filter!(isIgnoreIf, __traits(getAttributes, symbol)).length > 0;
+template hasIgnoreIf(alias symbol, Args...)
+{
+	static if (Args.length == 0)
+	{
+		enum bool hasIgnoreIf = Filter!(isIgnoreIf, __traits(getAttributes, symbol)).length > 0;
+	}
+	else
+	{
+		// シンボルからUDAを取り出す
+		alias udas = Filter!(isIgnoreIf, __traits(getAttributes, symbol));
+		enum bool isParameterMatch(alias func) = __traits(compiles, func(staticMap!(lvalueOf, Args)));
+		enum bool isUdaMatch(alias uda) = isParameterMatch!(TemplateArgsOf!uda);
+		enum bool hasIgnoreIf = Filter!(isUdaMatch, udas).length > 0;
+	}
+}
 ///
-template getPredIgnoreIf(alias value)
+template getPredIgnoreIf(alias value, Args...)
 {
 	static if (isIgnoreIf!value)
 	{
@@ -294,10 +308,41 @@ template getPredIgnoreIf(alias value)
 	else
 	{
 		// シンボルからUDAを取り出す
-		alias uda = Filter!(isIgnoreIf, __traits(getAttributes, value))[0];
+		alias udas = Filter!(isIgnoreIf, __traits(getAttributes, value));
 		// UDAから関数を取り出す
-		alias getPredIgnoreIf = TemplateArgsOf!uda[0];
+		static if (Args.length == 0)
+		{
+			// 引数0の場合は先頭
+			alias getPredIgnoreIf = TemplateArgsOf!(udas[0])[0];
+		}
+		else
+		{
+			// 引数ありの場合は、引数を確認
+			enum bool isParameterMatch(alias func) = __traits(compiles, func(staticMap!(lvalueOf, Args)));
+			enum bool isUdaMatch(alias uda) = isParameterMatch!(TemplateArgsOf!uda);
+			alias getPredIgnoreIf = TemplateArgsOf!(Filter!(isUdaMatch, udas)[0])[0];
+		}
 	}
+}
+
+@safe unittest
+{
+	struct Data
+	{
+		@ignoreIf!((int a) => a == 10)
+		@ignoreIf!((int[] a) => a.length == 2)
+		int x;
+	}
+	static assert(hasIgnoreIf!(Data.x));
+	static assert(hasIgnoreIf!(Data.x, int));
+	static assert(hasIgnoreIf!(Data.x, int[]));
+	static assert(!hasIgnoreIf!(Data.x, string));
+	static assert(getPredIgnoreIf!(Data.x)(10));
+	static assert(!getPredIgnoreIf!(Data.x)(1));
+	static assert(getPredIgnoreIf!(Data.x, int)(10));
+	static assert(!getPredIgnoreIf!(Data.x, int)(1));
+	static assert(getPredIgnoreIf!(Data.x, int[])([1, 2]));
+	static assert(!getPredIgnoreIf!(Data.x, int[])([1]));
 }
 
 private enum Essential {init}
