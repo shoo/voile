@@ -494,8 +494,8 @@ mixin template Json5DefaultAllocator()
 		Item[] items;
 	public:
 		///
-		auto byKeyValue() inout => items;
 		///
+		ref inout(Item[]) byKeyValue() inout => items;
 		auto prepend(K k, V v) => items = Item(k, v) ~ items;
 		///
 		auto append(K k, V v) => items ~= Item(k, v);
@@ -504,7 +504,7 @@ mixin template Json5DefaultAllocator()
 		///
 		size_t length() const => items.length;
 		///
-		V* opIn(K key)
+		inout(V)* opIn(K key) inout
 		{
 			foreach (ref item; items)
 			{
@@ -514,9 +514,9 @@ mixin template Json5DefaultAllocator()
 			return null;
 		}
 		///
-		ref Item opIndex(size_t idx) => items[idx];
+		ref inout(Item) opIndex(size_t idx) inout => items[idx];
 		///
-		ref V opIndex(K key)
+		ref inout(V) opIndex(K key) inout
 		{
 			if (auto p = this.opIn(key))
 				return *p;
@@ -638,9 +638,9 @@ static struct JsonValue(Builder)
 		bool singleLine;
 		
 		///
-		ref Dictionary!(JsonKey, JsonValue).Item opIndex()(size_t idx) => value[idx];
+		ref inout(Dictionary!(JsonKey, JsonValue).Item) opIndex()(size_t idx) inout => value[idx];
 		///
-		ref JsonValue opIndex()(string key)
+		ref inout(JsonValue) opIndex()(string key) inout
 		{
 			foreach (ref itm; value.byKeyValue)
 			{
@@ -3008,7 +3008,7 @@ public:
 	
 	private void _putPrettyStringImpl(OutputRange)(ref OutputRange dst, ref const(JsonValue) value,
 		in char[] indent, in char[] newline, size_t indentLevel,
-		JsonPrettyPrintOptions options) const
+		JsonPrettyPrintOptions options) const @safe
 	{
 		final switch (value.type)
 		{
@@ -3047,7 +3047,7 @@ public:
 	 */
 	void toPrettyString(OutputRange)(ref OutputRange dst, JsonValue value,
 		in char[] indent = "\t", in char[] newline = "\n",
-		JsonPrettyPrintOptions options = JsonPrettyPrintOptions.none)
+		JsonPrettyPrintOptions options = JsonPrettyPrintOptions.none) @safe
 	{
 		_putPrettyStringJsonCommentImpl(dst, value._comments, indent, newline, 0, options);
 		_putPrettyStringImpl(dst, value, indent, newline, 0, options);
@@ -3349,6 +3349,8 @@ public:
 			return deepCopy(src);
 		else static if (is(U == StdJsonValue))
 			return make(src);
+		else static if (isSomeString!T)
+			return make(src);
 		else static if (isIntegral!T)
 			return make(src);
 		else static if (isFloatingPoint!T)
@@ -3360,9 +3362,19 @@ public:
 		else static if (is(T == typeof(null)))
 			return make(src);
 		else static if (isArray!T)
-			return make(src);
+		{
+			auto ary = allocAry!JsonValue();
+			foreach (idx; 0..src.length)
+				ary ~= serialize(src[idx]);
+			return make(JsonArray(ary));
+		}
 		else static if (isAssociativeArray!T)
-			return make(src);
+		{
+			auto dic = allocDic!(JsonKey, JsonValue)();
+			foreach (ref k, ref v; src)
+				dic.append(JsonKey(allocStr(k)), serialize(v));
+			return make(JsonObject(dic));
+		}
 		else static if (isTuple!T)
 		{
 			auto ary = allocAry!JsonValue();
@@ -3502,9 +3514,14 @@ public:
 						}
 						obj.append(key, val);
 					};
-					static if (hasIgnoreIf!e)
+					static if (hasIgnoreIf!(e, const(E)))
 					{
-						if (!getPredIgnoreIf!e(value.tupleof[i]))
+						if (!getPredIgnoreIf!e(src.tupleof[i]))
+							appendObj();
+					}
+					else static if (hasIgnoreIf!(e, T))
+					{
+						if (!getPredIgnoreIf!e(src))
 							appendObj();
 					}
 					else static if (isPointer!(typeof(e)) && e.stringof == "this")
@@ -3583,6 +3600,8 @@ public:
 			dst = deepCopy(src);
 		else static if (is(U == StdJsonValue))
 			dst = src.toStdJson();
+		else static if (isSomeString!T)
+			dst = src.get!U;
 		else static if (isIntegral!T)
 			dst = src.get!U;
 		else static if (isFloatingPoint!T)
@@ -3772,8 +3791,12 @@ public:
 					bool found = false;
 				static if (isAccessible!m && !hasIgnore!m)
 				{
-					static if (hasIgnoreIf!m)
-						bool isIgnored = getPredIgnoreIf!m(value.tupleof[i]);
+					static if (hasIgnoreIf!(m, const(JsonValue)))
+						bool isIgnored = getPredIgnoreIf!m(src);
+					else static if (hasIgnoreIf!(m, typeof(m), const(JsonValue)))
+						bool isIgnored = getPredIgnoreIf!(m, typeof(m), const(JsonValue))(dst.tupleof[i], src);
+					else static if (hasIgnoreIf!(m, const(T), const(JsonValue)))
+						bool isIgnored = getPredIgnoreIf!(m, const(T), const(JsonValue))(dst, src);
 					else
 						enum isIgnored = false;
 					if (!isIgnored) foreach (ref e; src._reqObj.byKeyValue)
@@ -3873,7 +3896,9 @@ Json5Value serializeToJson(T)(in T src) @safe
 string serializeToJsonString(T)(in T src, in char[] indent = "\t", in char[] newline = "\n",
 		Json5Options options = Json5Options.none) @safe
 {
-	return g_defaultBuilder.serialize(src).toPrettyString(indent, newline, options);
+	auto app = appender!string;
+	g_defaultBuilder.toPrettyString(app, g_defaultBuilder.serialize(src), indent, newline, options);
+	return app.data;
 }
 ///
 bool deserializeFromJson(T)(in Json5Value src, ref T dst) @safe
@@ -3891,9 +3916,38 @@ bool deserializeFromJsonString(T)(in char[] src, ref T dst) @safe
 	return deserializeFromJson(g_defaultBuilder.parse(src, dst));
 }
 /// ditto
-T deserializeFromJsonString(T)(in Json5Value src) @safe
+T deserializeFromJsonString(T)(in char[] src) @safe
 {
 	return deserializeFromJson!T(g_defaultBuilder.parse(src));
+}
+///
+@safe unittest
+{
+	struct Data
+	{
+		int x;
+		int y;
+	}
+	auto dat1 = Data(1, 2);
+	auto str1 = dat1.serializeToJsonString();
+	assert(str1 == `
+	{
+		"x": 1,
+		"y": 2
+	}`.outdent.chompPrefix("\n"));
+	auto jv1 = parseJson(str1);
+	assert(jv1.getValue!int("x") == 1);
+	assert(jv1.getValue!int("y") == 2);
+	
+	auto dat2 = deserializeFromJsonString!Data(`{ x: 1, y: 2 }`);
+	assert(dat1 == dat2);
+	
+	auto jv2 = dat1.serializeToJson();
+	assert(jv2.getValue!int("x") == 1);
+	assert(jv2.getValue!int("y") == 2);
+	
+	auto dat3 = deserializeFromJson!Data(makeJson(["x": 1, "y": 2]));
+	assert(dat3 == dat1);
 }
 
 //######################################################################
@@ -4663,4 +4717,27 @@ T deserializeFromJsonString(T)(in Json5Value src) @safe
 	jv = builder.serialize(dat1);
 	builder.toPrettyString(app, jv, "  ", "\n");
 	assert(app.data == expected, "Result:\n" ~ app.data ~ "\nExpected:\n" ~ expected);
+}
+
+@system unittest
+{
+	struct Data
+	{
+		@singleLineAry
+		@ignoreIf!((in int[] ary) => ary.length == 0)
+		@ignoreIf!((int[] ary, const(Json5Value) jv) => jv.asObject["ary"].asArray.value.length == 0)
+		int[] ary;
+	}
+	auto dat1 = Data([1,2]);
+	auto str1 = dat1.serializeToJsonString();
+	assert(str1 == "{\n\t\"ary\": [ 1, 2 ]\n}");
+	
+	auto dat2 = Data([]);
+	auto str2 = dat2.serializeToJsonString();
+	assert(str2 == "{}");
+	
+	static assert(hasIgnoreIf!(Data.ary, int[], const(Json5Value)));
+	auto dat3 = Data([1,2]);
+	parseJson(`{"ary": []}`).deserializeFromJson(dat3);
+	assert(dat3.ary == [1, 2]);
 }
