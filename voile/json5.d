@@ -253,7 +253,11 @@ auto arrayFormat(bool tailingComma = false, bool singleLine = false)
 /// ditto
 enum singleLineAry = arrayFormat(false, true);
 
-private alias AttrJson5ObjectFormat = AttrJson5ArrayFormat;
+private struct AttrJson5ObjectFormat
+{
+	bool tailingComma;
+	bool singleLine;
+}
 private enum hasAttrJson5ObjectFormat(alias variable) = hasUDA!(variable, AttrJson5ObjectFormat);
 private enum getAttrJson5ObjectFormat(alias variable) = getUDAs!(variable, AttrJson5ObjectFormat)[0];
 
@@ -2921,7 +2925,7 @@ public:
 				}
 				// Value
 				put(dst, ": ");
-				_putPrettyStringImpl(dst, kv.value, indent, newline, indentLevel + 1, options);
+				_putPrettyStringImpl(dst, kv.value, indent, newline, indentLevel, options);
 				_putPrettyStringJsonTrailingCommentImpl(dst, kv.value._comments, true);
 				if (i + 1 < obj.value.length || obj.tailingComma)
 					put(dst, ",");
@@ -2980,7 +2984,7 @@ public:
 			foreach (i, ref v; ary.value)
 			{
 				put(dst, " ");
-				_putPrettyStringImpl(dst, v, indent, newline, indentLevel + 1, options);
+				_putPrettyStringImpl(dst, v, indent, newline, indentLevel, options);
 				_putPrettyStringJsonTrailingCommentImpl(dst, v._comments, true);
 				if (i + 1 != ary.value.length || ary.tailingComma)
 					put(dst, ",");
@@ -3511,6 +3515,63 @@ public:
 						else
 						{
 							// 何もしない
+						}
+						// 配列の要素に対する修飾
+						static if (isArray!E && isSomeString!(ElementType!E) && hasAttrJson5StringFormat!e)
+						{
+							foreach (ref elm; val._reqArray[])
+							{
+								assert(elm.type == JsonType.string);
+								elm.asString.singleQuoted = getAttrJson5StringFormat!e.singleQuoted;
+							}
+						}
+						else static if (isArray!E && isIntegral!(ElementType!E) && isSigned!(ElementType!E)
+							&& hasAttrJson5IntegralFormat!e)
+						{
+							foreach (ref elm; val._reqArray[])
+							{
+								assert(elm.type == JsonType.integer);
+								elm.asInteger.positiveSign = getAttrJson5IntegralFormat!e.positiveSign;
+								elm.asInteger.hex          = getAttrJson5IntegralFormat!e.hex;
+							}
+						}
+						else static if (isArray!E && isIntegral!(ElementType!E) && isUnsigned!(ElementType!E)
+							&& hasAttrJson5IntegralFormat!e)
+						{
+							foreach (ref elm; val._reqArray[])
+							{
+								assert(elm.type == JsonType.uinteger);
+								elm.asUInteger.positiveSign = getAttrJson5IntegralFormat!e.positiveSign;
+								elm.asUInteger.hex          = getAttrJson5IntegralFormat!e.hex;
+							}
+						}
+						else static if (isArray!E && isFloatingPoint!(ElementType!E)
+							&& hasAttrJson5FloatingPointFormat!e)
+						{
+							enum fpFormat = getAttrJson5FloatingPointFormat!e;
+							foreach (ref elm; val._reqArray[])
+							{
+								assert(elm.type == JsonType.floating);
+								elm.asFloatingPoint.leadingDecimalPoint = fpFormat.leadingDecimalPoint;
+								elm.asFloatingPoint.tailingDecimalPoint = fpFormat.tailingDecimalPoint;
+								elm.asFloatingPoint.positiveSign        = fpFormat.positiveSign;
+								elm.asFloatingPoint.withExponent        = fpFormat.withExponent;
+								elm.asFloatingPoint.precision           = fpFormat.precision;
+							}
+						}
+						else static if (isArray!E && isAggregateType!(ElementType!E) && hasAttrJson5ObjectFormat!e)
+						{
+							foreach (ref elm; val._reqArray[])
+							{
+								assert(elm.type == JsonType.object);
+								elm.asObject.tailingComma = getAttrJson5ObjectFormat!e.tailingComma;
+								elm.asObject.singleLine   = getAttrJson5ObjectFormat!e.singleLine;
+							}
+						}
+						else
+						{
+							// 何もしない
+							// 多重配列は今のところ非対応
 						}
 						obj.append(key, val);
 					};
@@ -4721,23 +4782,59 @@ T deserializeFromJsonString(T)(in char[] src) @safe
 
 @system unittest
 {
-	struct Data
+	struct Data1
 	{
 		@singleLineAry
 		@ignoreIf!((in int[] ary) => ary.length == 0)
 		@ignoreIf!((int[] ary, const(Json5Value) jv) => jv.asObject["ary"].asArray.value.length == 0)
 		int[] ary;
 	}
-	auto dat1 = Data([1,2]);
+	auto dat1 = Data1([1,2]);
 	auto str1 = dat1.serializeToJsonString();
 	assert(str1 == "{\n\t\"ary\": [ 1, 2 ]\n}");
 	
-	auto dat2 = Data([]);
+	auto dat2 = Data1([]);
 	auto str2 = dat2.serializeToJsonString();
 	assert(str2 == "{}");
 	
-	static assert(hasIgnoreIf!(Data.ary, int[], const(Json5Value)));
-	auto dat3 = Data([1,2]);
+	static assert(hasIgnoreIf!(Data1.ary, int[], const(Json5Value)));
+	auto dat3 = Data1([1,2]);
 	parseJson(`{"ary": []}`).deserializeFromJson(dat3);
 	assert(dat3.ary == [1, 2]);
+	
+	@unquotedKey struct Data4
+	{
+		string name;
+		
+		@ignoreIf!((in Data4[] ary) => ary.length == 0)
+		@singleLineObj
+		Data4[] data;
+	}
+	auto dat4 = Data4("test", [Data4("test1"), Data4("test2")]);
+	auto str4 = dat4.serializeToJsonString();
+	assert(str4 == `
+	{
+		name: "test",
+		data: [
+			{ name: "test1" },
+			{ name: "test2" }
+		]
+	}`.outdent.chompPrefix("\n"));
+	
+	struct Data5
+	{
+		@singleLineAry @singleQuotedStr string[] ary1;
+		@singleLineAry @integralFormat(true, false) int[] ary2;
+		@singleLineAry @integralFormat(false, true) uint[] ary3;
+		@singleLineAry @floatingPointFormat(false, false, false, false, 3) double[] ary4;
+	}
+	auto dat5 = Data5(["a", "b"], [1, 2], [0xab, 0xcd], [1.2, 3.4]);
+	auto str5 = dat5.serializeToJsonString();
+	assert(str5 == `
+	{
+		"ary1": [ 'a', 'b' ],
+		"ary2": [ +1, +2 ],
+		"ary3": [ 0xAB, 0xCD ],
+		"ary4": [ 1.200, 3.400 ]
+	}`.outdent.chompPrefix("\n"));
 }
