@@ -5,7 +5,7 @@ module voile.misc;
 
 
 import core.exception;
-import std.traits, std.typetuple, std.variant, std.sumtype;
+import std.traits, std.typetuple, std.variant, std.sumtype, std.algorithm, std.range, std.array;
 
 /*******************************************************************************
  * 
@@ -255,7 +255,6 @@ CommonType!(staticMap!(ReturnType, T))
 	variantSwitch(T...)(auto ref Variant var, T caseFunctions)
 {
 	enum isZeroLengthParameter(P) = staticMap!(Parameters, P).length == 0;
-	import core.exception;
 	static assert(allSatisfy!(isCallable, T),
 		"variantSwitch ascepts only callable");
 	foreach (i, t1; T)
@@ -550,20 +549,16 @@ CommonType!(staticMap!(ReturnType, T))
 		{
 			// 最後じゃなければBaseに暗黙変換可能な型のみが許される
 			// 必ず引数は1つとること
-			static assert(a1.length == 1
-			          && isImplicitlyConvertible!( a1[0], Base ),
-				"case function with argument types " ~ a1.stringof ~
-				" occludes successive function" );
+			static assert(a1.length == 1 && isImplicitlyConvertible!( a1[0], Base ),
+				"case function with argument types " ~ a1.stringof ~ " occludes successive function" );
 		}
 		else
 		{
 			// 最後なら引数なしか、Baseに暗黙変換可能な型か、Baseが暗黙変換可能な型が許される
 			static if (a1.length != 0)
 			{
-				static assert(isImplicitlyConvertible!( a1[0], Base )
-				           || isImplicitlyConvertible!( Base, a1[0] ),
-					"case function with argument types " ~ a1.stringof ~
-					" occludes successive function");
+				static assert(isImplicitlyConvertible!( a1[0], Base ) || isImplicitlyConvertible!( Base, a1[0] ),
+					"case function with argument types " ~ a1.stringof ~ " occludes successive function");
 			}
 		}
 		foreach (t2; T[i+1 .. $] )
@@ -774,7 +769,6 @@ version(none) @system unittest
 
 private S indentRuntime(S)(S s, S indentStr = " ")
 {
-	import std.array;
 	auto app = appender!(S)();
 	// Overflow is no problem for this line.
 	app.reserve((s.length * 17)/16);
@@ -814,7 +808,7 @@ private S indentRuntime(S)(S s, S indentStr = " ")
 
 private S indentCtfe(S)(S s, S indentStr = " ")
 {
-	import std.array, std.string;
+	import std.string;
 	auto app = appender!(S)();
 	
 	auto lines = s.splitLines(KeepTerminator.yes);
@@ -1174,7 +1168,7 @@ private T expandMacroImpl(T, alias func)(in T str)
 	&& is(bool:      ParameterTypeTuple!func[2])
 	&& (ParameterStorageClassTuple!func[0] & ParameterStorageClass.ref_) == ParameterStorageClass.ref_)
 {
-	import std.array, std.algorithm, std.string;
+	import std.string;
 	Appender!T result;
 	T rest = str[];
 	size_t idxBegin, idxEnd;
@@ -1380,7 +1374,6 @@ private T expandVariableImpl(T, alias func)(in T str)
 	&& is(ParameterTypeTuple!func[0] == T)
 	&& (ParameterStorageClassTuple!func[0] & ParameterStorageClass.ref_) == ParameterStorageClass.ref_)
 {
-	import std.array, std.algorithm;
 	Appender!T result;
 	T rest = str[];
 	size_t idxBegin, idxEnd;
@@ -1602,7 +1595,6 @@ public:
 	assert(x7 == x7);
 }
 
-private import std.range: isInputRange, ElementType;
 /*******************************************************************************
  * Create combinations matrix from specified lists of conditional patterns
  * 
@@ -1619,9 +1611,7 @@ private import std.range: isInputRange, ElementType;
 auto combinationMatrix(R)(R matrix)
 if (isInputRange!R && isInputRange!(ElementType!R))
 {
-	import std.algorithm: cartesianProduct, map;
 	import std.typecons: tuple;
-	import std.array: empty, front, popFront, array;
 	
 	if (matrix.empty)
 		return null;
@@ -1636,7 +1626,6 @@ if (isInputRange!R && isInputRange!(ElementType!R))
 ///
 @safe unittest
 {
-	import std.algorithm: equal;
 	assert(combinationMatrix([["a", "b"], ["A", "B", "C"], ["1", "2"]]).equal([
 		["a", "A", "1"],
 		["a", "A", "2"],
@@ -1653,14 +1642,11 @@ if (isInputRange!R && isInputRange!(ElementType!R))
 	]));
 }
 
-private import std.range: isInputRange;
 /// ditto
 auto combinationMatrix(K,R)(R[K] matrixAA)
 if (isInputRange!R)
 {
-	import std.algorithm: map;
 	import std.typecons: tuple;
-	import std.array: array, assocArray;
 	
 	return matrixAA.byKeyValue
 		.map!(vPair => vPair.value.map!(v => tuple(vPair.key, v)))
@@ -1669,7 +1655,6 @@ if (isInputRange!R)
 ///
 @safe unittest
 {
-	import std.algorithm: equal;
 	assert(combinationMatrix(["P1": ["a", "b"], "P2": ["A", "B", "C"], "P3": ["1", "2"]]).equal([
 		["P1": "a", "P2": "A", "P3": "1"],
 		["P1": "a", "P2": "A", "P3": "2"],
@@ -1687,7 +1672,6 @@ if (isInputRange!R)
 }
 
 
-private import std.range: isRandomAccessRange;
 /*******************************************************************************
  * Shuffle elements of specified range
  */
@@ -1695,8 +1679,6 @@ auto shuffle(R)(R ary)
 if (isRandomAccessRange!R)
 {
 	import std.random: uniform;
-	import std.range: iota, indexed, array;
-	import std.algorithm: swap;
 	auto idx = iota(0, ary.length).array;
 	foreach (i; 0..ary.length)
 		swap(idx[i], idx[uniform(i, ary.length)]);
@@ -1737,3 +1719,392 @@ if (isSumType!ST)
 	assert(v.get!bool == true);
 	assert(v.get!string("xxx") == "xxx");
 }
+
+
+/*******************************************************************************
+ * 最短編集スクリプトを計算して探索経路を記録
+ * 
+ * 最短編集系列（SES）の探索本体。各 D（編集回数）ごとの最遠到達点Vを保存する。
+ * Params:
+ *       lhs = 編集前入力シーケンス, 必ず1つ以上の要素を持つ
+ *       rhs = 編集後入力シーケンス, 必ず1つ以上の要素を持つ
+ *       trace = V配列のスナップショット配列(出力用)
+ * Returns: 編集距離 D (0..N+M) = 追加(insert)と削除(remove) の累計数
+ * Annotations : traceの各要素は int配列(長さ: 2*max+1)。
+ */
+private int _shortestEditScript(Range)(in Range lhs, in Range rhs, ref int[][] trace) @safe
+if (isRandomAccessRange!Range || isSomeString!Range)
+in (!lhs.empty)
+in (!rhs.empty)
+{
+	immutable int n = cast(int) lhs.length;
+	immutable int m = cast(int) rhs.length;
+	immutable int maxd = n + m;
+	immutable int offset = maxd;
+	immutable int width  = 2 * maxd + 1;
+	
+	int[] v = new int[width];
+	v[0..offset] = -1;               // センチネルは -1
+	
+	for (int d = 0; d <= maxd; ++d) {
+		auto prev = v.dup;  // 前回スナップショット
+
+		for (int k = -d; k <= d; k += 2) {
+			const int kIndex = offset + k;
+
+			int x;
+			// 参照は必ず prev から
+			if (k == -d || (k != d && prev[kIndex - 1] < prev[kIndex + 1])) {
+				// 挿入（down）：k+1 から来る
+				x = prev[kIndex + 1];
+			} else {
+				// 削除（right）：k-1 から来る
+				x = prev[kIndex - 1] + 1;
+			}
+			int y = x - k;
+
+			// スネーク
+			while (x < n && y < m && lhs[x] == rhs[y]) {
+				++x; ++y;
+			}
+			v[kIndex] = x;
+
+			if (x >= n && y >= m) {
+				trace ~= v.dup;   // バックトラック用に保存
+				return d;
+			}
+		}
+		trace ~= v.dup;
+	}
+	assert(0, "Unreachable");
+}
+
+@system unittest
+{
+	int[][] trace;
+	alias check = (lhs, rhs, int expectD)
+	{
+		import std.format;
+		// lhs, rhsはテンプレート(どんな型にもマッチ)
+		trace.length = 0;
+		int d = _shortestEditScript(lhs, rhs, trace);
+		assert(d == expectD, format("shortestEditScript failed for %s -> %s %d", lhs, rhs, d));
+	};
+
+	check("abc", "abc", 0);          // 完全一致
+	check("abc", "axc", 2);          // 1文字置換
+	check("abc", "abcd", 1);         // 末尾に追加
+	check("abcd", "abc", 1);         // 末尾を削除
+	check("kitten", "sitting", 5);   // Levenshtein距離で有名な例
+	check("aaaa", "bbbb", 8);        // 全置換
+	check("abcdef", "abqdef", 2);    // 中間1文字置換
+	check("abcdef", "azced", 5);     // 部分一致＋置換
+	check(["aaa", "bb", "c"], ["aa", "bb", "cc"], 4); // 文字列のリストでの比較
+	check("a", "b", 2);                  // 最小単位の変換
+	check("longtext", "long", 4);        // 末尾削除多数
+	check("long", "longtext", 4);        // 末尾追加多数
+}
+
+
+/*******************************************************************************
+ * trace を逆にたどって操作ステップ列を生成
+ * 
+ * 前進探索で保存した trace を用いて、編集ステップ列（前方向）を復元する
+ * 
+ * Params:
+ *       lhs = 編集前入力シーケンス, 必ず1つ以上の要素を持つ
+ *       rhs = 編集後入力シーケンス, 必ず1つ以上の要素を持つ
+ *       trace = _shortestEditScript で得た配列
+ *       dResult = _shortestEditScript の計算結果の編集距離 D
+ * Returns: 編集操作のリスト。追加(insert), 削除(remove), 変更なし(none) のみ。
+ */
+private EditOp[] _backtrackSteps(Range)(in Range lhs, in Range rhs, const ref int[][] trace, int dResult) @safe
+if (isRandomAccessRange!Range || isSomeString!Range)
+in (!lhs.empty)
+in (!rhs.empty)
+{
+	const size_t n = lhs.length;
+	const size_t m = rhs.length;
+
+	int x = cast(int)n;
+	int y = cast(int)m;
+	EditOp[] reversedSteps;
+
+	if (dResult < 0 || trace.length == 0)
+	{
+		return [];
+	}
+
+	// trace[d] が存在する前提で、配列幅から offset を決める（安全策）
+	// v の長さ = 2*offset + 1 と仮定 -> offset = (len - 1) / 2
+	int globalOffset = (cast(int)trace[dResult].length - 1) / 2;
+
+	// d を下っていく（dResult .. 1）。d==0 は最後の対角だけ残す扱いにする。
+	for (int d = dResult; d > 0; --d)
+	{
+		// 現在の k（現在位置の対角）
+		int k = x - y;
+
+		// 前のレベルの v を参照
+		auto vPrev = trace[d - 1];
+		int prevOffset = (cast(int)vPrev.length - 1) / 2;
+
+		// decide: 挿入 (came from k+1) か 削除 (came from k-1) か
+		bool cameFromInsert;
+		if (k == -d)
+		{
+			cameFromInsert = true;
+		}
+		else if (k == d)
+		{
+			cameFromInsert = false;
+		}
+		else
+		{
+			// 比較は vPrev[k-1] < vPrev[k+1] なら挿入（Myersの条件）
+			int idxLeft  = prevOffset + (k - 1);
+			int idxRight = prevOffset + (k + 1);
+			// （安全のための境界チェックを入れても良いが、trace の作り次第）
+			cameFromInsert = vPrev[idxLeft] < vPrev[idxRight];
+		}
+
+		int prevK;
+		int prevX; // = vPrev[prevK]
+		int prevY; // = prevX - prevK
+		EditOp edit;
+
+		if (cameFromInsert)
+		{
+			prevK = k + 1;
+			prevX = vPrev[prevOffset + prevK];
+			prevY = prevX - prevK;
+			edit = EditOp.insert;
+		}
+		else
+		{
+			prevK = k - 1;
+			prevX = vPrev[prevOffset + prevK];
+			prevY = prevX - prevK;
+			edit = EditOp.remove;
+		}
+
+		// prevX/prevY が「d-1 レベルでの座標 (x_prev, y_prev)」
+		// 今の位置 (x, y) から prev に向けて対角（一致）を出力
+		while (x > prevX && y > prevY)
+		{
+			reversedSteps ~= EditOp.none;
+			--x;
+			--y;
+		}
+
+		// 非対角移動（挿入 or 削除）を追加して、座標を prev に戻す
+		reversedSteps ~= edit;
+		x = prevX;
+		y = prevY;
+	}
+
+	// d == 0 レベルで残った対角 (先頭の一致) を追加
+	while (x > 0 && y > 0)
+	{
+		reversedSteps ~= EditOp.none;
+		--x;
+		--y;
+	}
+
+	// 逆向きに貯めてあるので反転して返す
+	return reversedSteps.reverse;
+}
+
+
+
+@safe unittest
+{
+	import std.format : format;
+	
+	EditOp[] ops(string opstr) @trusted => cast(EditOp[])opstr.dup;
+	int[][] trace;
+	alias check = (lhs, rhs, expect)
+	{
+		trace.length = 0;
+		int d = _shortestEditScript(lhs, rhs, trace);
+		auto steps = _backtrackSteps(lhs, rhs, trace, d);
+		assert(steps == expect,
+			format!"backtrackSteps failed: %s -> %s, got %s, expected %s"(lhs, rhs, steps, expect));
+	};
+
+	// --- backtrackSteps のテストケース ---
+	check("abc", "abc", ops("nnn"));
+	check("abc", "axc", ops("nrin"));
+	check("abc", "abcd", ops("nnni"));
+	check("abcd", "abc", ops("nnnr"));
+	check("a", "b", ops("ri"));
+	check("ab", "ba", ops("rni"));  // 転置的な場合
+	check("kitten", "sitting", ops("rinnnrini"));   // 結果は距離に応じて長い、ここでは成功すればOK
+	check("abcdef", "azced", ops("nrinrnri"));      // 複雑例
+	check("a", "aa", ops("ni"));    // 末尾追加
+	check("aa", "a", ops("nr"));    // 末尾削除
+}
+
+/*******************************************************************************
+ * 編集操作出力
+ * 
+ * ステップ列を走査し、置換(substitute)を畳み込みながら最終操作列を生成。
+ * 1文字操作 remove(削除) と insert(追加) の並びをペアリングして
+ * substitute(変更) を生成し、none（一致）はそのまま出力する。
+ * 具体的には、前方向のインデックス (i,j) を進めながら、
+ * - 一致セグメントは none を連続出力
+ * - 直後の remove と insert のペア（順不同）を一つの substitute に畳み込み
+ * - 余った単独の remove / insert はそのまま出力
+ * Params:
+ *       lhs = 編集前入力シーケンス
+ *       rhs = 編集後入力シーケンス
+ *       steps = backtrackSteps が返すステップ列 (none, remove, insert)
+ * Returns: 実際に出力すべき総文字数（バッファより長い場合は切り詰め書き込み）
+ */
+private EditOp[] _emitOpsCollapseSubst(Range)(in Range lhs, in Range rhs, in EditOp[] steps) @safe
+if (isRandomAccessRange!Range || isSomeString!Range)
+in (!lhs.empty)
+in (!rhs.empty)
+{
+	size_t i = 0;
+	size_t j = 0;
+	EditOp[] ops;
+
+	size_t p = 0;
+	while (p < steps.length)
+	{
+		EditOp step = steps[p];
+		
+		if (step == EditOp.none)
+		{
+			ops ~= EditOp.none;
+			++i;
+			++j;
+			++p;
+			continue;
+		}
+		
+		if (step == EditOp.remove || step == EditOp.insert)
+		{
+			// remove/insert のブロックをまとめる
+			size_t removeCount = 0;
+			size_t insertCount = 0;
+			
+			size_t q = p;
+			while (q < steps.length && (steps[q] == EditOp.remove || steps[q] == EditOp.insert))
+			{
+				if (steps[q] == EditOp.remove)
+					++removeCount;
+				else
+					++insertCount;
+				++q;
+			}
+			
+			// ペア部分は substitute
+			size_t substCount = (removeCount < insertCount) ? removeCount : insertCount;
+			foreach (_; 0 .. substCount)
+			{
+				ops ~= EditOp.substitute;
+				++i;
+				++j;
+			}
+			
+			// 余りの remove
+			foreach (_; substCount .. removeCount)
+			{
+				ops ~= EditOp.remove;
+				++i;
+			}
+			
+			// 余りの insert
+			foreach (_; substCount .. insertCount)
+			{
+				ops ~= EditOp.insert;
+				++j;
+			}
+			
+			p = q;
+			continue;
+		}
+		
+		// 不明なステップが混ざった場合（通常はありえない）
+		++p;
+	}
+
+	return ops;
+}
+
+@safe unittest
+{
+	import std.format : format;
+	
+	EditOp[] ops(string opstr) @trusted => cast(EditOp[])opstr.dup;
+	alias check = (lhs, rhs, EditOp[] steps, EditOp[] expect) {
+		int[][] trace;
+		trace.length = 0;
+		auto ops = _emitOpsCollapseSubst(lhs, rhs, steps);
+		assert(ops == expect,
+			format!"emitOpsCollapseSubst failed: %s -> %s, got %s, expected %s"(lhs, rhs, ops, expect));
+	};
+	
+	check("abc", "abc", ops("nnn"), ops("nnn"));
+	check("abc", "axc", ops("nrin"), ops("nsn")); // r+i → substitute
+	check("abc", "abcd", ops("nnni"), ops("nnni"));
+	check("abcd", "abc", ops("nnnr"), ops("nnnr"));
+	check("a", "b", ops("ri"), ops("s"));
+	check("aaaa", "bbbb", ops("rrrriiii"), ops("ssss"));
+	check("abcdef", "abqdef", ops("nnrinnn"), ops("nnsnnn"));
+	check("abcdef", "azced", ops("nrinrnri"), ops("nsnrns"));
+	check("a", "aa", ops("ni"), ops("ni"));
+	check("aa", "a", ops("nr"), ops("nr"));
+	
+	
+	check("abc", "abc", ops("nnn"), ops("nnn"));    // 一致のみ（none のみ）
+	check("abc", "adc", ops("nrin"), ops("nsn"));   // 1文字置換 / b削除→d追加のステップ -> substitute に畳み込み
+	check("abc", "xyz", ops("rrriii"), ops("sss")); // 全部置換 → substitute連発 / 3削除 + 3挿入 -> 3置換
+	check("ab", "abxy", ops("nnii"), ops("nnii"));  // 追加のみ
+	check("abcd", "ab", ops("nnrr"), ops("nnrr"));  // 削除のみ
+	// 複数削除の後に複数挿入 → substitute + 余り / x,y,z削除 → 1,2挿入 -> substitute2個 + insert + none2個
+	check("wxyz", "wab12z", ops("nrriiiin"), ops("nssiin"));
+	// remove, insert が交互に出る場合 → substitute にまとめる / p削除,r追加,q削除,s追加 -> substitute2個
+	check("pq", "rs", ops("riri"), ops("ss"));
+}
+
+/*******************************************************************************
+ * Myers' diff
+ * 
+ * lhs を rhs に変換する操作列を返す
+ * Params:
+ *      lhs = 編集前入力シーケンス
+ *      rhs = 編集後入力シーケンス
+ *      calcCollapseSubStitute = trueの場合、戻り値にEditOp.substituteが含まれるようになる
+ * Returns:
+ *      編集操作列(EditOpの配列)
+ */
+EditOp[] myersdiff(bool calcCollapseSubStitute = false, Range)(Range lhs, Range rhs)
+if (isRandomAccessRange!Range || isSomeString!Range)
+{
+	const size_t n = lhs.length;
+	const size_t m = rhs.length;
+	
+	if (n == 0 && m == 0)
+		return [];
+	if (n == 0)
+		return EditOp.insert.repeat(m).array;
+	if (m == 0)
+		return EditOp.remove.repeat(n).array;
+	int[][] trace;
+	int dResult = _shortestEditScript(lhs, rhs, trace);
+	static if (!calcCollapseSubStitute)
+	{
+		return _backtrackSteps(lhs, rhs, trace, dResult);
+	}
+	else
+	{
+		EditOp[] steps = _backtrackSteps(lhs, rhs, trace, dResult);
+		return _emitOpsCollapseSubst(lhs, rhs, steps);
+	}
+}
+
+/// ditto
+alias diff = myersdiff;
