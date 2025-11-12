@@ -4643,9 +4643,12 @@ static if (enableBcryptEngines)
 		 */
 		bin_t encrypt(in ubyte[] data, in PublicKey pubKey)
 		{
+			import std.random: uniform;
+			import std.algorithm: filter, each;
 			enforce(data.length <= 512 - 4, "Cannot encrypt specified data.");
 			// PKCS#1 v1.5 Padding
 			ubyte[512] ffFilled = cast(ubyte[])rndGen.takeExactly(512/uint.sizeof).array;
+			ffFilled[].filter!(a => a == 0).each!((ref e) => e = cast(ubyte)uniform!"[]"(1, 255, rndGen));
 			auto head = cast(ubyte[])[0x00, 0x02] ~ ffFilled[0..512 - 3 - data.length] ~ cast(ubyte[])[0x00];
 			auto msg = head ~ data;
 			assert(msg.length == 512);
@@ -5502,7 +5505,8 @@ public:
 /// ditto
 alias AES256CBCEncrypter = Encrypter!DefaultAES256CBCEncryptEngine;
 /// ditto
-alias AES256GCMEncrypter = Encrypter!DefaultAES256GCMEncryptEngine;
+static if (enableOpenSSLEngines || enableBcryptEngines)
+	alias AES256GCMEncrypter = Encrypter!DefaultAES256GCMEncryptEngine;
 /// ditto
 alias RSA4096Encrypter = Encrypter!DefaultRSA4096Engine;
 
@@ -5737,7 +5741,8 @@ public:
 /// ditto
 alias AES256CBCDecrypter = Decrypter!DefaultAES256CBCDecryptEngine;
 /// ditto
-alias AES256GCMDecrypter = Decrypter!DefaultAES256GCMDecryptEngine;
+static if (enableOpenSSLEngines || enableBcryptEngines)
+	alias AES256GCMDecrypter = Decrypter!DefaultAES256GCMDecryptEngine;
 /// ditto
 alias RSA4096Decrypter = Decrypter!DefaultRSA4096Engine;
 
