@@ -5816,7 +5816,7 @@ static if (enableOpenSSLEngines) @system unittest
 	assert(cast(string)dec.data == "Hello, World!Hello, World! Hello, World!Hello, World!");
 }
 // AES256GCM Encrypt/Decrypt for Bcrypt
-static if (enableOpenSSLEngines) @system unittest
+static if (enableBcryptEngines) @system unittest
 {
 	auto key = "0123456789ABCDEF0123456789ABCDEF".representation;
 	auto iv  = "0123456789AB".representation;
