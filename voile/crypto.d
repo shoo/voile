@@ -71,6 +71,7 @@ import std.range, std.array;
 import std.algorithm: move;
 import std.digest.sha: SHA256, SHA512;
 import std.string: representation;
+import std.random: rndGen;
 
 //##############################################################################
 //##### Common Types
@@ -374,6 +375,11 @@ version (unittest) debug private void dispBin(in ubyte[] dat) @trusted
 {
 	import std.stdio;
 	writefln("%(%02X%)", dat);
+}
+version (unittest) debug private void dispBin(string msg, in ubyte[] dat) @trusted
+{
+	import std.stdio;
+	writefln("%s%(%02X%)", msg, dat);
 }
 
 private bin_t encasn1(ubyte type, in ubyte[] data, bool padding = false)
@@ -1746,7 +1752,7 @@ static if (enableOpenSSLEngines)
 				outData.free();
 			int outLen = 0;
 			EVP_EncryptUpdate(_ctx, outData, &outLen, data.ptr, cast(int)data.length)
-				.evpEnforce("AES128 CBC encryption failed.");
+				.evpEnforce("AES encryption failed.");
 			dst.put(outData[0 .. outLen]);
 		}
 		/***********************************************************************
@@ -1760,16 +1766,88 @@ static if (enableOpenSSLEngines)
 			ubyte[16] outData;
 			int outLen = 0;
 			EVP_EncryptFinal_ex(_ctx, outData.ptr, &outLen)
-				.evpEnforce("AES128 CBC encryption failed.");
+				.evpEnforce("AES encryption failed.");
 			dst.put(outData[0 .. outLen]);
 		}
 	}
-	///
 	private alias OpenSSLAES128CBCEncryptEngine = OpenSSLAESCBCEncryptEngine;
-	///
 	private alias OpenSSLAES192CBCEncryptEngine = OpenSSLAESCBCEncryptEngine;
-	///
 	private alias OpenSSLAES256CBCEncryptEngine = OpenSSLAESCBCEncryptEngine;
+	///
+	private struct OpenSSLAESGCMEncryptEngine
+	{
+	private:
+		import std.range;
+		EVP_CIPHER_CTX* _ctx;
+		immutable(ubyte)[] _tag;
+	public:
+		/***********************************************************************
+		 * Constructor
+		 */
+		this(in ubyte[] key, in ubyte[] iv) @trusted
+		{
+			_ctx = EVP_CIPHER_CTX_new().enforce("Cannot create cipher context.");
+			// 初期化
+			_ctx.EVP_EncryptInit_ex(
+				key.length == 32 ? EVP_aes_256_gcm() : key.length == 24 ? EVP_aes_192_gcm() : EVP_aes_128_gcm(),
+				null, null, null).evpEnforce("Cannot create cipher context.");
+			_ctx.EVP_CIPHER_CTX_ctrl(EVP_CTRL_GCM_SET_IVLEN, cast(int)iv.length, null)
+				.evpEnforce("Cannot create cipher context.");
+			_ctx.EVP_EncryptInit_ex(null, null, key.ptr, iv.ptr).evpEnforce("Cannot create cipher context.");
+		}
+		/***********************************************************************
+		 * Destructor
+		 */
+		~this() @trusted
+		{
+			if (_ctx)
+				EVP_CIPHER_CTX_free(_ctx);
+		}
+		/***********************************************************************
+		 * Update
+		 */
+		void update(OutputRange)(in ubyte[] data, ref OutputRange dst)
+		if (isOutputRange!(OutputRange, ubyte))
+		{
+			import core.stdc.stdlib: malloc, free;
+			ubyte* outData = cast(ubyte*)malloc(data.length);
+			scope (exit)
+				outData.free();
+			int outLen = 0;
+			EVP_EncryptUpdate(_ctx, outData, &outLen, data.ptr, cast(int)data.length)
+				.evpEnforce("AES encryption failed.");
+			dst.put(outData[0 .. outLen]);
+		}
+		/***********************************************************************
+		 * Finalize
+		 */
+		void finalize(OutputRange)(ref OutputRange dst, bool padding = true)
+		if (isOutputRange!(OutputRange, ubyte))
+		{
+			if (!padding)
+				return;
+			ubyte[16] outData;
+			int outLen = 0;
+			_ctx.EVP_EncryptFinal_ex(outData.ptr, &outLen)
+				.evpEnforce("AES encryption failed.");
+			dst.put(outData[0 .. outLen]);
+			_ctx.EVP_CIPHER_CTX_ctrl(EVP_CTRL_GCM_GET_TAG, cast(int)outData.length, outData.ptr)
+				.evpEnforce("AES encryption failed.");
+			_tag = outData.idup;
+		}
+		
+		/***********************************************************************
+		 * Tag obtained after finalization
+		 */
+		immutable(ubyte)[] tag() const
+		{
+			return _tag;
+		}
+	}
+	private alias OpenSSLAES128GCMEncryptEngine = OpenSSLAESGCMEncryptEngine;
+	private alias OpenSSLAES192GCMEncryptEngine = OpenSSLAESGCMEncryptEngine;
+	private alias OpenSSLAES256GCMEncryptEngine = OpenSSLAESGCMEncryptEngine;
+	
 	///
 	private struct OpenSSLAESCBCDecryptEngine
 	{
@@ -1823,7 +1901,7 @@ static if (enableOpenSSLEngines)
 				int outLen = 0;
 				
 				EVP_DecryptUpdate(_ctx, outData.ptr, &outLen, _remain.ptr, cast(int)_remain.length)
-					.evpEnforce("AES128 CBC decryption failed.");
+					.evpEnforce("AES decryption failed.");
 				_inLen += _remain.length;
 				_outLen += outLen;
 				if (outLen != 0)
@@ -1845,7 +1923,7 @@ static if (enableOpenSSLEngines)
 				outData.free();
 			int outLen = 0;
 			EVP_DecryptUpdate(_ctx, outData, &outLen, src.ptr, cast(int)src.length)
-				.evpEnforce("AES128 CBC decryption failed.");
+				.evpEnforce("AES decryption failed.");
 			_inLen += src.length;
 			_outLen += outLen;
 			if (outLen != 0)
@@ -1864,7 +1942,7 @@ static if (enableOpenSSLEngines)
 					ubyte[16] outData;
 					int outLen = 0;
 					EVP_DecryptUpdate(_ctx, outData.ptr, &outLen, null, 0)
-						.evpEnforce("OpenSSL AES128 CBC decryption failed.");
+						.evpEnforce("OpenSSL AES decryption failed.");
 					dst.put(outData[0 .. $]);
 					_outLen += 16;
 				}
@@ -1875,20 +1953,83 @@ static if (enableOpenSSLEngines)
 				ubyte[16] outData;
 				int outLen = 0;
 				EVP_DecryptUpdate(_ctx, outData.ptr, &outLen, null, 0)
-					.evpEnforce("OpenSSL AES128 CBC decryption failed.");
+					.evpEnforce("OpenSSL AES decryption failed.");
 				EVP_DecryptFinal_ex(_ctx, outData.ptr, &outLen)
-					.evpEnforce("OpenSSL AES128 CBC decryption failed.");
+					.evpEnforce("OpenSSL AES decryption failed.");
 				dst.put(outData[0 .. outLen]);
 				_outLen += outLen;
 			}
 		}
 	}
-	///
 	private alias OpenSSLAES128CBCDecryptEngine = OpenSSLAESCBCDecryptEngine;
-	///
 	private alias OpenSSLAES192CBCDecryptEngine = OpenSSLAESCBCDecryptEngine;
-	///
 	private alias OpenSSLAES256CBCDecryptEngine = OpenSSLAESCBCDecryptEngine;
+	///
+	private struct OpenSSLAESGCMDecryptEngine
+	{
+	private:
+		import std.range;
+		EVP_CIPHER_CTX* _ctx;
+	public:
+		/***********************************************************************
+		 * Constructor
+		 */
+		this(in ubyte[] key, in ubyte[] iv) @trusted
+		{
+			_ctx = EVP_CIPHER_CTX_new().enforce("Cannot create OpenSSL cipher context.");
+			// 初期化
+			_ctx.EVP_DecryptInit_ex(
+				key.length == 32 ? EVP_aes_256_gcm() : key.length == 24 ? EVP_aes_192_gcm() : EVP_aes_128_gcm(),
+				null, null, null).evpEnforce("Cannot initialize cipher context.");
+			_ctx.EVP_CIPHER_CTX_ctrl(EVP_CTRL_GCM_SET_IVLEN, cast(int)iv.length, null)
+				.evpEnforce("Cannot create cipher context.");
+			_ctx.EVP_DecryptInit_ex(null, null, key.ptr, iv.ptr).evpEnforce("Cannot initialize cipher context.");
+		}
+		/***********************************************************************
+		 * Destructor
+		 */
+		~this() @trusted
+		{
+			if (_ctx)
+				EVP_CIPHER_CTX_free(_ctx);
+		}
+		/***********************************************************************
+		 * Update
+		 */
+		void update(OutputRange)(in ubyte[] data, ref OutputRange dst)
+		if (isOutputRange!(OutputRange, ubyte))
+		{
+			import core.stdc.stdlib: malloc, free;
+			auto bufPtr = cast(ubyte*)malloc(data.length + 16)
+				.enforce("OpenSSL AES decryption failed.");
+			scope (exit)
+				free(bufPtr);
+			int outLen;
+			_ctx.EVP_DecryptUpdate(bufPtr, &outLen, data.ptr, cast(int)data.length)
+				.evpEnforce("OpenSSL AES decryption failed.");
+			dst.put(bufPtr[0..outLen]);
+		}
+		/***********************************************************************
+		 * Finalize
+		 */
+		void finalize(OutputRange)(ref OutputRange dst, in ubyte[] tag)
+		if (isOutputRange!(OutputRange, ubyte))
+		{
+			ubyte[32] outData;
+			int outLen;
+			_ctx.EVP_DecryptUpdate(outData.ptr, &outLen, null, 0)
+				.evpEnforce("OpenSSL AES decryption failed.");
+			dst.put(outData[0..outLen]);
+			_ctx.EVP_CIPHER_CTX_ctrl(EVP_CTRL_GCM_SET_TAG, cast(int)tag.length, cast(ubyte*)tag.ptr)
+				.evpEnforce("OpenSSL AES decryption failed.");
+			_ctx.EVP_DecryptFinal_ex(outData.ptr, &outLen)
+				.evpEnforce("OpenSSL AES decryption failed.");
+			dst.put(outData[0..outLen]);
+		}
+	}
+	private alias OpenSSLAES128GCMDecryptEngine = OpenSSLAESGCMDecryptEngine;
+	private alias OpenSSLAES192GCMDecryptEngine = OpenSSLAESGCMDecryptEngine;
+	private alias OpenSSLAES256GCMDecryptEngine = OpenSSLAESGCMDecryptEngine;
 	///
 	private struct OpenSSLEd25519Engine
 	{
@@ -2952,6 +3093,24 @@ static if (enableBcryptEngines)
 		alias BCRYPT_KEY_HANDLE = BCRYPT_HANDLE;
 		alias BCRYPT_SECRET_HANDLE = BCRYPT_HANDLE;
 		alias NTSTATUS = int;
+		struct BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO
+		{
+			ULONG     cbSize;
+			ULONG     dwInfoVersion;
+			PUCHAR    pbNonce;
+			ULONG     cbNonce;
+			PUCHAR    pbAuthData;
+			ULONG     cbAuthData;
+			PUCHAR    pbTag;
+			ULONG     cbTag;
+			PUCHAR    pbMacContext;
+			ULONG     cbMacContext;
+			ULONG     cbAAD;
+			ULONGLONG cbData;
+			ULONG     dwFlags;
+		}
+		enum ULONG BCRYPT_AUTH_MODE_CHAIN_CALLS_FLAG = 1;
+		enum ULONG BCRYPT_AUTH_MODE_IN_PROGRESS_FLAG = 2;
 		NTSTATUS BCryptOpenAlgorithmProvider(BCRYPT_ALG_HANDLE* phAlgorithm, LPCWSTR pszAlgId,
 			LPCWSTR pszImplementation, ULONG dwFlags);
 		NTSTATUS BCryptSetProperty(BCRYPT_HANDLE hObject, LPCWSTR pszProperty,
@@ -2985,6 +3144,8 @@ static if (enableBcryptEngines)
 		NTSTATUS BCryptDestroySecret(BCRYPT_SECRET_HANDLE hSecret);
 		NTSTATUS BCryptDeriveKey(BCRYPT_SECRET_HANDLE hSharedSecret, LPCWSTR pwszKDF, void* pParameterList,
 			PUCHAR pbDerivedKey, ULONG cbDerivedKey, ULONG* pcbResult, ULONG dwFlags);
+		enum BCRYPT_CHAINING_MODE = "ChainingMode\0"w;
+		enum BCRYPT_CHAIN_MODE_GCM = "ChainingModeGCM\0"w;
 		enum ULONG BCRYPT_RSAPUBLIC_MAGIC =             0x31415352; // RSA1
 		enum ULONG BCRYPT_RSAPRIVATE_MAGIC =            0x32415352; // RSA2
 		enum ULONG BCRYPT_RSAFULLPRIVATE_MAGIC =        0x33415352; // RSA3
@@ -3007,6 +3168,11 @@ static if (enableBcryptEngines)
 		enum ULONG BCRYPT_NO_KEY_VALIDATION = 0x00000008;
 		bool ntEnforce(NTSTATUS status, string message, string f = __FILE__, size_t l = __LINE__)
 		{
+			version (unittest) debug if (status < 0)
+			{
+				import std.stdio;
+				stderr.writefln("status = %08X", status);
+			}
 			return enforce(status >= 0, message, f, l);
 		}
 		
@@ -3111,13 +3277,147 @@ static if (enableBcryptEngines)
 			dst.put(outData[]);
 		}
 	}
+	private alias BcryptAES128CBCEncryptEngine = BcryptAESCBCEncryptEngine;
+	private alias BcryptAES192CBCEncryptEngine = BcryptAESCBCEncryptEngine;
+	private alias BcryptAES256CBCEncryptEngine = BcryptAESCBCEncryptEngine;
+	
 	///
-	alias BcryptAES128CBCEncryptEngine = BcryptAESCBCEncryptEngine;
-	///
-	alias BcryptAES192CBCEncryptEngine = BcryptAESCBCEncryptEngine;
-	///
-	alias BcryptAES256CBCEncryptEngine = BcryptAESCBCEncryptEngine;
-	///
+	private struct BcryptAESGCMEncryptEngine
+	{
+	private:
+		BCRYPT_ALG_HANDLE _hAlg;
+		BCRYPT_KEY_HANDLE _hKey;
+		ubyte[] _iv;
+		ubyte[] _tag;
+		ubyte[] _cntBuffer;
+		ubyte[] _mac;
+		ubyte[16] _remain;
+		ubyte     _remainNum;
+		BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO _authInfo;
+		void _initAuthInfo()
+		{
+			_authInfo.cbSize        = BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO.sizeof;
+			_authInfo.dwInfoVersion = 1;
+			_authInfo.pbNonce       = cast(PUCHAR)_iv.ptr;
+			_authInfo.cbNonce       = cast(ULONG)_iv.length;
+			_authInfo.pbTag         = cast(PUCHAR)_tag.ptr;
+			_authInfo.cbTag         = cast(ULONG)_tag.length;
+			_authInfo.pbAuthData    = null;
+			_authInfo.cbAuthData    = 0;
+			_authInfo.pbMacContext  = cast(PUCHAR)_mac.ptr;
+			_authInfo.cbMacContext  = cast(ULONG)_mac.length;
+			_authInfo.cbAAD         = 0;
+			_authInfo.cbData        = 0;
+			_authInfo.dwFlags       = BCRYPT_AUTH_MODE_CHAIN_CALLS_FLAG;
+		}
+		size_t _enc(in ubyte[] src, ubyte[] dst)
+		{
+			ULONG outLen;
+			BCryptEncrypt(_hKey, cast(PUCHAR)src.ptr, cast(ULONG)src.length, &_authInfo,
+				cast(PUCHAR)_cntBuffer.ptr, cast(ULONG)_cntBuffer.length,
+				dst.ptr, cast(ULONG)dst.length, &outLen, 0)
+					.ntEnforce("Bcrypt AES encryption failed.");
+			return cast(size_t)outLen;
+		}
+	public:
+		/***********************************************************************
+		 * Constructor
+		 */
+		this(in ubyte[] key, in ubyte[] iv) @trusted
+		{
+			_hAlg      = BCRYPT_ALG_HANDLE.init;
+			_hKey      = BCRYPT_KEY_HANDLE.init;
+			_iv        = iv.dup;
+			_tag       = new ubyte[16];
+			_mac       = new ubyte[16];
+			_cntBuffer = new ubyte[16];
+			_remain    = new ubyte[16];
+			
+			BCryptOpenAlgorithmProvider(&_hAlg, "AES", null, 0).ntEnforce("Cannot open algorithm provider.");
+			// Set chaining mode to GCM
+			BCryptSetProperty(_hAlg, BCRYPT_CHAINING_MODE.ptr,
+				cast(PUCHAR)BCRYPT_CHAIN_MODE_GCM.ptr, BCRYPT_CHAIN_MODE_GCM.length * wchar.sizeof, 0)
+				.ntEnforce("Cannot open algorithm provider.");
+			BCryptGenerateSymmetricKey(_hAlg, &_hKey, null, 0, cast(ubyte*)key.ptr, cast(ULONG)key.length, 0)
+				.ntEnforce("Cannot generate symmetric key.");
+			_initAuthInfo();
+		}
+		/***********************************************************************
+		 * Destructor
+		 */
+		~this() @trusted
+		{
+			if (_hKey)
+				cast(void)BCryptDestroyKey(_hKey);
+			if (_hAlg)
+				cast(void)BCryptCloseAlgorithmProvider(_hAlg, 0);
+		}
+		/***********************************************************************
+		 * Update
+		 */
+		void update(OutputRange)(in ubyte[] data, ref OutputRange dst)
+		if (isOutputRange!(OutputRange, ubyte))
+		{
+			import core.stdc.stdlib: malloc, free;
+			const(ubyte)[] src;
+			if (_remainNum != 0)
+			{
+				ubyte[] outData = new ubyte[_remain.length + 16];
+				if (data.length < _remain.length - _remainNum)
+				{
+					_remain[_remainNum .. _remainNum + data.length] = data[];
+					_remainNum += cast(ubyte)data.length;
+					return;
+				}
+				_remain[_remainNum .. $] = data[0 .. _remain.length - _remainNum];
+				src = data[_remain.length - _remainNum .. $];
+				auto outLen = _enc(_remain[], outData[]);
+				dst.put(outData[0..outLen]);
+			}
+			else
+			{
+				src = data[];
+			}
+			
+			_remainNum = cast(ubyte)(src.length % _remain.length);
+			_remain[0 .. _remainNum] = src[$ - _remainNum .. $];
+			src = src[0 .. $ - _remainNum];
+			
+			if (src.length == 0)
+				return;
+			
+			auto outData = cast(ubyte*)malloc(src.length + 16);
+			scope (exit)
+				outData.free();
+			
+			auto outLen = _enc(src[], outData[0..src.length + 16]);
+			dst.put(outData[0..outLen]);
+		}
+		
+		/***********************************************************************
+		 * Finalize
+		 */
+		void finalize(OutputRange)(ref OutputRange dst)
+		if (isOutputRange!(OutputRange, ubyte))
+		{
+			_authInfo.dwFlags &= ~BCRYPT_AUTH_MODE_CHAIN_CALLS_FLAG;
+			ubyte[32] outData;
+			auto outLen = _enc(_remain[0.._remainNum], outData[]);
+			dst.put(outData[0..outLen]);
+		}
+		
+		/***********************************************************************
+		 * Tag obtained after finalization
+		 */
+		immutable(ubyte)[] tag() const
+		{
+			return _tag[].idup;
+		}
+	}
+	private alias BcryptAES128GCMEncryptEngine = BcryptAESGCMEncryptEngine;
+	private alias BcryptAES192GCMEncryptEngine = BcryptAESGCMEncryptEngine;
+	private alias BcryptAES256GCMEncryptEngine = BcryptAESGCMEncryptEngine;
+	
 	private struct BcryptAESCBCDecryptEngine
 	{
 	private:
@@ -3248,12 +3548,141 @@ static if (enableBcryptEngines)
 			}
 		}
 	}
-	///
-	alias BcryptAES128CBCDecryptEngine = BcryptAESCBCDecryptEngine;
-	///
-	alias BcryptAES192CBCDecryptEngine = BcryptAESCBCDecryptEngine;
-	///
-	alias BcryptAES256CBCDecryptEngine = BcryptAESCBCDecryptEngine;
+	private alias BcryptAES128CBCDecryptEngine = BcryptAESCBCDecryptEngine;
+	private alias BcryptAES192CBCDecryptEngine = BcryptAESCBCDecryptEngine;
+	private alias BcryptAES256CBCDecryptEngine = BcryptAESCBCDecryptEngine;
+	
+	private struct BcryptAESGCMDecryptEngine
+	{
+	private:
+		import core.sys.windows.windows;
+		BCRYPT_ALG_HANDLE _hAlg;
+		BCRYPT_KEY_HANDLE _hKey;
+		ubyte[]   _iv;
+		ubyte[]   _cntBuffer;
+		ubyte[]   _tag;
+		ubyte[]   _mac;
+		ubyte[16] _remain;
+		ubyte     _remainNum;
+		BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO _authInfo;
+		void _initAuthInfo()
+		{
+			_authInfo.cbSize        = BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO.sizeof;
+			_authInfo.dwInfoVersion = 1;
+			_authInfo.pbNonce       = cast(PUCHAR)_iv.ptr;
+			_authInfo.cbNonce       = cast(ULONG)_iv.length;
+			_authInfo.pbTag         = cast(PUCHAR)_tag.ptr;
+			_authInfo.cbTag         = cast(ULONG)_tag.length;
+			_authInfo.pbAuthData    = null;
+			_authInfo.cbAuthData    = 0;
+			_authInfo.pbMacContext  = cast(PUCHAR)_mac.ptr;
+			_authInfo.cbMacContext  = cast(ULONG)_mac.length;
+			_authInfo.cbAAD         = 0;
+			_authInfo.cbData        = 0;
+			_authInfo.dwFlags       = BCRYPT_AUTH_MODE_CHAIN_CALLS_FLAG;
+		}
+		size_t _dec(in ubyte[] src, ubyte[] dst)
+		{
+			ULONG outLen;
+			BCryptDecrypt(_hKey, cast(ubyte*)src.ptr, cast(ULONG)src.length, &_authInfo,
+				cast(PUCHAR)_cntBuffer.ptr, cast(ULONG)_cntBuffer.length,
+				cast(PUCHAR)dst.ptr, cast(ULONG)dst.length, &outLen, 0)
+				.ntEnforce("Bcrypt AES decryption failed.");
+			return cast(size_t)outLen;
+		}
+	public:
+		/***********************************************************************
+		 * Constructor
+		 */
+		this(in ubyte[] key, in ubyte[] iv)
+		{
+			_hAlg      = BCRYPT_ALG_HANDLE.init;
+			_hKey      = BCRYPT_KEY_HANDLE.init;
+			_iv        = iv.dup;
+			_tag       = new ubyte[16];
+			_mac       = new ubyte[16];
+			_cntBuffer = new ubyte[16];
+			BCryptOpenAlgorithmProvider(&_hAlg, "AES", null, 0).ntEnforce("Cannot open algorithm provider.");
+			// Set chaining mode to GCM
+			BCryptSetProperty(_hAlg, BCRYPT_CHAINING_MODE.ptr,
+				cast(PUCHAR)BCRYPT_CHAIN_MODE_GCM.ptr, BCRYPT_CHAIN_MODE_GCM.length, 0)
+				.ntEnforce("Cannot open algorithm provider.");
+			BCryptGenerateSymmetricKey(_hAlg, &_hKey, null, 0, cast(ubyte*)key.ptr, cast(ULONG)key.length, 0)
+				.ntEnforce("Cannot generate symmetric key.");
+			_initAuthInfo();
+		}
+		/***********************************************************************
+		 * Destructor
+		 */
+		~this() @trusted
+		{
+			if (_hKey)
+				cast(void)BCryptDestroyKey(_hKey);
+			if (_hAlg)
+				cast(void)BCryptCloseAlgorithmProvider(_hAlg, 0);
+		}
+		/***********************************************************************
+		 * Update
+		 */
+		void update(OutputRange)(in ubyte[] data, ref OutputRange dst)
+		if (isOutputRange!(OutputRange, ubyte))
+		{
+			import core.stdc.stdlib: malloc, free;
+			
+			const(ubyte)[] src;
+			if (_remainNum != 0)
+			{
+				if (data.length < _remain.length - _remainNum)
+				{
+					_remain[_remainNum .. _remainNum + data.length] = data[];
+					_remainNum += cast(ubyte)data.length;
+					return;
+				}
+				_remain[_remainNum .. $] = data[0 .. _remain.length - _remainNum];
+				src = data[_remain.length - _remainNum .. $];
+				
+				ubyte[32] outData;
+				auto outLen = _dec(_remain, outData[]);
+				assert(outLen == 16);
+				dst.put(outData[0..outLen]);
+			}
+			else
+			{
+				src = data[];
+			}
+			
+			_remainNum = cast(ubyte)(src.length % 16);
+			_remain[0 .. _remainNum] = src[$ - _remainNum .. $];
+			src = src[0..$ - _remainNum];
+			
+			if (src.length == 0)
+				return;
+			assert(src.length % 16 == 0);
+			
+			auto outData = cast(ubyte*)malloc(src.length + 16);
+			scope (exit)
+				outData.free();
+			auto outLen = _dec(src, outData[0..src.length + 16]);
+			dst.put(outData[0..outLen]);
+		}
+		/***********************************************************************
+		 * Finalize
+		 */
+		void finalize(OutputRange)(ref OutputRange dst, in ubyte[] tag)
+		if (isOutputRange!(OutputRange, ubyte))
+		{
+			ubyte[32] outData;
+			_authInfo.pbTag = cast(PUCHAR)tag.ptr;
+			_authInfo.cbTag = cast(ULONG)tag.length;
+			_authInfo.dwFlags &= ~BCRYPT_AUTH_MODE_CHAIN_CALLS_FLAG;
+			auto outLen = _dec(_remain[0.._remainNum], outData[]);
+			if (outLen > 0)
+				dst.put(outData[0..outLen]);
+		}
+	}
+	private alias BcryptAES128GCMDecryptEngine = BcryptAESGCMDecryptEngine;
+	private alias BcryptAES192GCMDecryptEngine = BcryptAESGCMDecryptEngine;
+	private alias BcryptAES256GCMDecryptEngine = BcryptAESGCMDecryptEngine;
 	///
 	private struct BcryptECDSAEngine(ECDSAType type)
 	{
@@ -4216,8 +4645,8 @@ static if (enableBcryptEngines)
 		{
 			enforce(data.length <= 512 - 4, "Cannot encrypt specified data.");
 			// PKCS#1 v1.5 Padding
-			enum ubyte[512] ffFilled = repeat(ubyte(0xFF), 512).array;
-			auto head = cast(ubyte[])[0x00, 0x01] ~ ffFilled[0..512 - 3 - data.length] ~ cast(ubyte[])[0x00];
+			ubyte[512] ffFilled = cast(ubyte[])rndGen.takeExactly(512/uint.sizeof).array;
+			auto head = cast(ubyte[])[0x00, 0x02] ~ ffFilled[0..512 - 3 - data.length] ~ cast(ubyte[])[0x00];
 			auto msg = head ~ data;
 			assert(msg.length == 512);
 			auto encrypted = new ubyte[512];
@@ -4243,11 +4672,23 @@ static if (enableBcryptEngines)
 				.ntEnforce("Cannot decrypt specified data.");
 			assert(len == 512);
 			// Remove PKCS#1 v1.5 Padding
-			enforce(decrypted[0..3] == [0x00, 0x01, 0xFF], "Cannot decrypt specified data.");
-			auto found = find(decrypted[3..len], 0x00);
-			enforce(!found.empty && found.length > 0, "Cannot decrypt specified data.");
-			assert(found.front == 0x00);
-			return found[1..$].assumeUnique;
+			if (decrypted[0..3] == [0x00, 0x01, 0xFF])
+			{
+				// 署名用だが一応対応
+				auto found = find(decrypted[3..len], 0x00);
+				enforce(!found.empty && found.length > 0, "Cannot decrypt specified data.");
+				assert(found.front == 0x00);
+				return found[1..$].assumeUnique;
+			}
+			else if (decrypted[0..2] == [0x00, 0x02])
+			{
+				auto found = find(decrypted[2..len], 0x00);
+				enforce(!found.empty && found.length > 0, "Cannot decrypt specified data.");
+				assert(found.front == 0x00);
+				return found[1..$].assumeUnique;
+			}
+			else enforce(0, "Cannot decrypt specified data.");
+			assert(0);
 		}
 	}
 	///
@@ -4589,9 +5030,13 @@ static if (enableBcryptEngines)
 static if (enableOpenSSLCmdEngines)
 {
 	///
-	enum bool isOpenSSLCmdAESEngine(T) = false
+	enum bool isOpenSSLCmdAESCBCEngine(T) = false
 		|| is(T == OpenSSLCmdAESCBCEncryptEngine)
 		|| is(T == OpenSSLCmdAESCBCDecryptEngine);
+	///
+	enum bool isOpenSSLCmdAESGCMEngine(T) = false;
+	///
+	enum bool isOpenSSLCmdAESEngine(T) = isOpenSSLCmdAESCBCEngine!T || isOpenSSLCmdAESGCMEngine!T;
 	///
 	enum bool isOpenSSLCmdEd25519Engine(T) = is(T == OpenSSLCmdEd25519Engine);
 	///
@@ -4616,6 +5061,10 @@ static if (enableOpenSSLCmdEngines)
 else
 {
 	///
+	enum bool isOpenSSLCmdAESCBCEngine(T) = false;
+	///
+	enum bool isOpenSSLCmdAESGCMEngine(T) = false;
+	///
 	enum bool isOpenSSLCmdAESEngine(T) = false;
 	///
 	enum bool isOpenSSLCmdEd25519Engine(T) = false;
@@ -4638,8 +5087,15 @@ else
 static if (enableOpenSSLEngines)
 {
 	///
-	enum bool isOpenSSLAESEngine(T) = is(T == OpenSSLAESCBCEncryptEngine)
+	enum bool isOpenSSLAESCBCEngine(T) = false
+		|| is(T == OpenSSLAESCBCEncryptEngine)
 		|| is(T == OpenSSLAESCBCDecryptEngine);
+	///
+	enum bool isOpenSSLAESGCMEngine(T) = false
+		|| is(T == OpenSSLAESGCMEncryptEngine)
+		|| is(T == OpenSSLAESGCMDecryptEngine);
+	///
+	enum bool isOpenSSLAESEngine(T) = isOpenSSLAESCBCEngine!T || isOpenSSLAESGCMEngine!T;
 	///
 	enum bool isOpenSSLEd25519Engine(T) = is(T == OpenSSLEd25519Engine);
 	///
@@ -4664,6 +5120,10 @@ static if (enableOpenSSLEngines)
 else
 {
 	///
+	enum bool isOpenSSLAESCBCEngine(T) = false;
+	///
+	enum bool isOpenSSLAESGCMEngine(T) = false;
+	///
 	enum bool isOpenSSLAESEngine(T) = false;
 	///
 	enum bool isOpenSSLEd25519Engine(T) = false;
@@ -4686,8 +5146,15 @@ else
 static if (enableBcryptEngines)
 {
 	///
-	enum bool isBcryptAESEngine(T) = is(T == BcryptAESCBCEncryptEngine)
+	enum bool isBcryptAESCBCEngine(T) = false
+		|| is(T == BcryptAESCBCEncryptEngine)
 		|| is(T == BcryptAESCBCDecryptEngine);
+	///
+	enum bool isBcryptAESGCMEngine(T) = false
+		|| is(T == BcryptAESGCMEncryptEngine)
+		|| is(T == BcryptAESGCMDecryptEngine);
+	///
+	enum bool isBcryptAESEngine(T) = isBcryptAESCBCEngine!T || isBcryptAESGCMEngine!T;
 	///
 	enum bool isBcryptEd25519Engine(T) = false;
 	///
@@ -4711,6 +5178,10 @@ static if (enableBcryptEngines)
 }
 else
 {
+	///
+	enum bool isBcryptAESCBCEngine(T) = false;
+	///
+	enum bool isBcryptAESGCMEngine(T) = false;
 	///
 	enum bool isBcryptAESEngine(T) = false;
 	///
@@ -4750,9 +5221,15 @@ enum bool isBcryptEngine(T) = isBcryptAESEngine!T
 	|| isBcryptRSA4096Engine!T
 	|| isBcryptECDHP256Engine!T;
 ///
-enum bool isAESEngine(T) = isOpenSSLCmdAESEngine!T
-	|| isOpenSSLAESEngine!T
-	|| isBcryptAESEngine!T;
+enum bool isAESCBCEngine(T) = isOpenSSLCmdAESCBCEngine!T
+	|| isOpenSSLAESCBCEngine!T
+	|| isBcryptAESCBCEngine!T;
+///
+enum bool isAESGCMEngine(T) = isOpenSSLCmdAESGCMEngine!T
+	|| isOpenSSLAESGCMEngine!T
+	|| isBcryptAESGCMEngine!T;
+///
+enum bool isAESEngine(T) = isAESCBCEngine!T || isAESGCMEngine!T;
 ///
 enum bool isEd25519Engine(T) = isOpenSSLCmdEd25519Engine!T
 	|| isOpenSSLEd25519Engine!T
@@ -4797,6 +5274,14 @@ static if (enableOpenSSLEngines)
 	///
 	alias DefaultAES256CBCDecryptEngine = OpenSSLAES256CBCDecryptEngine;
 	///
+	alias DefaultAES128GCMEncryptEngine = OpenSSLAES128GCMEncryptEngine;
+	///
+	alias DefaultAES256GCMEncryptEngine = OpenSSLAES256GCMEncryptEngine;
+	///
+	alias DefaultAES128GCMDecryptEngine = OpenSSLAES128GCMDecryptEngine;
+	///
+	alias DefaultAES256GCMDecryptEngine = OpenSSLAES256GCMDecryptEngine;
+	///
 	alias DefaultEd25519Engine = OpenSSLEd25519Engine;
 	///
 	alias DefaultECDSAP256Engine = OpenSSLECDSAP256Engine;
@@ -4822,6 +5307,14 @@ else static if (enableBcryptEngines)
 	///
 	alias DefaultAES256CBCDecryptEngine = BcryptAES256CBCDecryptEngine;
 	///
+	alias DefaultAES128GCMEncryptEngine = BcryptAES128GCMEncryptEngine;
+	///
+	alias DefaultAES256GCMEncryptEngine = BcryptAES256GCMEncryptEngine;
+	///
+	alias DefaultAES128GCMDecryptEngine = BcryptAES128GCMDecryptEngine;
+	///
+	alias DefaultAES256GCMDecryptEngine = BcryptAES256GCMDecryptEngine;
+	///
 	alias DefaultEd25519Engine = OpenSSLCmdEd25519Engine;
 	///
 	alias DefaultECDSAP256Engine = BcryptECDSAP256Engine;
@@ -4846,6 +5339,14 @@ else
 	alias DefaultAES128CBCDecryptEngine = OpenSSLCmdAES128CBCDecryptEngine;
 	///
 	alias DefaultAES256CBCDecryptEngine = OpenSSLCmdAES256CBCDecryptEngine;
+	///
+	//alias DefaultAES128GCMEncryptEngine = OpenSSLCmdAES128GCMEncryptEngine;
+	///
+	//alias DefaultAES256GCMEncryptEngine = OpenSSLCmdAES256GCMEncryptEngine;
+	///
+	//alias DefaultAES128GCMDecryptEngine = OpenSSLCmdAES128GCMDecryptEngine;
+	///
+	//alias DefaultAES256GCMDecryptEngine = OpenSSLCmdAES256GCMDecryptEngine;
 	///
 	alias DefaultEd25519Engine = OpenSSLCmdEd25519Engine;
 	///
@@ -4880,7 +5381,8 @@ private:
 		Appender!(immutable(ubyte)[]) _dst;
 		enum _onlyOneShot = false;
 	}
-	bool _padding;
+	static if (!isAESGCMEngine!Engine)
+		bool _padding;
 	bool _finalized;
 public:
 	/***************************************************************************
@@ -4891,7 +5393,8 @@ public:
 		_engine = engine.move();
 		static if (!_onlyOneShot)
 			_dst = appender!(immutable(ubyte)[])();
-		_padding = padding;
+		static if (!isAESGCMEngine!Engine)
+			_padding = padding;
 		_finalized = false;
 	}
 	/// ditto
@@ -4964,11 +5467,22 @@ public:
 	{
 		if (!_finalized)
 		{
-			_engine.finalize(_dst, _padding);
+			static if (isAESGCMEngine!Engine)
+				_engine.finalize(_dst);
+			else
+				_engine.finalize(_dst, _padding);
 			_finalized = true;
 		}
 		return _dst.data();
 	}
+	/***************************************************************************
+	 * Tag
+	 */
+	static if (isAESGCMEngine!Engine) bin_t tag() const
+	{
+		return _engine.tag;
+	}
+	
 	/***************************************************************************
 	 * OneShot encrypt
 	 */
@@ -4987,6 +5501,10 @@ public:
 }
 /// ditto
 alias AES256CBCEncrypter = Encrypter!DefaultAES256CBCEncryptEngine;
+/// ditto
+alias AES256GCMEncrypter = Encrypter!DefaultAES256GCMEncryptEngine;
+/// ditto
+alias RSA4096Encrypter = Encrypter!DefaultRSA4096Engine;
 
 // AES256CBC Encrypt for OpenSSL
 static if (enableOpenSSLEngines) @system unittest
@@ -5025,19 +5543,57 @@ static if (enableOpenSSLCmdEngines) @system unittest
 {
 	if (!isCommandExisting(defaultOpenSSLCommand))
 		return;
-	auto key = cast(immutable(ubyte)[])"0123456789ABCDEF0123456789ABCDEF";
-	auto iv = cast(immutable(ubyte)[])"0123456789ABCDEF";
+	auto key = "0123456789ABCDEF0123456789ABCDEF".representation;
+	auto iv = "0123456789ABCDEF".representation;
 	
 	auto enc = Encrypter!OpenSSLCmdAES256CBCEncryptEngine(key, iv);
-	enc.update(cast(ubyte[])"Hello");
-	enc.update(cast(ubyte[])", World!");
+	enc.update("Hello".representation);
+	enc.update(", World!".representation);
 	assert(enc.data == x"D326AEF69B8B37F21276C2E1DCE0D750");
 	enc = Encrypter!OpenSSLCmdAES256CBCEncryptEngine(key, iv);
-	enc.update(cast(ubyte[])"Hello, World!");
-	enc.update(cast(ubyte[])"Hello, World! Hello, World!");
-	enc.update(cast(ubyte[])"Hello, World!");
+	enc.update("Hello, World!".representation);
+	enc.update("Hello, World! Hello, World!".representation);
+	enc.update("Hello, World!".representation);
 	assert(enc.data == x"5331710676FF966EB2A6DC185BE60BED10D1E288A2B5EC75CA0E78F4422809E0"
 		~ x"979CE7F69DA3C7171B0ADE10D456A63BB48CA033BEAA27D8E49EE1CBA03D064C");
+}
+// AES256GCM Encrypt for OpenSSL
+static if (enableOpenSSLEngines) @system unittest
+{
+	auto key = "0123456789ABCDEF0123456789ABCDEF".representation;
+	auto iv = "0123456789AB".representation;
+	
+	auto enc = Encrypter!OpenSSLAES256GCMEncryptEngine(key, iv);
+	enc.update("Hello".representation);
+	enc.update(", World!".representation);
+	assert(enc.data == x"8D02AE8AE6672DAF46316392E7".bin);
+	assert(enc.tag == x"A67BE2F2569C6F75640C9562F36C0DDD".bin);
+	enc = Encrypter!OpenSSLAES256GCMEncryptEngine(key, iv);
+	enc.update("Hello, World!".representation);
+	enc.update("Hello, World! Hello, World!".representation);
+	enc.update("Hello, World!".representation);
+	assert(enc.data == x"8D02AE8AE6672DAF46316392E7E7340B9D3553A976E8354D97151E47C42CE49A"
+		~ x"AD60FE9CFF0597BF41C1F5C513906398B09CE77B34".bin);
+	assert(enc.tag == x"B17247DE53AB12386D13C5756747F9F6".bin);
+}
+// AES256GCM Encrypt for Bcrypt
+static if (enableBcryptEngines) @system unittest
+{
+	auto key = "0123456789ABCDEF0123456789ABCDEF".representation;
+	auto iv = "0123456789AB".representation;
+	
+	auto enc = Encrypter!BcryptAES256GCMEncryptEngine(key, iv);
+	enc.update("Hello".representation);
+	enc.update(", World!".representation);
+	assert(enc.data == x"8D02AE8AE6672DAF46316392E7".bin);
+	assert(enc.tag == x"A67BE2F2569C6F75640C9562F36C0DDD".bin);
+	enc = Encrypter!BcryptAES256GCMEncryptEngine(key, iv);
+	enc.update("Hello, World!".representation);
+	enc.update("Hello, World! Hello, World!".representation);
+	enc.update("Hello, World!".representation);
+	assert(enc.data == x"8D02AE8AE6672DAF46316392E7E7340B9D3553A976E8354D97151E47C42CE49A"
+		~ x"AD60FE9CFF0597BF41C1F5C513906398B09CE77B34".bin);
+	assert(enc.tag == x"B17247DE53AB12386D13C5756747F9F6".bin);
 }
 
 /*******************************************************************************
@@ -5058,7 +5614,10 @@ private:
 		Appender!(immutable(ubyte)[]) _dst;
 	}
 	enum bool _requireCommand = isOpenSSLCmdEngine!Engine;
-	bool _padding;
+	static if (isAESGCMEngine!Engine)
+		ubyte[] _tag;
+	static if (!isAESGCMEngine!Engine)
+		bool _padding;
 	bool _finalized;
 public:
 	/***************************************************************************
@@ -5069,20 +5628,28 @@ public:
 		_engine = engine.move;
 		static if (!_onlyOneShot)
 			_dst = appender!(immutable(ubyte)[])();
-		_padding = padding;
+		static if (!isAESGCMEngine!Engine)
+			_padding = padding;
 		_finalized = false;
 	}
 	/// ditto
-	static if (_requireCommand && isAESEngine!Engine)
-	this(immutable(ubyte)[] key, immutable(ubyte)[] iv, bool padding = true, string cmd = defaultOpenSSLCommand)
+	static if (_requireCommand && isAESCBCEngine!Engine)
+	this(in ubyte[] key, in ubyte[] iv, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
 		this(Engine(key, iv, cmd), padding);
 	}
 	/// ditto
-	static if (!_requireCommand && isAESEngine!Engine)
-	this(immutable(ubyte)[] key, immutable(ubyte)[] iv, bool padding = true)
+	static if (!_requireCommand && isAESCBCEngine!Engine)
+	this(in ubyte[] key, in ubyte[] iv, bool padding = true)
 	{
 		this(Engine(key, iv), padding);
+	}
+	/// ditto
+	static if (!_requireCommand && isAESGCMEngine!Engine)
+	this(in ubyte[] key, in ubyte[] iv, in ubyte[] tag)
+	{
+		_tag = tag.dup;
+		this(Engine(key, iv));
 	}
 	/// ditto
 	static if (_requireCommand && isRSAEngine!Engine)
@@ -5093,7 +5660,7 @@ public:
 	}
 	/// ditto
 	static if (_requireCommand && isRSAEngine!Engine)
-	this(immutable(ubyte)[] prvKey, bool padding = true, string cmd = defaultOpenSSLCommand)
+	this(in ubyte[] prvKey, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
 		_key = Engine.PrivateKey.fromDER(prvKey);
 		this(Engine(cmd), padding);
@@ -5114,7 +5681,7 @@ public:
 	}
 	/// ditto
 	static if (!_requireCommand && isRSAEngine!Engine)
-	this(immutable(ubyte)[] prvKey, bool padding = true)
+	this(in ubyte[] prvKey, bool padding = true)
 	{
 		_key = Engine.PrivateKey.fromDER(prvKey);
 		this(Engine(), padding);
@@ -5143,7 +5710,10 @@ public:
 	{
 		if (!_finalized)
 		{
-			_engine.finalize(_dst, _padding);
+			static if (isAESGCMEngine!Engine)
+				_engine.finalize(_dst, _tag);
+			else
+				_engine.finalize(_dst, _padding);
 			_finalized = true;
 		}
 		return _dst.data();
@@ -5167,35 +5737,38 @@ public:
 /// ditto
 alias AES256CBCDecrypter = Decrypter!DefaultAES256CBCDecryptEngine;
 /// ditto
+alias AES256GCMDecrypter = Decrypter!DefaultAES256GCMDecryptEngine;
+/// ditto
 alias RSA4096Decrypter = Decrypter!DefaultRSA4096Engine;
 
 // AES256CBC Encrypt/Decrypt for OpenSSL
 static if (enableOpenSSLEngines) @system unittest
 {
-	auto key = cast(immutable(ubyte)[])"0123456789ABCDEF0123456789ABCDEF";
-	auto iv = cast(immutable(ubyte)[])"0123456789ABCDEF";
+	auto key = "0123456789ABCDEF0123456789ABCDEF".representation;
+	auto iv = "0123456789ABCDEF".representation;
 	auto dec = Decrypter!OpenSSLAES256CBCDecryptEngine(key, iv);
-	dec.update(x"D326");
-	dec.update(x"AEF69B8B");
-	dec.update(x"37F21276C2E1DCE0D750");
-	assert(dec.data == cast(ubyte[])"Hello, World!");
+	dec.update(x"D326".bin);
+	dec.update(x"AEF69B8B".bin);
+	dec.update(x"37F21276C2E1DCE0D750".bin);
+	assert(cast(string)dec.data == "Hello, World!");
 	dec = Decrypter!OpenSSLAES256CBCDecryptEngine(key, iv);
-	dec.update(x"5331710676FF966EB2A6DC185BE60BED10D1E288A2B5EC75CA0E78F4422809E0");
-	dec.update(x"979CE7F69DA3C7171B0ADE10D456A63BB48C");
-	dec.update(x"A033BEAA27D8E49EE1CBA03D064C");
+	dec.update(x"5331710676FF966EB2A6DC185BE60BED10D1E288A2B5EC75CA0E78F4422809E0".bin);
+	dec.update(x"979CE7F69DA3C7171B0ADE10D456A63BB48C".bin);
+	dec.update(x"A033BEAA27D8E49EE1CBA03D064C".bin);
 	assert(cast(string)dec.data == "Hello, World!Hello, World! Hello, World!Hello, World!");
 }
 // AES256CBC Encrypt/Decrypt for Bcrypt
 static if (enableBcryptEngines) @system unittest
 {
-	auto key = cast(immutable(ubyte)[])"0123456789ABCDEF0123456789ABCDEF";
-	auto iv = cast(immutable(ubyte)[])"0123456789ABCDEF";
+	auto key = "0123456789ABCDEF0123456789ABCDEF".representation;
+	auto iv = "0123456789ABCDEF".representation;
 	auto dec = Decrypter!BcryptAES256CBCDecryptEngine(key, iv);
 	dec.update(x"D326");
 	dec.update(x"AEF69B8B");
 	dec.update(x"37F21276C2E1DCE0D750");
-	assert(dec.data == cast(ubyte[])"Hello, World!");
+	assert(cast(string)dec.data == "Hello, World!");
 	dec = Decrypter!BcryptAES256CBCDecryptEngine(key, iv);
+	//5331710676FF966EB2A6DC185BE60BED10D1E288A2B5EC75CA0E78F4422809E0979CE7F69DA3C7171B0ADE10D456A63BB48CA033BEAA27D8E49EE1CBA03D064C
 	dec.update(x"5331710676FF966EB2A6DC185BE60BED10D1E288A2B5EC75CA0E78F4422809E0");
 	dec.update(x"979CE7F69DA3C7171B0ADE10D456A63BB48C");
 	dec.update(x"A033BEAA27D8E49EE1CBA03D064C");
@@ -5206,17 +5779,53 @@ static if (enableOpenSSLCmdEngines) @system unittest
 {
 	if (!isCommandExisting(defaultOpenSSLCommand))
 		return;
-	auto key = cast(immutable(ubyte)[])"0123456789ABCDEF0123456789ABCDEF";
-	auto iv = cast(immutable(ubyte)[])"0123456789ABCDEF";
+	auto key = "0123456789ABCDEF0123456789ABCDEF".representation;
+	auto iv = "0123456789ABCDEF".representation;
 	auto dec = Decrypter!OpenSSLCmdAES256CBCDecryptEngine(key, iv);
 	dec.update(x"D326");
 	dec.update(x"AEF69B8B");
 	dec.update(x"37F21276C2E1DCE0D750");
-	assert(dec.data == cast(ubyte[])"Hello, World!");
+	assert(cast(string)dec.data == "Hello, World!");
 	dec = Decrypter!OpenSSLCmdAES256CBCDecryptEngine(key, iv);
 	dec.update(x"5331710676FF966EB2A6DC185BE60BED10D1E288A2B5EC75CA0E78F4422809E0");
 	dec.update(x"979CE7F69DA3C7171B0ADE10D456A63BB48C");
 	dec.update(x"A033BEAA27D8E49EE1CBA03D064C");
+	assert(cast(string)dec.data == "Hello, World!Hello, World! Hello, World!Hello, World!");
+}
+// AES256GCM Encrypt/Decrypt for OpenSSL
+static if (enableOpenSSLEngines) @system unittest
+{
+	auto key = "0123456789ABCDEF0123456789ABCDEF".representation;
+	auto iv  = "0123456789AB".representation;
+	auto tag1 = x"A67BE2F2569C6F75640C9562F36C0DDD".bin;
+	auto dec = Decrypter!OpenSSLAES256GCMDecryptEngine(key, iv, tag1);
+	dec.update(x"8D02");
+	dec.update(x"AE8AE667");
+	dec.update(x"2DAF46316392E7");
+	assert(dec.data == cast(ubyte[])"Hello, World!");
+	auto tag2 = x"B17247DE53AB12386D13C5756747F9F6".bin;
+	dec = Decrypter!OpenSSLAES256GCMDecryptEngine(key, iv, tag2);
+	dec.update(x"8D02AE8AE6672DAF46316392E7E7340B9D3553A976E8354D97151E47C42CE49A");
+	dec.update(x"AD60FE9CFF0597BF41C1F5C513906398B09C");
+	dec.update(x"E77B34");
+	assert(cast(string)dec.data == "Hello, World!Hello, World! Hello, World!Hello, World!");
+}
+// AES256GCM Encrypt/Decrypt for Bcrypt
+static if (enableOpenSSLEngines) @system unittest
+{
+	auto key = "0123456789ABCDEF0123456789ABCDEF".representation;
+	auto iv  = "0123456789AB".representation;
+	auto tag1 = x"A67BE2F2569C6F75640C9562F36C0DDD".bin;
+	auto dec = Decrypter!BcryptAES256GCMDecryptEngine(key, iv, tag1);
+	dec.update(x"8D02");
+	dec.update(x"AE8AE667");
+	dec.update(x"2DAF46316392E7");
+	assert(dec.data == cast(ubyte[])"Hello, World!");
+	auto tag2 = x"B17247DE53AB12386D13C5756747F9F6".bin;
+	dec = Decrypter!BcryptAES256GCMDecryptEngine(key, iv, tag2);
+	dec.update(x"8D02AE8AE6672DAF46316392E7E7340B9D3553A976E8354D97151E47C42CE49A");
+	dec.update(x"AD60FE9CFF0597BF41C1F5C513906398B09C");
+	dec.update(x"E77B34");
 	assert(cast(string)dec.data == "Hello, World!Hello, World! Hello, World!Hello, World!");
 }
 
@@ -7349,19 +7958,19 @@ public:
 	/***************************************************************************
 	 * Derive decrypter
 	 */
-	auto deriveEncrypter(DigestEngine = SHA256)(in char[] pubKeyPEM,
+	auto deriveDecrypter(DigestEngine = SHA256)(in char[] pubKeyPEM,
 		immutable(ubyte)[] salt = null, size_t aesKeyBits = 256)
 	{
 		return _deriveDecrypter!DigestEngine(Engine.PublicKey.fromPEM(pubKeyPEM), salt, aesKeyBits);
 	}
 	/// ditto
-	auto deriveEncrypter(DigestEngine = SHA256)(in ubyte[] pubKeyDER,
+	auto deriveDecrypter(DigestEngine = SHA256)(in ubyte[] pubKeyDER,
 		immutable(ubyte)[] salt = null, size_t aesKeyBits = 256)
 	{
 		return _deriveDecrypter!DigestEngine(Engine.PublicKey.fromPEM(pubKeyDER));
 	}
 	/// ditto
-	auto deriveEncrypter(DigestEngine = SHA256, size_t N)(in ubyte[N] pubKeyRaw,
+	auto deriveDecrypter(DigestEngine = SHA256, size_t N)(in ubyte[N] pubKeyRaw,
 		immutable(ubyte)[] salt = null, size_t aesKeyBits = 256)
 	{
 		return _deriveDecrypter!DigestEngine(Engine.PublicKey.fromBinary(pubKeyRaw), salt, aesKeyBits);
@@ -7624,6 +8233,15 @@ ubyte[DefaultRSA4096Engine.pubKeyLen] createRSA4096PublicKey(
 	ubyte[DefaultRSA4096Engine.prvKeyLen] prvKey) @safe
 {
 	return createPublicKey!DefaultRSA4096Engine(prvKey);
+}
+
+/// ditto
+ubyte[32] createAES256CommonKey(Random)(Random rng = rndGen()) @safe
+{
+	ubyte[32] ret;
+	foreach (ref e; cast(uint[])ret[])
+		e = rng.uniform!uint();
+	return ret;
 }
 
 @safe unittest
