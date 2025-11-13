@@ -768,6 +768,7 @@ static if (enableOpenSSLCmdEngines)
 			Thread thread;
 			Mutex mutex;
 			size_t inputSize;
+			bool padding;
 			void entryConsumer()
 			{
 				foreach (ref chunk; pipe.stdout.byChunk(4096))
@@ -780,7 +781,7 @@ static if (enableOpenSSLCmdEngines)
 		/***************************************************************************
 		 * Constructor
 		 */
-		this(in ubyte[] key, in ubyte[] iv, string cmd = defaultOpenSSLCommand)
+		this(in ubyte[] key, in ubyte[] iv, bool padding = true, string cmd = defaultOpenSSLCommand)
 		{
 			import std.format;
 			isCommandExisting(cmd).enforce("OpenSSL command line interface cannot find.");
@@ -790,6 +791,7 @@ static if (enableOpenSSLCmdEngines)
 				: key.length == 24 ? "-aes-192-cbc"
 				: "";
 			enforce(encType.length > 0, "Unsupported key type.");
+			_instance.padding = padding;
 			with (_instance.refCountedPayload)
 			{
 				pipe = pipeProcess([cmd, "enc", encType, "-e", "-in", "-", "-out", "-", "-nopad",
@@ -823,7 +825,7 @@ static if (enableOpenSSLCmdEngines)
 		/***************************************************************************
 		 * Finalize
 		 */
-		void finalize(OutputRange)(ref OutputRange dst, bool padding = true)
+		void finalize(OutputRange)(ref OutputRange dst)
 		if (isOutputRange!(OutputRange, ubyte))
 		{
 			with (_instance.refCountedPayload)
@@ -861,6 +863,7 @@ static if (enableOpenSSLCmdEngines)
 			Appender!(ubyte[]) app;
 			Thread thread;
 			Mutex mutex;
+			bool padding;
 			void entryConsumer()
 			{
 				foreach (ref chunk; pipe.stdout.byChunk(4096))
@@ -873,7 +876,7 @@ static if (enableOpenSSLCmdEngines)
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(in ubyte[] key, in ubyte[] iv, string cmd = defaultOpenSSLCommand)
+		this(in ubyte[] key, in ubyte[] iv, bool padding = true, string cmd = defaultOpenSSLCommand)
 		{
 			import std.format;
 			isCommandExisting(cmd).enforce("OpenSSL command line interface cannot find.");
@@ -883,6 +886,7 @@ static if (enableOpenSSLCmdEngines)
 				: key.length == 24 ? "-aes-192-cbc"
 				: "";
 			enforce(encType.length > 0, "Unsupported key type.");
+			_instance.padding = padding;
 			with (_instance.refCountedPayload)
 			{
 				pipe = pipeProcess([cmd, "enc", encType, "-d", "-in", "-", "-out", "-", "-nopad",
@@ -917,7 +921,7 @@ static if (enableOpenSSLCmdEngines)
 		/***************************************************************************
 		 * Finalize
 		 */
-		void finalize(OutputRange)(ref OutputRange dst, bool padding = true)
+		void finalize(OutputRange)(ref OutputRange dst)
 		if (isOutputRange!(OutputRange, ubyte))
 		{
 			with (_instance.refCountedPayload)
@@ -1724,13 +1728,15 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(in ubyte[] key, in ubyte[] iv) @trusted
+		this(in ubyte[] key, in ubyte[] iv, bool padding = true) @trusted
 		{
 			_ctx = EVP_CIPHER_CTX_new().enforce("Cannot create cipher context.");
 			// 初期化
 			_ctx.EVP_EncryptInit_ex(
 				key.length == 32 ? EVP_aes_256_cbc() : key.length == 24 ? EVP_aes_192_cbc() : EVP_aes_128_cbc(),
 				null, key.ptr, iv.ptr).evpEnforce("Cannot create cipher context.");
+			if (!padding)
+				_ctx.EVP_CIPHER_CTX_set_padding(0).evpEnforce("Cannot create cipher context.");
 		}
 		/***********************************************************************
 		 * Destructor
@@ -1758,11 +1764,9 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * Finalize
 		 */
-		void finalize(OutputRange)(ref OutputRange dst, bool padding = true)
+		void finalize(OutputRange)(ref OutputRange dst)
 		if (isOutputRange!(OutputRange, ubyte))
 		{
-			if (!padding)
-				return;
 			ubyte[16] outData;
 			int outLen = 0;
 			EVP_EncryptFinal_ex(_ctx, outData.ptr, &outLen)
@@ -1784,7 +1788,7 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(in ubyte[] key, in ubyte[] iv) @trusted
+		this(in ubyte[] key, in ubyte[] iv, bool padding = true) @trusted
 		{
 			_ctx = EVP_CIPHER_CTX_new().enforce("Cannot create cipher context.");
 			// 初期化
@@ -1794,6 +1798,8 @@ static if (enableOpenSSLEngines)
 			_ctx.EVP_CIPHER_CTX_ctrl(EVP_CTRL_GCM_SET_IVLEN, cast(int)iv.length, null)
 				.evpEnforce("Cannot create cipher context.");
 			_ctx.EVP_EncryptInit_ex(null, null, key.ptr, iv.ptr).evpEnforce("Cannot create cipher context.");
+			if (!padding)
+				_ctx.EVP_CIPHER_CTX_set_padding(0).evpEnforce("Cannot create cipher context.");
 		}
 		/***********************************************************************
 		 * Destructor
@@ -1821,11 +1827,9 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * Finalize
 		 */
-		void finalize(OutputRange)(ref OutputRange dst, bool padding = true)
+		void finalize(OutputRange)(ref OutputRange dst)
 		if (isOutputRange!(OutputRange, ubyte))
 		{
-			if (!padding)
-				return;
 			ubyte[16] outData;
 			int outLen = 0;
 			_ctx.EVP_EncryptFinal_ex(outData.ptr, &outLen)
@@ -1862,13 +1866,15 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(in ubyte[] key, in ubyte[] iv) @trusted
+		this(in ubyte[] key, in ubyte[] iv, bool padding = true) @trusted
 		{
 			_ctx = EVP_CIPHER_CTX_new().enforce("Cannot create OpenSSL cipher context.");
 			// 初期化
 			_ctx.EVP_DecryptInit_ex(
 				key.length == 32 ? EVP_aes_256_cbc() : key.length == 24 ? EVP_aes_192_cbc() : EVP_aes_128_cbc(),
 				null, key.ptr, iv.ptr).evpEnforce("Cannot initialize cipher context.");
+			if (!padding)
+				_ctx.EVP_CIPHER_CTX_set_padding(0).evpEnforce("Cannot create cipher context.");
 		}
 		/***********************************************************************
 		 * Destructor
@@ -1932,33 +1938,21 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * Finalize
 		 */
-		void finalize(OutputRange)(ref OutputRange dst, bool padding = true)
+		void finalize(OutputRange)(ref OutputRange dst)
 		if (isOutputRange!(OutputRange, ubyte))
 		{
-			if (!padding)
-			{
-				if (_outLen < _inLen)
-				{
-					ubyte[16] outData;
-					int outLen = 0;
-					EVP_DecryptUpdate(_ctx, outData.ptr, &outLen, null, 0)
-						.evpEnforce("OpenSSL AES decryption failed.");
-					dst.put(outData[0 .. $]);
-					_outLen += 16;
-				}
-				return;
-			}
+			ubyte[16] outData;
+			int outLen = 0;
 			if (_outLen < _inLen)
 			{
-				ubyte[16] outData;
-				int outLen = 0;
 				EVP_DecryptUpdate(_ctx, outData.ptr, &outLen, null, 0)
 					.evpEnforce("OpenSSL AES decryption failed.");
-				EVP_DecryptFinal_ex(_ctx, outData.ptr, &outLen)
-					.evpEnforce("OpenSSL AES decryption failed.");
 				dst.put(outData[0 .. outLen]);
-				_outLen += outLen;
 			}
+			EVP_DecryptFinal_ex(_ctx, outData.ptr, &outLen)
+				.evpEnforce("OpenSSL AES decryption failed.");
+			dst.put(outData[0 .. outLen]);
+			_outLen += outLen;
 		}
 	}
 	private alias OpenSSLAES128CBCDecryptEngine = OpenSSLAESCBCDecryptEngine;
@@ -1974,7 +1968,7 @@ static if (enableOpenSSLEngines)
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(in ubyte[] key, in ubyte[] iv) @trusted
+		this(in ubyte[] key, in ubyte[] iv, bool padding = true) @trusted
 		{
 			_ctx = EVP_CIPHER_CTX_new().enforce("Cannot create OpenSSL cipher context.");
 			// 初期化
@@ -1984,6 +1978,8 @@ static if (enableOpenSSLEngines)
 			_ctx.EVP_CIPHER_CTX_ctrl(EVP_CTRL_GCM_SET_IVLEN, cast(int)iv.length, null)
 				.evpEnforce("Cannot create cipher context.");
 			_ctx.EVP_DecryptInit_ex(null, null, key.ptr, iv.ptr).evpEnforce("Cannot initialize cipher context.");
+			if (!padding)
+				_ctx.EVP_CIPHER_CTX_set_padding(0).evpEnforce("Cannot create cipher context.");
 		}
 		/***********************************************************************
 		 * Destructor
@@ -3186,15 +3182,17 @@ static if (enableBcryptEngines)
 		ubyte[16] _iv;
 		ubyte[16] _remain;
 		ubyte     _remainNum;
+		bool      _padding;
 	public:
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(in ubyte[] key, in ubyte[] iv) @trusted
+		this(in ubyte[] key, in ubyte[] iv, bool padding = true) @trusted
 		{
 			_hAlg = BCRYPT_ALG_HANDLE.init;
 			_hKey = BCRYPT_KEY_HANDLE.init;
 			_iv[] = iv[0..16];
+			_padding = padding;
 			
 			BCryptOpenAlgorithmProvider(&_hAlg, "AES", null, 0).ntEnforce("Cannot open algorithm provider.");
 			
@@ -3263,10 +3261,10 @@ static if (enableBcryptEngines)
 		/***********************************************************************
 		 * Finalize
 		 */
-		void finalize(OutputRange)(ref OutputRange dst, bool padding = true)
+		void finalize(OutputRange)(ref OutputRange dst)
 		if (isOutputRange!(OutputRange, ubyte))
 		{
-			if (!padding)
+			if (!_padding)
 				return;
 			_remain[_remainNum .. $] = cast(ubyte)(16 - _remainNum);
 			ubyte[16] outData;
@@ -3293,6 +3291,7 @@ static if (enableBcryptEngines)
 		ubyte[] _mac;
 		ubyte[16] _remain;
 		ubyte     _remainNum;
+		bool      _padding;
 		BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO _authInfo;
 		void _initAuthInfo()
 		{
@@ -3323,7 +3322,7 @@ static if (enableBcryptEngines)
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(in ubyte[] key, in ubyte[] iv) @trusted
+		this(in ubyte[] key, in ubyte[] iv, bool padding = true) @trusted
 		{
 			_hAlg      = BCRYPT_ALG_HANDLE.init;
 			_hKey      = BCRYPT_KEY_HANDLE.init;
@@ -3332,6 +3331,7 @@ static if (enableBcryptEngines)
 			_mac       = new ubyte[16];
 			_cntBuffer = new ubyte[16];
 			_remain    = new ubyte[16];
+			_padding   = padding;
 			
 			BCryptOpenAlgorithmProvider(&_hAlg, "AES", null, 0).ntEnforce("Cannot open algorithm provider.");
 			// Set chaining mode to GCM
@@ -3429,13 +3429,15 @@ static if (enableBcryptEngines)
 		ubyte     _remainNum;
 		ubyte[16] _prev;
 		ubyte     _prevNum;
+		bool      _padding;
 	public:
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(in ubyte[] key, in ubyte[] iv)
+		this(in ubyte[] key, in ubyte[] iv, bool padding = true)
 		{
 			_iv[] = iv[0..16];
+			_padding = padding;
 			BCryptOpenAlgorithmProvider(&_hAlg, "AES", null, 0).ntEnforce("Cannot open algorithm provider.");
 			BCryptGenerateSymmetricKey(_hAlg, &_hKey, null, 0, cast(ubyte*)key.ptr, cast(ULONG)key.length, 0)
 				.ntEnforce("Cannot generate symmetric key.");
@@ -3527,18 +3529,9 @@ static if (enableBcryptEngines)
 		/***********************************************************************
 		 * Finalize
 		 */
-		void finalize(OutputRange)(ref OutputRange dst, bool padding = true)
+		void finalize(OutputRange)(ref OutputRange dst)
 		if (isOutputRange!(OutputRange, ubyte))
 		{
-			if (!padding)
-			{
-				if (_prevNum != 0)
-				{
-					dst.put(_prev[0 .. _prevNum]);
-					_prevNum = 0;
-				}
-				return;
-			}
 			if (_prevNum != 0)
 			{
 				_prevNum = 0;
@@ -5384,75 +5377,71 @@ private:
 		Appender!(immutable(ubyte)[]) _dst;
 		enum _onlyOneShot = false;
 	}
-	static if (!isAESGCMEngine!Engine)
-		bool _padding;
 	bool _finalized;
 public:
 	/***************************************************************************
 	 * Constructor
 	 */
-	this(Engine engine, bool padding = true)
+	this(Engine engine)
 	{
 		_engine = engine.move();
 		static if (!_onlyOneShot)
 			_dst = appender!(immutable(ubyte)[])();
-		static if (!isAESGCMEngine!Engine)
-			_padding = padding;
 		_finalized = false;
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine && isAESEngine!Engine)
 	this(in ubyte[] key, in ubyte[] iv, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
-		this(Engine(key, iv, cmd), padding);
+		this(Engine(key, iv, padding, cmd));
 	}
 	/// ditto
 	static if ((isOpenSSLEngine!Engine || isBcryptEngine!Engine) && isAESEngine!Engine)
 	this(in ubyte[] key, in ubyte[] iv, bool padding = true)
 	{
-		this(Engine(key, iv), padding);
+		this(Engine(key, iv, padding));
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
 	this(in char[] pubKey, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
 		_key = Engine.PublicKey.fromPEM(pubKey);
-		this(Engine(cmd), padding);
+		this(Engine(cmd));
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
 	this(in ubyte[] pubKey, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
 		_key = Engine.PublicKey.fromDER(pubKey);
-		this(cmd, padding);
+		this(cmd);
 	}
 	/// ditto
 	static if (isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
 	this(in BinaryKey!(Engine.pubKeyLen) pubKey, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
 		_key = Engine.PublicKey.fromBinary(pubKey);
-		this(cmd, padding);
+		this(cmd);
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
 	this(in char[] pubKey, bool padding = true)
 	{
 		_key = Engine.PublicKey.fromPEM(pubKey);
-		this(Engine(), padding);
+		this(Engine());
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
 	this(in ubyte[] pubKey, bool padding = true)
 	{
 		_key = Engine.PublicKey.fromDER(pubKey);
-		this(Engine(), padding);
+		this(Engine());
 	}
 	/// ditto
 	static if (!isOpenSSLCmdEngine!Engine && isRSAEngine!Engine)
 	this(BinaryKey!(Engine.pubKeyLen) pubKey, bool padding = true)
 	{
 		_key = Engine.PublicKey.fromBinary(pubKey);
-		this(Engine(), padding);
+		this(Engine());
 	}
 	
 	/***************************************************************************
@@ -5470,10 +5459,7 @@ public:
 	{
 		if (!_finalized)
 		{
-			static if (isAESGCMEngine!Engine)
-				_engine.finalize(_dst);
-			else
-				_engine.finalize(_dst, _padding);
+			_engine.finalize(_dst);
 			_finalized = true;
 		}
 		return _dst.data();
@@ -5632,21 +5618,19 @@ public:
 		_engine = engine.move;
 		static if (!_onlyOneShot)
 			_dst = appender!(immutable(ubyte)[])();
-		static if (!isAESGCMEngine!Engine)
-			_padding = padding;
 		_finalized = false;
 	}
 	/// ditto
 	static if (_requireCommand && isAESCBCEngine!Engine)
 	this(in ubyte[] key, in ubyte[] iv, bool padding = true, string cmd = defaultOpenSSLCommand)
 	{
-		this(Engine(key, iv, cmd), padding);
+		this(Engine(key, iv, padding, cmd));
 	}
 	/// ditto
 	static if (!_requireCommand && isAESCBCEngine!Engine)
 	this(in ubyte[] key, in ubyte[] iv, bool padding = true)
 	{
-		this(Engine(key, iv), padding);
+		this(Engine(key, iv, padding));
 	}
 	/// ditto
 	static if (!_requireCommand && isAESGCMEngine!Engine)
@@ -5717,7 +5701,7 @@ public:
 			static if (isAESGCMEngine!Engine)
 				_engine.finalize(_dst, _tag);
 			else
-				_engine.finalize(_dst, _padding);
+				_engine.finalize(_dst);
 			_finalized = true;
 		}
 		return _dst.data();
