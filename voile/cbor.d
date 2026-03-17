@@ -11,15 +11,16 @@ module voile.cbor;
 
 import std.sumtype;
 import std.range, std.algorithm, std.array, std.traits, std.meta, std.string;
+import std.typecons: Tuple, tuple, isTuple;
 import core.lifetime: move;
 import voile.attr;
 alias attr = voile.attr;
 
 
-/*******************************************************************************
- * Determines if the type is binary
- */
-enum isBinary(T) = is(T == immutable(ubyte)[]);
+
+//##############################################################################
+//##### MARK: Attributes
+//##############################################################################
 
 private struct Kind
 {
@@ -141,9 +142,20 @@ auto converterDuration()
 		(in Duration src, ref CborValue dst) { dst = src.total!"hnsecs"(); });
 }
 
+
+//##############################################################################
+//##### MARK: Traits
+//##############################################################################
+
+
+
+/*******************************************************************************
+ * Determines if the type is binary
+ */
+enum isBinary(T) = is(T == immutable(ubyte)[]);
+
 private enum isArrayWithoutBinary(T) = isArray!T && !isBinary!T;
 
-import std.typecons: Tuple, tuple, isTuple;
 
 /*******************************************************************************
  * Determines if the Tuple can be serialized to CBOR format
@@ -269,6 +281,10 @@ template isSerializable(T)
 		enum isSerializable = isSerializableData!T;
 }
 
+//##############################################################################
+//##### MARK: Builder
+//##############################################################################
+
 /*******************************************************************************
  * The Builder struct is used to generate and manipulate CBOR (Concise Binary Object Representation) data.
  * 
@@ -280,6 +296,9 @@ template isSerializable(T)
 struct Builder
 {
 private:
+	//##########################################################################
+	//##### MARK: -- Types
+	//##########################################################################
 	enum String: string { init = string.init }
 	enum Binary: immutable(ubyte)[] { init = (immutable(ubyte)[]).init }
 	enum Undefined { init }
@@ -526,7 +545,7 @@ public:
 		/***********************************************************************
 		 * Type getter
 		 */
-		Type type() const pure nothrow @safe
+		Type type() const pure nothrow @trusted
 		{
 			return cast(Type)__traits(getMember, _instance, "tag");
 		}
