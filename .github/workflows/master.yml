@@ -294,32 +294,32 @@ jobs:
 
   # No. OS      ARCH    COMPILER   UT  TT  BLD DOC COV
   # 21. macOS   x86_64  dmd        o   o   x   x   o
-  test-macos13-x86_64-dmd-latest:
-    name: test-macos13-x86_64-dmd-latest
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install D compiler
-        uses: dlang-community/setup-dlang@v2
-        with:
-          compiler: dmd-latest
-      - name: Run unit tests
-        run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
-      - name: Run integration tests
-        run: rdmd ./ci/runner.d -a=x86_64 --mode=integration-test
-      - name: Upload coverage result
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-macos13
-          path: .cov
-          include-hidden-files: true
+  #test-macos-x86_64-dmd-latest:
+  #  name: test-macos-x86_64-dmd-latest
+  #  runs-on: macos-latest
+  #  steps:
+  #    - uses: actions/checkout@v4
+  #    - name: Install D compiler
+  #      uses: dlang-community/setup-dlang@v2
+  #      with:
+  #        compiler: dmd-latest
+  #    - name: Run unit tests
+  #      run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
+  #    - name: Run integration tests
+  #      run: rdmd ./ci/runner.d -a=x86_64 --mode=integration-test
+  #    - name: Upload coverage result
+  #      uses: actions/upload-artifact@v4
+  #      with:
+  #        name: coverage-macos
+  #        path: .cov
+  #        include-hidden-files: true
 
 
   # No. OS      ARCH    COMPILER   UT  TT  BLD DOC COV
   # 22. macOS   x86_64  ldc        o   x   o   o   x
-  test-macos13-x86_64-ldc-latest:
-    name: test-macos13-x86_64-ldc-latest
-    runs-on: macos-13
+  test-macos-x86_64-ldc-latest:
+    name: test-macos-x86_64-ldc-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install D compiler
@@ -330,8 +330,16 @@ jobs:
         run: rdmd ./ci/runner.d -a=x86_64 --mode=unit-test
       - name: Build tests
         run: dub build -a=x86_64 -b=release -c=default
+      - name: Run integration tests
+        run: rdmd ./ci/runner.d -a=x86_64 --mode=integration-test
       - name: Generate document tests
         run: rdmd ./ci/runner.d -a=x86_64 --mode=generate-document
+      - name: Upload coverage result
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-macos
+          path: .cov
+          include-hidden-files: true
 
   # No. OS      ARCH    COMPILER   UT  TT  BLD DOC COV
   # 23. macOS   x86_64  dmd-master x   x   x   x   x
@@ -344,7 +352,7 @@ jobs:
   # Upload coverage to Codecov
   upload-codecov:
     name: upload-codecov
-    needs: [test-windows-x86-dmd-latest, test-windows-x86-ldc-latest, test-windows-x86_64-dmd-latest, test-windows-x86_64-ldc-latest, test-windows-x86_64-ldc-master, test-linux-x86-ldc-latest, test-linux-x86_64-dmd-latest, test-linux-x86_64-ldc-latest, test-linux-x86_64-dmd-master, test-macos13-x86_64-dmd-latest, test-macos13-x86_64-ldc-latest]
+    needs: [test-windows-x86-dmd-latest, test-windows-x86-ldc-latest, test-windows-x86_64-dmd-latest, test-windows-x86_64-ldc-latest, test-windows-x86_64-ldc-master, test-linux-x86-ldc-latest, test-linux-x86_64-dmd-latest, test-linux-x86_64-ldc-latest, test-linux-x86_64-dmd-master, test-macos-x86_64-ldc-latest]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -365,10 +373,10 @@ jobs:
       - name: Download coverage result
         uses: actions/download-artifact@v4
         with:
-          name: coverage-macos13
-          path: coverage-macos13
+          name: coverage-macos
+          path: coverage-macos
       - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }} -s coverage-macos13
+        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }} -s coverage-macos
 
   # Deploy Pages
   deproy-pages:
