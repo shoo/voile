@@ -5,7 +5,7 @@ module voile.log;
 
 
 import std.range: isInputRange, isOutputRange, isForwardRange, hasLength, hasSlicing;
-import std.logger: Logger, FileLogger, MultiLogger, sharedLog;
+import std.logger: Logger, FileLogger, MultiLogger, sharedLog, LogLevel, CreateFolder;
 
 
 
@@ -14,7 +14,6 @@ import std.logger: Logger, FileLogger, MultiLogger, sharedLog;
  */
 struct LogData
 {
-	import std.logger;
 	import std.datetime, std.json;
 	import voile.json;
 	///
@@ -259,7 +258,6 @@ static assert(hasSlicing!(typeof(LogStorageInMemory.slice(0,0))));
 class LogStorageLogger : Logger
 {
 private:
-	import std.logger: LogLevel;
 	size_t _currentId;
 	LogStorageOutput _logDst;
 public:
@@ -297,7 +295,6 @@ public:
 class InMemoryLogger: LogStorageLogger
 {
 private:
-	import std.logger: LogLevel;
 	LogStorageInMemory _logStorage;
 	
 	
@@ -333,7 +330,6 @@ public:
 ///
 @system unittest
 {
-	import std.logger: LogLevel;
 	auto logger = new InMemoryLogger(LogLevel.info);
 	logger.trace("TRACETEST"); // ignore
 	logger.info("INFOTEST");
@@ -361,7 +357,6 @@ public:
  */
 class TextFileLogger: FileLogger
 {
-	import std.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -393,9 +388,8 @@ class TextFileLogger: FileLogger
 		//ptrdiff_t fnIdx = file.lastIndexOf('/') + 1;
 		//ptrdiff_t funIdx = funcName.lastIndexOf('.') + 1;
 		auto writer = this.file.lockingTextWriter();
-		writer.formattedWrite("%s(%s): %s: %s @ ", file, line, logLevel, funcName);
 		writer.systimeToISOString(timestamp);
-		writer.put(": ");
+		writer.formattedWrite(" [%s] %s(%s) %s: ", logLevel, file, line, funcName);
 	}
 	
 	///
@@ -419,7 +413,6 @@ class TextFileLogger: FileLogger
 class JsonFileLogger: Logger
 {
 private:
-	import std.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -603,6 +596,166 @@ public:
 	input.destroy();
 }
 
+/*******************************************************************************
+ * JSONファイルのロガー
+ */
+class JsonLineFileLogger: Logger
+{
+private:
+	import std.concurrency: Tid;
+	import std.datetime: SysTime;
+	import std.stdio: File;
+	File _file;
+	string _filename;
+public:
+	
+	///
+	this(in string fn, const LogLevel lv = LogLevel.all) @safe
+	{
+		this(fn, lv, CreateFolder.yes);
+	}
+	/// ditto
+	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder) @safe
+	{
+		import std.file : exists, mkdirRecurse;
+		import std.path : dirName;
+		import std.conv : text;
+		import core.stdc.stdio;
+		super(lv);
+		_filename = fn;
+		if (createFileNameFolder)
+		{
+			auto d = dirName(_filename);
+			mkdirRecurse(d);
+			assert(exists(d), text("The folder the FileLogger should have",
+			                       " created in '", d,"' could not be created."));
+		}
+		_file.open(_filename, "ab");
+	}
+	/// ditto
+	this(File file, const LogLevel lv = LogLevel.all) @safe
+	{
+		super(lv);
+		_file = file;
+	}
+	
+	///
+	override void writeLogMsg(ref LogEntry payload) @trusted
+	{
+		import std.format: formattedWrite;
+		import std.json: JSONValue;
+		import core.stdc.stdio;
+		import std.stdio;
+		auto writer = _file.lockingTextWriter();
+		writer.formattedWrite(
+			"{"
+			~`"file":%s,`
+			~`"line":"%s",`
+			~`"funcName":"%s",`
+			~`"prettyFuncName":%s,`
+			~`"moduleName":"%s",`
+			~`"logLevel":"%s",`
+			~`"threadId":"%s",`
+			~`"time":"%s",`
+			~`"msg":%s`
+			~`}`~"\n",
+			JSONValue(payload.file).toString,
+			payload.line,
+			payload.funcName,
+			JSONValue(payload.prettyFuncName).toString,
+			payload.moduleName,
+			payload.logLevel,
+			payload.threadId,
+			payload.timestamp.toISOExtString(),
+			JSONValue(payload.msg).toString
+		);
+	}
+	
+	///
+	string getFilename()
+	{
+		return _filename;
+	}
+	
+	///
+	static LogStorageInput loadFromFile(string fileName)
+	{
+		return new class LogStorageInput
+		{
+			import std.stdio;
+			File file;
+			typeof(file.byLine()) byLine;
+			const(char)[] line;
+			ulong id;
+			
+			this()
+			{
+				file.open(fileName, "r");
+				reset();
+			}
+			///
+			LogData front() const @property
+			{
+				import voile.json;
+				LogData ret;
+				ret.deserializeFromJsonString(cast(string)line);
+				ret.id = id;
+				return ret;
+			}
+			///
+			bool empty() const @property
+			{
+				return line.length == 0;
+			}
+			///
+			void popFront()
+			{
+				byLine.popFront();
+				line = byLine.front;
+				id++;
+			}
+			///
+			void reset()
+			{
+				file.seek(0);
+				byLine = file.byLine();
+				line = byLine.front;
+				id = 0;
+			}
+		};
+	}
+}
+
+@system unittest
+{
+	import voile.fs;
+	auto fs = createDisposableDir("ut");
+	auto logger = new JsonLineFileLogger(fs.absolutePath("jsonlinelogger.jsonl"));
+	logger.trace("TRACETEST");
+	logger.info("INFOTEST");
+	logger.warning("WARNINGTEST");
+	logger.error("ERRORTEST");
+	logger.destroy();
+	auto input = JsonLineFileLogger.loadFromFile(fs.absolutePath("jsonlinelogger.jsonl"));
+	assert(!input.empty);
+	assert(input.front.id == 0);
+	assert(input.front.msg == "TRACETEST");
+	input.popFront();
+	assert(!input.empty);
+	assert(input.front.id == 1);
+	assert(input.front.msg == "INFOTEST");
+	input.popFront();
+	assert(!input.empty);
+	assert(input.front.id == 2);
+	assert(input.front.msg == "WARNINGTEST");
+	input.popFront();
+	assert(!input.empty);
+	assert(input.front.id == 3);
+	assert(input.front.msg == "ERRORTEST");
+	input.popFront();
+	assert(input.empty);
+	input.destroy();
+}
 
 /*******************************************************************************
  * XMLファイルのロガー
@@ -610,7 +763,6 @@ public:
 class XmlFileLogger: Logger
 {
 private:
-	import std.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -716,7 +868,6 @@ public:
 class CsvFileLogger: Logger
 {
 private:
-	import std.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -797,7 +948,6 @@ public:
 class TsvFileLogger: Logger
 {
 private:
-	import std.logger: LogLevel, CreateFolder;
 	import std.concurrency: Tid;
 	import std.datetime: SysTime;
 	import std.stdio: File;
@@ -871,6 +1021,287 @@ public:
 }
 
 
+/*******************************************************************************
+ * 
+ */
+abstract class RotationLogger(BaseLogger): Logger
+{
+protected:
+	///
+	Logger logger;
+	///
+	string currFilePath;
+	/***************************************************************************
+	 * ログローテート
+	 */
+	void rotate(string oldFilePath, string newFilePath) @trusted
+	{
+		// 現在のファイルを閉じる
+		destroy(logger);
+		
+		// 現在のファイル名をoldNameに変更する
+		import std.file;
+		std.file.rename(currFilePath, oldFilePath);
+		
+		// 新しいLoggerを開く
+		logger = new BaseLogger(newFilePath, logger.logLevel);
+		currFilePath = newFilePath;
+	}
+public:
+	///
+	this(in string fn, const LogLevel lv = LogLevel.all) @safe
+	{
+		this(fn, lv, CreateFolder.yes);
+	}
+	/// ditto
+	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder) @trusted
+	{
+		super(lv);
+		logger = new BaseLogger(fn, lv, createFileNameFolder);
+		currFilePath = fn;
+	}
+	
+	///
+	abstract override void writeLogMsg(ref LogEntry payload);
+}
+
+/*******************************************************************************
+ * 
+ */
+class SizeRotationLogger(BaseLogger): RotationLogger!BaseLogger
+{
+private:
+	size_t _threshold;
+public:
+	///
+	this(in string fn, const LogLevel lv = LogLevel.all, size_t threshold = 16 * 1024 * 1024) @safe
+	{
+		this(fn, lv, CreateFolder.yes, threshold);
+	}
+	/// ditto
+	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder, size_t threshold = 16 * 1024 * 1024) @trusted
+	{
+		super(fn, lv, createFileNameFolder);
+		_threshold = threshold;
+	}
+	
+	///
+	override void writeLogMsg(ref LogEntry payload) @trusted
+	{
+		import std.file, std.path, std.conv, std.string, std.exception, std.regex, std.format;
+		if (std.file.getSize(currFilePath) >= _threshold)
+		{
+			auto baseLogName = currFilePath.baseName(currFilePath.extension);
+			auto blobName = baseLogName ~ "-*" ~ currFilePath.extension;
+			size_t latestNumber = 0;
+			size_t maxSpace = 1;
+			foreach (de; dirEntries(currFilePath.dirName, blobName, SpanMode.shallow))
+			{
+				if (!de.isFile)
+					continue;
+				auto scannedBaseLogName = de.name.baseName(de.name.extension);
+				auto idx = scannedBaseLogName.lastIndexOf("-");
+				assert(idx != -1);
+				try
+				{
+					auto number = scannedBaseLogName[idx + 1 .. $].to!size_t();
+					if (number > latestNumber)
+						latestNumber = number;
+				}
+				catch (Exception)
+					continue;
+				if (scannedBaseLogName.length - idx - 1 > maxSpace)
+					maxSpace = scannedBaseLogName.length - idx;
+			}
+			latestNumber++;
+			auto oldBaseName = format("%s-%0" ~ to!string(maxSpace) ~ "d%s",
+				baseLogName, latestNumber, currFilePath.extension);
+			rotate(currFilePath.dirName.buildPath(oldBaseName), currFilePath);
+		}
+		logger.writeLogMsg(payload);
+	}
+}
+
+@system unittest
+{
+	import std.algorithm, std.range, std.array;
+	import core.thread;
+	import voile.fs;
+	import std.file;
+	auto fs = createDisposableDir("ut");
+	auto logger = new SizeRotationLogger!TextFileLogger(fs.absolutePath("test.log"), threshold: 128);
+	
+	logger.info("test");
+	assert(fs.entries("*.log").walkLength == 1);
+	assert(fs.exists("test.log"));
+	assert(fs.absolutePath("test.log").getSize() < 128);
+	
+	logger.info("testtesttesttesttesttesttest");
+	assert(fs.entries("*.log").walkLength == 1);
+	assert(fs.absolutePath("test.log").getSize() > 128);
+	
+	Thread.sleep(1.msecs);
+	logger.info("testtesttesttesttesttesttest");
+	assert(fs.entries("*.log").walkLength == 2);
+	assert(fs.exists("test.log"));
+	assert(fs.exists("test-1.log"));
+	assert(fs.getTimeStamp("test.log") > fs.getTimeStamp("test-1.log"));
+	
+	logger.info("testtesttesttesttesttesttest");
+	logger.info("testtesttesttesttesttesttest");
+	assert(fs.entries("*.log").walkLength == 3);
+	assert(fs.exists("test-2.log"));
+	logger.logger.destroy();
+}
+
+/*******************************************************************************
+ * 
+ */
+class DateRotationLogger(BaseLogger): RotationLogger!BaseLogger
+{
+	///
+	enum LogInterval
+	{
+		///
+		hourly,
+		///
+		daily,
+		///
+		weekly,
+		///
+		monthly,
+	}
+private:
+	import std.datetime;
+	SysTime _nextRotateTime;
+	SysTime _currRotateTime;
+	LogInterval _interval;
+	
+	SysTime calcPrevRotateTime(SysTime tim) @safe
+	{
+		final switch (_interval)
+		{
+		case LogInterval.hourly:
+			return SysTime(DateTime(tim.year, tim.month, tim.day, tim.hour, 0, 0));
+		case LogInterval.daily:
+			return SysTime(DateTime(tim.year, tim.month, tim.day, 0, 0, 0));
+		case LogInterval.weekly:
+			auto t = SysTime(DateTime(tim.year, tim.month, tim.day, 0, 0, 0));
+			return t - days(cast(int)t.dayOfWeek);
+		case LogInterval.monthly:
+			return SysTime(DateTime(tim.year, tim.month, 1, 0, 0, 0));
+		}
+	}
+	
+	SysTime calcNextTime(SysTime tim) @safe
+	{
+		final switch (_interval)
+		{
+		case LogInterval.hourly:
+			return tim + hours(1);
+		case LogInterval.daily:
+			return tim + days(1);
+		case LogInterval.weekly:
+			return tim + days(7);
+		case LogInterval.monthly:
+			return tim.roll!"months"(1);
+		}
+	}
+	void rollTime() @safe
+	{
+		_currRotateTime = _nextRotateTime;
+		_nextRotateTime = calcNextTime(calcPrevRotateTime(Clock.currTime));
+	}
+public:
+	///
+	this(in string fn, const LogLevel lv = LogLevel.all, LogInterval interval = LogInterval.daily) @safe
+	{
+		this(fn, lv, CreateFolder.yes, interval);
+	}
+	/// ditto
+	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder, LogInterval interval = LogInterval.daily) @safe
+	{
+		super(fn, lv, createFileNameFolder);
+		auto tim = Clock.currTime;
+		_interval = interval;
+		_currRotateTime = calcPrevRotateTime(tim);
+		_nextRotateTime = calcNextTime(_currRotateTime);
+	}
+	
+	///
+	override void writeLogMsg(ref LogEntry payload) @safe
+	{
+		import std.file, std.path, std.format;
+		if (payload.timestamp >= _nextRotateTime)
+		{
+			scope (exit)
+				rollTime();
+			auto baseLogName = currFilePath.baseName(currFilePath.extension);
+			auto ot = _currRotateTime;
+			string oldBaseName;
+			final switch (_interval)
+			{
+			case LogInterval.hourly:
+				oldBaseName = format("%s-%04d%02d%02d%02d", baseLogName, ot.year, ot.month, ot.day, ot.hour);
+				break;
+			case LogInterval.daily:
+				oldBaseName = format("%s-%04d%02d%02d", baseLogName, ot.year, ot.month, ot.day);
+				break;
+			case LogInterval.weekly:
+				oldBaseName = format("%s-%04d%02d%02d", baseLogName, ot.year, ot.month, ot.day);
+				break;
+			case LogInterval.monthly:
+				oldBaseName = format("%s-%04d%02d", baseLogName, ot.year, ot.month);
+				break;
+			}
+			auto oldFilePath = currFilePath.dirName.buildPath(format("%s%s", oldBaseName, currFilePath.extension));
+			size_t dupIndex = 1;
+			while (oldFilePath.exists)
+			{
+				oldFilePath = currFilePath.dirName.buildPath(
+					format("%s-%d%s", baseLogName, oldBaseName, dupIndex, currFilePath.extension));
+				dupIndex++;
+			}
+			rotate(oldFilePath, currFilePath);
+		}
+		logger.writeLogMsg(payload);
+	}
+}
+
+@system unittest
+{
+	import std.algorithm, std.range, std.array;
+	import core.thread;
+	import voile.fs;
+	import std.datetime;
+	import std.file;
+	auto fs = createDisposableDir("ut");
+	alias LI = DateRotationLogger!TextFileLogger.LogInterval;
+	auto logger = new DateRotationLogger!TextFileLogger(fs.absolutePath("test.log"), interval: LI.daily);
+	auto prev = SysTime(DateTime(2022, 11, 6, 17, 0, 0));
+	auto never = SysTime(DateTime(9999, 12, 31, 23, 59, 59));
+	auto next = SysTime(DateTime(2024, 11, 7, 15, 0, 0));
+	auto currTime = Clock.currTime;
+	
+	logger._currRotateTime = prev;
+	logger._nextRotateTime = never;
+	logger.info("test");
+	assert(fs.entries("*.log").walkLength == 1);
+	assert(fs.exists("test.log"));
+	assert(logger._currRotateTime is prev);
+	assert(logger._nextRotateTime is never);
+	
+	logger._nextRotateTime = next;
+	logger.info("test");
+	assert(fs.entries("*.log").walkLength == 2);
+	assert(fs.exists("test.log"));
+	assert(fs.exists("test-20221106.log"));
+	assert(logger._currRotateTime is next);
+	assert(logger._nextRotateTime > currTime);
+	
+	logger.logger.destroy();
+}
+
 
 /*******************************************************************************
  * 
@@ -907,7 +1338,6 @@ class NamedLogger: MultiLogger
  */
 class DispatchLogger: NamedLogger
 {
-	import std.logger: LogLevel;
 	import std.regex;
 	/***************************************************************************
 	 * 
@@ -1155,7 +1585,6 @@ public:
 class SynchronizedLogger: Logger
 {
 private:
-	import std.logger: LogLevel;
 	Logger _logger;
 public:
 	///
@@ -1197,7 +1626,6 @@ public:
  */
 mixin template Logging(loggerAlias...)
 {
-	private import std.logger: Logger, LogLevel;
 	private import std.string: format;
 	static if (loggerAlias.length == 1 && is(typeof(loggerAlias[0]): Logger))
 	{
@@ -1416,7 +1844,6 @@ mixin template Logging(loggerAlias...)
  */
 Logger getLogger(string name, Logger defaultLogger = cast()sharedLog) @trusted
 {
-	import std.logger;
 	auto logger = cast(NamedLogger)cast()sharedLog;
 	if (!logger)
 		return defaultLogger;

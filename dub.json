@@ -14,18 +14,10 @@
             "targetType": "library"
         },
         {
-            "name": "unittest-debug",
-            "targetType": "executable",
-            "targetName": "voile-ut",
-            "dflags": ["-main", "-mixin=.dub/mixin.d"],
-            "dependencies": {
-                "openssl-static": "~>1.0.5+3.0.8"
-            }
-        },
-        {
             "name": "unittest",
-            "targetType": "library",
-            "dflags": ["-mixin=.dub/mixin.d"],
+            "targetName": "voile-ut",
+            "targetType": "executable",
+            "dflags": ["-mixin=.dub/mixin.d", "-main"],
             "dependencies": {
                 "openssl-static": "~>1.0.5+3.0.8"
             }
