@@ -868,7 +868,7 @@ public:
 	/***************************************************************************
 	 * 
 	 */
-	Type type() const nothrow pure @nogc @safe
+	Type type() const nothrow pure @nogc @trusted
 	{
 		return cast(Type)__traits(getMember, _instance, "tag");
 	}
@@ -1161,19 +1161,19 @@ public:
 	/***************************************************************************
 	 * Check if the comment at the given index is a line comment/block/trailing comment
 	 */
-	bool isLineComment(size_t idx) const @safe
+	bool isLineComment(size_t idx) const @trusted
 	{
 		assert(idx < _comments.length, "Comment index out of range");
 		return __traits(getMember, _comments[idx], "tag") == 0;
 	}
 	/// ditto
-	bool isBlockComment(size_t idx) const @safe
+	bool isBlockComment(size_t idx) const @trusted
 	{
 		assert(idx < _comments.length, "Comment index out of range");
 		return __traits(getMember, _comments[idx], "tag") == 1;
 	}
 	/// ditto
-	bool isTrailingComment(size_t idx) const @safe
+	bool isTrailingComment(size_t idx) const @trusted
 	{
 		assert(idx + 1 == _comments.length, "Trailing comment index must be the last one");
 		return __traits(getMember, _comments[idx], "tag") == 2;
@@ -4546,6 +4546,7 @@ T deserializeFromJsonString(T)(in char[] src) @safe
 	
 }
 
+@("json5 creation.")
 @system unittest
 {
 	Json5Builder builder;
