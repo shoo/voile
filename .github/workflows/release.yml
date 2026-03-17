@@ -111,7 +111,11 @@ jobs:
   # Deploy Pages
   create-release:
     name: create-release
-    needs: [create-windows-x86, create-windows-x86_64, create-linux-x86_64, create-macos-x86_64]
+    needs:
+      - create-windows-x86
+      - create-windows-x86_64
+      - create-linux-x86_64
+      - create-macos-x86_64
     runs-on: ubuntu-latest
     steps:
       #- name: Get Names
