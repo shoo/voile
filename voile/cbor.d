@@ -569,6 +569,12 @@ public:
 				_instance = value._instance;
 				_builder  = value._builder;
 			}
+			else static if (is(T: const(CborValue)))
+			{
+				auto tmp = _builder.deepCopy(value);
+				_instance = tmp._instance;
+				tmp._builder = null;
+			}
 			else static if (isIntegral!T && isSigned!T && !is(T == enum))
 				_instance = value < 0
 					? CborType(cast(NegativeInteger)cast(ulong)(-1-value))
@@ -655,6 +661,7 @@ public:
 		T get(T)(lazy T defaultValue = T.init) const nothrow @safe
 		{
 			import std.conv: to;
+			import std.json: JSONValue, JSONType;
 			try
 			{
 				static if (is(T == const(CborValue)))
@@ -710,7 +717,7 @@ public:
 				else static if (isArray!T && !is(T == enum))
 				{
 					T ret;
-					foreach (e; _reqArray)
+					foreach (ref e; _reqArray)
 						ret ~= e.get!(ElementType!T);
 					return ret;
 				}
@@ -719,9 +726,37 @@ public:
 					T ret;
 					alias V = ValueType!T;
 					alias K = KeyType!T;
-					foreach (e; _reqMap.byKeyValue)
+					foreach (ref e; _reqMap.byKeyValue)
 						ret[e.key.get!K] = e.value.get!V;
 					return ret;
+				}
+				else static if (is(T == JSONValue))
+				{
+					import std.base64;
+					return _instance.match!(
+						(in Undefined v) @trusted       => defaultValue,
+						(in Null v) @trusted            => JSONValue(null),
+						(in Boolean v) @trusted         => JSONValue(cast(bool)v),
+						(in PositiveInteger v) @trusted => JSONValue(cast(ulong)v),
+						(in NegativeInteger v) @trusted => JSONValue(long(-1)-cast(long)cast(ulong)v),
+						(in HalfFloat v) @trusted       => JSONValue(convToFloat!double(v)),
+						(in SingleFloat v) @trusted     => JSONValue(cast(float)v),
+						(in DoubleFloat v) @trusted     => JSONValue(cast(double)v),
+						(in String v) @trusted          => JSONValue(cast(string)v),
+						(in Binary v) @trusted          => JSONValue(Base64.encode(cast(immutable(ubyte)[])v)),
+						(in CborArray v) @trusted {
+							JSONValue ret = JSONValue.emptyArray;
+							foreach (ref e; _reqArray)
+								ret.array ~= e.get!JSONValue();
+							return ret;
+						},
+						(in CborMap v) @trusted {
+							JSONValue ret = JSONValue.emptyOrderedObject;
+							alias JVOOM = JSONValue.OrderedObjectMember;
+							foreach (ref kv; _reqMap.byKeyValue)
+								ret.orderedObject ~= JVOOM(kv.key.get!string(), kv.value.get!JSONValue());
+							return ret;
+						});
 				}
 				else
 					return (() @trusted => (cast()_instance).match!((ref T v) => v, (ref _) => defaultValue))();
@@ -832,7 +867,7 @@ public:
 	/***************************************************************************
 	 * Create a CborValue from a given value.
 	 */
-	CborValue make(T)(T value) @safe
+	CborValue make(T)(auto ref T value) @safe
 	{
 		return CborValue(value, this);
 	}
@@ -882,26 +917,36 @@ public:
 	 */
 	CborValue deepCopy(CborValue src) pure @safe
 	{
+		return deepCopy(src);
+	}
+	/// ditto
+	CborValue deepCopy(ref CborValue src) pure @safe
+	{
 		if (src._builder is &this)
 			return src;
+		return deepCopy(cast(const)src);
+	}
+	/// ditto
+	CborValue deepCopy(in CborValue src) pure @safe
+	{
 		return src._instance.match!(
-			(ref CborValue.CborArray ary)
+			(const ref CborValue.CborArray ary)
 			{
 				CborValue.CborArray dst;
 				foreach (ref e; ary)
 					dst ~= deepCopy(e);
 				return CborValue(dst, this);
 			},
-			(ref CborValue.CborMap map) @trusted
+			(const ref CborValue.CborMap map) @trusted
 			{
 				auto dst = allocDic!(CborValue, CborValue);
 				foreach (ref e; src._reqMap.byKeyValue)
 					dst.append(deepCopy(e.key), deepCopy(e.value));
 				return CborValue(dst, this);
 			},
-			(ref Binary bin) => CborValue(copyImmutableMemory(cast(immutable(ubyte)[])bin), this),
-			(ref String str) => CborValue(copyImmutableMemory(cast(string)str), this),
-			(ref _) => CborValue(src._instance, this)
+			(const ref Binary bin) => CborValue(copyImmutableMemory(cast(immutable(ubyte)[])bin), this),
+			(const ref String str) => CborValue(copyImmutableMemory(cast(string)str), this),
+			(const ref _) => CborValue(src._instance, this)
 		);
 	}
 	
@@ -1119,7 +1164,7 @@ public:
 	/***************************************************************************
 	 * Build a CborValue to a binary CBOR data.
 	 */
-	void build(OutputRange)(ref OutputRange dst, CborValue src) @safe
+	void build(OutputRange)(ref OutputRange dst, in CborValue src) @safe
 	if (isOutputRange!(OutputRange, ubyte))
 	{
 		import std.conv: to;
@@ -1174,13 +1219,13 @@ public:
 			writeUInt(data.length, 2);
 			dst.put(data);
 		}
-		void writeArray(CborValue.CborArray data) @safe
+		void writeArray(const ref CborValue.CborArray data) @safe
 		{
 			writeUInt(data.length, 4);
 			foreach (e; data)
 				build(dst, e);
 		}
-		void writeMap(ref CborValue.CborMap data) @trusted
+		void writeMap(const ref CborValue.CborMap data) @trusted
 		{
 			writeUInt(data.items.length, 5);
 			foreach (e; (*cast(Dictionary!(CborValue, CborValue)*)&data).items)
@@ -1190,22 +1235,22 @@ public:
 			}
 		}
 		src._instance.match!(
-			(ref Undefined v)             => dst.put(ubyte(0xF7)),
-			(ref Null v)                  => dst.put(ubyte(0xF6)),
-			(ref Boolean v)               => dst.put(ubyte(cast(bool)v ? 0xF5 : 0xF4)),
-			(ref PositiveInteger v)       => writeUInt(cast(ulong)v, 0),
-			(ref NegativeInteger v)       => writeUInt(cast(ulong)v, 1),
-			(ref HalfFloat v)             => writeFloat(cast(ulong)cast(ushort)v, 7),
-			(ref SingleFloat v) @trusted  => writeFloat(cast(ulong)*cast(uint*)&v, 7),
-			(ref DoubleFloat v) @trusted  => writeFloat(*cast(ulong*)&v, 7),
-			(ref String v)                => writeString(cast(string)v),
-			(ref Binary v)                => writeBinary(cast(immutable(ubyte)[])v),
-			(ref CborValue.CborArray v)   => writeArray(v),
-			(ref CborValue.CborMap v)     => writeMap(v)
+			(const ref Undefined v)             => dst.put(ubyte(0xF7)),
+			(const ref Null v)                  => dst.put(ubyte(0xF6)),
+			(const ref Boolean v)               => dst.put(ubyte(cast(bool)v ? 0xF5 : 0xF4)),
+			(const ref PositiveInteger v)       => writeUInt(cast(ulong)v, 0),
+			(const ref NegativeInteger v)       => writeUInt(cast(ulong)v, 1),
+			(const ref HalfFloat v)             => writeFloat(cast(ulong)cast(ushort)v, 7),
+			(const ref SingleFloat v) @trusted  => writeFloat(cast(ulong)*cast(uint*)&v, 7),
+			(const ref DoubleFloat v) @trusted  => writeFloat(*cast(ulong*)&v, 7),
+			(const ref String v)                => writeString(cast(string)v),
+			(const ref Binary v)                => writeBinary(cast(immutable(ubyte)[])v),
+			(const ref CborValue.CborArray v)   => writeArray(v),
+			(const ref CborValue.CborMap v)     => writeMap(v)
 		);
 	}
 	/// ditto
-	immutable(ubyte)[] build(CborValue src) @safe
+	immutable(ubyte)[] build(in CborValue src) @safe
 	{
 		auto app = appender!(immutable ubyte[]);
 		build(app, src);
@@ -1862,14 +1907,39 @@ alias CBOR = Builder;
 /// ditto
 alias CborBuilder = Builder;
 
+private __gshared CborBuilder g_defaultBuilder;
 
 /*******************************************************************************
  * Perse CBOR data
  */
 CborValue parseCBOR(immutable(ubyte)[] binary) @trusted
 {
-	static Builder builder;
-	return builder.parse(binary);
+	return g_defaultBuilder.parse(binary);
+}
+
+///
+@safe unittest
+{
+	immutable ubyte[] data = [0x63, 'f', 'o', 'o']; // "foo"
+	auto value = parseCBOR(data);
+	assert(value.type == CborType.string);
+	assert(value.get!string == "foo");
+}
+
+/*******************************************************************************
+ * Make CBOR data
+ */
+CborValue makeCbor(T)(auto ref T val) @safe
+{
+	return g_defaultBuilder.make(val);
+}
+
+///
+@safe unittest
+{
+	auto value = makeCbor("foo");
+	assert(value.type == CborType.string);
+	assert(value.get!string == "foo");
 }
 
 /*******************************************************************************
@@ -1880,9 +1950,101 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	return cv._builder.build(cv);
 }
 
+///
+@safe unittest
+{
+	// Test parsing of string values
+	auto data = [0x63, 'f', 'o', 'o']; // "foo"
+	auto value = toCBOR(makeCbor("foo"));
+	assert(value == data);
+}
+
+
+/*******************************************************************************
+ * Serialize any type to CborValue
+ */
+CborValue serializeToCbor(T)(in T src) @safe
+{
+	return g_defaultBuilder.serialize(src);
+}
+
+///
+@safe unittest
+{
+	struct Data { string foo; int hoge; }
+	auto data = Data("bar", 42);
+	auto value = serializeToCbor(data);
+	assert(value.getValue!string("foo") == "bar");
+	assert(value.getValue!int("hoge") == 42);
+	assert(value.toCBOR() == [0xA2,
+		0x63, 'f', 'o', 'o', 
+		0x63, 'b', 'a', 'r',
+		0x64, 'h', 'o', 'g', 'e',
+		0x18, 0x2A]);
+}
+
+/*******************************************************************************
+ * Serialize any type to CBOR binary
+ */
+immutable(ubyte)[] serializeToCborBinary(T)(in T src) @safe
+{
+	auto app = appender!(immutable(ubyte)[]);
+	g_defaultBuilder.build(app, g_defaultBuilder.serialize(src));
+	return app.data;
+}
+
+///
+@safe unittest
+{
+	struct Data { string foo; int hoge; }
+	auto data = Data("bar", 42);
+	auto value = serializeToCborBinary(data);
+	assert(value == [0xA2,
+		0x63, 'f', 'o', 'o', 
+		0x63, 'b', 'a', 'r',
+		0x64, 'h', 'o', 'g', 'e',
+		0x18, 0x2A]);
+}
+
+
+/*******************************************************************************
+ * Deserialize a CborValue to any type
+ */
+bool deserializeFromCbor(T)(in CborValue src, ref T dst) @safe
+{
+	return g_defaultBuilder.deserialize(src, dst);
+}
+///
+@safe unittest
+{
+	struct Data { string foo; int hoge; }
+	auto value = makeCbor(["foo": makeCbor("bar"), "hoge": makeCbor(42)]);
+	Data data;
+	auto res = deserializeFromCbor(value, data);
+	assert(res);
+	assert(data == Data("bar", 42));
+}
+
+/// ditto
+T deserializeFromCbor(T)(in CborValue src) @safe
+{
+	return g_defaultBuilder.deserialize!T(src);
+}
+/// ditto
+bool deserializeFromCborBinary(T)(in ubyte[] src, ref T dst) @safe
+{
+	return deserializeFromCbor(g_defaultBuilder.parse(src, dst));
+}
+/// ditto
+T deserializeFromCborBinary(T)(in ubyte[] src) @safe
+{
+	return deserializeFromCbor!T(g_defaultBuilder.parse(src));
+}
+
 // Test of the CBOR builder
 @safe unittest
 {
+	import std.json: JSONValue, JSONType;
 	bool testSumType(T, ST)(ref ST value, T checkValue) @trusted
 	if (isSumType!ST)
 	{
@@ -1891,13 +2053,20 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 			(ref _) => false
 		);
 	}
+	JSONValue[] getAry(JSONValue jv) @trusted
+	{
+		return jv.array;
+	}
 	Builder builder;
 	Builder.CborValue value;
 	
+	// Test for undefined values
 	assert(value.isUndefined);
 	assert(!value.isNull);
 	assert(!value._builder);
 	assert(&(value.builder()) is null);
+	assert(value.get!JSONValue().type == JSONType.null_);
+	assert(value.get!JSONValue(JSONValue.emptyObject).type == JSONType.object);
 	
 	value = builder.undefinedValue;
 	assert(value.isUndefined);
@@ -1912,10 +2081,11 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	assert(value.type == CborType.map);
 	assert(!value.get!bool);
 	
-	// Test for integer values
+	// Test for null values
 	value = builder.make(null);
 	assert(!value.isUndefined);
 	assert(value.isNull);
+	assert(value.get!JSONValue().type == JSONType.null_);
 	
 	// Test for integer values
 	value = builder.make(42);
@@ -1930,6 +2100,8 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	assert(value.get!double == 42.0);
 	assert(value.get!real == 42.0);
 	assert(value.get!string == "42");
+	assert(value.get!JSONValue().type == JSONType.uinteger);
+	assert(value.get!JSONValue().uinteger == 42);
 	
 	// Test for unsigned integer values
 	value = builder.make(42u);
@@ -1940,6 +2112,8 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	assert(value.get!uint == 42u);
 	assert(value.get!float == 42.0f);
 	assert(value.get!string == "42");
+	assert(value.get!JSONValue().type == JSONType.uinteger);
+	assert(value.get!JSONValue().uinteger == 42);
 	
 	// Test for negative integer values
 	value = builder.make(-42);
@@ -1950,6 +2124,8 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	assert(value.get!uint == cast(uint)-42);
 	assert(value.get!float == -42.0f);
 	assert(value.get!string == "-42");
+	assert(value.get!JSONValue().type == JSONType.integer);
+	assert(value.get!JSONValue().integer == -42);
 	
 	// Integer overflow test
 	value = builder.make(long.max);
@@ -1965,29 +2141,39 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	assert(testSumType(value._instance, cast(Builder.NegativeInteger)0xCFFFFFFFFFFFFFFF));
 	assert(value.isOverflowedInteger);
 	assert(value.get!ulong == ulong(0x3000000000000000));
+	assert(value.get!JSONValue().type == JSONType.integer);
+	assert(value.get!JSONValue().integer == long(0x3000000000000000));
 	
 	// Test for boolean values
 	value = builder.make(true);
 	assert(testSumType(value._instance, cast(Builder.Boolean)true));
 	assert(value.get!bool);
 	assert(value.get!string == "true");
+	assert(value.get!JSONValue().type == JSONType.true_);
+	assert(value.get!JSONValue().boolean);
 	
 	// Test for float values
 	value = builder.make(3.14f);
 	assert(testSumType(value._instance, cast(Builder.SingleFloat)3.14f));
+	assert(value.get!JSONValue().type == JSONType.float_);
 	
 	// Test for double values
 	value = builder.make(3.14);
 	assert(testSumType(value._instance, cast(Builder.DoubleFloat)3.14));
+	assert(value.get!JSONValue().type == JSONType.float_);
 	
 	// Test for string values
 	value = builder.make("hello");
 	assert(testSumType(value._instance, cast(Builder.String)"hello"));
 	assert(value.get!string == "hello");
+	assert(value.get!JSONValue().type == JSONType.string);
+	assert(value.get!JSONValue().str == "hello");
 	
 	// Test for binary values
 	value = builder.make(cast(immutable(ubyte)[])"\x01\x02\x03"c);
 	assert(testSumType(value._instance, cast(Builder.Binary)"\x01\x02\x03"c));
+	assert(value.get!JSONValue().type == JSONType.string);
+	assert(value.get!JSONValue().str == "AQID");
 	
 	// Test for array values
 	value = builder.make([1, 2, 3]);
@@ -1998,6 +2184,12 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	assert(cborArray[0].get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)1);
 	assert(cborArray[1].get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)2);
 	assert(cborArray[2].get!(Builder.PositiveInteger) == cast(Builder.PositiveInteger)3);
+	assert(value.get!JSONValue().type == JSONType.array);
+	assert(getAry(value.get!JSONValue()).length == 3);
+	assert(getAry(value.get!JSONValue())[0].type == JSONType.uinteger);
+	assert(getAry(value.get!JSONValue())[0].uinteger == 1);
+	assert(getAry(value.get!JSONValue())[1].get!int == 2);
+	assert(getAry(value.get!JSONValue())[2].get!int == 3);
 	
 	// Test for associative array values
 	value = builder.make(["1_one": 1, "2_two": 2]);
@@ -2011,6 +2203,8 @@ immutable(ubyte)[] toCBOR(CborValue cv) @trusted
 	assert(value.getValue("2_two", 0) == 2);
 	assert(value.getValue("3_three", 333) == 333);
 	assert(value.getValue("4_four", imported!"std.exception".enforce(0)) == 0);
+	assert(value.getValue!JSONValue("2_two").type == JSONType.uinteger);
+	assert(value.getValue!JSONValue("2_two").uinteger == 2);
 	
 	// Test for cbor values
 	value = builder.make(cast(Builder.String)"aaa");
