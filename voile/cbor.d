@@ -536,7 +536,7 @@ public:
 		/***********************************************************************
 		 * Constructor
 		 */
-		this(T)(T value, ref Builder builder) @trusted
+		this(T)(auto ref T value, ref Builder builder) pure @trusted
 		{
 			_builder = &builder;
 			opAssign(value);
@@ -562,8 +562,9 @@ public:
 		/***********************************************************************
 		 * Assign operator
 		 */
-		ref CborValue opAssign(T)(T value) pure return @trusted
+		ref CborValue opAssign(T)(auto ref T value) pure return @trusted
 		{
+			import std.json: JSONValue;
 			static if (is(T == CborValue))
 			{
 				_instance = value._instance;
@@ -574,6 +575,57 @@ public:
 				auto tmp = _builder.deepCopy(value);
 				_instance = tmp._instance;
 				tmp._builder = null;
+			}
+			else static if (is(T: const(JSONValue)))
+			{
+				import std.json: JSONType;
+				final switch (value.type)
+				{
+				case JSONType.null_:
+					_instance = Null.init;
+					break;
+				case JSONType.string:
+					_instance = cast(String)value.str;
+					break;
+				case JSONType.integer:
+					if (value.integer < 0)
+						_instance = cast(NegativeInteger)cast(ulong)(-1-value.integer);
+					else
+						_instance = cast(PositiveInteger)cast(ulong)(value.integer);
+					break;
+				case JSONType.uinteger:
+					_instance = cast(PositiveInteger)cast(ulong)(value.uinteger);
+					break;
+				case JSONType.float_:
+					_instance = cast(DoubleFloat)value.floating;
+					break;
+				case JSONType.array:
+					auto ary = builder.allocAry!CborValue;
+					foreach (ref e; value.array)
+						ary ~= CborValue(e, builder);
+					_instance = ary.move;
+					break;
+				case JSONType.object:
+					auto map = builder.allocDic!(CborValue, CborValue);
+					if (value.isOrdered)
+					{
+						foreach (ref itm; value.orderedObject)
+							map.append(CborValue(itm.key, builder), CborValue(itm.value, builder));
+					}
+					else
+					{
+						foreach (ref k, ref v; value.object)
+							map.append(CborValue(k, builder), CborValue(v, builder));
+					}
+					_instance = (*cast(CborMap*)&map).move;
+					break;
+				case JSONType.true_:
+					_instance = cast(Boolean)true;
+					break;
+				case JSONType.false_:
+					_instance = cast(Boolean)false;
+					break;
+				}
 			}
 			else static if (isIntegral!T && isSigned!T && !is(T == enum))
 				_instance = value < 0
@@ -841,7 +893,7 @@ public:
 		/***********************************************************************
 		 * 
 		 */
-		T getValueAt(T)(size_t idx, lazy T defaultValue = T.init) const nothrow
+		T getElement(T)(size_t idx, lazy T defaultValue = T.init) const nothrow
 		{
 			try
 			{
@@ -861,6 +913,24 @@ public:
 				catch (Exception e2)
 					return T.init;
 			}
+		}
+		
+		/***********************************************************************
+		 * 
+		 */
+		string toString() const @safe
+		{
+			import std.json: JSONValue;
+			return get!JSONValue().toString();
+		}
+		
+		/***********************************************************************
+		 * 
+		 */
+		string toPrettyString() const @safe
+		{
+			import std.json: JSONValue, JSONOptions;
+			return get!JSONValue().toPrettyString(JSONOptions.doNotEscapeSlashes);
 		}
 	}
 	
@@ -1302,8 +1372,11 @@ public:
 	 */
 	CborValue serialize(T)(T value) @safe
 	{
+		import std.json;
 		static if (is(T == CborValue))
 			return value;
+		else static if (is(T == JSONValue))
+			return CborValue(value, this);
 		else static if (isBinary!T)
 			return CborValue(value, this);
 		else static if (isArray!T && isSerializable!(ElementType!T))
@@ -1761,8 +1834,8 @@ public:
 		auto testTuple1 = tuple(42, "test");
 		cborValue = b.serialize(testTuple1);
 		assert(cborValue.type == CborType.array);
-		assert(cborValue.getValueAt!int(0) == 42);
-		assert(cborValue.getValueAt!string(1) == "test");
+		assert(cborValue.getElement!int(0) == 42);
+		assert(cborValue.getElement!string(1) == "test");
 		assert(b.deserialize!TP1(cborValue) == testTuple1);
 		
 		// toCbor/fromCborメソッドを持つ構造体の例1
@@ -2209,6 +2282,40 @@ T deserializeFromCborBinary(T)(in ubyte[] src) @safe
 	// Test for cbor values
 	value = builder.make(cast(Builder.String)"aaa");
 	assert(testSumType(value._instance, cast(Builder.String)"aaa"));
+	
+	// Test for JSON
+	value = builder.make(JSONValue.init);
+	assert(testSumType(value._instance, Builder.Null.init));
+	value = builder.make(JSONValue(null));
+	assert(testSumType(value._instance, Builder.Null.init));
+	value = builder.make(JSONValue("test"));
+	assert(testSumType(value._instance, cast(Builder.String)"test"));
+	assert(value.toString() == `"test"`);
+	value = builder.make(JSONValue(-123));
+	assert(testSumType(value._instance, cast(Builder.NegativeInteger)122));
+	assert(value.toString() == `-123`);
+	value = builder.make(JSONValue(0xAB000000_00000000UL));
+	assert(testSumType(value._instance, cast(Builder.PositiveInteger)0xAB000000_00000000UL));
+	assert(value.toString() == `12321848580485677056`);
+	value = builder.make(JSONValue(3.14));
+	assert(value.type == CborType.float64);
+	assert(value.get!string == "3.14", value.get!string);
+	assert(value.toString()[0..3] == `3.1`);
+	value = builder.make(JSONValue(true));
+	assert(testSumType(value._instance, cast(Builder.Boolean)true));
+	assert(value.toString() == `true`);
+	value = builder.make(JSONValue(false));
+	assert(value.toString() == `false`);
+	assert(testSumType(value._instance, cast(Builder.Boolean)false));
+	value = builder.make(JSONValue([1,2,3]));
+	assert(value.toString() == `[1,2,3]`);
+	assert(value.type == CborType.array);
+	assert(value.getElement(1, 0) == 2);
+	value = builder.make(JSONValue(["test": "value"]));
+	assert(value.type == CborType.map);
+	assert(value.getValue("test", "x") == "value");
+	assert(value.toString() == `{"test":"value"}`);
+	assert(value.toPrettyString() == "{\n    \"test\": \"value\"\n}");
 }
 
 // Test of the CBOR parser
