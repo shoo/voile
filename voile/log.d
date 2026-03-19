@@ -1627,6 +1627,7 @@ public:
 mixin template Logging(loggerAlias...)
 {
 	private import std.string: format;
+	private import std.logger: Logger;
 	static if (loggerAlias.length == 1 && is(typeof(loggerAlias[0]): Logger))
 	{
 		private pragma(inline) typeof(loggerAlias[0]) logger() @trusted const
