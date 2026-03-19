@@ -1027,6 +1027,7 @@ public:
 abstract class RotationLogger(BaseLogger): Logger
 {
 protected:
+	import voile.handler;
 	///
 	Logger logger;
 	///
@@ -1046,8 +1047,14 @@ protected:
 		// 新しいLoggerを開く
 		logger = new BaseLogger(newFilePath, logger.logLevel);
 		currFilePath = newFilePath;
+		
+		// ハンドラ呼び出し
+		onRotated(oldFilePath, newFilePath);
 	}
 public:
+	///
+	Handler!(void delegate(string oldFilePath, string newFilePath)) onRotated;
+	
 	///
 	this(in string fn, const LogLevel lv = LogLevel.all) @safe
 	{
