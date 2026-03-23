@@ -390,9 +390,9 @@ public:
 	 * 子ディレクトリ
 	 * 
 	 * Params:
-	 *     target = ディレクトリのパス
+	 *     path = ディレクトリのパス
 	 */
-	FileSystem dir(string path)
+	FileSystem dir(string path) const @safe
 	{
 		return FileSystem(workDir.buildPath(path));
 	}
