@@ -1032,17 +1032,40 @@ protected:
 	Logger logger;
 	///
 	string currFilePath;
+	///
+	string backupDirPath;
+	
 	/***************************************************************************
 	 * ログローテート
+	 * 
+	 * Params:
+	 *      oldFilePath = ローテーション前のファイルで、バックアップ先に保存するファイル名。
+	 *      newFilePath = ローテーション後のファイルで、新しくログを記録し始めるファイル名。
 	 */
 	void rotate(string oldFilePath, string newFilePath) @trusted
 	{
+		import std.file;
+		import std.path;
 		// 現在のファイルを閉じる
 		destroy(logger);
 		
+		// バックアップディレクトリの考慮
+		auto backupFilePath = oldFilePath;
+		if (backupDirPath.length > 0 && !oldFilePath.isAbsolute)
+		{
+			backupFilePath = backupDirPath.buildPath(oldFilePath);
+			if (backupDirPath.exists && !backupFilePath.dirName.exists)
+				mkdirRecurse(backupFilePath.dirName);
+		}
+		
 		// 現在のファイル名をoldNameに変更する
-		import std.file;
-		std.file.rename(currFilePath, oldFilePath);
+		try std.file.rename(currFilePath, backupFilePath);
+		catch (Exception e)
+		{
+			// 失敗したらコピー＆削除
+			std.file.copy(currFilePath, backupFilePath);
+			std.file.remove(currFilePath);
+		}
 		
 		// 新しいLoggerを開く
 		logger = new BaseLogger(newFilePath, logger.logLevel);
@@ -1056,16 +1079,21 @@ public:
 	Handler!(void delegate(string oldFilePath, string newFilePath)) onRotated;
 	
 	///
-	this(in string fn, const LogLevel lv = LogLevel.all) @safe
+	this(in string fn, const LogLevel lv = LogLevel.all, string backupDir = null) @safe
 	{
 		this(fn, lv, CreateFolder.yes);
 	}
 	/// ditto
-	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder) @trusted
+	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder,
+		string backupDir = null) @trusted
 	{
+		import std.path, std.file;
 		super(lv);
 		logger = new BaseLogger(fn, lv, createFileNameFolder);
-		currFilePath = fn;
+		currFilePath = fn.absolutePath().buildNormalizedPath();
+		backupDirPath = backupDir is null ? null : backupDir.absolutePath().buildNormalizedPath();
+		if (createFileNameFolder && !backupDirPath.exists)
+			mkdirRecurse(backupDirPath);
 	}
 	
 	///
@@ -1081,14 +1109,16 @@ private:
 	size_t _threshold;
 public:
 	///
-	this(in string fn, const LogLevel lv = LogLevel.all, size_t threshold = 16 * 1024 * 1024) @safe
+	this(in string fn, const LogLevel lv = LogLevel.all,
+		string backupDir = null, size_t threshold = 16 * 1024 * 1024) @safe
 	{
-		this(fn, lv, CreateFolder.yes, threshold);
+		this(fn, lv, CreateFolder.yes, backupDir, threshold);
 	}
 	/// ditto
-	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder, size_t threshold = 16 * 1024 * 1024) @trusted
+	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder,
+		string backupDir = null, size_t threshold = 16 * 1024 * 1024) @trusted
 	{
-		super(fn, lv, createFileNameFolder);
+		super(fn, lv, createFileNameFolder, backupDir);
 		_threshold = threshold;
 	}
 	
@@ -1102,7 +1132,8 @@ public:
 			auto blobName = baseLogName ~ "-*" ~ currFilePath.extension;
 			size_t latestNumber = 0;
 			size_t maxSpace = 1;
-			foreach (de; dirEntries(currFilePath.dirName, blobName, SpanMode.shallow))
+			auto backupDir = backupDirPath.length > 0 ? backupDirPath : currFilePath.dirName;
+			foreach (de; dirEntries(backupDir, blobName, SpanMode.shallow))
 			{
 				if (!de.isFile)
 					continue;
@@ -1123,7 +1154,7 @@ public:
 			latestNumber++;
 			auto oldBaseName = format("%s-%0" ~ to!string(maxSpace) ~ "d%s",
 				baseLogName, latestNumber, currFilePath.extension);
-			rotate(currFilePath.dirName.buildPath(oldBaseName), currFilePath);
+			rotate(backupDir.buildPath(oldBaseName), currFilePath);
 		}
 		logger.writeLogMsg(payload);
 	}
@@ -1137,6 +1168,8 @@ public:
 	import std.file;
 	auto fs = createDisposableDir("ut");
 	auto logger = new SizeRotationLogger!TextFileLogger(fs.absolutePath("test.log"), threshold: 128);
+	scope (exit)
+		logger.logger.destroy();
 	
 	logger.info("test");
 	assert(fs.entries("*.log").walkLength == 1);
@@ -1158,7 +1191,23 @@ public:
 	logger.info("testtesttesttesttesttesttest");
 	assert(fs.entries("*.log").walkLength == 3);
 	assert(fs.exists("test-2.log"));
-	logger.logger.destroy();
+}
+
+@system unittest
+{
+	import std.range;
+	import voile.fs;
+	auto fs = createDisposableDir("ut");
+	auto logger = new SizeRotationLogger!TextFileLogger(
+		fs.absolutePath("test.log"), backupDir: fs.absolutePath("bkup"), threshold: 128);
+	scope (exit)
+		logger.logger.destroy();
+	logger.info("testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest");
+	logger.info("testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest");
+	assert(fs.entries("*.log").walkLength == 1);
+	assert(fs.dir("bkup").entries("*.log").walkLength == 1);
+	assert(fs.exists("test.log"));
+	assert(fs.exists("bkup/test-1.log"));
 }
 
 /*******************************************************************************
@@ -1221,14 +1270,16 @@ private:
 	}
 public:
 	///
-	this(in string fn, const LogLevel lv = LogLevel.all, LogInterval interval = LogInterval.daily) @safe
+	this(in string fn, const LogLevel lv = LogLevel.all,
+		string backupDir = null, LogInterval interval = LogInterval.daily) @safe
 	{
-		this(fn, lv, CreateFolder.yes, interval);
+		this(fn, lv, CreateFolder.yes, backupDir, interval);
 	}
 	/// ditto
-	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder, LogInterval interval = LogInterval.daily) @safe
+	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder,
+		string backupDir = null, LogInterval interval = LogInterval.daily) @safe
 	{
-		super(fn, lv, createFileNameFolder);
+		super(fn, lv, createFileNameFolder, backupDir);
 		auto tim = Clock.currTime;
 		_interval = interval;
 		_currRotateTime = calcPrevRotateTime(tim);
@@ -1261,11 +1312,12 @@ public:
 				oldBaseName = format("%s-%04d%02d", baseLogName, ot.year, ot.month);
 				break;
 			}
-			auto oldFilePath = currFilePath.dirName.buildPath(format("%s%s", oldBaseName, currFilePath.extension));
+			auto backupDir = backupDirPath.length > 0 ? backupDirPath : currFilePath.dirName;
+			auto oldFilePath = backupDir.buildPath(format("%s%s", oldBaseName, currFilePath.extension));
 			size_t dupIndex = 1;
 			while (oldFilePath.exists)
 			{
-				oldFilePath = currFilePath.dirName.buildPath(
+				oldFilePath = backupDir.buildPath(
 					format("%s-%d%s", baseLogName, oldBaseName, dupIndex, currFilePath.extension));
 				dupIndex++;
 			}
@@ -1278,13 +1330,14 @@ public:
 @system unittest
 {
 	import std.algorithm, std.range, std.array;
-	import core.thread;
 	import voile.fs;
 	import std.datetime;
 	import std.file;
 	auto fs = createDisposableDir("ut");
 	alias LI = DateRotationLogger!TextFileLogger.LogInterval;
 	auto logger = new DateRotationLogger!TextFileLogger(fs.absolutePath("test.log"), interval: LI.daily);
+	scope (exit)
+		logger.logger.destroy();
 	auto prev = SysTime(DateTime(2022, 11, 6, 17, 0, 0));
 	auto never = SysTime(DateTime(9999, 12, 31, 23, 59, 59));
 	auto next = SysTime(DateTime(2024, 11, 7, 15, 0, 0));
@@ -1305,10 +1358,37 @@ public:
 	assert(fs.exists("test-20221106.log"));
 	assert(logger._currRotateTime is next);
 	assert(logger._nextRotateTime > currTime);
-	
-	logger.logger.destroy();
 }
 
+@system unittest
+{
+	import std.file, std.range;
+	import voile.fs;
+	import std.datetime;
+	auto fs = createDisposableDir("ut");
+	
+	alias LI = DateRotationLogger!TextFileLogger.LogInterval;
+	auto logger = new DateRotationLogger!TextFileLogger(
+		fs.absolutePath("test.log"), backupDir: fs.absolutePath("bkup"), interval: LI.daily);
+	scope (exit)
+		logger.logger.destroy();
+	auto prev = SysTime(DateTime(2022, 11, 6, 17, 0, 0));
+	auto never = SysTime(DateTime(9999, 12, 31, 23, 59, 59));
+	auto next = SysTime(DateTime(2024, 11, 7, 15, 0, 0));
+	auto currTime = Clock.currTime;
+	
+	logger._currRotateTime = prev;
+	logger._nextRotateTime = never;
+	logger.info("test");
+	logger._nextRotateTime = next;
+	logger.info("test");
+	assert(fs.entries("*.log").walkLength == 1);
+	assert(fs.exists("test.log"));
+	assert(fs.dir("bkup").entries("*.log").walkLength == 1);
+	assert(fs.exists("bkup/test-20221106.log"));
+	assert(logger._currRotateTime is next);
+	assert(logger._nextRotateTime > currTime);
+}
 
 /*******************************************************************************
  * 
