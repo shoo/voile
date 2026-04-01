@@ -171,9 +171,8 @@ private:
 		static import voile.sync;
 		static import core.thread;
 		voile.sync.SyncEvent _evWatcherFinish;
-		voile.sync.SyncEvent _evWatcherStart;
 		core.thread.Thread   _thWatcher;
-		void _watcherEntry() shared
+		void _watcherEntry(Duration delayTime, voile.sync.SyncEvent evStart) shared
 		{
 			import core.sys.windows.windows;
 			import voile.sync: SyncEvent;
@@ -193,6 +192,28 @@ private:
 			auto buf = new ubyte[1024*8];
 			import std.array: appender;
 			auto notifiedFile = appender!(string[]);
+			
+			import std.datetime.stopwatch;
+			StopWatch[string] timers;
+			void onFileChanged(string file)
+			{
+				timers.require(file, StopWatch(AutoStart.yes)).reset();
+			}
+			void onProgress()
+			{
+				string[] processed;
+				foreach (file, ref sw; timers)
+				{
+					if (sw.peek() > delayTime)
+					{
+						onWatcherChanged(file);
+						processed ~= file;
+					}
+				}
+				foreach (f; processed)
+					timers.remove(f);
+			}
+			
 			while (1)
 			{
 				OVERLAPPED ovl;
@@ -210,8 +231,8 @@ private:
 					// 監視終了
 					return;
 				}
-				(cast()_evWatcherStart).signaled = true;
-				final switch (WaitForMultipleObjects(2, waitfor.ptr, FALSE, INFINITE))
+				(cast()evStart).signaled = true;
+				final switch (WaitForMultipleObjects(2, waitfor.ptr, FALSE, 100))
 				{
 				case WAIT_OBJECT_0 + 0:
 					// 監視終了
@@ -253,11 +274,13 @@ private:
 					{
 						import std.algorithm: canFind;
 						if (!notifiedFile.data[i+1..$].canFind(notifiedFile.data[i]))
-							onWatcherChanged(notifiedFile.data[i]);
+							onFileChanged(notifiedFile.data[i]);
 					}
+					onProgress();
 					continue;
 				case WAIT_TIMEOUT:
 					// 再度確認
+					onProgress();
 					break;
 				case WAIT_FAILED:
 					// 再度確認
@@ -271,9 +294,8 @@ private:
 		static import voile.sync;
 		static import core.thread;
 		core.thread.Thread   _thWatcher;
-		voile.sync.SyncEvent _evWatcherStart;
 		int                  _fdWatcherNotify;
-		void _watcherEntry() shared
+		void _watcherEntry(Duration delayTime, voile.sync.SyncEvent evStart) shared
 		{
 			import voile.misc: assumeUnshared;
 			import std.string: toStringz;
@@ -284,7 +306,7 @@ private:
 			import core.sys.posix.sys.types;
 			import core.sys.posix.sys.select;
 			scope (failure)
-				_evWatcherStart.signaled = true;
+				evStart.signaled = true;
 			auto inotifyFd = inotify_init();
 			_fdWatcherNotify.assumeUnshared = inotifyFd;
 			enforce(inotifyFd != -1, "Failed to initialize inotify");
@@ -295,22 +317,51 @@ private:
 			scope (exit)
 				inotify_rm_watch(inotifyFd, watchFd);
 			// 初期化完了。監視開始済み。
-			_evWatcherStart.signaled = true;
+			evStart.signaled = true;
 			auto buffer = new ubyte[1024 * 64];
+			
+			import std.datetime.stopwatch;
+			StopWatch[string] timers;
+			// ファイルが変更されたら呼び出す
+			void onFileChanged(string file)
+			{
+				timers.require(file, StopWatch(AutoStart.yes)).reset();
+			}
+			// 時間経過で呼びだす。
+			void onProgress()
+			{
+				string[] processed;
+				foreach (file, ref sw; timers)
+				{
+					if (sw.peek() > delayTime)
+					{
+						onWatcherChanged(file);
+						processed ~= file;
+					}
+				}
+				foreach (f; processed)
+					timers.remove(f);
+			}
+			
 			while (1)
 			{
 				// ファイルをタイムアウト付きで監視
-				// タイムアウト設定1秒
+				// タイムアウト設定0.1秒
 				timeval timeout;
-				timeout.tv_sec = 1;
-				timeout.tv_usec = 0;
+				timeout.tv_sec = 0;
+				timeout.tv_usec = 100_000;
 				fd_set readFds;
 				FD_ZERO(&readFds);
 				FD_SET(inotifyFd, &readFds);
 				int selectResult = core.sys.posix.sys.select.select(inotifyFd + 1, &readFds, null, null, &timeout);
 				// タイムアウト時はループ継続(何もしない)
 				if (selectResult == 0)
+				{
+					onProgress();
 					continue;
+				}
+				
+				// エラー
 				if (selectResult == -1)
 					break;
 				
@@ -337,10 +388,11 @@ private:
 						immutable edFileName = stFileName + ev.len;
 						import std.string: fromStringz;
 						auto file = (cast(char[])buffer[stFileName .. edFileName]).fromStringz().idup;
-						onWatcherChanged(file);
+						onFileChanged(file);
 					}
 					offset += inotify_event.sizeof + ev.len;
 				}
+				onProgress();
 			}
 		}
 		
@@ -2267,27 +2319,36 @@ public:
 	
 	/***************************************************************************
 	 * ディレクトリ監視を有効にする
+	 * 
+	 * Params:
+	 *      delayTime = 変化を察知してから遅延させる時間。0だと過剰反応する可能性がある。
 	 */
-	void enableWatcher()
+	void enableWatcher(Duration delayTime = 100.msecs)
 	{
+		// 一度止める
+		disableWatcher();
 		version (Windows)
 		{
 			import core.thread;
 			import voile.sync;
-			_evWatcherStart = new SyncEvent;
+			auto evStart = new SyncEvent;
 			_evWatcherFinish = new SyncEvent;
-			_thWatcher = new Thread(cast(void delegate())&((cast(shared)this)._watcherEntry));
+			_thWatcher = new Thread({
+				(cast(shared)this)._watcherEntry(delayTime, evStart);
+			});
 			_thWatcher.start();
-			_evWatcherStart.wait();
+			evStart.wait();
 		}
 		else version (linux)
 		{
 			import core.thread;
 			import voile.sync: SyncEvent;
-			_evWatcherStart = new SyncEvent;
-			_thWatcher = new Thread(cast(void delegate())&((cast(shared)this)._watcherEntry));
+			auto evStart = new SyncEvent;
+			_thWatcher = new Thread({
+				(cast(shared)this)._watcherEntry(delayTime, evStart);
+			});
 			_thWatcher.start();
-			_evWatcherStart.wait();
+			evStart.wait();
 		}
 		else
 		{
@@ -2303,7 +2364,6 @@ public:
 			{
 				_evWatcherFinish.signaled = true;
 				_thWatcher.join();
-				_evWatcherStart = null;
 				_evWatcherFinish = null;
 				_thWatcher = null;
 			}

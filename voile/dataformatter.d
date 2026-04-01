@@ -535,13 +535,13 @@ void pick(R, E)(ref R r, ref E e)
 
 
 ///
-enum isEntryRange(R, E) = is(typeof(
+enum isEntryRange(R, E) = __traits(compiles,
 {
 	R r = void;
 	E e = void;
 	bool b = r.empty;
 	pick!(R, E)(r, e);
-}()));
+});
 
 static assert(isEntryRange!(ubyte[],ubyte[]));
 static assert(isEntryRange!(ubyte[],ubyte));
