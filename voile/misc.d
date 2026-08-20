@@ -1486,7 +1486,7 @@ public:
 	 */
 	T value() const
 	{
-		return value;
+		return _value;
 	}
 	
 	/***************************************************************************
@@ -1556,6 +1556,7 @@ public:
 	++ser;
 	assert(ser > SerialNum(249));
 	assert(ser == SerialNum(10));
+	assert(ser.value == 10);
 }
 
 @safe unittest
