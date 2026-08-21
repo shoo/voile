@@ -1358,10 +1358,10 @@ T expandVariable(T, Func)(in T str, Func mapFunc)
 	&& ParameterTypeTuple!Func.length == 1
 	&& is(T: ParameterTypeTuple!Func[0]))
 {
-	bool func(in T arg)
+	bool func(ref T arg)
 	{
 		arg = mapFunc(arg);
-		return ture;
+		return true;
 	}
 	return expandVariableImpl!(T, func)(str);
 }
@@ -1422,6 +1422,19 @@ private T expandVariableImpl(T, alias func)(in T str)
 	}}
 }
 
+@system unittest
+{
+	import std.meta;
+	static foreach (T; AliasSeq!(string, wstring, dstring))
+	{{
+		T str = "test%xxx%te%%st%yyy%";
+		T mapFunc(T arg) { return arg == "xxx" ? "XXX" : arg; }
+		// AA版と異なり「マップに無ければそのまま残す」概念が無く、
+		// マッチした%...%は必ず消費・置換される(yyyはmapFuncが恒等変換のため
+		// 値としては変化しないが、%は失われる)点に注意。
+		assert(str.expandVariable(&mapFunc) == "testXXXte%styyy");
+	}}
+}
 
 /*******************************************************************************
  * 
