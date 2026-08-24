@@ -2990,21 +2990,27 @@ private:
 		alias MapKey = Fiber;
 		enum bool _hasDefaultKey = true;
 		pragma(inline, true) static MapKey _mapkey(Key k) { return k.fiber(); }
-		pragma(inline, true) static Key _defaultKey() { return Task.getThis; }
+		pragma(inline, true) static Key _defaultKey() nothrow { return Task.getThis; }
 	}
 	else static if (_isTid)
 	{
 		alias MapKey = Tid;
 		enum bool _hasDefaultKey = true;
 		pragma(inline, true) static MapKey _mapkey(Key k) { return k; }
-		pragma(inline, true) static Key _defaultKey() { return thisTid(); }
+		pragma(inline, true) static Key _defaultKey() nothrow
+		{
+			try
+				return thisTid();
+			catch (Exception)
+				assert(0);
+		}
 	}
 	else static if (_isFiber)
 	{
 		alias MapKey = Fiber;
 		enum bool _hasDefaultKey = true;
 		pragma(inline, true) static MapKey _mapkey(Key k) { return k; }
-		pragma(inline, true) static Key _defaultKey() shared { return Fiber.getThis(); }
+		pragma(inline, true) static Key _defaultKey() { return Fiber.getThis(); }
 	}
 	else static if (_isThread)
 	{
@@ -3088,12 +3094,12 @@ public:
 	 */
 	this() shared
 	{
-		_map = new shared ManagedShared!(Queue[Key]);
+		_map = new shared ManagedShared!(Queue[MapKey]);
 	}
 	/// ditto
 	this() @system
 	{
-		_map = cast()new shared ManagedShared!(Queue[Key]);
+		_map = cast()new shared ManagedShared!(Queue[MapKey]);
 	}
 	
 	/***************************************************************************
@@ -3182,7 +3188,7 @@ public:
 	bool waitForData()() nothrow shared
 	if (_hasDefaultKey)
 	{
-		return waitForData(_defauleKey());
+		return waitForData(_defaultKey());
 	}
 	/// ditto
 	bool waitForData(Key key, Duration timeout) nothrow shared
@@ -3193,7 +3199,7 @@ public:
 	bool waitForData()(Duration timeout) nothrow shared
 	if (_hasDefaultKey)
 	{
-		return waitForData(_defauleKey(), timeout);
+		return waitForData(_defaultKey(), timeout);
 	}
 	
 	
@@ -3275,4 +3281,43 @@ public:
 	msgbox.closeAll();
 	assert("1" !in msgbox);
 	assert(test == ["aaa", "bbb", "ccc", "ddd", "eee", "fff"]);
+}
+
+@system unittest
+{
+	import core.thread : Fiber;
+	auto msgbox = new shared MessageBox!(string, Fiber);
+	new Fiber({
+		// データが無い状態でキー省略+タイムアウト版を呼ぶ -> タイムアウトして false
+		assert(!msgbox.waitForData(10.msecs));
+		// put()もキー省略版は自Fiber(Fiber.getThis())宛に積む
+		msgbox.put("hello");
+		// データがある状態でキー省略版(タイムアウト無し)を呼ぶ -> 即座に true
+		assert(msgbox.waitForData());
+		// データがある状態でキー省略+タイムアウト版を呼ぶ -> 即座に true
+		assert(msgbox.waitForData(10.msecs));
+		assert(msgbox.consume() == "hello");
+	}).call();
+}
+
+@system unittest
+{
+	import std.concurrency : Tid;
+	auto msgbox = new shared MessageBox!(string, Tid);
+	assert(!msgbox.waitForData(10.msecs));
+	msgbox.put("hello");
+	assert(msgbox.waitForData());
+	assert(msgbox.waitForData(10.msecs));
+	assert(msgbox.consume() == "hello");
+}
+
+@system unittest
+{
+	import core.thread : Thread;
+	auto msgbox = new shared MessageBox!(string, Thread);
+	assert(!msgbox.waitForData(10.msecs));
+	msgbox.put("hello");
+	assert(msgbox.waitForData());
+	assert(msgbox.waitForData(10.msecs));
+	assert(msgbox.consume() == "hello");
 }
