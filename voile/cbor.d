@@ -1699,7 +1699,7 @@ public:
 				static if (isAccessible!m && !hasIgnore!m)
 				{
 					static if (hasIgnoreIf!m)
-						bool isIgnored = getPredIgnoreIf!m(value.tupleof[i]);
+						bool isIgnored = getPredIgnoreIf!m(dst.tupleof[i]);
 					else
 						enum isIgnored = false;
 					if (!isIgnored) foreach (ref e; src._reqMap.byKeyValue)
@@ -2451,17 +2451,15 @@ T deserializeFromCborBinary(T)(in ubyte[] src) @safe
 	assert(builder.build(value) == [0x3B, 0x00, 0x00, 0x00, 0x1C, 0xBE, 0x99, 0x1A, 0x13]);
 }
 
-import voile.cbor;
-import voile.attr : value;
-
-
-
 @safe unittest
 {
 	struct A
 	{
 		@value(10) int a;
+		@ignoreIf!((int b) => b == 10) int b;
 	}
 	A dat;
 	auto cv = serializeToCbor(dat);
+	bool ok = deserializeFromCbor(cv, dat);
+	assert(ok);
 }
