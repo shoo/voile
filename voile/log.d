@@ -607,15 +607,16 @@ private:
 	import std.stdio: File;
 	File _file;
 	string _filename;
+	bool _autoflush;
 public:
 	
 	///
-	this(in string fn, const LogLevel lv = LogLevel.all) @safe
+	this(in string fn, const LogLevel lv = LogLevel.all, bool autoflush = false) @safe
 	{
-		this(fn, lv, CreateFolder.yes);
+		this(fn, lv, CreateFolder.yes, autoflush);
 	}
 	/// ditto
-	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder) @safe
+	this(in string fn, const LogLevel lv, CreateFolder createFileNameFolder, bool autoflush = false) @safe
 	{
 		import std.file : exists, mkdirRecurse;
 		import std.path : dirName;
@@ -623,6 +624,7 @@ public:
 		import core.stdc.stdio;
 		super(lv);
 		_filename = fn;
+		_autoflush = autoflush;
 		if (createFileNameFolder)
 		{
 			auto d = dirName(_filename);
@@ -633,10 +635,11 @@ public:
 		_file.open(_filename, "ab");
 	}
 	/// ditto
-	this(File file, const LogLevel lv = LogLevel.all) @safe
+	this(File file, const LogLevel lv = LogLevel.all, bool autoflush = false) @safe
 	{
 		super(lv);
 		_file = file;
+		_autoflush = autoflush;
 	}
 	
 	///
@@ -669,10 +672,18 @@ public:
 			payload.timestamp.toISOExtString(),
 			JSONValue(payload.msg).toString
 		);
+		if (_autoflush)
+			flush();
 	}
 	
 	///
-	string getFilename()
+	void flush() @safe
+	{
+		_file.flush();
+	}
+	
+	///
+	string getFilename() const pure nothrow @safe
 	{
 		return _filename;
 	}
@@ -730,7 +741,7 @@ public:
 {
 	import voile.fs;
 	auto fs = createDisposableDir("ut");
-	auto logger = new JsonLineFileLogger(fs.absolutePath("jsonlinelogger.jsonl"));
+	auto logger = new JsonLineFileLogger(fs.absolutePath("jsonlinelogger.jsonl"), autoflush: true);
 	logger.trace("TRACETEST");
 	logger.info("INFOTEST");
 	logger.warning("WARNINGTEST");
