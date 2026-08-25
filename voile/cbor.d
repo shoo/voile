@@ -1460,7 +1460,7 @@ public:
 						else static if (hasConvBy!e && canConvTo!(e, CborValue))
 							alias getval = () @trusted { auto cv = nullValue; convertTo!e(value.tupleof[i], cv); return cv; };
 						else static if (hasValue!e)
-							alias getval = () => serialzie(getValue!e);
+							alias getval = () => serialize(getValue!e);
 						else
 							alias getval = () => serialize(value.tupleof[i]);
 						map.append(getname(), getval());
@@ -2449,4 +2449,19 @@ T deserializeFromCborBinary(T)(in ubyte[] src) @safe
 	value = builder.parse(data);
 	assert(value.get!long == -123_456_789_012);
 	assert(builder.build(value) == [0x3B, 0x00, 0x00, 0x00, 0x1C, 0xBE, 0x99, 0x1A, 0x13]);
+}
+
+import voile.cbor;
+import voile.attr : value;
+
+
+
+@safe unittest
+{
+	struct A
+	{
+		@value(10) int a;
+	}
+	A dat;
+	auto cv = serializeToCbor(dat);
 }
