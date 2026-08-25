@@ -2105,12 +2105,12 @@ T deserializeFromCbor(T)(in CborValue src) @safe
 	return g_defaultBuilder.deserialize!T(src);
 }
 /// ditto
-bool deserializeFromCborBinary(T)(in ubyte[] src, ref T dst) @safe
+bool deserializeFromCborBinary(T)(immutable(ubyte)[] src, ref T dst) @safe
 {
-	return deserializeFromCbor(g_defaultBuilder.parse(src, dst));
+	return deserializeFromCbor(g_defaultBuilder.parse(src), dst);
 }
 /// ditto
-T deserializeFromCborBinary(T)(in ubyte[] src) @safe
+T deserializeFromCborBinary(T)(immutable(ubyte)[] src) @safe
 {
 	return deserializeFromCbor!T(g_defaultBuilder.parse(src));
 }
@@ -2464,4 +2464,9 @@ T deserializeFromCborBinary(T)(in ubyte[] src) @safe
 	auto cv = serializeToCbor(dat);
 	bool ok = deserializeFromCbor(cv, dat);
 	assert(ok);
+	
+	auto bin = serializeToCborBinary(dat);
+	ok = deserializeFromCborBinary(bin, dat);
+	assert(ok);
+	dat = deserializeFromCborBinary!A(bin);
 }
