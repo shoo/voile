@@ -12,6 +12,7 @@ module voile.cbor;
 import std.sumtype;
 import std.range, std.algorithm, std.array, std.traits, std.meta, std.string;
 import std.typecons: Tuple, tuple, isTuple;
+import std.exception;
 import core.lifetime: move;
 import voile.attr;
 alias attr = voile.attr;
@@ -2457,6 +2458,7 @@ T deserializeFromCborBinary(T)(in ubyte[] src) @safe
 	{
 		@value(10) int a;
 		@ignoreIf!((int b) => b == 10) int b;
+		@essential int c;
 	}
 	A dat;
 	auto cv = serializeToCbor(dat);
