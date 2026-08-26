@@ -3976,7 +3976,7 @@ T deserializeFromJson(T)(in Json5Value src) @safe
 /// ditto
 bool deserializeFromJsonString(T)(in char[] src, ref T dst) @safe
 {
-	return deserializeFromJson(g_defaultBuilder.parse(src, dst));
+	return deserializeFromJson(g_defaultBuilder.parse(src), dst);
 }
 /// ditto
 T deserializeFromJsonString(T)(in char[] src) @safe
@@ -4011,6 +4011,12 @@ T deserializeFromJsonString(T)(in char[] src) @safe
 	
 	auto dat3 = deserializeFromJson!Data(makeJson(["x": 1, "y": 2]));
 	assert(dat3 == dat1);
+	
+	// 2-argument overload of deserializeFromJsonString
+	Data dat4;
+	bool ok = deserializeFromJsonString(`{ x: 1, y: 2 }`, dat4);
+	assert(ok);
+	assert(dat4 == dat1);
 }
 
 //######################################################################
