@@ -3062,64 +3062,70 @@ public:
 	//##### MARK: - - Update
 	//##########################################################################
 	
-	private void _updateValue(T)(ref JsonValue dst, auto ref T src) const @safe
+	private void _updateValue(T)(ref JsonValue dst, auto ref T src) @safe
 	{
 		alias US = Unqual!T;
 		static if (is(US == JsonValue))
-			srcVal.match!((s) => _updateValue(dst, s));
-		else static if (is(US == String))
 		{
-			dst._instance.match!(
-				(ref JsonString v) {v.value = srcVal;},
-				(_) @trusted { dst._instance = JsonString(srcVal, this); });
+			src._instance.match!(
+				(ref JsonString s) => _updateValue(dst, s.value),
+				(ref JsonInteger s) => _updateValue(dst, s.value),
+				(ref JsonUInteger s) => _updateValue(dst, s.value),
+				(ref JsonFloatingPoint s) => _updateValue(dst, s.value),
+				(ref bool s) => _updateValue(dst, s),
+				(ref JsonArray s) => _updateValue(dst, s),
+				(ref JsonObject s) => _updateValue(dst, s),
+				(ref typeof(null) s) => _updateValue(dst, s),
+				(ref JsonValue.UndefinedValue s) @trusted { dst._instance = JsonValue.UndefinedValue.init; },
+			);
 		}
-		else static if (isInteger!US)
+		else static if (is(US == String) || isSomeString!US)
 		{
 			dst._instance.match!(
-				(ref JsonInteger v) {v.value = srcVal;},
-				(_) @trusted { dst._instance = JsonInteger(srcVal, this); });
+				(ref JsonString v) { v.value = cast(String)src[]; },
+				(_) @trusted { dst._instance = JsonString(cast(String)src[]); });
 		}
-		else static if (isUInteger!US)
+		else static if (isIntegral!US && isSigned!US)
 		{
 			dst._instance.match!(
-				(ref JsonUInteger v) {v.value = srcVal;},
-				(_) @trusted { dst._instance = JsonUInteger(srcVal, this); });
+				(ref JsonInteger v) { v.value = src; },
+				(_) @trusted { dst._instance = JsonInteger(cast(long)src); });
+		}
+		else static if (isIntegral!US && isUnsigned!US)
+		{
+			dst._instance.match!(
+				(ref JsonUInteger v) { v.value = src; },
+				(_) @trusted { dst._instance = JsonUInteger(cast(ulong)src); });
 		}
 		else static if (isFloatingPoint!US)
 		{
 			dst._instance.match!(
-				(ref JsonFloatingPoint v) { v.value = srcVal; },
-				(_) @trusted { dst._instance = JsonFloatingPoint(srcVal, this); });
+				(ref JsonFloatingPoint v) { v.value = src; },
+				(_) @trusted { dst._instance = JsonFloatingPoint(cast(double)src); });
 		}
 		else static if (isBoolean!US)
 		{
-			dst._instance = srcVal;
+			() @trusted { dst._instance = src; }();
 		}
 		else static if (is(US == typeof(null)))
 		{
-			dst._instance = null;
+			() @trusted { dst._instance = null; }();
 		}
-		else static if (is(US == UndefinedValue))
+		else static if (is(US == JsonValue.UndefinedValue))
 		{
-			dst._instance = UndefinedValue.init;
-		}
-		else static if (isBoolean!US)
-		{
-			dst._instance.match!(
-				(ref bool v) { v = srcVal; },
-				(_) @trusted { dst._instance = srcVal; });
+			() @trusted { dst._instance = JsonValue.UndefinedValue.init; }();
 		}
 		else static if (isArray!US || is(US == Array!JsonValue))
 		{
 			dst._instance.match!(
 				(ref JsonArray a) {
-					a.value.length = srcVal.length;
-					foreach (i, ref e; srcVal[])
-						updateValue(a.value[i], e);
+					a.value.length = src.length;
+					foreach (i, ref e; src[])
+						_updateValue(a.value[i], e);
 				},
-				(_) {
+				(_) @trusted {
 					auto tmp = allocAry!JsonValue;
-					foreach (i, ref e; srcVal[])
+					foreach (i, ref e; src[])
 						tmp ~= serialize(e);
 					dst._instance = JsonArray(tmp);
 				});
@@ -3128,24 +3134,50 @@ public:
 		{
 			dst._instance.match!(
 				(ref JsonObject d) {
+					// Merge: update/add keys from src, preserve original keys not in src
+					// (order: original keys first, then newly added keys).
 					auto tmp = allocDic!(JsonKey, JsonValue);
-					foreach (ref itm; srcVal.byKeyValue)
+					foreach (ref orig; d.value.byKeyValue)
 					{
-						if (auto pv = itm.key in d.value)
+						bool replaced = false;
+						foreach (ref itm; src.byKeyValue)
 						{
-							_updateValue(*pv, itm.value);
-							tmp.append(JsonKey(itm.key), *pv);
+							static if (is(typeof(itm.key) == JsonKey))
+								auto skey = itm.key;
+							else
+								auto skey = JsonKey(allocStr(itm.key));
+							if (orig.key == skey)
+							{
+								_updateValue(orig.value, itm.value);
+								tmp.append(orig.key, orig.value);
+								replaced = true;
+								break;
+							}
 						}
-						else
-							tmp.append(JsonKey(itm.key), serialize(itm.value));
+						if (!replaced)
+							tmp.append(orig.key, orig.value);
 					}
-					dst._instance.value = tmp;
+					foreach (ref itm; src.byKeyValue)
+					{
+						static if (is(typeof(itm.key) == JsonKey))
+							auto skey = itm.key;
+						else
+							auto skey = JsonKey(allocStr(itm.key));
+						if (!d.value.opIn(skey))
+							tmp.append(skey, serialize(itm.value));
+					}
+					d.value = tmp;
 				},
-				(_) {
+				(_) @trusted {
 					auto tmp = allocDic!(JsonKey, JsonValue);
-					foreach (ref itm; srcVal.byKeyValue)
-						tmp.append(JsonKey(itm.key), serialize(itm.value));
-					dstVal._instance = JsonObject(tmp);
+					foreach (ref itm; src.byKeyValue)
+					{
+						static if (is(typeof(itm.key) == JsonKey))
+							tmp.append(itm.key, serialize(itm.value));
+						else
+							tmp.append(JsonKey(allocStr(itm.key)), serialize(itm.value));
+					}
+					dst._instance = JsonObject(tmp);
 				});
 		}
 		else static if (is(US == JsonObject))
@@ -3154,9 +3186,9 @@ public:
 			_updateValue(dst, src.value);
 		else
 		{
-			dstVal._instance.match!(
-				(ref US d) { d.value = srcVal.value; },
-				(_) { dstVal._instance = srcVal; });
+			dst._instance.match!(
+				(ref US d) { d.value = src.value; },
+				(_) @trusted { dst._instance = src; });
 		}
 	}
 	
@@ -3168,33 +3200,35 @@ public:
 	 * キーが存在しない場合は作成されます。
 	 * 値の型が異なる場合は再作成されます。
 	 */
-	void update(T)(ref JsonValue dst, in T src) const @safe
+	void update(T)(ref JsonValue dst, in T src) @safe
 	{
 		import std.base64;
 		alias U = Unqual!T;
 		static if (is(U == JsonValue))
 			_updateValue(dst, src);
 		else static if (is(U == StdJsonValue))
-			_updateValue(dst, JsonValue(value, this));
+			_updateValue(dst, JsonValue(src, this));
+		else static if (isSomeString!T)
+			_updateValue(dst, src);
 		else static if (isIntegral!T)
-			_updateValue(dst, value);
+			_updateValue(dst, src);
 		else static if (isFloatingPoint!T)
-			_updateValue(dst, value);
+			_updateValue(dst, src);
 		else static if (isBoolean!T)
-			_updateValue(dst, value);
+			_updateValue(dst, src);
 		else static if (isBinary!T)
-			_updateValue(dst, Base64URLNoPadding.encode(value));
+			_updateValue(dst, Base64URLNoPadding.encode(src));
 		else static if (is(T == typeof(null)))
-			_updateValue(dst, value);
+			_updateValue(dst, src);
 		else static if (isArray!T)
-			_updateValue(dst, value);
+			_updateValue(dst, src);
 		else static if (isAssociativeArray!T)
-			_updateValue(dst, value);
+			_updateValue(dst, src);
 		else static if (isTuple!T)
 		{
 			auto ary = allocAry!JsonValue();
-			static foreach (idx; 0..value[].length)
-				ary ~= serialize(value[idx]);
+			static foreach (idx; 0..src[].length)
+				ary ~= serialize(src[idx]);
 			_updateValue(dst, ary);
 		}
 		else static if (isSumType!T)
@@ -3202,15 +3236,14 @@ public:
 			// SumTypeの場合
 			// AggregateTypeの場合は、@kind属性で指定された値を付与して判別に用いる
 			// それ以外の場合は、整数、実数、文字列、バイナリ、真偽値のいずれかがユニークでなければならない
-			_updateValue(dst, value.match!(
+			_updateValue(dst, src.match!(
 				(ref e)
 				{
 					static if (isAggregateType!(typeof(e)) && hasKind!(typeof(e)))
 					{
-						alias Obj = Dictionary!(JsonKey, JsonValue);
 						auto obj = serialize(e);
 						enum kind = getKind!(typeof(e));
-						obj._reqObj.prepend(Obj.Item(JsonKey(kind.key, this), JsonValue(kind.value, this)));
+						obj._reqObj.prepend(JsonKey(allocStr(kind.key)), make(kind.value));
 						return obj;
 					}
 					else
@@ -3221,23 +3254,21 @@ public:
 			));
 		}
 		else static if (isAggregateType!T && hasConvertJsonMethodA!T)
-			_updateValue(dst, value.toJson(this));
+			_updateValue(dst, src.toJson(this));
 		else static if (isAggregateType!T && hasConvertJsonMethodB!T)
-			_updateValue(dst, deepCopy(value.toJson()));
+			_updateValue(dst, deepCopy(src.toJson()));
 		else static if (isAggregateType!T && hasConvertJsonMethodC!T)
-			_updateValue(dst, JsonValue(value.toJson(), this));
+			_updateValue(dst, JsonValue(src.toJson(), this));
 		else static if (isAggregateType!T && hasConvertJsonBinaryMethodA!T)
-			_updateValue(dst, Base64URLNoPadding.encode(value.toBinary()));
+			_updateValue(dst, Base64URLNoPadding.encode(src.toBinary()));
 		else static if (isAggregateType!T && hasConvertJsonBinaryMethodB!T)
-			_updateValue(dst, Base64URLNoPadding.encode(value.toRepresentation()));
+			_updateValue(dst, Base64URLNoPadding.encode(src.toRepresentation()));
 		else static if (isAggregateType!T && hasConvertJsonBinaryMethodC!T)
-			_updateValue(dst, value.toRepresentation());
+			_updateValue(dst, src.toRepresentation());
 		else static if (isAggregateType!T)
 		{
 			auto obj = allocDic!(JsonKey, JsonValue)();
-			alias JsonValue = JV;
-			alias JsonKey = JK;
-			static foreach (i, e; value.tupleof[])
+			static foreach (i, e; src.tupleof[])
 			{
 				// メンバー変数をシリアライズ
 				// @ignore属性が付与されている場合はシリアライズしない
@@ -3250,38 +3281,38 @@ public:
 					alias appendObj = ()
 					{
 						static if (hasName!e)
-							alias getname = () => JK(getName!e, this);
+							alias getname = () => JsonKey(allocStr(getName!e));
 						else
-							alias getname = () => JK(e.stringof, this);
+							alias getname = () => JsonKey(allocStr(e.stringof));
 						static if (hasConvBy!e && canConvTo!(e, string))
-							alias getval = () @trusted => JV(convTo!(e, string)(value.tupleof[i]), this);
+							alias getval = () => make(convTo!(e, string)(src.tupleof[i]));
 						else static if (hasConvBy!e && canConvTo!(e, immutable(ubyte)[]))
-							alias getval = () @trusted => JV(convTo!(e, immutable(ubyte)[])(value.tupleof[i]), this);
+							alias getval = () => serialize(convTo!(e, immutable(ubyte)[])(src.tupleof[i]));
 						else static if (hasConvBy!e && canConvTo!(e, JsonValue))
 						{
-							alias getval = () @trusted {
+							alias getval = () {
 								auto v = undefinedValue;
-								convertTo!e(value.tupleof[i], v);
+								convertTo!e(src.tupleof[i], v);
 								return v;
 							};
 						}
 						else static if (hasConvBy!e && canConvTo!(e, StdJsonValue))
 						{
-							alias getval = () @trusted {
+							alias getval = () {
 								auto v = StdJsonValue.init;
-								convertTo!e(value.tupleof[i], v);
-								return () @trusted => JV(v, this);
+								convertTo!e(src.tupleof[i], v);
+								return make(v);
 							};
 						}
 						else static if (hasValue!e)
 							alias getval = () => serialize(getValue!e);
 						else
-							alias getval = () => serialize(value.tupleof[i]);
+							alias getval = () => serialize(src.tupleof[i]);
 						obj.append(getname(), getval());
 					};
 					static if (hasIgnoreIf!e)
 					{
-						if (!getPredIgnoreIf!e(value.tupleof[i]))
+						if (!getPredIgnoreIf!e(src.tupleof[i]))
 							appendObj();
 					}
 					else
@@ -3294,7 +3325,7 @@ public:
 		}
 		else
 		{
-			return undefinedValue();
+			static assert(0, "Unsupported type for update: " ~ T.stringof);
 		}
 	}
 	
@@ -4863,7 +4894,7 @@ T deserializeFromJsonString(T)(in char[] src) @safe
 	}`.outdent.chompPrefix("\n"));
 	auto jv = parseJson(str);
 	assert(jv.getValue!int("a") == 999);
-
+	
 	// Multiple fields: only @value fields are forced
 	struct B
 	{
@@ -4877,3 +4908,159 @@ T deserializeFromJsonString(T)(in char[] src) @safe
 	assert(jvB.getValue!int("y") == 2);
 	assert(jvB.getValue!string("z") == "fixed");
 }
+
+// update() must compile and work for plain structs (no UDAs)
+@safe unittest
+{
+	struct A
+	{
+		int a;
+		string b;
+	}
+	Json5Builder builder;
+	Json5Value jv = builder.parse(`{}`);
+	A dat = A(1, "x");
+	builder.update(jv, dat);
+	assert(jv.getValue!int("a") == 1);
+	assert(jv.getValue!string("b") == "x");
+	
+	// Value overwrite of existing keys
+	jv = builder.parse(`{ a: 0, b: "old", /* keep */ c: 99 }`);
+	builder.update(jv, A(42, "new"));
+	assert(jv.getValue!int("a") == 42);
+	assert(jv.getValue!string("b") == "new");
+}
+
+// udpate() preserve comments, extra keys, and formatting
+@safe unittest
+{
+	import std.algorithm : canFind;
+	import std.array : appender;
+	
+	struct Config
+	{
+		int port;
+		string host;
+	}
+	
+	Json5Builder builder;
+	// Human-edited JSON5 with comments, hex, single-quoted string, unquoted keys,
+	// trailing comma, and a key that is not a field of Config.
+	auto jv = builder.parse(`
+	{
+		// server listen port
+		port: 0x1F90, // default 8080
+		host: 'localhost',
+		/* retained by update */
+		debug: true,
+	}`.outdent.chompPrefix("\n"));
+	
+	builder.update(jv, Config(9090, "api.example.com"));
+	
+	// Values updated
+	assert(jv.getValue!int("port") == 9090);
+	assert(jv.getValue!string("host") == "api.example.com");
+	
+	// Keys not present on the struct are retained
+	assert(jv.getValue!bool("debug") == true);
+	
+	// Formatting flags on updated fields are retained (in-place value write)
+	assert(jv.getValue!Json5Integer("port").hex);
+	assert(jv.getValue!Json5String("host").singleQuoted);
+	
+	// Comments on updated / retained members survive
+	// asObject order follows parse order: port, host, debug
+	assert(jv.asObject[0].key.value[] == "port");
+	assert(jv.asObject[0].value.asLineComment(0)[] == " server listen port");
+	assert(jv.asObject[0].value.asTrailingComment(1)[] == " default 8080");
+	assert(jv.asObject[1].key.value[] == "host");
+	assert(jv.asObject[2].key.value[] == "debug");
+	assert(jv.asObject[2].value.asBlockComment(0)[0][] == " retained by update ");
+	
+	// Object-level formatting retained
+	assert(jv.asObject.tailingComma);
+	
+	// Pretty-print still contains comments (round-trip intent)
+	auto app = appender!string();
+	builder.toPrettyString(app, jv);
+	auto outStr = app.data;
+	assert(outStr.canFind("server listen port"));
+	assert(outStr.canFind("default 8080"));
+	assert(outStr.canFind("retained by update"));
+	assert(outStr.canFind("9090") || outStr.canFind("0x2382")); // value present (hex may be kept)
+	assert(outStr.canFind("api.example.com"));
+	assert(outStr.canFind("debug"));
+}
+
+// update(): coverage for primitives, arrays, AA, type change, and @value
+@safe unittest
+{
+	Json5Builder builder;
+	
+	// --- primitives (in-place when type matches) ---
+	auto jv = builder.parse(`0x10`);
+	assert(jv.asInteger.hex);
+	builder.update(jv, 32);
+	assert(jv.get!long == 32);
+	assert(jv.asInteger.hex); // format flag kept
+	
+	jv = builder.parse(`'old'`);
+	assert(jv.asString.singleQuoted);
+	builder.update(jv, "new");
+	assert(jv.get!string == "new");
+	assert(jv.asString.singleQuoted);
+	
+	jv = builder.parse(`true`);
+	builder.update(jv, false);
+	assert(jv.get!bool == false);
+	
+	jv = builder.parse(`1.5`);
+	builder.update(jv, 2.5);
+	assert(jv.get!double == 2.5);
+	
+	jv = builder.parse(`null`);
+	builder.update(jv, null);
+	assert(jv.type == Json5Type.nullfied);
+	
+	// --- type change: node is replaced ---
+	jv = builder.parse(`123`);
+	assert(jv.type == Json5Type.integer);
+	builder.update(jv, "now-a-string");
+	assert(jv.get!string == "now-a-string");
+	assert(jv.type == Json5Type.string);
+	
+	// --- arrays ---
+	jv = builder.parse(`[1, 2, 3]`);
+	builder.update(jv, [10, 20]);
+	assert(jv.getElement!int(0) == 10);
+	assert(jv.getElement!int(1) == 20);
+	assert(jv.asArray.length == 2);
+	
+	// --- associative arrays ---
+	jv = builder.parse(`{ a: 1, b: 2 }`);
+	int[string] aa = ["a": 100, "c": 300];
+	builder.update(jv, aa);
+	assert(jv.getValue!int("a") == 100);
+	assert(jv.getValue!int("c") == 300);
+	// key only in original is retained
+	assert(jv.getValue!int("b") == 2);
+	
+	// --- struct with @value forces fixed serialized value ---
+	struct WithValue
+	{
+		@value(999) int a = 5;
+		int b = 1;
+	}
+	jv = builder.parse(`{ a: 0, b: 0 }`);
+	builder.update(jv, WithValue.init);
+	assert(jv.getValue!int("a") == 999);
+	assert(jv.getValue!int("b") == 1);
+	
+	// --- empty object receives all struct fields ---
+	struct Pair { int x; int y; }
+	jv = builder.parse(`{}`);
+	builder.update(jv, Pair(7, 8));
+	assert(jv.getValue!int("x") == 7);
+	assert(jv.getValue!int("y") == 8);
+}
+
