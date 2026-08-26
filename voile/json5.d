@@ -3274,7 +3274,7 @@ public:
 							};
 						}
 						else static if (hasValue!e)
-							alias getval = () => serialzie(getValue!e);
+							alias getval = () => serialize(getValue!e);
 						else
 							alias getval = () => serialize(value.tupleof[i]);
 						obj.append(getname(), getval());
@@ -3461,6 +3461,8 @@ public:
 								return make(v);
 							};
 						}
+						else static if (hasValue!e)
+							alias getval = () => serialize(getValue!e);
 						else
 							alias getval = () => serialize(src.tupleof[i]);
 						auto key = getname();
@@ -4838,4 +4840,34 @@ T deserializeFromJsonString(T)(in char[] src) @safe
 		"ary3": [ 0xAB, 0xCD ],
 		"ary4": [ 1.200, 3.400 ]
 	}`.outdent.chompPrefix("\n"));
+}
+
+// @value UDA must be applied during serialize (not the runtime field value)
+@safe unittest
+{
+	struct A
+	{
+		@value(999) int a = 5;
+	}
+	A dat;
+	auto str = serializeToJsonString(dat);
+	assert(str == `
+	{
+		"a": 999
+	}`.outdent.chompPrefix("\n"));
+	auto jv = parseJson(str);
+	assert(jv.getValue!int("a") == 999);
+
+	// Multiple fields: only @value fields are forced
+	struct B
+	{
+		@value(42) int x = 1;
+		int y = 2;
+		@value("fixed") string z = "runtime";
+	}
+	B datB;
+	auto jvB = serializeToJson(datB);
+	assert(jvB.getValue!int("x") == 42);
+	assert(jvB.getValue!int("y") == 2);
+	assert(jvB.getValue!string("z") == "fixed");
 }
