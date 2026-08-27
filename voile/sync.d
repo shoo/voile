@@ -908,6 +908,20 @@ private:
 		}
 	}
 	
+	void _submit(TaskPool pool)
+	{
+		// ワーカースレッドが1つも無いプールにキューイングしても
+		// (誰かが明示的にそのタスクへ .yieldForce() 等を呼ばない限り)
+		// 永久に実行されないため、その場合は新規スレッドでの実行にフォールバックする。
+		if (pool.size == 0)
+			_task.executeInNewThread();
+		else
+		{
+			_taskPool = pool;
+			pool.put(_task);
+		}
+	}
+	
 public:
 	/***************************************************************************
 	 * コンストラクタ
@@ -957,7 +971,7 @@ public:
 	{
 		_makeTask!func(this, args);
 		_taskPool = pool;
-		pool.put(_task);
+		_submit(_taskPool);
 		return this;
 	}
 	/// ditto
@@ -967,7 +981,7 @@ public:
 		_makeTask!func(this, args);
 		if (_taskPool)
 		{
-			_taskPool.put(_task);
+			_submit(_taskPool);
 		}
 		else
 		{
@@ -981,7 +995,7 @@ public:
 	{
 		_makeTask!_dgRun(this, dg, args);
 		_taskPool = pool;
-		pool.put(_task);
+		_submit(_taskPool);
 		return this;
 	}
 	/// ditto
@@ -991,7 +1005,7 @@ public:
 		_makeTask!_dgRun(this, dg, args);
 		if (_taskPool)
 		{
-			_taskPool.put(_task);
+			_submit(_taskPool);
 		}
 		else
 		{
@@ -1541,6 +1555,18 @@ public:
 	assert(e2.msg == "Ex1");
 	// (Ex2は投げられない)
 }
+
+@system unittest
+{
+	auto pool0 = new TaskPool(0);
+	scope (exit)
+		pool0.finish();
+	
+	auto future = new Future!int;
+	future.perform(pool0, delegate (int a) => a + 20, 10);
+	auto result = future.yieldForce();
+}
+
 
 /*******************************************************************************
  * 非同期処理の開始
