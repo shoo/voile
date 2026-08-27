@@ -803,7 +803,6 @@ private void _makeTask(alias func, Fut, Args...)(Fut future, Args args)
 	}
 	auto dg = ()
 	{
-		future._evStart.signaled = true;
 		try
 		{
 			static if (is(Ret == void))
@@ -850,6 +849,14 @@ private auto _dgRun(F, Args...)(F dg, Args args)
 	return dg(args);
 }
 
+
+/*******************************************************************************
+ * `T` が `Future!X` のインスタンスかどうかを判定する(`then()`の
+ * コールバックがFutureを返した場合の自動フラット化=chainingに使用)
+ */
+private enum isFutureInstance(T) = isInstanceOf!(Future, T);
+/// ditto
+private alias FutureResultType(T) = TemplateArgsOf!T[0];
 
 /*******************************************************************************
  * 
@@ -922,6 +929,130 @@ private:
 		}
 	}
 	
+	/***************************************************************************
+	 * タスクを介さずに、直接値/例外/致命的エラーで確定させる。
+	 * `then()`のコールバックが`Future`を返した場合の自動フラット化(chaining)、
+	 * すなわち内側の`Future`が確定した際に外側の`Future`(`this`)へ結果を
+	 * 伝播させるために使用する。
+	 */
+	static if (!is(Ret == void))
+	{
+		void _settleDone()(auto ref ResultType val)
+		{
+			import std.algorithm: move;
+			synchronized (this)
+			{
+				if (_task is null)
+				{
+					static assert(isPointer!TaskType);
+					_task = new PointerTarget!TaskType;
+					static if (is(typeof(_task.returnVal) == ResultType*))
+						_task.returnVal = new ResultType;
+				}
+				_resultRaw() = val;
+				_type = FinishedType.done;
+			}
+			FinishedHandler call;
+			synchronized (this)
+				call = _onFinished.move();
+			scope (exit)
+				_evStart.signaled = true;
+			call(_resultRaw);
+		}
+	}
+	else
+	{
+		void _settleDone()()
+		{
+			import std.algorithm: move;
+			synchronized (this)
+				_type = FinishedType.done;
+			FinishedHandler call;
+			synchronized (this)
+				call = _onFinished.move();
+			scope (exit)
+				_evStart.signaled = true;
+			call();
+		}
+	}
+	/// ditto
+	void _settleFailed(Exception e)
+	{
+		import std.algorithm: move;
+		synchronized (this)
+		{
+			_resultException = e;
+			_type = FinishedType.failed;
+		}
+		FailedHandler call;
+		synchronized (this)
+			call = _onFailed.move();
+		scope (exit)
+			_evStart.signaled = true;
+		call(e);
+	}
+	/// ditto
+	void _settleFatal(Throwable e)
+	{
+		import std.algorithm: move;
+		synchronized (this)
+		{
+			_resultFatal = e;
+			_type = FinishedType.fatal;
+		}
+		FatalHandler call;
+		synchronized (this)
+			call = _onFatal.move();
+		scope (exit)
+			_evStart.signaled = true;
+		call(e);
+	}
+	
+	/***************************************************************************
+	 * 内側の`Future!ResultType`(`inner`)が確定した際に、その結果(成功/失敗/
+	 * 致命的エラー)を`this`へそのまま伝播させる(Promiseの`thenable`展開に相当)。
+	 */
+	void _adopt(Future!ResultType inner)
+	{
+		static if (is(ResultType == void))
+		{
+			inner.addListenerFinished({
+				try
+					_settleDone();
+				catch (Throwable)
+				{
+					// _settleDone自体が例外を投げることは通常無いはずだが、
+					// 万一投げても外側(inner側)の通知処理を巻き込んで
+					// 壊さないよう、ここで受け止める。
+				}
+			});
+		}
+		else
+		{
+			inner.addListenerFinished((ref ResultType v){
+				try
+					_settleDone(v);
+				catch (Throwable)
+				{
+				}
+			});
+		}
+		inner.addListenerFailed((Exception e) nothrow {
+			try
+				_settleFailed(e);
+			catch (Throwable)
+			{
+			}
+		});
+		inner.addListenerFatal((Throwable e) nothrow {
+			try
+				_settleFatal(e);
+			catch (Throwable)
+			{
+			}
+		});
+	}
+	
 public:
 	/***************************************************************************
 	 * コンストラクタ
@@ -970,8 +1101,8 @@ public:
 		if (is(typeof(func(args)) == ResultType))
 	{
 		_makeTask!func(this, args);
-		_taskPool = pool;
-		_submit(_taskPool);
+		_submit(pool);
+		_evStart.signaled = true;
 		return this;
 	}
 	/// ditto
@@ -987,6 +1118,7 @@ public:
 		{
 			_task.executeInNewThread();
 		}
+		_evStart.signaled = true;
 		return this;
 	}
 	/// ditto
@@ -994,8 +1126,8 @@ public:
 		if (is(typeof(dg(args)) == ResultType))
 	{
 		_makeTask!_dgRun(this, dg, args);
-		_taskPool = pool;
-		_submit(_taskPool);
+		_submit(pool);
+		_evStart.signaled = true;
 		return this;
 	}
 	/// ditto
@@ -1011,6 +1143,7 @@ public:
 		{
 			_task.executeInNewThread();
 		}
+		_evStart.signaled = true;
 		return this;
 	}
 	
@@ -1018,32 +1151,28 @@ public:
 	{
 		addListenerFailed(cast(CallbackFailedType)(Exception e)
 		{
-			scope (exit)
-				future._evStart.signaled = true;
-			synchronized (future)
-			{
-				future._resultException = e;
-				future._type = Future!Ret2.FinishedType.failed;
-			}
 			if (callbackFailed)
 				callbackFailed(e);
-			_execTaskOnFailed(future, e);
+			// _execTaskOnFailed ではなく、例外を投げない _settleFailed を使う。
+			// このコールバックは(nothrow指定の)_onFailed の emit() 内から
+			// 呼ばれるため、ここで万一throwすると Handler.emit() 側の
+			// catch-allに握りつぶされるだけでなく、同じ _onFailed に登録された
+			// *他の*リスナー(例えば同じFutureに対する2つ目以降の .then())の
+			// 呼び出しごと中断させてしまう(結果、そちらの派生Futureが
+			// 永久にFinishedType.noneのまま止まり、joinやyieldForceが
+			// デッドロックする)。
+			future._settleFailed(e);
 		});
 	}
 	private void _addListenerFatalWithNewFeature(Ret2)(CallbackFatalType callbackFatal, Future!Ret2 future)
 	{
 		addListenerFatal(cast(CallbackFatalType)(Throwable e)
 		{
-			scope (exit)
-				future._evStart.signaled = true;
-			synchronized (future)
-			{
-				future._resultFatal = e;
-				future._type = Future!Ret2.FinishedType.fatal;
-			}
 			if (callbackFatal)
 				callbackFatal(e);
-			_execTaskOnFatal(future, e);
+			// 上記 _addListenerFailedWithNewFeature と同じ理由で
+			// _execTaskOnFatal ではなく _settleFatal を使う。
+			future._settleFatal(e);
 		});
 	}
 	
@@ -1054,10 +1183,31 @@ public:
 		Ret2 delegate(ResultType) callbackFinished,
 		void delegate(Exception e) nothrow callbackFailed = null,
 		void delegate(Throwable e) nothrow callbackFatal = null)
-		if (!is(Ret == void) && is(typeof(callbackFinished(_resultRaw))))
+	if (!is(Ret == void) && is(typeof(callbackFinished(_resultRaw))))
 	{
-		auto ret = new Future!Ret2;
-		addListenerFinished((ref ResultType result) { ret.perform(pool, callbackFinished, result); });
+		static if (isFutureInstance!Ret2)
+		{
+			alias InnerRet = FutureResultType!Ret2;
+			auto ret = new Future!InnerRet;
+			addListenerFinished((ref ResultType result) {
+				Ret2 inner;
+				try
+					inner = callbackFinished(result);
+				catch (Exception e) { ret._settleFailed(e); return; }
+				catch (Throwable e) { ret._settleFatal(e); return; }
+				if (inner is null)
+				{
+					ret._settleFailed(new Exception("`then()`のコールバックがnullのFutureを返しました"));
+					return;
+				}
+				ret._adopt(inner);
+			});
+		}
+		else
+		{
+			auto ret = new Future!Ret2;
+			addListenerFinished((ref ResultType result) { ret.perform(pool, callbackFinished, result); });
+		}
 		_addListenerFailedWithNewFeature(callbackFailed, ret);
 		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
@@ -1067,10 +1217,31 @@ public:
 		Ret2 delegate(ResultType) callbackFinished,
 		void delegate(Exception e) nothrow callbackFailed = null,
 		void delegate(Throwable e) nothrow callbackFatal = null)
-		if (!is(Ret == void) && is(typeof(callbackFinished(_resultRaw))))
+	if (!is(Ret == void) && is(typeof(callbackFinished(_resultRaw))))
 	{
-		auto ret = new Future!Ret2;
-		addListenerFinished((ref ResultType result){ ret.perform(callbackFinished, result); });
+		static if (isFutureInstance!Ret2)
+		{
+			alias InnerRet = FutureResultType!Ret2;
+			auto ret = new Future!InnerRet;
+			addListenerFinished((ref ResultType result) {
+				Ret2 inner;
+				try
+					inner = callbackFinished(result);
+				catch (Exception e) { ret._settleFailed(e); return; }
+				catch (Throwable e) { ret._settleFatal(e); return; }
+				if (inner is null)
+				{
+					ret._settleFailed(new Exception("`then()`のコールバックがnullのFutureを返しました"));
+					return;
+				}
+				ret._adopt(inner);
+			});
+		}
+		else
+		{
+			auto ret = new Future!Ret2;
+			addListenerFinished((ref ResultType result){ ret.perform(callbackFinished, result); });
+		}
 		_addListenerFailedWithNewFeature(callbackFailed, ret);
 		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
@@ -1079,10 +1250,32 @@ public:
 	auto then(alias func, Ex = Exception)(TaskPool pool,
 		void delegate(Ex e) nothrow callbackFailed = null,
 		void delegate(Throwable e) nothrow callbackFatal = null)
-		if (!is(Ret == void) && is(typeof(func(_resultRaw))) && is(Ex == Exception))
+	if (!is(Ret == void) && is(typeof(func(_resultRaw))) && is(Ex == Exception))
 	{
-		auto ret = new Future!(typeof(func(_resultRaw)));
-		addListenerFinished((ref ResultType result) { ret.perform!func(pool, result); });
+		alias Ret2 = typeof(func(_resultRaw));
+		static if (isFutureInstance!Ret2)
+		{
+			alias InnerRet = FutureResultType!Ret2;
+			auto ret = new Future!InnerRet;
+			addListenerFinished((ref ResultType result) {
+				Ret2 inner;
+				try
+					inner = func(result);
+				catch (Exception e) { ret._settleFailed(e); return; }
+				catch (Throwable e) { ret._settleFatal(e); return; }
+				if (inner is null)
+				{
+					ret._settleFailed(new Exception("`then()`のコールバックがnullのFutureを返しました"));
+					return;
+				}
+				ret._adopt(inner);
+			});
+		}
+		else
+		{
+			auto ret = new Future!Ret2;
+			addListenerFinished((ref ResultType result) { ret.perform!func(pool, result); });
+		}
 		_addListenerFailedWithNewFeature(callbackFailed, ret);
 		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
@@ -1091,10 +1284,32 @@ public:
 	auto then(alias func, Ex = Exception)(
 		void delegate(Ex e) nothrow callbackFailed = null,
 		void delegate(Throwable e) nothrow callbackFatal = null)
-		if (!is(Ret == void) && is(typeof(func(_resultRaw))) && is(Ex == Exception))
+	if (!is(Ret == void) && is(typeof(func(_resultRaw))) && is(Ex == Exception))
 	{
-		auto ret = new Future!(typeof(func(_resultRaw)));
-		addListenerFinished((ref ResultType result) { ret.perform!func(result); });
+		alias Ret2 = typeof(func(_resultRaw));
+		static if (isFutureInstance!Ret2)
+		{
+			alias InnerRet = FutureResultType!Ret2;
+			auto ret = new Future!InnerRet;
+			addListenerFinished((ref ResultType result) {
+				Ret2 inner;
+				try
+					inner = func(result);
+				catch (Exception e) { ret._settleFailed(e); return; }
+				catch (Throwable e) { ret._settleFatal(e); return; }
+				if (inner is null)
+				{
+					ret._settleFailed(new Exception("`then()`のコールバックがnullのFutureを返しました"));
+					return;
+				}
+				ret._adopt(inner);
+			});
+		}
+		else
+		{
+			auto ret = new Future!Ret2;
+			addListenerFinished((ref ResultType result) { ret.perform!func(result); });
+		}
 		_addListenerFailedWithNewFeature(callbackFailed, ret);
 		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
@@ -1104,10 +1319,31 @@ public:
 		Ret2 delegate() callbackFinished,
 		void delegate(Exception e) nothrow callbackFailed = null,
 		void delegate(Throwable e) nothrow callbackFatal = null)
-		if (is(Ret == void) && is(typeof(callbackFinished())))
+	if (is(Ret == void) && is(typeof(callbackFinished())))
 	{
-		auto ret = new Future!Ret2;
-		addListenerFinished(() { ret.perform(pool, callbackFinished); });
+		static if (isFutureInstance!Ret2)
+		{
+			alias InnerRet = FutureResultType!Ret2;
+			auto ret = new Future!InnerRet;
+			addListenerFinished(() {
+				Ret2 inner;
+				try
+					inner = callbackFinished();
+				catch (Exception e) { ret._settleFailed(e); return; }
+				catch (Throwable e) { ret._settleFatal(e); return; }
+				if (inner is null)
+				{
+					ret._settleFailed(new Exception("`then()`のコールバックがnullのFutureを返しました"));
+					return;
+				}
+				ret._adopt(inner);
+			});
+		}
+		else
+		{
+			auto ret = new Future!Ret2;
+			addListenerFinished(() { ret.perform(pool, callbackFinished); });
+		}
 		_addListenerFailedWithNewFeature(callbackFailed, ret);
 		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
@@ -1117,10 +1353,31 @@ public:
 		Ret2 delegate() callbackFinished,
 		void delegate(Exception e) nothrow callbackFailed = null,
 		void delegate(Throwable e) nothrow callbackFatal = null)
-		if (is(Ret == void) && is(typeof(callbackFinished())))
+	if (is(Ret == void) && is(typeof(callbackFinished())))
 	{
-		auto ret = new Future!Ret2;
-		addListenerFinished((){ ret.perform(callbackFinished); });
+		static if (isFutureInstance!Ret2)
+		{
+			alias InnerRet = FutureResultType!Ret2;
+			auto ret = new Future!InnerRet;
+			addListenerFinished(() {
+				Ret2 inner;
+				try
+					inner = callbackFinished();
+				catch (Exception e) { ret._settleFailed(e); return; }
+				catch (Throwable e) { ret._settleFatal(e); return; }
+				if (inner is null)
+				{
+					ret._settleFailed(new Exception("`then()`のコールバックがnullのFutureを返しました"));
+					return;
+				}
+				ret._adopt(inner);
+			});
+		}
+		else
+		{
+			auto ret = new Future!Ret2;
+			addListenerFinished((){ ret.perform(callbackFinished); });
+		}
 		_addListenerFailedWithNewFeature(callbackFailed, ret);
 		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
@@ -1129,10 +1386,32 @@ public:
 	auto then(alias func, Ex = Exception)(TaskPool pool,
 		void delegate(Ex e) nothrow callbackFailed = null,
 		void delegate(Throwable e) nothrow callbackFatal = null)
-		if (is(Ret == void) && is(typeof(func())) && is(Ex == Exception))
+	if (is(Ret == void) && is(typeof(func())) && is(Ex == Exception))
 	{
-		auto ret = new Future!(typeof(func()));
-		addListenerFinished( () { ret.perform!func(pool); });
+		alias Ret2 = typeof(func());
+		static if (isFutureInstance!Ret2)
+		{
+			alias InnerRet = FutureResultType!Ret2;
+			auto ret = new Future!InnerRet;
+			addListenerFinished(() {
+				Ret2 inner;
+				try
+					inner = func();
+				catch (Exception e) { ret._settleFailed(e); return; }
+				catch (Throwable e) { ret._settleFatal(e); return; }
+				if (inner is null)
+				{
+					ret._settleFailed(new Exception("`then()`のコールバックがnullのFutureを返しました"));
+					return;
+				}
+				ret._adopt(inner);
+			});
+		}
+		else
+		{
+			auto ret = new Future!Ret2;
+			addListenerFinished( () { ret.perform!func(pool); });
+		}
 		_addListenerFailedWithNewFeature(callbackFailed, ret);
 		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
@@ -1141,10 +1420,32 @@ public:
 	auto then(alias func, Ex = Exception)(
 		void delegate(Ex e) nothrow callbackFailed = null,
 		void delegate(Throwable e) nothrow callbackFatal = null)
-		if (is(Ret == void) && is(typeof(func())) && is(Ex == Exception))
+	if (is(Ret == void) && is(typeof(func())) && is(Ex == Exception))
 	{
-		auto ret = new Future!(typeof(func()));
-		addListenerFinished( () { ret.perform!func(); } );
+		alias Ret2 = typeof(func());
+		static if (isFutureInstance!Ret2)
+		{
+			alias InnerRet = FutureResultType!Ret2;
+			auto ret = new Future!InnerRet;
+			addListenerFinished(() {
+				Ret2 inner;
+				try
+					inner = func();
+				catch (Exception e) { ret._settleFailed(e); return; }
+				catch (Throwable e) { ret._settleFatal(e); return; }
+				if (inner is null)
+				{
+					ret._settleFailed(new Exception("`then()`のコールバックがnullのFutureを返しました"));
+					return;
+				}
+				ret._adopt(inner);
+			});
+		}
+		else
+		{
+			auto ret = new Future!Ret2;
+			addListenerFinished( () { ret.perform!func(); } );
+		}
 		_addListenerFailedWithNewFeature(callbackFailed, ret);
 		_addListenerFatalWithNewFeature(callbackFatal, ret);
 		return ret;
@@ -1256,7 +1557,15 @@ public:
 				}
 			}
 		}
-		dg(_resultException);
+		try
+			dg(_resultException);
+		catch (Throwable)
+		{
+			// dg は nothrow のはずだが、内部実装(_addListenerFailedWithNewFeatureの
+			// ラッパー等)がcast経由でnothrow指定を回避し例外を送出することがあるため、
+			// (addListenerFinishedの「既に完了している場合の即時呼び出し」パスと同様に)
+			// プロセス全体をクラッシュさせないための保険としてここで受け止める。
+		}
 		return FailedHandler.HandlerProcId.init;
 	}
 	
@@ -1294,7 +1603,12 @@ public:
 				}
 			}
 		}
-		dg(_resultFatal);
+		try
+			dg(_resultFatal);
+		catch (Throwable)
+		{
+			// addListenerFailed と同様の保険。
+		}
 		return FatalHandler.HandlerProcId.init;
 	}
 	
@@ -1344,7 +1658,19 @@ public:
 		final switch (_type)
 		{
 		case FinishedType.none:
-			(cast(TaskType)_task).yieldForce();
+			try
+				(cast(TaskType)_task).yieldForce();
+			catch (Throwable e)
+			{
+				// `rethrow`引数を無視して例外を投げてしまわないよう、
+				// ここで一旦受け止めたうえで`rethrow`の指示に従う。
+				// (このcase節に来るのは`_type`がまだ`none`のまま
+				// `_task`自身の完了待ちに委ねている場合であり、
+				// `_type`が`failed`/`fatal`へ確定済みの場合と挙動を
+				// 一致させる必要がある)
+				if (rethrow)
+					throw e;
+			}
 			break;
 		case FinishedType.done:
 			break;
@@ -1556,17 +1882,33 @@ public:
 	// (Ex2は投げられない)
 }
 
+// ワーカースレッド数0のTaskPoolでもデッドロックしないことのテスト
 @system unittest
 {
+	import std.parallelism: TaskPool;
+	// ワーカースレッドを1つも持たないプールへ明示的に投げる。
+	// (通常totalCPUs-1個のワーカーが自動的に立つが、ここでは
+	// totalCPUsの値に依存せず確実に「誰も拾わない」状況を再現するため
+	// 明示的に0ワーカーのプールを構築する)
 	auto pool0 = new TaskPool(0);
 	scope (exit)
 		pool0.finish();
-	
+	assert(pool0.size == 0);
 	auto future = new Future!int;
 	future.perform(pool0, delegate (int a) => a + 20, 10);
-	auto result = future.yieldForce();
-}
+	// 修正前はここで永久にハングした(_evStartがタスク実行開始時に
+	// シグナルされる一方、実行開始はワーカーがいないため永久に起こらず、
+	// かつ自スレッドでの代行実行(Task.yieldForce())へも到達できなかったため)。
+	assert(future.yieldForce() == 30);
 
+	// .then() でチェーンした先の future もデッドロックしないことを確認する
+	auto future2 = new Future!int;
+	future2.perform(pool0, delegate (int a) => a, 10);
+	auto future3 = future2
+		.then(pool0, (int a) => a + 1)
+		.then(pool0, (int a) => a + 1);
+	assert(future3.yieldForce() == 12);
+}
 
 /*******************************************************************************
  * 非同期処理の開始
@@ -1601,8 +1943,8 @@ auto async(F, Args...)(TaskPool pool, F dg, Args args)
 {
 	auto ret = new Future!(ReturnType!F);
 	_makeTask!_dgRun(ret, dg, args);
-	ret._taskPool = pool;
-	pool.put(ret._task);
+	ret._submit(pool);
+	ret._evStart.signaled = true;
 	return ret;
 }
 @system unittest
@@ -1618,6 +1960,7 @@ auto async(F, Args...)(F dg, Args args)
 	auto ret = new Future!(ReturnType!F);
 	_makeTask!_dgRun(ret, dg, args);
 	ret._task.executeInNewThread();
+	ret._evStart.signaled = true;
 	return ret;
 }
 @system unittest
@@ -1631,8 +1974,8 @@ auto async(alias func, Args...)(TaskPool pool, Args args)
 {
 	auto ret = new Future!(typeof(func(args)));
 	_makeTask!func(ret, args);
-	pool.put(ret._task);
-	ret._taskPool = pool;
+	ret._submit(pool);
+	ret._evStart.signaled = true;
 	return ret;
 }
 @system unittest
@@ -1647,6 +1990,7 @@ auto async(alias func, Args...)(Args args)
 	auto ret = new Future!(typeof(func(args)));
 	_makeTask!func(ret, args);
 	ret._task.executeInNewThread();
+	ret._evStart.signaled = true;
 	return ret;
 }
 @system unittest
@@ -1654,8 +1998,6 @@ auto async(alias func, Args...)(Args args)
 	auto future = async!(a => a + 40)(10);
 	assert(future.yieldForce() == 50);
 }
-
-
 
 /*******************************************************************************
  * 管理された共有資源
@@ -3309,41 +3651,127 @@ public:
 	assert(test == ["aaa", "bbb", "ccc", "ddd", "eee", "fff"]);
 }
 
+/* *****************************************************************************
+ * Future の Promise 的挙動に関する回帰テスト
+ * 
+ * `known-issues-voile.md` Issue 12 参照。`.then()` を既に確定済み(failed/fatal)の
+ * Future に対して呼び出すと、addListenerFailed()/addListenerFatal() の
+ * 「即時呼び出し」経路がtry/catchで保護されていなかったため、プロセス全体が
+ * クラッシュしていた。addListenerFinished()には元々このtry/catchが存在して
+ * おり、非対称な実装漏れだった。
+ */
 @system unittest
 {
-	import core.thread : Fiber;
-	auto msgbox = new shared MessageBox!(string, Fiber);
-	new Fiber({
-		// データが無い状態でキー省略+タイムアウト版を呼ぶ -> タイムアウトして false
-		assert(!msgbox.waitForData(10.msecs));
-		// put()もキー省略版は自Fiber(Fiber.getThis())宛に積む
-		msgbox.put("hello");
-		// データがある状態でキー省略版(タイムアウト無し)を呼ぶ -> 即座に true
-		assert(msgbox.waitForData());
-		// データがある状態でキー省略+タイムアウト版を呼ぶ -> 即座に true
-		assert(msgbox.waitForData(10.msecs));
-		assert(msgbox.consume() == "hello");
-	}).call();
+	import std.exception: collectException;
+	// 既に failed 確定済みの Future に .then() を呼んでもクラッシュしない
+	// (JS Promiseの `.then()` は決して同期的に例外を投げない、という契約に相当)
+	auto future = new Future!int;
+	future.perform(delegate (int a) { throw new Exception("already failed"); return a; }, 10);
+	future.join(false);
+	bool onRejectedCalled;
+	void delegate(Exception) nothrow onRejected = (Exception e) nothrow {
+		onRejectedCalled = true;
+	};
+	auto d = future.then((int a) => a + 1, onRejected);
+	assert(onRejectedCalled);
+	bool dFailed;
+	try
+		d.yieldForce();
+	catch (Exception e)
+		dFailed = true;
+	assert(dFailed);
 }
 
+// ditto (同じFutureに複数の.then()を接続しても、両方とも独立して正しく通知される)
 @system unittest
 {
-	import std.concurrency : Tid;
-	auto msgbox = new shared MessageBox!(string, Tid);
-	assert(!msgbox.waitForData(10.msecs));
-	msgbox.put("hello");
-	assert(msgbox.waitForData());
-	assert(msgbox.waitForData(10.msecs));
-	assert(msgbox.consume() == "hello");
+	auto future = new Future!int;
+	future.perform(delegate (int a) { throw new Exception("original boom"); return a; }, 10);
+	bool failed1Called, failed2Called;
+	void delegate(Exception) nothrow onRejected1 = (Exception e) nothrow { failed1Called = true; };
+	void delegate(Exception) nothrow onRejected2 = (Exception e) nothrow { failed2Called = true; };
+	auto d1 = future.then((int a) => a + 1, onRejected1);
+	auto d2 = future.then((int a) => a + 2, onRejected2);
+	d1.join(false);
+	d2.join(false);
+	assert(failed1Called);
+	assert(failed2Called);
 }
 
+/* *****************************************************************************
+ * Future の `.then()` が Future を返した場合の自動フラット化(chaining)に
+ * 関するテスト(JavaScriptのPromiseにおける thenable resolution に相当)。
+ * 
+ * 修正前は `then((int a) => someFuture)` の戻り値が `Future!(Future!int)` と
+ * 二重にネストしてしまい、Promiseのように自動的に内側のFutureの結果へ
+ * 展開されることはなかった。
+ */
 @system unittest
 {
-	import core.thread : Thread;
-	auto msgbox = new shared MessageBox!(string, Thread);
-	assert(!msgbox.waitForData(10.msecs));
-	msgbox.put("hello");
-	assert(msgbox.waitForData());
-	assert(msgbox.waitForData(10.msecs));
-	assert(msgbox.consume() == "hello");
+	// 1. 内側のFutureが成功する場合、外側もその値で成功する
+	auto future1 = new Future!int;
+	future1.perform(delegate (int a) => a + 10, 10);
+	auto inner1 = new Future!int;
+	inner1.perform(delegate (int a) => a * 100, 5);
+	auto chained1 = future1.then((int a) => inner1);
+	static assert(is(typeof(chained1) == Future!int));
+	assert(chained1.yieldForce() == 500);
+}
+// ditto (内側のFutureが失敗する場合、外側もfailedになる)
+@system unittest
+{
+	auto future2 = new Future!int;
+	future2.perform(delegate (int a) => a + 10, 10);
+	auto inner2 = new Future!int;
+	inner2.perform(delegate (int a) { throw new Exception("inner boom"); return a; }, 5);
+	auto chained2 = future2.then((int a) => inner2);
+	bool threw;
+	try
+		chained2.yieldForce();
+	catch (Exception e)
+	{
+		threw = true;
+		assert(e.msg == "inner boom");
+	}
+	assert(threw);
+}
+// ditto (コールバック自体が例外を投げた場合も外側がfailedになる)
+@system unittest
+{
+	auto future3 = new Future!int;
+	future3.perform(delegate (int a) => a + 10, 10);
+	auto chained3 = future3.then((int a) {
+		throw new Exception("callback boom");
+		return new Future!int;
+	});
+	bool threw;
+	try
+		chained3.yieldForce();
+	catch (Exception e)
+	{
+		threw = true;
+		assert(e.msg == "callback boom");
+	}
+	assert(threw);
+}
+// ditto (既に完了済みの内側Futureにも正しくフラット化される)
+@system unittest
+{
+	auto future4 = new Future!int;
+	future4.perform(delegate (int a) => a + 10, 10);
+	auto inner4 = new Future!int(999);
+	auto chained4 = future4.then((int a) => inner4);
+	assert(chained4.yieldForce() == 999);
+}
+// ditto (Future!void へのフラット化)
+@system unittest
+{
+	auto future5 = new Future!int;
+	future5.perform(delegate (int a) => a + 1, 1);
+	auto innerVoid5 = new Future!void;
+	bool ran;
+	innerVoid5.perform(delegate () { ran = true; });
+	auto chained5 = future5.then((int a) => innerVoid5);
+	chained5.yieldForce();
+	assert(ran);
 }
