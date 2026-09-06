@@ -16,12 +16,12 @@
  */
 module voile.yaml;
 
-import std.algorithm  : map, filter, among, startsWith, endsWith, canFind, joiner;
+import std.algorithm  : map, filter, among, startsWith, endsWith, canFind, joiner, move;
 import std.array      : Appender, appender, join, split;
 import std.conv       : to, text, parse, ConvException;
 import std.conv;
 import std.ascii      : isDigit, isHexDigit, isOctalDigit;
-import std.exception  : enforce;
+import std.exception  : enforce, collectException;
 import std.format     : format, formattedWrite, sformat;
 import std.meta       : AliasSeq, staticMap, Filter, allSatisfy, staticIndexOf;
 import std.range      : isOutputRange, ElementType, repeat, put;
@@ -32,7 +32,8 @@ import std.traits     : isIntegral, isFloatingPoint, isSomeString, isArray,
                         isSigned, isUnsigned, isAggregateType, isDynamicArray,
                         hasElaborateAssign, hasElaborateCopyConstructor,
                         hasElaborateMove, hasElaborateDestructor, hasNested,
-                        ReturnType, TemplateArgsOf, lvalueOf, hasUDA, getUDAs;
+                        ReturnType, TemplateArgsOf, lvalueOf, hasUDA, getUDAs,
+                        isPointer;
 import std.typecons   : Nullable, nullable, Tuple, isTuple;
 import std.sumtype    : SumType, match, isSumType;
 import std.utf         : encode;
@@ -464,8 +465,18 @@ enum isSerializableSumType(T) = isSumType!T
 	&& Filter!(isBinary,            T.Types).length <= 1
 	&& Filter!(isAssociativeArray,  T.Types).length <= 1;
 
-private enum isYamlValue(T) = isInstanceOf!(YamlValue, T);
-private alias builderOf(T) = TemplateArgsOf!(T, YamlValue)[0];
+// 注意: モジュール末尾の`alias YamlValue = YamlBuilder.YamlValue;`(Export
+// Types)は特定のBuilder(YamlDefaultAllocator版)に固定された具体型であり、
+// `isInstanceOf!(YamlValue, T)`のようにテンプレートとして扱うことはできない
+// (常にfalseになる。toYaml/fromYamlフックが実際には一切検出されず
+// 素通りしてしまう不具合として発覚したため、`is()`パターンマッチで
+// `YamlValueImpl`テンプレート自体を直接判定する方式に修正した)。
+private enum isYamlValue(T) = is(T == YamlValueImpl!Builder, Builder);
+private template builderOf(T)
+{
+	static if (is(T == YamlValueImpl!Builder, Builder))
+		alias builderOf = Builder;
+}
 
 // toYaml / fromYaml フック検出
 private template hasConvertYamlMethodA(T)
@@ -5511,16 +5522,749 @@ public:
 	{
 		updateValueImpl(dst, src);
 	}
+	
+	// ==========================================================================
+	// MARK: - - Serializer
+	// ==========================================================================
+	// T40: serialize()実装(design 4.2節: JSON5のserialize()とほぼ同じ骨格を
+	// 移植し、フォーマット属性をYAML用(comment/scalarStyle/integralFormat/
+	// floatingPointFormat/arrayFormat/mappingFormat/keyStyle/anchor/tag)に
+	// 差し替える)。T31実装メモの教訓(JSON5の未検証コードを鵜呑みにしない)に
+	// 従い、json5.dの`getval = () => serialzie(getValue!e);`という綴りミスは
+	// 修正して移植した。
+	
+	/***************************************************************************
+	 * D型の値からYamlValueを構築する(シリアライズ)
+	 * 
+	 * 対応する`T`の種類:
+	 * 
+	 * - `YamlValue`(`deepCopy()`される)
+	 * - 整数型・浮動小数点型・真偽値型・文字列型・`null`
+	 * - バイナリ型(`immutable(ubyte)[]`、Base64URL(パディング無し)エンコード
+	 *   文字列として出力)
+	 * - 配列・連想配列(キーは`string`のみ) - 再帰的にシリアライズ
+	 * - `Tuple` - シーケンスに変換し、再帰的にシリアライズ
+	 * - `SumType` - 集約型バリアントは`@kind`属性のキー・値をマッピング先頭に
+	 *   追加してから判別に用いる。それ以外はそのままシリアライズする
+	 * - 集約型(struct/class/union): 以下のいずれかの条件を満たすもの
+	 *   - `toYaml`/`fromYaml`メンバーを持つ(`toYaml`はビルダー引数の有無を問わない)
+	 *   - 単純な公開メンバー変数で構成される
+	 *     - `@ignore`属性: シリアライズ対象から除外する
+	 *     - `@ignoreIf`属性: 条件を満たす場合はシリアライズ対象から除外する
+	 *     - `@name`属性: キー名としてその値を使う
+	 *     - `@value`属性: メンバー値の代わりにその値をシリアライズする
+	 *     - `@converter`/`@convBy`属性: 指定した変換関数の戻り値を使う
+	 *     - フォーマット属性(`comment`/`scalarStyle`/`integralFormat`/
+	 *       `floatingPointFormat`/`arrayFormat`/`mappingFormat`/`keyStyle`/
+	 *       `anchor`/`tag`)が付与されていればそれを出力に反映する
+	 * Params:
+	 *      src = シリアライズ対象の値
+	 * Returns:
+	 *      構築された`YamlValue`
+	 */
+	YamlValue serialize(T)(in T src) @safe
+	{
+		import std.base64: Base64URLNoPadding;
+		alias U = Unqual!T;
+		static if (is(U == YamlValue))
+			return deepCopy(src);
+		else static if (isSomeString!T)
+			return make(src);
+		else static if (isIntegral!T)
+			return make(src);
+		else static if (isFloatingPoint!T)
+			return make(src);
+		else static if (isBoolean!T)
+			return make(src);
+		else static if (isBinary!T)
+			return make(Base64URLNoPadding.encode(src));
+		else static if (is(T == typeof(null)))
+			return make(src);
+		else static if (isArray!T)
+		{
+			auto ary = allocAry!YamlValue();
+			foreach (idx; 0..src.length)
+				ary ~= serialize(src[idx]);
+			return make(YamlSequence(ary));
+		}
+		else static if (isAssociativeArray!T)
+		{
+			auto dic = allocDic!(YamlKey, YamlValue)();
+			foreach (ref k, ref v; src)
+				dic.append(YamlKey(allocStr(k)), serialize(v));
+			return make(YamlMapping(dic));
+		}
+		else static if (isTuple!T)
+		{
+			auto ary = allocAry!YamlValue();
+			static foreach (idx; 0..src[].length)
+				ary ~= serialize(src[idx]);
+			return make(YamlSequence(ary));
+		}
+		else static if (isSumType!T)
+		{
+			// SumTypeの場合
+			// 集約型バリアントは`@kind`属性のキー・値をマッピング先頭に追加して
+			// 判別に用いる。それ以外は整数・実数・文字列・真偽値・配列・
+			// 連想配列のいずれかがユニークでなければならない(isSerializableSumType参照)
+			return src.match!(
+				(ref e) @trusted
+				{
+					static if (isAggregateType!(typeof(e)) && hasKind!(typeof(e)))
+					{
+						auto obj = serialize(e);
+						enum kd = getKind!(typeof(e));
+						obj.asMapping.value.prepend(YamlKey(allocStr(kd.key)), make(kd.value));
+						return obj;
+					}
+					else
+					{
+						return serialize(e);
+					}
+				}
+			);
+		}
+		else static if (isAggregateType!T && hasConvertYamlMethodA!T)
+			return src.toYaml(this);
+		else static if (isAggregateType!T && hasConvertYamlMethodB!T)
+			return src.toYaml();
+		else static if (isAggregateType!T)
+		{
+			auto obj = allocDic!(YamlKey, YamlValue)();
+			static foreach (i, e; src.tupleof[])
+			{
+				// メンバー変数をシリアライズする
+				// @ignore属性が付与されている場合はシリアライズしない
+				// @ignoreIf属性が付与されている場合はその条件に合致する場合はシリアライズしない
+				// @name属性が付与されている場合はその名前を使用する
+				// @value属性が付与されている場合はその値を使用する
+				// @converter属性が付与されている場合はその関数による変換値を使用する
+				static if (isAccessible!e && !hasIgnore!e)
+				{{
+					alias E = typeof(e);
+					alias appendObj = ()
+					{
+						static if (hasName!e)
+							alias getname = () => YamlKey(allocStr(getName!e));
+						else
+							alias getname = () => YamlKey(allocStr(e.stringof));
+						static if (hasConvBy!e && canConvTo!(e, string))
+							alias getval = () => make(convTo!(e, string)(src.tupleof[i]));
+						else static if (hasConvBy!e && canConvTo!(e, immutable(ubyte)[]))
+							alias getval = () => serialize(convTo!(e, immutable(ubyte)[])(src.tupleof[i]));
+						else static if (hasConvBy!e && canConvTo!(e, YamlValue))
+						{
+							alias getval = () {
+								auto v = undefinedValue();
+								convertTo!e(src.tupleof[i], v);
+								return v;
+							};
+						}
+						else static if (hasValue!e)
+							alias getval = () => serialize(getValue!e);
+						else
+							alias getval = () => serialize(src.tupleof[i]);
+						auto key = getname();
+						auto val = getval();
+						// コメント
+						static foreach (c; getAttrYamlComments!e)
+							val.addComment(c.value, c.type);
+						// キー出力スタイル
+						static if (hasAttrYamlKeyStyle!e)
+							key.style = getAttrYamlKeyStyle!e.style;
+						else static if (hasAttrYamlKeyStyle!T)
+							key.style = getAttrYamlKeyStyle!T.style;
+						// 各型の修飾
+						static if (isSomeString!E && hasAttrYamlScalarStyle!e)
+						{
+							assert(val.type == YamlType.string);
+							val.asString.style = getAttrYamlScalarStyle!e.style;
+						}
+						else static if (isIntegral!E && isSigned!E && hasAttrYamlIntegralFormat!e)
+						{
+							assert(val.type == YamlType.integer);
+							val.asInteger.positiveSign = getAttrYamlIntegralFormat!e.positiveSign;
+							val.asInteger.base         = getAttrYamlIntegralFormat!e.base;
+						}
+						else static if (isIntegral!E && isUnsigned!E && hasAttrYamlIntegralFormat!e)
+						{
+							assert(val.type == YamlType.uinteger);
+							val.asUInteger.positiveSign = getAttrYamlIntegralFormat!e.positiveSign;
+							val.asUInteger.base         = getAttrYamlIntegralFormat!e.base;
+						}
+						else static if (isFloatingPoint!E && hasAttrYamlFloatingPointFormat!e)
+						{
+							assert(val.type == YamlType.floating);
+							val.asFloatingPoint.leadingDecimalPoint = getAttrYamlFloatingPointFormat!e.leadingDecimalPoint;
+							val.asFloatingPoint.tailingDecimalPoint = getAttrYamlFloatingPointFormat!e.tailingDecimalPoint;
+							val.asFloatingPoint.positiveSign        = getAttrYamlFloatingPointFormat!e.positiveSign;
+							val.asFloatingPoint.withExponent        = getAttrYamlFloatingPointFormat!e.withExponent;
+							val.asFloatingPoint.precision           = getAttrYamlFloatingPointFormat!e.precision;
+						}
+						else static if (isArray!E && !isSomeString!E && hasAttrYamlArrayFormat!e)
+						{
+							assert(val.type == YamlType.sequence);
+							val.asSequence.style         = getAttrYamlArrayFormat!e.style;
+							val.asSequence.trailingComma = getAttrYamlArrayFormat!e.trailingComma;
+							val.asSequence.singleLine    = getAttrYamlArrayFormat!e.singleLine;
+						}
+						else static if (isAggregateType!E && hasAttrYamlMappingFormat!e)
+						{
+							assert(val.type == YamlType.mapping);
+							val.asMapping.style         = getAttrYamlMappingFormat!e.style;
+							val.asMapping.trailingComma = getAttrYamlMappingFormat!e.trailingComma;
+							val.asMapping.singleLine    = getAttrYamlMappingFormat!e.singleLine;
+						}
+						else
+						{
+							// 何もしない
+						}
+						// アンカー・タグ
+						static if (hasAttrYamlAnchor!e)
+							val.setAnchor(getAttrYamlAnchor!e.anchorName);
+						static if (hasAttrYamlTag!e)
+							val.setTag(getAttrYamlTag!e.tagName);
+						// 配列の要素に対する修飾(多重配列は非対応)
+						static if (isArray!E && isSomeString!(ElementType!E) && hasAttrYamlScalarStyle!e)
+						{
+							foreach (ref elm; val.asSequence.value[])
+							{
+								assert(elm.type == YamlType.string);
+								elm.asString.style = getAttrYamlScalarStyle!e.style;
+							}
+						}
+						else static if (isArray!E && isIntegral!(ElementType!E) && isSigned!(ElementType!E)
+							&& hasAttrYamlIntegralFormat!e)
+						{
+							foreach (ref elm; val.asSequence.value[])
+							{
+								assert(elm.type == YamlType.integer);
+								elm.asInteger.positiveSign = getAttrYamlIntegralFormat!e.positiveSign;
+								elm.asInteger.base         = getAttrYamlIntegralFormat!e.base;
+							}
+						}
+						else static if (isArray!E && isIntegral!(ElementType!E) && isUnsigned!(ElementType!E)
+							&& hasAttrYamlIntegralFormat!e)
+						{
+							foreach (ref elm; val.asSequence.value[])
+							{
+								assert(elm.type == YamlType.uinteger);
+								elm.asUInteger.positiveSign = getAttrYamlIntegralFormat!e.positiveSign;
+								elm.asUInteger.base         = getAttrYamlIntegralFormat!e.base;
+							}
+						}
+						else static if (isArray!E && isFloatingPoint!(ElementType!E)
+							&& hasAttrYamlFloatingPointFormat!e)
+						{
+							enum fpFormat = getAttrYamlFloatingPointFormat!e;
+							foreach (ref elm; val.asSequence.value[])
+							{
+								assert(elm.type == YamlType.floating);
+								elm.asFloatingPoint.leadingDecimalPoint = fpFormat.leadingDecimalPoint;
+								elm.asFloatingPoint.tailingDecimalPoint = fpFormat.tailingDecimalPoint;
+								elm.asFloatingPoint.positiveSign        = fpFormat.positiveSign;
+								elm.asFloatingPoint.withExponent        = fpFormat.withExponent;
+								elm.asFloatingPoint.precision           = fpFormat.precision;
+							}
+						}
+						else static if (isArray!E && isAggregateType!(ElementType!E) && hasAttrYamlMappingFormat!e)
+						{
+							foreach (ref elm; val.asSequence.value[])
+							{
+								assert(elm.type == YamlType.mapping);
+								elm.asMapping.style         = getAttrYamlMappingFormat!e.style;
+								elm.asMapping.trailingComma = getAttrYamlMappingFormat!e.trailingComma;
+								elm.asMapping.singleLine    = getAttrYamlMappingFormat!e.singleLine;
+							}
+						}
+						else
+						{
+							// 何もしない
+						}
+						obj.append(key, val);
+					};
+					static if (hasIgnoreIf!(e, const(E)))
+					{
+						if (!getPredIgnoreIf!e(src.tupleof[i]))
+							appendObj();
+					}
+					else static if (hasIgnoreIf!(e, T))
+					{
+						if (!getPredIgnoreIf!e(src))
+							appendObj();
+					}
+					else static if (isPointer!(typeof(e)) && e.stringof == "this")
+					{
+						// クロージャの隠しコンテキストポインタ対策
+						// (ネストした構造体の`this`メンバーをスキップするワークアラウンド)
+						if (false)
+							appendObj();
+					}
+					else
+					{
+						appendObj();
+					}
+				}}
+			}
+			static if (hasAttrYamlMappingFormat!T)
+			{
+				enum mfmt = getAttrYamlMappingFormat!T;
+				return make(YamlMapping(obj, mfmt.style, mfmt.trailingComma, mfmt.singleLine));
+			}
+			else
+			{
+				return make(YamlMapping(obj));
+			}
+		}
+		else
+		{
+			return undefinedValue();
+		}
+	}
+	
+	// ==========================================================================
+	// MARK: - - Deserializer
+	// ==========================================================================
+	// T41: deserialize()実装(design 4.2節: JSON5のdeserialize()とほぼ同じ
+	// 骨格を移植する)。json5.dのTuple分岐は例外を握り潰す公開ラッパー
+	// `deserialize()`を誤って呼んでいたため、他の分岐と同じ`deserializeImpl()`
+	// 直接呼び出しに修正して移植した(T31実装メモの教訓を踏まえた意図的な差分)。
+	// SumType分岐は`switch`ではなく`final switch`を使用し、`YamlType.alias_`
+	// (`dereference()`済みのため実行時には到達しない)を`assert(0)`で
+	// 明示することで、将来`Type`にバリアントが追加された際に
+	// コンパイルエラーで気づけるようにしている。
+	
+	/***************************************************************************
+	 * YamlValueから指定した型の値へデシリアライズする
+	 * 
+	 * 対応する`T`の種類は`serialize()`とほぼ対称(design 4.2節 T41):
+	 * 
+	 * - `YamlValue`(`deepCopy()`される)
+	 * - 整数型・浮動小数点型・真偽値型・文字列型・`null`
+	 * - バイナリ型(`immutable(ubyte)[]`、Base64URLデコード)
+	 * - 配列・連想配列 - 再帰的にデシリアライズ
+	 * - `Tuple` - シーケンスから復元
+	 * - `SumType` - マッピング先頭の`@kind`タグ、または整数/実数/文字列/
+	 *   真偽値/null/配列/連想配列の型から一意に判定して復元
+	 * - 集約型(struct/class/union): 以下のいずれかの条件を満たすもの
+	 *   - `toYaml`/`fromYaml`メンバーを持つ
+	 *   - 単純な公開メンバー変数で構成される
+	 *     - `@ignore`属性: デシリアライズしない
+	 *     - `@ignoreIf`属性: 条件を満たす場合はデシリアライズしない
+	 *     - `@name`属性: キー名としてその値を使う
+	 *     - `@converter`/`@convBy`属性: 指定した変換関数を使う
+	 *     - `@essential`属性: 対応するキーが見つからない場合は例外を投げる
+	 * Params:
+	 *      src = デシリアライズ元の値
+	 *      dst = デシリアライズ先(出力引数)
+	 */
+	void deserializeImpl(T)(in YamlValue src, ref T dst) @safe
+	{
+		import std.base64: Base64URLNoPadding;
+		alias U = Unqual!T;
+		static if (is(U == YamlValue))
+			dst = deepCopy(src);
+		else static if (isSomeString!T)
+			dst = src.get!U;
+		else static if (isIntegral!T)
+			dst = src.get!U;
+		else static if (isFloatingPoint!T)
+			dst = src.get!U;
+		else static if (isBoolean!T)
+			dst = src.get!U;
+		else static if (isBinary!T)
+			dst = Base64URLNoPadding.decode(src.get!string);
+		else static if (is(T == typeof(null)))
+			dst = null;
+		else static if (isArray!T)
+		{
+			// 配列
+			dst.length = src.dereference()._reqSeq.length;
+			foreach (i, ref e; src.dereference()._reqSeq)
+				deserializeImpl(e, dst[i]);
+		}
+		else static if (isAssociativeArray!T)
+		{
+			// 連想配列
+			foreach (ref e; src.dereference()._reqMap.byKeyValue)
+			{
+				ValueType!T val;
+				deserializeImpl(e.value, val);
+				dst[cast(string)e.key.value[]] = val;
+			}
+		}
+		else static if (isTuple!T)
+		{
+			auto ary = src.dereference()._reqSeq;
+			static foreach (idx; 0..dst.length)
+				deserializeImpl(ary[idx], dst[idx]);
+		}
+		else static if (isSumType!T)
+		{
+			// SumTypeの場合
+			// 集約型バリアントはマッピング先頭の@kind属性のキー・値を手掛かりに
+			// 判別する。それ以外は整数/実数/文字列/真偽値/null/配列/連想配列の
+			// いずれかがユニークでなければならない(isSerializableSumType参照)
+			final switch (src.dereference().type)
+			{
+			case YamlType.integer:
+			case YamlType.uinteger:
+				alias Types = Filter!(isIntegral, T.Types);
+				static if (Types.length == 1)
+				{
+					Types[0] ret;
+					deserializeImpl(src, ret);
+					(() @trusted => dst = ret.move)();
+				}
+				break;
+			case YamlType.floating:
+				alias Types = Filter!(isFloatingPoint, T.Types);
+				static if (Types.length == 1)
+				{
+					Types[0] ret;
+					deserializeImpl(src, ret);
+					(() @trusted => dst = ret.move)();
+				}
+				break;
+			case YamlType.string:
+				alias Types1 = Filter!(isSomeString, T.Types);
+				alias Types2 = Filter!(isBinary, T.Types);
+				static if (Types1.length == 1 && Types2.length == 0)
+				{
+					Types1[0] ret;
+					deserializeImpl(src, ret);
+					(() @trusted => dst = ret.move)();
+				}
+				else static if (Types1.length == 0 && Types2.length == 1)
+				{
+					Types2[0] ret;
+					deserializeImpl(src, ret);
+					(() @trusted => dst = ret.move)();
+				}
+				else
+				{
+					// Ignore
+				}
+				break;
+			case YamlType.nullfied:
+				import std.typecons: NullableRef;
+				enum isNullableType(X) = is(X == typeof(null))
+					|| isInstanceOf!(Nullable, X) || isInstanceOf!(NullableRef, X);
+				alias Types = Filter!(isNullableType, T.Types);
+				static if (Types.length == 1)
+				{
+					static if (is(Types[0] == typeof(null)))
+						dst = null;
+					else
+						dst.nullify();
+				}
+				break;
+			case YamlType.undefined:
+				// Ignore
+				break;
+			case YamlType.boolean:
+				alias Types = Filter!(isBoolean, T.Types);
+				static if (Types.length == 1)
+				{
+					Types[0] ret;
+					deserializeImpl(src, ret);
+					(() @trusted => dst = ret.move)();
+				}
+				break;
+			case YamlType.sequence:
+				alias Types = Filter!(isArrayWithoutBinary, T.Types);
+				static if (Types.length == 1)
+				{
+					Types[0] ret;
+					deserializeImpl(src, ret);
+					(() @trusted => dst = ret.move)();
+				}
+				break;
+			case YamlType.mapping:
+				immutable kinds = [staticMap!(getKind, Filter!(isAggregateType, T.Types))];
+				size_t kindIdx = size_t.max;
+				static if (kinds.length)
+				{
+					// kindIdxは「マッピング内でのキー出現位置」ではなく「kinds(=Types)
+					// 配列内でのマッチ位置」を記録する。@kindタグは常にマッピング先頭に
+					// 付与される(serialize()参照)ため、前者を使うと2番目以降のバリアントを
+					// 正しく判別できない(json5.dの`_reqObj.byKeyValue`側のインデックスを
+					// そのまま使う実装は、1番目のバリアントとキー位置がたまたま一致する
+					// 場合のみ動作する潜在バグだったため、ここでは意図的に修正して移植した)。
+					foreach (ref e; src.dereference()._reqMap.byKeyValue)
+					{
+						foreach (ki, kd; kinds)
+						{
+							if (e.key.value[] == kd.key
+								&& e.value.dereference().type == YamlType.string
+								&& e.value.dereference()._reqStr[] == kd.value)
+							{
+								kindIdx = ki;
+								break;
+							}
+						}
+						if (kindIdx != size_t.max)
+							break;
+					}
+				}
+				if (kindIdx != size_t.max)
+				{
+					// isAggregateType
+					alias Types = Filter!(isAggregateType, T.Types);
+					static foreach (i, E; Types)
+					{
+						if (kindIdx == i)
+						{
+							E ret;
+							deserializeImpl(src, ret);
+							(() @trusted => dst = ret.move)();
+						}
+					}
+				}
+				else
+				{
+					// isAssociativeArray
+					alias Types = Filter!(isAssociativeArray, T.Types);
+					static if (Types.length == 1)
+					{
+						Types[0] ret;
+						deserializeImpl(src, ret);
+						(() @trusted => dst = ret.move)();
+					}
+				}
+				break;
+			case YamlType.alias_:
+				assert(0, "unreachable: dereference() must resolve YamlAlias");
+			}
+		}
+		else static if (isAggregateType!T && hasConvertYamlMethodA!T)
+			dst = T.fromYaml(src);
+		else static if (isAggregateType!T && hasConvertYamlMethodB!T)
+			dst = T.fromYaml(src);
+		else static if (isAggregateType!T)
+		{
+			// その他の構造体・クラス
+			static foreach (i, m; dst.tupleof[])
+			{{
+				// メンバー変数をデシリアライズ
+				// @ignore属性が付与されている場合はデシリアライズしない
+				// @ignoreIf属性が付与されている場合はその条件に合致する場合はデシリアライズしない
+				// @name属性が付与されている場合はその名前を使用する
+				// @converter属性が付与されている場合はその関数による変換値を使用する
+				// @essential属性が付与されている場合は変換できない場合に例外を投げる
+				static if (hasEssential!m)
+					bool found = false;
+				static if (isAccessible!m && !hasIgnore!m)
+				{
+					static if (hasIgnoreIf!(m, const(YamlValue)))
+						bool isIgnored = getPredIgnoreIf!m(src);
+					else static if (hasIgnoreIf!(m, typeof(m), const(YamlValue)))
+						bool isIgnored = getPredIgnoreIf!(m, typeof(m), const(YamlValue))(dst.tupleof[i], src);
+					else static if (hasIgnoreIf!(m, const(T), const(YamlValue)))
+						bool isIgnored = getPredIgnoreIf!(m, const(T), const(YamlValue))(dst, src);
+					else
+						enum isIgnored = false;
+					if (!isIgnored) foreach (ref e; src.dereference()._reqMap.byKeyValue)
+					{
+						static if (hasName!m)
+							enum memberName = getName!m;
+						else
+							enum memberName = m.stringof;
+						
+						if (e.key.value[] == memberName)
+						{
+							static if (hasConvBy!m && canConvFrom!(m, string))
+								dst.tupleof[i] = (() @trusted => convFrom!(m, string)(e.value.get!string))();
+							else static if (hasConvBy!m && canConvFrom!(m, immutable(ubyte)[]))
+							{
+								immutable(ubyte)[] tmp;
+								deserializeImpl(e.value, tmp);
+								dst.tupleof[i] = (() @trusted => convFrom!(m, immutable(ubyte)[])(tmp))();
+							}
+							else static if (hasConvBy!m && canConvFrom!(m, YamlValue))
+								dst.tupleof[i] = convFrom!(m, YamlValue)(e.value);
+							else
+								deserializeImpl(e.value, dst.tupleof[i]);
+							static if (hasEssential!m)
+								found = true;
+							break;
+						}
+					}
+				}
+				static if (hasEssential!m)
+					enforce(found, "Essential member[" ~ m.stringof ~ "] is not found.");
+			}}
+		}
+		else
+		{
+			// ignore
+		}
+	}
+	/// ditto
+	bool deserialize(T)(in YamlValue src, ref T dst) @safe
+	{
+		return !deserializeImpl(src, dst).collectException;
+	}
+	/// ditto
+	T deserialize(T)(in YamlValue src) @safe
+	{
+		T dst;
+		deserializeImpl(src, dst);
+		return dst;
+	}
 }
 
 // ============================================================================
 // MARK: - Export Types
 // ============================================================================
 
-// 以下は T03 検証用の暫定エイリアス。正式な公開APIは T50 で確定させる。
-alias YamlBuilder  = YamlBuilderImpl!YamlDefaultAllocator;
-alias YamlValue    = YamlBuilder.YamlValue;
-alias YamlOptions  = YamlBuilder.YamlPrettyPrintOptions;
+// T50: design 2.3節のエイリアス群。命名は「Json5 → Yaml」の単純置換とし、
+// JSON5利用者が迷わず移行できることを優先する。`YamlMapping`/`YamlSequence`が
+// 正式名称(design 2.2節)であり、`YamlObject`/`YamlArray`はJSON5からの
+// 乗り換えを容易にするための別名エイリアスとして追加提供する。
+
+///
+alias YamlBuilder       = YamlBuilderImpl!YamlDefaultAllocator;
+///
+alias YamlValue         = YamlBuilder.YamlValue;
+///
+alias YamlType          = YamlBuilder.YamlType;
+///
+alias YamlString        = YamlBuilder.YamlValue.YamlString;
+///
+alias YamlInteger       = YamlBuilder.YamlValue.YamlInteger;
+///
+alias YamlUInteger      = YamlBuilder.YamlValue.YamlUInteger;
+///
+alias YamlFloatingPoint = YamlBuilder.YamlValue.YamlFloatingPoint;
+///
+alias YamlBoolean       = YamlBuilder.YamlValue.YamlBoolean;
+///
+alias YamlMapping       = YamlBuilder.YamlValue.YamlMapping;
+///
+alias YamlSequence      = YamlBuilder.YamlValue.YamlSequence;
+/// JSON5の`JsonObject`に相当する別名エイリアス
+alias YamlObject        = YamlMapping;
+/// JSON5の`JsonArray`に相当する別名エイリアス
+alias YamlArray         = YamlSequence;
+///
+alias YamlOptions       = YamlBuilder.YamlPrettyPrintOptions;
+
+// 注意: JSON5の`Json5Builder`はフィールドを持たない完全に無状態な構造体
+// (`hasIndirections!Json5Builder == false`)であるため、json5.dでは
+// `private __gshared Json5Builder g_defaultBuilder;`を自由関数群から
+// 共有して問題なかった。一方`YamlBuilder`はパース時にアンカーテーブル
+// (`_anchorTable`)や保留コメント(`_pendingComments`)を実インスタンス
+// フィールドとして保持するステートフルな構造体であるため
+// (`hasIndirections!YamlBuilder == true`)、同じ設計を踏襲すると
+// (1) `@safe`関数から`__gshared`データへアクセスできずコンパイルエラーになる
+// (2) 仮にコンパイルが通ったとしても複数スレッド・再入呼び出し間で
+//     パース状態を共有してしまう、という二重の問題がある。
+// そのため自由関数群では`__gshared`のBuilderを共有せず、呼び出しごとに
+// ローカルな`YamlBuilder`インスタンスを生成する設計に変更した
+// (デフォルトアロケータでは`YamlBuilder`の生成は軽量なゼロ初期化のみ)。
+
+// T51: 自由関数API(JSON5の makeJson/parseJson/... と同じ命名規則)
+
+/***************************************************************************
+ * 値からYamlValueを構築する(既定のBuilderを使用する自由関数版)
+ */
+YamlValue makeYaml(T)(in T val) @safe
+{
+	YamlBuilder builder;
+	return builder.make(val);
+}
+
+/***************************************************************************
+ * YAML文字列をパースする(既定のBuilderを使用する自由関数版)
+ */
+YamlValue parseYaml(in char[] str) @safe
+{
+	YamlBuilder builder;
+	return builder.parse(str);
+}
+
+/***************************************************************************
+ * D型の値をYamlValueへシリアライズする(既定のBuilderを使用する自由関数版)
+ */
+YamlValue serializeToYaml(T)(in T src) @safe
+{
+	YamlBuilder builder;
+	return builder.serialize(src);
+}
+
+/***************************************************************************
+ * D型の値をYAML文字列へシリアライズする(既定のBuilderを使用する自由関数版)
+ * Params:
+ *      src     = シリアライズ対象の値
+ *      options = pretty-print整形オプション(既定値: `YamlOptions.init`)
+ */
+string serializeToYamlString(T)(in T src, YamlOptions options = YamlOptions.init) @safe
+{
+	YamlBuilder builder;
+	auto app = appender!string;
+	auto v = builder.serialize(src);
+	builder.toPrettyString(app, v, options);
+	return app.data;
+}
+
+/***************************************************************************
+ * YamlValueからD型の値へデシリアライズする(既定のBuilderを使用する自由関数版)
+ */
+bool deserializeFromYaml(T)(in YamlValue src, ref T dst) @safe
+{
+	YamlBuilder builder;
+	return builder.deserialize(src, dst);
+}
+/// ditto
+T deserializeFromYaml(T)(in YamlValue src) @safe
+{
+	YamlBuilder builder;
+	return builder.deserialize!T(src);
+}
+
+/***************************************************************************
+ * YAML文字列をパースしてD型の値へデシリアライズする
+ * (既定のBuilderを使用する自由関数版)
+ */
+bool deserializeFromYamlString(T)(in char[] src, ref T dst) @safe
+{
+	YamlBuilder builder;
+	return builder.deserialize(builder.parse(src), dst);
+}
+/// ditto
+T deserializeFromYamlString(T)(in char[] src) @safe
+{
+	YamlBuilder builder;
+	return builder.deserialize!T(builder.parse(src));
+}
+
+/// T50/T51: makeYaml/parseYaml/serializeToYaml(String)/deserializeFromYaml(String)の統合テスト
+@safe unittest
+{
+	struct Data
+	{
+		int x;
+		int y;
+	}
+	auto dat1 = Data(1, 2);
+	auto str1 = dat1.serializeToYamlString();
+	assert(str1 == "x: 1\ny: 2\n");
+	
+	auto v1 = parseYaml(str1);
+	assert(v1.getValue!int("x") == 1);
+	assert(v1.getValue!int("y") == 2);
+	
+	auto dat2 = deserializeFromYamlString!Data("x: 1\ny: 2\n");
+	assert(dat1 == dat2);
+	
+	auto v2 = dat1.serializeToYaml();
+	assert(v2.getValue!int("x") == 1);
+	assert(v2.getValue!int("y") == 2);
+	
+	auto dat3 = deserializeFromYaml!Data(makeYaml(["x": 1, "y": 2]));
+	assert(dat3 == dat1);
+}
 
 // ============================================================================
 // MARK: - Unittests
@@ -9301,4 +10045,534 @@ alias YamlOptions  = YamlBuilder.YamlPrettyPrintOptions;
 	auto app = appender!(char[])();
 	builder.toPrettyString(app, root);
 	assert(app.data == "name: Alice # who\nage: 31\n");
+}
+
+// ============================================================================
+// T40: Serializer のユニットテスト
+// ============================================================================
+
+/// T40: 単純な構造体のシリアライズ(公開メンバー変数→マッピング)
+@safe unittest
+{
+	struct Data
+	{
+		int x;
+		string y;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(1, "hello"));
+	assert(v.type == YamlBuilder.YamlType.mapping);
+	assert(v.getValue!int("x") == 1);
+	assert(v.getValue!string("y") == "hello");
+}
+
+/// T40: @ignore属性が付与されたメンバーはシリアライズされない
+@safe unittest
+{
+	struct Data
+	{
+		int x;
+		@ignore int y;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(1, 2));
+	assert(v.asMapping.value.length == 1);
+	assert(v.getValue!int("x") == 1);
+}
+
+/// T40: @ignoreIf属性が付与されたメンバーは条件を満たす場合シリアライズされない
+@safe unittest
+{
+	struct Data
+	{
+		@ignoreIf!((int a) => a == 0)
+		int x;
+	}
+	YamlBuilder builder;
+	auto v1 = builder.serialize(Data(0));
+	assert(v1.asMapping.value.length == 0);
+	auto v2 = builder.serialize(Data(5));
+	assert(v2.asMapping.value.length == 1);
+	assert(v2.getValue!int("x") == 5);
+}
+
+/// T40: @name属性でキー名を変更できる
+@safe unittest
+{
+	struct Data
+	{
+		@name("renamed") int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(3));
+	assert(v.getValue!int("renamed") == 3);
+	assert(v.getValue!int("x", -1) == -1);
+}
+
+/// T40: @value属性でメンバー値の代わりに固定値を使用する
+@safe unittest
+{
+	struct Data
+	{
+		@value!100 int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(1));
+	assert(v.getValue!int("x") == 100);
+}
+
+/// T40: comment属性でコメントを出力に反映する
+@safe unittest
+{
+	struct Data
+	{
+		@comment("this is x") int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(1));
+	assert(v.asMapping["x"].getCommentLength == 1);
+	assert(v.asMapping["x"].getComment(0) == "this is x");
+}
+
+/// T40: scalarStyle属性で文字列出力スタイルを指定できる
+@safe unittest
+{
+	struct Data
+	{
+		@scalarStyle(ScalarStyle.singleQuoted) string s;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data("hello"));
+	assert(v.asMapping["s"].asString.style == ScalarStyle.singleQuoted);
+}
+
+/// T40: integralFormat属性で整数の基数・符号を指定できる
+@safe unittest
+{
+	struct Data
+	{
+		@integralFormat(true, IntegerBase.hex) int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(255));
+	assert(v.asMapping["x"].asInteger.base == IntegerBase.hex);
+	assert(v.asMapping["x"].asInteger.positiveSign);
+}
+
+/// T40: floatingPointFormat属性で浮動小数点の出力形式を指定できる
+@safe unittest
+{
+	struct Data
+	{
+		@floatingPointFormat(true, true, true, true, 3) double x;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(1.5));
+	assert(v.asMapping["x"].asFloatingPoint.leadingDecimalPoint);
+	assert(v.asMapping["x"].asFloatingPoint.tailingDecimalPoint);
+	assert(v.asMapping["x"].asFloatingPoint.positiveSign);
+	assert(v.asMapping["x"].asFloatingPoint.withExponent);
+	assert(v.asMapping["x"].asFloatingPoint.precision == 3);
+}
+
+/// T40: arrayFormat属性でシーケンスのflow/ケツカンマ/1行出力を指定できる
+@safe unittest
+{
+	struct Data
+	{
+		@arrayFormat(CollectionStyle.flow, true, true) int[] xs;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data([1, 2, 3]));
+	assert(v.asMapping["xs"].asSequence.style == CollectionStyle.flow);
+	assert(v.asMapping["xs"].asSequence.trailingComma);
+	assert(v.asMapping["xs"].asSequence.singleLine);
+}
+
+/// T40: mappingFormat属性で構造体全体のflow/ケツカンマ/1行出力を指定できる
+@safe unittest
+{
+	@mappingFormat(CollectionStyle.flow, true, true)
+	struct Data
+	{
+		int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(1));
+	assert(v.asMapping.style == CollectionStyle.flow);
+	assert(v.asMapping.trailingComma);
+	assert(v.asMapping.singleLine);
+}
+
+/// T40: keyStyle属性でキーの出力スタイルを指定できる(フィールド単位)
+@safe unittest
+{
+	struct Data
+	{
+		@keyStyle(ScalarStyle.singleQuoted) int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(1));
+	assert(v.asMapping.value[0].key.style == ScalarStyle.singleQuoted);
+}
+
+/// T40: anchor/tag属性でシリアライズ時にアンカー・タグを付与できる
+@safe unittest
+{
+	struct Data
+	{
+		@anchor("a1") @tag("mytag") int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(1));
+	assert(v.asMapping["x"].anchorName.get == "a1");
+	assert(v.asMapping["x"].tagName.get == "mytag");
+}
+
+/// T40: 入れ子の構造体・構造体配列もシリアライズできる
+@safe unittest
+{
+	struct Inner { int a; }
+	struct Outer { Inner inner; Inner[] list; }
+	YamlBuilder builder;
+	auto v = builder.serialize(Outer(Inner(1), [Inner(2), Inner(3)]));
+	assert(v.asMapping["inner"].getValue!int("a") == 1);
+	assert(v.asMapping["list"].asSequence.value[0].getValue!int("a") == 2);
+	assert(v.asMapping["list"].asSequence.value[1].getValue!int("a") == 3);
+}
+
+/// T40: 連想配列(キーはstring)もシリアライズできる
+@safe unittest
+{
+	YamlBuilder builder;
+	auto v = builder.serialize(["a": 1, "b": 2]);
+	assert(v.type == YamlBuilder.YamlType.mapping);
+	assert(v.getValue!int("a") == 1);
+	assert(v.getValue!int("b") == 2);
+}
+
+/// T40: Tupleはシーケンスとしてシリアライズされる
+@safe unittest
+{
+	import std.typecons: tuple;
+	YamlBuilder builder;
+	auto v = builder.serialize(tuple(1, "two"));
+	assert(v.type == YamlBuilder.YamlType.sequence);
+	assert(v.getElement!int(0) == 1);
+	assert(v.getElement!string(1) == "two");
+}
+
+/// T40: @kind属性を持つ集約型バリアントを含むSumTypeはマッピングにタグを付与してシリアライズされる
+@safe unittest
+{
+	import std.sumtype: SumType;
+	@kind("A") struct VariantA { int a; }
+	@kind("B") struct VariantB { string b; }
+	alias Variant = SumType!(VariantA, VariantB);
+	YamlBuilder builder;
+	auto v1 = builder.serialize(Variant(VariantA(1)));
+	assert(v1.getValue!string("$type") == "A");
+	assert(v1.getValue!int("a") == 1);
+	auto v2 = builder.serialize(Variant(VariantB("x")));
+	assert(v2.getValue!string("$type") == "B");
+	assert(v2.getValue!string("b") == "x");
+}
+
+/// T40: プリミティブ型のみからなるSumTypeはそのままシリアライズされる
+@safe unittest
+{
+	import std.sumtype: SumType;
+	alias Variant = SumType!(int, string);
+	YamlBuilder builder;
+	auto v1 = builder.serialize(Variant(1));
+	assert(v1.type == YamlBuilder.YamlType.integer);
+	auto v2 = builder.serialize(Variant("x"));
+	assert(v2.type == YamlBuilder.YamlType.string);
+}
+
+/// T40: @convBy属性(voile.attr)で変換プロキシを通した値をシリアライズできる
+@safe unittest
+{
+	static struct Proxy
+	{
+		static string to(int v) @safe { return v.to!string; }
+		static int from(string v) @safe { return v.to!int; }
+	}
+	struct Data
+	{
+		@convBy!Proxy int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(42));
+	assert(v.getValue!string("x") == "42");
+}
+
+/// T40: バイナリ型(immutable(ubyte)[])はBase64URL文字列としてシリアライズされる
+@safe unittest
+{
+	struct Data
+	{
+		immutable(ubyte)[] bin;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data([0, 1, 2, 3, 255]));
+	assert(v.asMapping["bin"].type == YamlBuilder.YamlType.string);
+}
+
+/// T40: toYaml(Builder引数あり)/fromYamlフックが定義されている型はそちらが優先される
+@safe unittest
+{
+	static struct Data
+	{
+		int x;
+		YamlBuilder.YamlValue toYaml(YamlBuilder b) const @safe
+		{
+			return b.make(x * 2);
+		}
+		static Data fromYaml(in YamlBuilder.YamlValue v) @safe
+		{
+			return Data(v.get!int / 2);
+		}
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(21));
+	assert(v.get!int == 42);
+}
+
+/// T40: toYaml(引数なし)/fromYamlフックも検出される
+@safe unittest
+{
+	static struct Data
+	{
+		int x;
+		YamlBuilder.YamlValue toYaml() const @safe
+		{
+			YamlBuilder b;
+			return b.make(x + 1);
+		}
+		static Data fromYaml(in YamlBuilder.YamlValue v) @safe
+		{
+			return Data(v.get!int - 1);
+		}
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(9));
+	assert(v.get!int == 10);
+}
+
+/// T40: YamlValueを渡した場合はdeepCopyされる(独立したコピーになる)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto src = builder.make(["a": 1]);
+	auto v = builder.serialize(src);
+	assert(v.getValue!int("a") == 1);
+	assert(&v.asMapping.value[0] !is &src.asMapping.value[0]);
+}
+
+// ============================================================================
+// T41: Deserializer のユニットテスト
+// ============================================================================
+
+/// T41: 単純な構造体へのデシリアライズ(serialize()との往復)
+@safe unittest
+{
+	struct Data
+	{
+		int x;
+		string y;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(1, "hello"));
+	auto dst = builder.deserialize!Data(v);
+	assert(dst == Data(1, "hello"));
+}
+
+/// T41: @ignore属性が付与されたメンバーはデシリアライズされず既定値のまま
+@safe unittest
+{
+	struct Data
+	{
+		int x;
+		@ignore int y = 99;
+	}
+	YamlBuilder builder;
+	auto v = builder.parse("x: 1\ny: 2\n");
+	auto dst = builder.deserialize!Data(v);
+	assert(dst.x == 1);
+	assert(dst.y == 99);
+}
+
+/// T41: @name属性で指定したキー名から値を取得する
+@safe unittest
+{
+	struct Data
+	{
+		@name("renamed") int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.parse("renamed: 5\n");
+	auto dst = builder.deserialize!Data(v);
+	assert(dst.x == 5);
+}
+
+/// T41: @essential属性が付与されたメンバーに対応するキーが無い場合は
+/// deserialize()がfalseを返す(例外はdeserializeImpl()側で送出される)
+@safe unittest
+{
+	struct Data
+	{
+		@essential int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.parse("y: 1\n");
+	Data dst;
+	assert(!builder.deserialize(v, dst));
+}
+
+/// T41: 入れ子の構造体・構造体配列もデシリアライズできる(往復確認)
+@safe unittest
+{
+	struct Inner { int a; }
+	struct Outer { Inner inner; Inner[] list; }
+	YamlBuilder builder;
+	auto src = Outer(Inner(1), [Inner(2), Inner(3)]);
+	auto v = builder.serialize(src);
+	auto dst = builder.deserialize!Outer(v);
+	assert(dst == src);
+}
+
+/// T41: 連想配列(キーはstring)もデシリアライズできる(往復確認)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto v = builder.serialize(["a": 1, "b": 2]);
+	auto dst = builder.deserialize!(int[string])(v);
+	assert(dst["a"] == 1);
+	assert(dst["b"] == 2);
+}
+
+/// T41: Tupleもデシリアライズできる(往復確認)
+@safe unittest
+{
+	import std.typecons: tuple;
+	YamlBuilder builder;
+	auto src = tuple(1, "two");
+	auto v = builder.serialize(src);
+	auto dst = builder.deserialize!(typeof(src))(v);
+	assert(dst == src);
+}
+
+/// T41: @kind属性付きSumTypeは往復でバリアント種別を復元できる
+@safe unittest
+{
+	import std.sumtype: SumType, match;
+	@kind("A") struct VariantA { int a; }
+	@kind("B") struct VariantB { string b; }
+	alias Variant = SumType!(VariantA, VariantB);
+	YamlBuilder builder;
+	auto v1 = builder.serialize(Variant(VariantA(1)));
+	auto dst1 = builder.deserialize!Variant(v1);
+	assert(dst1.match!((VariantA a) => a.a == 1, (VariantB b) => false));
+	
+	auto v2 = builder.serialize(Variant(VariantB("x")));
+	auto dst2 = builder.deserialize!Variant(v2);
+	assert(dst2.match!((VariantA a) => false, (VariantB b) => b.b == "x"));
+}
+
+/// T41: プリミティブ型のみからなるSumTypeも往復できる
+@safe unittest
+{
+	import std.sumtype: SumType, match;
+	alias Variant = SumType!(int, string);
+	YamlBuilder builder;
+	auto v1 = builder.serialize(Variant(10));
+	auto dst1 = builder.deserialize!Variant(v1);
+	assert(dst1.match!((int i) => i == 10, (string s) => false));
+	
+	auto v2 = builder.serialize(Variant("hi"));
+	auto dst2 = builder.deserialize!Variant(v2);
+	assert(dst2.match!((int i) => false, (string s) => s == "hi"));
+}
+
+/// T41: @convBy属性(voile.attr)で変換プロキシを通した値をデシリアライズできる
+@safe unittest
+{
+	static struct Proxy
+	{
+		static string to(int v) @safe { return v.to!string; }
+		static int from(string v) @safe { return v.to!int; }
+	}
+	struct Data
+	{
+		@convBy!Proxy int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.parse("x: \"42\"\n");
+	auto dst = builder.deserialize!Data(v);
+	assert(dst.x == 42);
+}
+
+/// T41: バイナリ型(immutable(ubyte)[])は往復でBase64URLデコードされる
+@safe unittest
+{
+	struct Data
+	{
+		immutable(ubyte)[] bin;
+	}
+	YamlBuilder builder;
+	auto src = Data([0, 1, 2, 3, 255]);
+	auto v = builder.serialize(src);
+	auto dst = builder.deserialize!Data(v);
+	assert(dst == src);
+}
+
+/// T41: toYaml/fromYamlフックが定義されている型は往復でそちらが使われる
+@safe unittest
+{
+	static struct Data
+	{
+		int x;
+		YamlBuilder.YamlValue toYaml(YamlBuilder b) const @safe
+		{
+			return b.make(x * 2);
+		}
+		static Data fromYaml(in YamlBuilder.YamlValue v) @safe
+		{
+			return Data(v.get!int / 2);
+		}
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(21));
+	auto dst = builder.deserialize!Data(v);
+	assert(dst.x == 21);
+}
+
+/// T41: YamlValueへのデシリアライズはdeepCopyされる
+@safe unittest
+{
+	YamlBuilder builder;
+	auto v = builder.parse("x: 1\n");
+	auto dst = builder.deserialize!(YamlBuilder.YamlValue)(v);
+	assert(dst.getValue!int("x") == 1);
+}
+
+/// T41: parseからserialize/deserializeで構造体を往復できる統合テスト
+@safe unittest
+{
+	struct Person
+	{
+		string name;
+		int age;
+		@ignore string cache;
+	}
+	YamlBuilder builder;
+	auto v = builder.parse("name: Alice\nage: 30\n");
+	auto p = builder.deserialize!Person(v);
+	assert(p.name == "Alice");
+	assert(p.age == 30);
+	
+	p.age = 31;
+	auto v2 = builder.serialize(p);
+	assert(v2.getValue!int("age") == 31);
 }
