@@ -4105,6 +4105,7 @@ private:
 	import std.container.dlist: DList;
 	import std.range: put, isInputRange, isOutputRange;
 	import std.exception: collectException;
+	import std.sumtype: isSumType;
 	Condition _cond;
 	DList!T _list;
 	size_t  _length;
@@ -4201,6 +4202,24 @@ public:
 			m.unlock_nothrow();
 		(cast()this).put(src);
 	}
+	static if (isSumType!T)
+	static foreach (SumTypeValue; T.Types)
+	{
+		/// ditto
+		void put(SumTypeValue dat) nothrow
+		{
+			this.put(T(dat.move));
+		}
+		/// ditto
+		void put(SumTypeValue dat) @trusted nothrow shared
+		{
+			auto m = _mutex;
+			m.lock_nothrow();
+			scope (exit)
+				m.unlock_nothrow();
+			(cast()this).put(dat.move);
+		}
+	}
 	
 	/***************************************************************************
 	 * 消費
@@ -4258,7 +4277,7 @@ public:
 			return false;
 		scope (exit)
 			_list.removeFront();
-		dst = _list.front.move();
+		_list.front.move(dst);
 		--_length;
 		return true;
 	}
@@ -4366,7 +4385,7 @@ public:
 	}
 }
 
-
+///
 @system unittest
 {
 	import core.thread;
@@ -4406,6 +4425,72 @@ public:
 	
 	tg.joinAll();
 	assert(test == ["aaa", "bbb", "ccc", "ddd", "eee", "fff"]);
+}
+
+@system unittest
+{
+	import core.thread;
+	import core.sync.barrier;
+	import std.sumtype;
+	import std.algorithm;
+	import std.array;
+	import std.conv;
+	auto tg = new ThreadGroup;
+	
+	struct TestDataA
+	{
+		immutable string command = "testdata_a";
+		int testValue;
+		this(int x) { testValue = x; }
+	}
+	struct TestDataB
+	{
+		immutable string command = "testdata_b";
+		string testString;
+		this(string x) { testString = x; }
+	}
+	
+	alias TestData = SumType!(TestDataA, TestDataB);
+	
+	auto queue = new shared MessageQueue!TestData;
+	auto b = new Barrier(2);
+	TestData[] test;
+	// producer
+	tg.create({
+		b.wait();
+		queue.put(TestData(TestDataA(10)));
+		queue.put(TestData(TestDataB("testB-1")));
+		queue.put(TestDataA(11));
+		b.wait();
+		queue.put(TestDataB("testB-2"));
+		b.wait();
+	});
+	// consumer
+	tg.create({
+		b.wait();
+		test ~= queue.consume();
+		TestData tmp;
+		auto tryres = queue.tryConsume(tmp, 100.msecs);
+		assert(tryres);
+		
+		test ~= tmp;
+		import std.array;
+		auto app = appender!(TestData[]);
+		queue.consumeAll(app);
+		b.wait();
+		tryres = queue.tryConsumeAll(app, 100.msecs);
+		assert(tryres);
+		test ~= app.data;
+		b.wait();
+		assert(queue.length == 0);
+	});
+	
+	tg.joinAll();
+	auto teststrs = test.map!(a => a.match!(
+		(TestDataA a) => a.testValue.to!string(),
+		(TestDataB b) => b.testString
+	)).array;
+	assert(teststrs == ["10", "testB-1", "11", "testB-2"]);
 }
 
 /*******************************************************************************
