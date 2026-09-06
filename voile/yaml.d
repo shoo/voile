@@ -25,7 +25,7 @@ import std.exception  : enforce, collectException;
 import std.format     : format, formattedWrite, sformat;
 import std.meta       : AliasSeq, staticMap, Filter, allSatisfy, staticIndexOf;
 import std.range      : isOutputRange, ElementType, repeat, put;
-import std.string     : outdent, splitLines, strip, stripRight, stripLeft, indexOf;
+import std.string     : outdent, splitLines, strip, stripRight, stripLeft, indexOf, chompPrefix;
 import std.traits     : isIntegral, isFloatingPoint, isSomeString, isArray,
                         isAssociativeArray, isBoolean, Unqual, FieldNameTuple,
                         KeyType, ValueType, isInstanceOf, hasMember,
@@ -36,7 +36,7 @@ import std.traits     : isIntegral, isFloatingPoint, isSomeString, isArray,
                         isPointer;
 import std.typecons   : Nullable, nullable, Tuple, isTuple;
 import std.sumtype    : SumType, match, isSumType;
-import std.utf         : encode;
+import std.utf        : encode;
 
 import voile.attr;
 private alias attr = voile.attr;
@@ -2745,7 +2745,7 @@ private:
 	 * （JSON5の`parseNumberImpl`と同じ判定方針）。桁溢れ等でパースに失敗した
 	 * 場合は数値としての解決を諦め、文字列として扱う。
 	 */
-	private YamlType resolveIntegerImpl(ref YamlValue dst, in char[] raw, in char[] digits,
+	YamlType resolveIntegerImpl(ref YamlValue dst, in char[] raw, in char[] digits,
 		uint base, bool positiveSign, bool negative, IntegerBase intBase) @safe
 	{
 		auto r = allocStr();
@@ -2810,7 +2810,7 @@ private:
 	 * plainスカラーの文字列解決では両者は常に一致する（数値等と異なり、値と表記が
 	 * 分離しないため）。
 	 */
-	private YamlType resolveAsStringImpl(ref YamlValue dst, in char[] raw) @safe
+	YamlType resolveAsStringImpl(ref YamlValue dst, in char[] raw) @safe
 	{
 		auto v = allocStr();
 		v ~= raw;
@@ -3833,7 +3833,7 @@ private:
 	 * 境界は角括弧の対応により曖昧さなく決まるため、この値は意味を持たない
 	 * （3.7節ルール4のインデント比較はblock文脈のdanglingコメント判定にのみ使う）。
 	 */
-	private static struct PendingComment
+	static struct PendingComment
 	{
 		///
 		String text;
@@ -3843,7 +3843,7 @@ private:
 	
 	/// 保留中コメントのキュー（`skipBlankAndCommentLinesImpl`/`skipFlowSpacingImpl`で
 	/// 蓄積され、`attachPendingLeadingCommentsImpl`等で取り出される）
-	private Array!PendingComment _pendingComments;
+	Array!PendingComment _pendingComments;
 	
 	/***************************************************************************
 	 * `#`から行末までのコメント本文を読み取る
@@ -4072,7 +4072,7 @@ private:
 	/// アンカーテーブル（design 3.5節）。`parse()`（T1A）呼び出しごとに
 	/// 新規にクリアすべきだが、本タスク時点ではT1A未実装のため各テストは
 	/// 新規`YamlBuilder`インスタンスを使うことで暗黙にクリア状態から開始している
-	private Dictionary!(string, YamlValue) _anchorTable;
+	Dictionary!(string, YamlValue) _anchorTable;
 	
 	/***************************************************************************
 	 * アンカーを登録する（同名アンカーが既にあれば上書きする。再アンカーは
@@ -4483,7 +4483,8 @@ private:
 	 *      dst   = 出力先
 	 *      fpVal = 出力対象
 	 */
-	void putYamlFloatingPointImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlFloatingPoint) fpVal) const @safe
+	void putYamlFloatingPointImpl(OutputRange)(ref OutputRange dst,
+		ref const(YamlValue.YamlFloatingPoint) fpVal) const @safe
 	{
 		import std.math : isNaN, isInfinity;
 		
@@ -4652,7 +4653,8 @@ private:
 	 *      dst      = 出力先
 	 *      comments = 出力対象のコメント配列
 	 */
-	void putYamlTrailingCommentImpl(OutputRange)(ref OutputRange dst, ref const(Array!(YamlValue.Comment)) comments) const @safe
+	void putYamlTrailingCommentImpl(OutputRange)(ref OutputRange dst,
+		ref const(Array!(YamlValue.Comment)) comments) const @safe
 	{
 		if (comments.length == 0)
 			return;
@@ -4733,6 +4735,41 @@ private:
 	}
 	
 	/***************************************************************************
+	 * アンカー・タグの前置トークン（`&name`・`!tag`）を出力する（design 3.5節）
+	 * 
+	 * アンカーが設定されていれば`&name`を、タグが設定されていれば続けて
+	 * (アンカーがあれば半角スペース区切りで)`!tag`を出力する。末尾には
+	 * 空白を付与しない(値そのものとの区切りは呼び出し元の責務とする)。
+	 * 
+	 * タグについては`_tag`の格納形式に2通りある点に注意する:
+	 * パーサー(`parseTagImpl`)が設定した場合は`!`自体を含む生のトークン
+	 * (`!mytag`/`!!str`/`!<...>`等)がそのまま格納されるが、`tag()`UDA
+	 * (`setTag()`経由)は`!!`プレフィックスを除いた名称のみを格納する
+	 * 契約になっている(3.1節)。そのため、格納値が`!`から始まっていなければ
+	 * `!!`を補って出力する。
+	 * Params:
+	 *      dst   = 出力先
+	 *      value = 出力対象(そのノード自身の`_anchor`/`_tag`を参照する)
+	 */
+	void putYamlAnchorTagPrefixImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue) value) const @safe
+	{
+		if (!value._anchor.isNull)
+		{
+			put(dst, "&");
+			put(dst, value._anchor.get[]);
+		}
+		if (!value._tag.isNull)
+		{
+			if (!value._anchor.isNull)
+				put(dst, " ");
+			auto t = value._tag.get[];
+			if (t.length == 0 || t[0] != '!')
+				put(dst, "!!");
+			put(dst, t);
+		}
+	}
+	
+	/***************************************************************************
 	 * flowコンテキスト内の1ノード(スカラー・エイリアス・ネストしたflow
 	 * コレクション)を出力する
 	 * 
@@ -4746,9 +4783,9 @@ private:
 	 * 出力しない。呼び出し元(`putYamlFlowSequenceImpl`/
 	 * `putYamlFlowMappingImpl`/`putYamlBlockChildImpl`)が各要素の前後で
 	 * `putYamlCommentLinesImpl`/`putYamlTrailingCommentImpl`を呼び出す
-	 * 構成になっている(T23)。アンカー(`&name`)・タグ(`!tag`)の出力は
-	 * T24の統合層で全ノード共通の処理として追加する予定であり、本関数の
-	 * 時点ではまだ対応しない(3.5節の要求に対する既知の未実装事項)。
+	 * 構成になっている(T23)。アンカー(`&name`)・タグ(`!tag`)は
+	 * `putYamlAnchorTagPrefixImpl`により本関数の先頭で共通処理として
+	 * 出力する(T61で発覚した不備の修正。design 3.5節)。
 	 * Params:
 	 *      dst            = 出力先
 	 *      value          = 出力対象
@@ -4760,6 +4797,11 @@ private:
 	void putYamlFlowNodeImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue) value,
 		in char[] indent, in char[] newline, size_t indentLevel, bool escapeNonAscii = false) const @safe
 	{
+		if (!value._anchor.isNull || !value._tag.isNull)
+		{
+			putYamlAnchorTagPrefixImpl(dst, value);
+			put(dst, " ");
+		}
 		final switch (value.type)
 		{
 		case YamlType.undefined:
@@ -4991,6 +5033,11 @@ private:
 	{
 		if (isBlockNestedCollectionImpl(value))
 		{
+			if (!value._anchor.isNull || !value._tag.isNull)
+			{
+				put(dst, " ");
+				putYamlAnchorTagPrefixImpl(dst, value);
+			}
 			put(dst, newline);
 			putYamlCommentLinesImpl(dst, value._comments, indent, newline, indentLevel + 1);
 			final switch (value.type)
@@ -5017,7 +5064,15 @@ private:
 			put(dst, " ");
 			putYamlFlowNodeImpl(dst, value, indent, newline, indentLevel, escapeNonAscii);
 			putYamlTrailingCommentImpl(dst, value._comments);
-			put(dst, newline);
+			// literal/foldedブロックスカラーは`putYamlBlockScalarImpl`が
+			// 既に末尾の改行(ヘッダ行の改行、および内容行それぞれの改行)を
+			// 出力済みのため、ここで追加の改行を出すと空行が二重に生じてしまう
+			// (T61総合ラウンドトリップテストで発見したバグの修正)。
+			immutable isBlockScalarValue = value.type == YamlType.string
+				&& (value.asString.style == ScalarStyle.literal
+					|| value.asString.style == ScalarStyle.folded);
+			if (!isBlockScalarValue)
+				put(dst, newline);
 		}
 	}
 	
@@ -5120,6 +5175,11 @@ private:
 	{
 		if (isBlockNestedCollectionImpl(value))
 		{
+			if (!value._anchor.isNull || !value._tag.isNull)
+			{
+				putYamlAnchorTagPrefixImpl(dst, value);
+				put(dst, newline);
+			}
 			final switch (value.type)
 			{
 			case YamlType.sequence:
@@ -10575,4 +10635,396 @@ T deserializeFromYamlString(T)(in char[] src) @safe
 	p.age = 31;
 	auto v2 = builder.serialize(p);
 	assert(v2.getValue!int("age") == 31);
+}
+/// T61: 総合ラウンドトリップテスト(コメント・アンカー・ブロックスカラー・
+/// flowコレクション・ケツカンマ・各種数値表記を含む合成サンプル)
+@safe unittest
+{
+	enum src = `# root comment
+name: Alice # trailing comment
+tags: [a, b, c,]
+scores:
+  - 1
+  - 2
+  - 3
+address: &addr
+  city: Tokyo
+  zip: "100-0001"
+address2: *addr
+bio: |
+  Hello
+  World
+note: >
+  single line note
+hex: 0x1A
+oct1: 0o17
+float1: 3.14
+float2: 1.5e10
+flag: true
+nothing: null
+# dangling comment at end
+`;
+	YamlBuilder builder;
+	auto v = builder.parse(src);
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, v);
+	assert(app.data == src, "Result:\n" ~ app.data ~ "\n----\nExpected:\n" ~ src);
+}
+
+/// T61(回帰テスト): インラインスカラー値へのアンカーがstringifyで往復する
+/// (T21/T22/T24では未実装だったアンカー出力の不具合修正。上記の総合
+/// ラウンドトリップテストで発覚した)
+@safe unittest
+{
+	enum src = "a: &x 1\nb: *x\n";
+	YamlBuilder builder;
+	auto v = builder.parse(src);
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, v);
+	assert(app.data == src, "Result:\n" ~ app.data ~ "\n----\nExpected:\n" ~ src);
+}
+
+/// T61(回帰テスト): flowシーケンス要素へのアンカーがstringifyで往復する
+@safe unittest
+{
+	enum src = "a: [&x 1, 2, 3]\n";
+	YamlBuilder builder;
+	auto v = builder.parse(src);
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, v);
+	assert(app.data == src, "Result:\n" ~ app.data ~ "\n----\nExpected:\n" ~ src);
+}
+
+/// T61(回帰テスト): 明示タグ単体・タグとアンカーの組み合わせがstringifyで往復する
+@safe unittest
+{
+	enum src = "a: !mytag value\nb: !!str hello\nc: &x !mytag value2\n";
+	YamlBuilder builder;
+	auto v = builder.parse(src);
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, v);
+	assert(app.data == src, "Result:\n" ~ app.data ~ "\n----\nExpected:\n" ~ src);
+}
+
+/// T61(回帰テスト): ルートレベルのブロックマッピングがキーと同じ行以外の
+/// 位置にアンカーを持つケースは、パーサーが現状「ドキュメント本体の前に
+/// 独立したアンカー行を置く」構文をサポートしていないため対象外とした
+/// (root直下のアンカーはstringify側は`putYamlBlockNodeImpl`で対応済みだが、
+/// パース側の対応は本タスクのスコープ外。値の一部としてのアンカー
+/// `key: &name ...`や`key: &name\n  ...`は上記テストの通り対応済み)
+
+/// T61(回帰テスト): `@anchor`/`@tag`属性でシリアライズした値のタグは
+/// `!!`プレフィックスを補って出力される(`tag()`UDAはプレフィックス無しの
+/// 名称を格納する契約のため、パーサーが格納する生トークンとは形式が異なる。
+/// `putYamlAnchorTagPrefixImpl`のdocコメント参照)
+@safe unittest
+{
+	struct Data
+	{
+		@anchor("a1") @tag("mytag") int x;
+	}
+	YamlBuilder builder;
+	auto v = builder.serialize(Data(1));
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, v);
+	assert(app.data == "x: &a1 !!mytag 1\n", "Result:\n" ~ app.data);
+}
+/// T62: Serializer/Deserializer総合テスト(JSON5のData1/Data2構造を移植し、
+/// 期待値のみYAML記法に置き換えたもの)
+@safe unittest
+{
+	import std.datetime: SysTime, DateTime;
+	import std.sumtype: SumType;
+	import std.typecons: tuple;
+	YamlBuilder builder;
+	auto app = appender!(char[])();
+	
+	@kind("Data1") struct Data1
+	{
+		int a;
+		int b;
+	}
+	auto dat1 = Data1(1, 3);
+	auto v = builder.serialize(dat1);
+	builder.toPrettyString(app, v);
+	auto expected = "a: 1\nb: 3\n";
+	assert(app.data == expected, "Result:\n" ~ app.data ~ "\nExpected:\n" ~ expected);
+	app.shrinkTo(0);
+	auto dat1b = builder.deserialize!Data1(builder.parse(expected));
+	assert(dat1b.a == dat1.a);
+	assert(dat1b.b == dat1.b);
+	
+	alias ST = SumType!(Data1, int);
+	// convStr!T(...)/converter!(T1,T2)(...)をUDAとしてインラインの関数
+	// リテラル引数付きで直接呼び出すと、内部の関数ポインタキャスト
+	// (`T1 function(string)` → `T1 function(in string)`)がCTFEで
+	// 評価不能というコンパイラの制限に抵触する(D言語側の既知の制約。
+	// json5.dが`converterSysTime()`のような名前付きゼロ引数関数を経由して
+	// いたのは、単なるスタイルの選択ではなくこの制限を回避するための
+	// 必須の書き方だったと判明した)。そのため名前付きヘルパー関数を介して
+	// 呼び出す。
+	static auto convSysTimeStr() @safe
+	{
+		return convStr!SysTime(
+			src => SysTime.fromISOExtString(src),
+			src => src.toISOExtString());
+	}
+	static auto convSysTimeYaml() @safe
+	{
+		return converter!(SysTime, YamlValue)(
+			src => SysTime.fromISOExtString(src.get!string),
+			src => makeYaml(src.toISOExtString()));
+	}
+	static auto convSysTimeBin() @safe
+	{
+		return converter!(SysTime, immutable(ubyte)[])(
+			(src) @trusted => SysTime.fromISOExtString(cast(string)src),
+			(src) @trusted => cast(immutable(ubyte)[])(src.toISOExtString()));
+	}
+	struct Data2
+	{
+		YamlValue val1;
+		int a;
+		@name("float_b") float b;
+		bool c;
+		void* voidData; // ignore as undefined
+		immutable(ubyte)[] bin;
+		typeof(null) nul;
+		string[] strlist;
+		string[string] aa;
+		Tuple!(int, string) tp;
+		@convSysTimeStr SysTime tim1;
+		@convSysTimeYaml SysTime tim2;
+		@convSysTimeBin SysTime tim3;
+		static struct DataA
+		{
+			int a;
+			YamlValue toYaml(YamlBuilder b) const @safe => b.make(a);
+			static DataA fromYaml(in YamlValue v) @safe => DataA(v.get!int);
+		}
+		DataA dataA;
+		static assert(hasConvertYamlMethodA!DataA);
+		static struct DataB
+		{
+			int a;
+			YamlValue toYaml() const @safe => makeYaml(a);
+			static DataB fromYaml(in YamlValue v) @safe => DataB(v.get!int);
+		}
+		DataB dataB;
+		static assert(hasConvertYamlMethodB!DataB);
+		ST stVal1;
+		ST stVal2;
+	}
+	auto dat2 = Data2(builder.deepCopy(v), 1, 2, true, null,
+		[1, 2, 3, 4], null, ["a", "b"], ["t1": "t2"], tuple(10, "aaa"),
+		SysTime(DateTime(2000, 1, 1)), SysTime(DateTime(2001, 1, 1)),
+		SysTime(DateTime(2002, 1, 1)),
+		Data2.DataA(10), Data2.DataB(12),
+		ST(Data1(1, 2)), ST(16));
+	v = builder.serialize(dat2);
+	assert(v.asMapping["voidData"].type == YamlBuilder.YamlType.undefined);
+	builder.toPrettyString(app, v);
+	expected = `
+val1:
+  a: 1
+  b: 3
+a: 1
+float_b: 2.0
+c: true
+bin: AQIDBA
+nul: null
+strlist:
+  - a
+  - b
+aa:
+  t1: t2
+tp:
+  - 10
+  - aaa
+tim1: 2000-01-01T00:00:00
+tim2: 2001-01-01T00:00:00
+tim3: MjAwMi0wMS0wMVQwMDowMDowMA
+dataA: 10
+dataB: 12
+stVal1:
+  $type: Data1
+  a: 1
+  b: 2
+stVal2: 16
+`.chompPrefix("\n").outdent;
+	assert(app.data == expected, "Result:\n" ~ app.data ~ "\nExpected:\n" ~ expected);
+	app.shrinkTo(0);
+	Data2 dat2b;
+	builder.deserialize(builder.parse(expected), dat2b);
+	v = builder.serialize(dat2b);
+	builder.toPrettyString(app, v);
+	assert(app.data == expected, "Result:\n" ~ app.data ~ "\nExpected:\n" ~ expected);
+}
+/// T63: 配列要素へのフォーマット属性伝播(文字列scalarStyle・整数
+/// integralFormat・浮動小数点floatingPointFormatが各要素に適用される)
+@safe unittest
+{
+	struct Data
+	{
+		@arrayFormat(CollectionStyle.flow, false, true) @scalarStyle(ScalarStyle.singleQuoted)
+		string[] ary1;
+		@arrayFormat(CollectionStyle.flow, false, true) @integralFormat(true, IntegerBase.decimal)
+		int[] ary2;
+		@arrayFormat(CollectionStyle.flow, false, true) @integralFormat(false, IntegerBase.hex)
+		uint[] ary3;
+		@arrayFormat(CollectionStyle.flow, false, true) @floatingPointFormat(false, false, false, false, 3)
+		double[] ary4;
+	}
+	auto dat = Data(["a", "b"], [1, 2], [0xab, 0xcd], [1.2, 3.4]);
+	YamlBuilder builder;
+	auto v = builder.serialize(dat);
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, v);
+	auto expected = "ary1: ['a', 'b']\nary2: [+1, +2]\nary3: [0xab, 0xcd]\nary4: [1.200, 3.400]\n";
+	assert(app.data == expected, "Result:\n" ~ app.data ~ "\nExpected:\n" ~ expected);
+}
+
+/// T63: `@ignoreIf`をシリアライズ用(1引数)・デシリアライズ用(2引数、現在値+
+/// 現在のYamlValueを参照)で使い分けられる(JSON5のDataA相当テストを移植)
+@safe unittest
+{
+	struct Data
+	{
+		@singleLineAry
+		@ignoreIf!((in int[] ary) => ary.length == 0)
+		@ignoreIf!((int[] ary, const(YamlValue) v) => v.asMapping["ary"].asSequence.value.length == 0)
+		int[] ary;
+	}
+	auto dat1 = Data([1, 2]);
+	auto str1 = dat1.serializeToYamlString();
+	assert(str1 == "ary: [1, 2,]\n", "Result: [" ~ str1 ~ "]");
+	
+	auto dat2 = Data([]);
+	auto str2 = dat2.serializeToYamlString();
+	assert(str2 == "{}", "Result: [" ~ str2 ~ "]");
+	
+	static assert(hasIgnoreIf!(Data.ary, int[], const(YamlValue)));
+	auto dat3 = Data([1, 2]);
+	parseYaml("ary: []").deserializeFromYaml(dat3);
+	assert(dat3.ary == [1, 2]);
+}
+
+/// T63: `@essential`属性が付与されたメンバーに対応するキーがあれば
+/// 正常にデシリアライズされる(存在しない場合の挙動はT41で検証済み)
+@safe unittest
+{
+	struct Data
+	{
+		@essential int x;
+		int y = 99;
+	}
+	YamlBuilder builder;
+	auto v = builder.parse("x: 1\n");
+	auto dst = builder.deserialize!Data(v);
+	assert(dst.x == 1);
+	assert(dst.y == 99);
+}
+
+/// T63: フィールドを持たない(または全メンバーが`@ignore`の)構造体は
+/// 空のflowマッピング`{}`としてシリアライズされる(上の`ary.length==0`の
+/// ケースで`{}`になった理由の裏付け: マッピング自体が空のときのみ`{}`になる)
+@safe unittest
+{
+	struct Empty
+	{
+	}
+	auto str = Empty().serializeToYamlString();
+	assert(str == "{}", "Result: [" ~ str ~ "]");
+}
+/// T64: パースエラー時の例外メッセージにline/column情報が正しく含まれる
+/// (JSON5では未検証だった項目。design 4.3節で明示的な改善点として指定されている)
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		// 3行目のインデントにタブ文字が混入している
+		enum src = "a: 1\nb:\n\tc: 1\n";
+		auto e = collectException!YamlParseException(builder.parse(src));
+		assert(e !is null);
+		assert(e.msg.canFind("line=3"), e.msg);
+	}
+	{
+		// 2行目でキーが重複している
+		enum src = "a: 1\na: 2\n";
+		auto e = collectException!YamlParseException(builder.parse(src));
+		assert(e !is null);
+		assert(e.msg.canFind("line=2"), e.msg);
+	}
+	{
+		// 2行目で未定義のアンカーを参照している
+		enum src = "a: 1\nb: *undefined\n";
+		auto e = collectException!YamlParseException(builder.parse(src));
+		assert(e !is null);
+		assert(e.msg.canFind("line=2"), e.msg);
+	}
+	{
+		// 3行目でシングルクォート文字列が閉じられていない
+		enum src = "a: 1\nb: 2\nc: 'unterminated\n";
+		auto e = collectException!YamlParseException(builder.parse(src));
+		assert(e !is null);
+		assert(e.msg.canFind("line=3"), e.msg);
+	}
+}
+
+/// T64: エッジケース - 空ドキュメント・空白のみ・コメントのみは`null`
+/// (`YamlType.nullfied`)になる(T1Aの既存テストの再確認に加え、
+/// `parseYaml`自由関数版でも同様に振る舞うことを確認する)
+@safe unittest
+{
+	assert(parseYaml("").type == YamlType.nullfied);
+	assert(parseYaml("   \n  \n").type == YamlType.nullfied);
+	assert(parseYaml("# just a comment\n").type == YamlType.nullfied);
+}
+
+// T64: 空キー(`: value`のように`?`を伴わない裸のコロンで始まる行)は
+// 現状のパーサーでは内部アサーション("Cannot start plain scalar at a
+// terminator position")に抵触することが判明した。YAML 1.1/1.2仕様上も
+// 稀なケース(明示キー記法`? \n: value`を使わない空キーの単純平文表現)
+// であり、本タスクの範囲では深追いせず既知の制限として記録するに留める。
+// 対応する場合は新規タスクとして設計書に追記の上、パーサー側の
+// 修正を検討すること。
+
+/// T64: エッジケース - 深いネスト(10階層)も正しくパース・シリアライズできる
+@safe unittest
+{
+	enum src = "a:\n b:\n  c:\n   d:\n    e:\n     f:\n      g:\n       h:\n        i:\n         j: deep\n";
+	YamlBuilder builder;
+	auto v = builder.parse(src);
+	assert(v.asMapping["a"].asMapping["b"].asMapping["c"].asMapping["d"].asMapping["e"]
+		.asMapping["f"].asMapping["g"].asMapping["h"].asMapping["i"].getValue!string("j") == "deep");
+}
+
+/// T64: エッジケース - 巨大な整数(long境界値付近)・極小浮動小数点数も
+/// 誤差なくパースできる
+@safe unittest
+{
+	import std.math: isClose;
+	YamlBuilder builder;
+	auto v = builder.parse("a: 9223372036854775807\nb: -9223372036854775808\nc: 0.0000001\n");
+	assert(v.getValue!long("a") == long.max);
+	assert(v.getValue!long("b") == long.min);
+	assert(v.getValue!double("c").isClose(0.0000001, 1e-9, 1e-12));
+}
+
+/// T64: エッジケース - 空文字列・空配列・空マッピングをシリアライズ→
+/// デシリアライズしても等価性が保たれる
+@safe unittest
+{
+	struct Data
+	{
+		string s;
+		int[] ary;
+		string[string] aa;
+	}
+	auto dat = Data("", [], null);
+	auto str = dat.serializeToYamlString();
+	auto dat2 = deserializeFromYamlString!Data(str);
+	assert(dat2.s == "");
+	assert(dat2.ary.length == 0);
+	assert(dat2.aa.length == 0);
 }
