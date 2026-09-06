@@ -1552,13 +1552,13 @@ public:
 	/***************************************************************************
 	 * Check if the comment at the given index is a line comment/trailing comment
 	 */
-	bool isLineComment(size_t idx) const @safe
+	bool isLineComment(size_t idx) const @trusted
 	{
 		assert(idx < _comments.length, "Comment index out of range");
 		return __traits(getMember, _comments[idx], "tag") == 0;
 	}
 	/// ditto
-	bool isTrailingComment(size_t idx) const @safe
+	bool isTrailingComment(size_t idx) const @trusted
 	{
 		assert(idx + 1 == _comments.length, "Trailing comment index must be the last one");
 		return __traits(getMember, _comments[idx], "tag") == 1;
