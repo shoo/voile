@@ -17,15 +17,15 @@
 module voile.yaml;
 
 import std.algorithm  : map, filter, among, startsWith, endsWith, canFind, joiner;
-import std.array      : Appender, appender, join;
+import std.array      : Appender, appender, join, split;
 import std.conv       : to, text, parse, ConvException;
 import std.conv;
 import std.ascii      : isDigit, isHexDigit, isOctalDigit;
 import std.exception  : enforce;
-import std.format     : format;
+import std.format     : format, formattedWrite, sformat;
 import std.meta       : AliasSeq, staticMap, Filter, allSatisfy, staticIndexOf;
-import std.range      : isOutputRange, ElementType, repeat;
-import std.string     : outdent, splitLines, strip, stripRight, indexOf;
+import std.range      : isOutputRange, ElementType, repeat, put;
+import std.string     : outdent, splitLines, strip, stripRight, stripLeft, indexOf;
 import std.traits     : isIntegral, isFloatingPoint, isSomeString, isArray,
                         isAssociativeArray, isBoolean, Unqual, FieldNameTuple,
                         KeyType, ValueType, isInstanceOf, hasMember,
@@ -1108,6 +1108,16 @@ public:
 	alias asArray = asSequence;
 	
 	/***************************************************************************
+	 * 
+	 */
+	ref inout(YamlNull) asNull() inout @trusted
+	{
+		auto vp = &dereference();
+		assert(vp.type == Type.nullfied, "Not a null type");
+		return __traits(getMember, vp._instance, "storage").tupleof[cast(size_t)Type.nullfied];
+	}
+	
+	/***************************************************************************
 	 * Get value as the given type
 	 * 
 	 * If the type conversion is not possible, return the given default value (or T.init if not given).
@@ -1798,6 +1808,17 @@ private:
 						// コメント自体は後でその位置から`skipBlankAndCommentLinesImpl`
 						// 等が改めて読み取り、次の実トークンのleading commentとして
 						// 蓄積する。
+						break;
+					}
+					if (isPlainScalarTerminator(afterIndent, inFlowContext))
+					{
+						// 継続行の内容が即座にスカラー終端（フロー終端記号`]`/`}`/`,`や
+						// `: `等）である場合は、継続とはみなさずここでスカラーを
+						// 終了させる。この判定を怠ると、後続の
+						// `content ~= ' ';` によって改行が誤ってスペース1つに
+						// 折り畳まれてしまい、内容の末尾に余分な空白が残ってしまう
+						// （T21で発見・修正。flow文脈で要素の直後に改行を挟んで
+						// `]`/`,`が続く場合に顕在化する）。
 						break;
 					}
 					if (indentLen < minIndent)
@@ -4067,6 +4088,996 @@ private:
 		}
 	}
 	
+	// ==========================================================================
+	// MARK: - - Stringify
+	// ==========================================================================
+	// T20: スカラー出力（rawテキスト優先方式、3.3節）
+	
+	/***************************************************************************
+	 * `long`の値を符号なし整数の絶対値へ変換する
+	 * 
+	 * `-long.min`は`long`の範囲では表現できず単純な符号反転がオーバーフローするため、
+	 * `long.min`のみ特別扱いする（`resolveIntegerImpl`の`negLimit`と対になる、
+	 * 整数出力側でのraw未設定時のフォールバック用ヘルパー）。
+	 * Params:
+	 *      v = 変換対象の値
+	 * Returns:
+	 *      `v`の絶対値（符号なし）
+	 */
+	ulong absULongImpl(long v) const pure nothrow @nogc @safe
+	{
+		if (v == long.min)
+			return cast(ulong)long.max + 1;
+		return v < 0 ? cast(ulong)(-v) : cast(ulong)v;
+	}
+	
+	/***************************************************************************
+	 * 与えられた文字列が、プレーンスカラーとして安全に出力できるかどうかを判定する
+	 * 
+	 * `raw`が未設定の場合（T30以降の新規構築値を想定）の簡易フォールバック用の
+	 * 安全確認であり、YAML仕様上の完全なプレーンスカラー安全性判定ではない
+	 * （厳密な安全性判定はT30/T42の値構築・シリアライズ側の責務とする）。
+	 * 改行を含む・インジケータ文字で始まる・`": "`や行末`" #"`を含む・
+	 * 空文字列である、のいずれかに該当する場合は安全でないと判定する。
+	 * Params:
+	 *      s = 判定対象の文字列
+	 * Returns:
+	 *      プレーンスカラーとして安全に出力できる場合`true`
+	 */
+	bool isSafePlainScalarContentImpl(in char[] s) const @safe
+	{
+		if (s.length == 0)
+			return false;
+		if (s.canFind('\n'))
+			return false;
+		if (s[0].among('-', '?', ':', ',', '[', ']', '{', '}', '#', '&', '*',
+				'!', '|', '>', '\'', '"', '%', '@', '`', ' '))
+		{
+			return false;
+		}
+		if (s.canFind(": ") || s.endsWith(":") || s.canFind(" #"))
+			return false;
+		return true;
+	}
+	
+	/***************************************************************************
+	 * ダブルクォート文字列の内容部分をエスケープして出力する
+	 * 
+	 * 制御文字・`"`・`\`のみをエスケープする最小限の実装。パース側（T12）が
+	 * 受理する全エスケープ種別（`\N`/`\_`/`\L`/`\P`等）を出力側でも網羅する
+	 * 必要はない（3.3節のraw優先方針により、quoted文字列は本来rawが
+	 * 保持されていればそちらが優先される。ただしT12時点ではquoted文字列の
+	 * rawは保持していないため、実際には本関数が主経路となる）。
+	 * `escapeNonAscii`が`true`の場合、ASCII範囲外（0x7Fを超える）の
+	 * コードポイントを`\uXXXX`（BMP範囲）または`\U XXXXXXXX`（それ以外）で
+	 * エスケープする（T24。`YamlPrettyPrintOptions.escapeNonAscii`用。
+	 * パース側（T12）は`\u`/`\U`両方に対応済みのため対称）。UTF-8の
+	 * マルチバイト列をバイト単位ではなくコードポイント単位で判定する
+	 * 必要があるため、`content`は`dchar`単位でデコードしながら走査する。
+	 * Params:
+	 *      dst            = 出力先
+	 *      content        = エスケープ対象の文字列（クォート文字は含まない）
+	 *      escapeNonAscii = ASCII範囲外をエスケープするか（既定: `false`）
+	 */
+	void putYamlDoubleQuotedContentImpl(OutputRange)(ref OutputRange dst, in char[] content,
+		bool escapeNonAscii = false) const @safe
+	{
+		foreach (dchar c; content)
+		{
+			switch (c)
+			{
+			case '"':  put(dst, "\\\""); break;
+			case '\\': put(dst, `\\`); break;
+			case '\0': put(dst, `\0`); break;
+			case '\a': put(dst, `\a`); break;
+			case '\b': put(dst, `\b`); break;
+			case '\t': put(dst, `\t`); break;
+			case '\n': put(dst, `\n`); break;
+			case '\v': put(dst, `\v`); break;
+			case '\f': put(dst, `\f`); break;
+			case '\r': put(dst, `\r`); break;
+			default:
+				if (escapeNonAscii && c > 0x7F)
+				{
+					if (c <= 0xFFFF)
+						formattedWrite(dst, "\\u%04X", cast(uint)c);
+					else
+						formattedWrite(dst, "\\U%08X", cast(uint)c);
+				}
+				else
+				{
+					put(dst, c);
+				}
+				break;
+			}
+		}
+	}
+	
+	/***************************************************************************
+	 * ブロックスカラー（literal `|` / folded `>`）を出力する
+	 * 
+	 * ヘッダ行（スタイル指示子+chomping指定子）の後、内容を`indentLevel + 1`の
+	 * インデントで再構成して出力する。明示インデント指定子（`explicitIndent`）は
+	 * 意図的に再出力しない。再構成後の内容は常にクリーンな一定インデントに
+	 * 揃うため自動検出で正しく再パースできるが、元の数値をそのまま再出力すると
+	 * 出力側のインデント幅と無関係な値になり、再パース時に誤ったバイト数を
+	 * 読み飛ばして内容を破壊する危険がある（3.4節の実装上の判断）。
+	 * Params:
+	 *      dst         = 出力先
+	 *      strVal      = 出力対象（`style`がliteral/foldedであること）
+	 *      indent      = インデント文字列
+	 *      newline     = 改行文字列
+	 *      indentLevel = 現在のインデントレベル（内容は`indentLevel + 1`で出力）
+	 */
+	void putYamlBlockScalarImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlString) strVal,
+		in char[] indent, in char[] newline, size_t indentLevel) const @safe
+	{
+		put(dst, strVal.style == ScalarStyle.literal ? "|" : ">");
+		final switch (strVal.chomping)
+		{
+		case ChompingIndicator.clip:
+			break;
+		case ChompingIndicator.strip:
+			put(dst, "-");
+			break;
+		case ChompingIndicator.keep:
+			put(dst, "+");
+			break;
+		}
+		put(dst, newline);
+		
+		const(char)[] content = strVal.value[];
+		if (content.length == 0)
+			return;
+		
+		size_t trailingNl;
+		while (trailingNl < content.length && content[$ - 1 - trailingNl] == '\n')
+			trailingNl++;
+		auto body_ = content[0 .. $ - trailingNl];
+		
+		size_t start;
+		for (size_t i; i <= body_.length; i++)
+		{
+			if (i < body_.length && body_[i] != '\n')
+				continue;
+			auto ln = body_[start .. i];
+			if (ln.length > 0)
+			{
+				put(dst, indent.repeat(indentLevel + 1));
+				put(dst, ln);
+			}
+			put(dst, newline);
+			start = i + 1;
+		}
+		foreach (_; 0 .. (trailingNl > 0 ? trailingNl - 1 : 0))
+			put(dst, newline);
+	}
+	
+	/***************************************************************************
+	 * 文字列スカラーを出力する（rawテキスト優先方式、3.3節）
+	 * 
+	 * `raw`が非空であれば無条件でそのまま出力する。空の場合は`style`に応じて
+	 * 再構成する。プレーンスタイル・シングルクォートスタイルで改行を含む等
+	 * 安全に出力できない内容の場合は、値を破壊しないようダブルクォートへ
+	 * 自動的にフォールバックする。`escapeNonAscii`は`raw`が空でダブル
+	 * クォートとして出力する場合にのみ影響する（`raw`優先時・plain/
+	 * シングルクォートで安全に出力できる場合は素通しする。T24）。
+	 * Params:
+	 *      dst            = 出力先
+	 *      strVal         = 出力対象
+	 *      indent         = インデント文字列（ブロックスカラーで使用）
+	 *      newline        = 改行文字列
+	 *      indentLevel    = 現在のインデントレベル（ブロックスカラーで使用）
+	 *      escapeNonAscii = ASCII範囲外をエスケープするか（既定: `false`）
+	 */
+	void putYamlStringImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlString) strVal,
+		in char[] indent, in char[] newline, size_t indentLevel, bool escapeNonAscii = false) const @safe
+	{
+		if (strVal.raw.length > 0)
+		{
+			put(dst, strVal.raw[]);
+			return;
+		}
+		final switch (strVal.style)
+		{
+		case ScalarStyle.plain:
+			if (isSafePlainScalarContentImpl(strVal.value[]))
+			{
+				put(dst, strVal.value[]);
+			}
+			else
+			{
+				put(dst, '"');
+				putYamlDoubleQuotedContentImpl(dst, strVal.value[], escapeNonAscii);
+				put(dst, '"');
+			}
+			break;
+		case ScalarStyle.singleQuoted:
+			if (strVal.value[].canFind('\n'))
+			{
+				put(dst, '"');
+				putYamlDoubleQuotedContentImpl(dst, strVal.value[], escapeNonAscii);
+				put(dst, '"');
+			}
+			else
+			{
+				put(dst, '\'');
+				foreach (c; strVal.value[])
+				{
+					if (c == '\'')
+						put(dst, "''");
+					else
+						put(dst, c);
+				}
+				put(dst, '\'');
+			}
+			break;
+		case ScalarStyle.doubleQuoted:
+			put(dst, '"');
+			putYamlDoubleQuotedContentImpl(dst, strVal.value[], escapeNonAscii);
+			put(dst, '"');
+			break;
+		case ScalarStyle.literal:
+		case ScalarStyle.folded:
+			putYamlBlockScalarImpl(dst, strVal, indent, newline, indentLevel);
+			break;
+		}
+	}
+	
+	/***************************************************************************
+	 * 符号付き整数スカラーを出力する（rawテキスト優先方式、3.3節）
+	 * Params:
+	 *      dst    = 出力先
+	 *      intVal = 出力対象
+	 */
+	void putYamlIntegerImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlInteger) intVal) const @safe
+	{
+		if (intVal.raw.length > 0)
+		{
+			put(dst, intVal.raw[]);
+			return;
+		}
+		final switch (intVal.base)
+		{
+		case IntegerBase.decimal:
+			if (intVal.positiveSign)
+				formattedWrite(dst, "%+d", intVal.value);
+			else
+				formattedWrite(dst, "%d", intVal.value);
+			break;
+		case IntegerBase.hex:
+			if (intVal.value < 0)
+				put(dst, "-");
+			else if (intVal.positiveSign)
+				put(dst, "+");
+			formattedWrite(dst, "0x%x", absULongImpl(intVal.value));
+			break;
+		case IntegerBase.octal:
+			if (intVal.value < 0)
+				put(dst, "-");
+			else if (intVal.positiveSign)
+				put(dst, "+");
+			formattedWrite(dst, "0o%o", absULongImpl(intVal.value));
+			break;
+		case IntegerBase.binary:
+			if (intVal.value < 0)
+				put(dst, "-");
+			else if (intVal.positiveSign)
+				put(dst, "+");
+			formattedWrite(dst, "0b%b", absULongImpl(intVal.value));
+			break;
+		}
+	}
+	
+	/***************************************************************************
+	 * 符号なし整数スカラーを出力する（rawテキスト優先方式、3.3節）
+	 * Params:
+	 *      dst    = 出力先
+	 *      intVal = 出力対象
+	 */
+	void putYamlUIntegerImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlUInteger) intVal) const @safe
+	{
+		if (intVal.raw.length > 0)
+		{
+			put(dst, intVal.raw[]);
+			return;
+		}
+		if (intVal.positiveSign)
+			put(dst, "+");
+		final switch (intVal.base)
+		{
+		case IntegerBase.decimal:
+			formattedWrite(dst, "%d", intVal.value);
+			break;
+		case IntegerBase.hex:
+			formattedWrite(dst, "0x%x", intVal.value);
+			break;
+		case IntegerBase.octal:
+			formattedWrite(dst, "0o%o", intVal.value);
+			break;
+		case IntegerBase.binary:
+			formattedWrite(dst, "0b%b", intVal.value);
+			break;
+		}
+	}
+	
+	/***************************************************************************
+	 * 浮動小数点数スカラーを出力する（rawテキスト優先方式、3.3節）
+	 * 
+	 * 無限大・NaNは1.2 Core Schemaの表記（`.inf`/`-.inf`/`.nan`）で出力する。
+	 * それ以外の有限値はJSON5の浮動小数点フォーマットロジックを踏襲する。
+	 * 
+	 * 実装メモ: JSON5参考実装(`_putPrettyStringJsonFloatingPointImpl`)の
+	 * `withExponent && precision != 0`分岐には、生成した書式文字列`fmt`に
+	 * 小数点(`.`)が欠落しておりかつ`fmt`自体が後続処理で使われずに
+	 * 無視される、という2重のバグが存在することを本タスクで発見した。
+	 * YAML版では書式文字列に`.`を補い、実際に`fmt`を使用するよう修正している。
+	 * Params:
+	 *      dst   = 出力先
+	 *      fpVal = 出力対象
+	 */
+	void putYamlFloatingPointImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlFloatingPoint) fpVal) const @safe
+	{
+		import std.math : isNaN, isInfinity;
+		
+		if (fpVal.raw.length > 0)
+		{
+			put(dst, fpVal.raw[]);
+			return;
+		}
+		if (isNaN(fpVal.value))
+		{
+			put(dst, ".nan");
+			return;
+		}
+		if (isInfinity(fpVal.value))
+		{
+			if (fpVal.value < 0)
+			{
+				put(dst, "-.inf");
+			}
+			else
+			{
+				if (fpVal.positiveSign)
+					put(dst, "+");
+				put(dst, ".inf");
+			}
+			return;
+		}
+		
+		char[64] buf;
+		if (fpVal.withExponent)
+		{
+			if (fpVal.precision == 0)
+			{
+				auto valStrs = sformat(buf[], fpVal.positiveSign ? "%+e" : "%e", fpVal.value).split("e");
+				assert(valStrs.length == 2 && valStrs[1].length > 2);
+				formattedWrite(dst, "%se%c%s",
+					valStrs[0].stripRight("0"),
+					valStrs[1][0],
+					valStrs[1][1 .. $].stripLeft("0"));
+			}
+			else
+			{
+				auto fmt = sformat(buf[], fpVal.positiveSign ? "%%+.%de" : "%%.%de", fpVal.precision);
+				auto valStrs = sformat(buf[], fmt, fpVal.value).split("e");
+				assert(valStrs.length == 2 && valStrs[1].length > 2);
+				formattedWrite(dst, "%se%c%s",
+					valStrs[0],
+					valStrs[1][0],
+					valStrs[1][1 .. $].stripLeft("0"));
+			}
+		}
+		else
+		{
+			if (fpVal.precision == 0)
+			{
+				auto valStr = sformat(buf[], fpVal.positiveSign ? "%+f" : "%f", fpVal.value).stripRight("0");
+				if (fpVal.leadingDecimalPoint && valStr.startsWith("0."))
+					put(dst, valStr[1 .. $]);
+				else
+					put(dst, valStr);
+				if (fpVal.tailingDecimalPoint && !valStr.canFind('.'))
+					put(dst, ".");
+				if (!fpVal.tailingDecimalPoint && valStr[$ - 1] == '.')
+					put(dst, "0");
+			}
+			else
+			{
+				auto fmt = fpVal.positiveSign ? sformat(buf[], "%%+.%df", fpVal.precision)
+					: sformat(buf[], "%%.%df", fpVal.precision);
+				auto valStr = sformat(buf[], fmt, fpVal.value);
+				if (fpVal.leadingDecimalPoint && valStr.startsWith("0."))
+					put(dst, valStr[1 .. $]);
+				else
+					put(dst, valStr);
+				if (fpVal.tailingDecimalPoint && !valStr.canFind('.'))
+					put(dst, ".");
+			}
+		}
+	}
+	
+	/***************************************************************************
+	 * 真偽値スカラーを出力する（rawテキスト優先方式、3.3節）
+	 * 
+	 * `raw`が空の場合は1.2 Core Schema既定の`true`/`false`(小文字)で出力する。
+	 * Params:
+	 *      dst     = 出力先
+	 *      boolVal = 出力対象
+	 */
+	void putYamlBooleanImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlBoolean) boolVal) const @safe
+	{
+		if (boolVal.raw.length > 0)
+		{
+			put(dst, boolVal.raw[]);
+			return;
+		}
+		put(dst, boolVal.value ? "true" : "false");
+	}
+	
+	/***************************************************************************
+	 * null スカラーを出力する（rawテキスト優先方式、3.3節）
+	 * 
+	 * `raw`が空の場合は1.2 Core Schema既定の`null`で出力する。
+	 * Params:
+	 *      dst     = 出力先
+	 *      nullVal = 出力対象
+	 */
+	void putYamlNullImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlNull) nullVal) const @safe
+	{
+		if (nullVal.raw.length > 0)
+		{
+			put(dst, nullVal.raw[]);
+			return;
+		}
+		put(dst, "null");
+	}
+	
+	// ==========================================================================
+	// MARK: - - Stringify (comment)
+	// ==========================================================================
+	// T23: コメント出力（leading/trailing/dangling）
+	
+	/***************************************************************************
+	 * コメント配列を「各行`# text`をそれ自身の行として出力する」形で出力する
+	 * 
+	 * 先頭付きコメント（`_comments`。末尾の1件が`TrailingComment`である場合は
+	 * 同一行末コメントなのでここではスキップし、`putYamlTrailingCommentImpl`が
+	 * 担当する）と、コレクションの`trailingComments`（ぶら下がりコメント。
+	 * design 3.7節）の両方の出力に共用する。`#`直後の文字列は
+	 * `parseCommentTextImpl`が`#`の直後から改行直前までを一切加工せず
+	 * 保持しているため、`"#" ~ value`だけで元のコメント行を正確に再現できる。
+	 * Params:
+	 *      dst         = 出力先
+	 *      comments    = 出力対象のコメント配列
+	 *      indent      = インデント文字列
+	 *      newline     = 改行文字列
+	 *      indentLevel = コメント行自身のインデントレベル
+	 */
+	void putYamlCommentLinesImpl(OutputRange)(ref OutputRange dst, ref const(Array!(YamlValue.Comment)) comments,
+		in char[] indent, in char[] newline, size_t indentLevel) const @safe
+	{
+		foreach (ref c; comments[])
+		{
+			c.match!(
+				(ref const(YamlValue.LineComment) lc)
+				{
+					put(dst, indent.repeat(indentLevel));
+					put(dst, "#");
+					put(dst, lc.value[]);
+					put(dst, newline);
+				},
+				(ref const(YamlValue.TrailingComment) tc) {}
+			);
+		}
+	}
+	
+	/***************************************************************************
+	 * 値と同一行に続く末尾コメント（`key: value # comment`の`# comment`部分）を
+	 * 出力する
+	 * 
+	 * `comments`の末尾の1件が`TrailingComment`である場合のみ出力する
+	 * （`isTrailingComment`の前提と同じく、`TrailingComment`は配列の
+	 * 最後尾にしか現れない）。値と`#`の間の空白は`expectEndOfLineImpl`が
+	 * 元の個数を保持せず読み飛ばすため、常に半角スペース1つに正規化して
+	 * 出力する（design 3.7節の既知の制約）。
+	 * Params:
+	 *      dst      = 出力先
+	 *      comments = 出力対象のコメント配列
+	 */
+	void putYamlTrailingCommentImpl(OutputRange)(ref OutputRange dst, ref const(Array!(YamlValue.Comment)) comments) const @safe
+	{
+		if (comments.length == 0)
+			return;
+		comments[$ - 1].match!(
+			(ref const(YamlValue.TrailingComment) tc)
+			{
+				put(dst, " #");
+				put(dst, tc.value[]);
+			},
+			(ref const(YamlValue.LineComment) lc) {}
+		);
+	}
+	
+	// ==========================================================================
+	// MARK: - - Stringify (flow collection)
+	// ==========================================================================
+	// T21: flowコレクション出力
+	
+	/***************************************************************************
+	 * マッピングキーを出力する
+	 * 
+	 * キーには`raw`フィールドが無いため、常に`style`から再構成する。
+	 * plain/シングルクォートで安全に出力できない内容(改行を含む等)は
+	 * ダブルクォートへ自動的にフォールバックする(`putYamlStringImpl`の
+	 * 対応する分岐と同じ方針)。design 3.1節によりキーは
+	 * literal/foldedスタイルを取り得ない前提とする。
+	 * Params:
+	 *      dst            = 出力先
+	 *      key            = 出力対象のキー
+	 *      escapeNonAscii = ASCII範囲外をエスケープするか（既定: `false`。T24）
+	 */
+	void putYamlKeyImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlKey) key,
+		bool escapeNonAscii = false) const @safe
+	{
+		final switch (key.style)
+		{
+		case ScalarStyle.plain:
+			if (isSafePlainScalarContentImpl(key.value[]))
+			{
+				put(dst, key.value[]);
+			}
+			else
+			{
+				put(dst, '"');
+				putYamlDoubleQuotedContentImpl(dst, key.value[], escapeNonAscii);
+				put(dst, '"');
+			}
+			break;
+		case ScalarStyle.singleQuoted:
+			if (key.value[].canFind('\n'))
+			{
+				put(dst, '"');
+				putYamlDoubleQuotedContentImpl(dst, key.value[], escapeNonAscii);
+				put(dst, '"');
+			}
+			else
+			{
+				put(dst, '\'');
+				foreach (c; key.value[])
+				{
+					if (c == '\'')
+						put(dst, "''");
+					else
+						put(dst, c);
+				}
+				put(dst, '\'');
+			}
+			break;
+		case ScalarStyle.doubleQuoted:
+			put(dst, '"');
+			putYamlDoubleQuotedContentImpl(dst, key.value[], escapeNonAscii);
+			put(dst, '"');
+			break;
+		case ScalarStyle.literal:
+		case ScalarStyle.folded:
+			assert(0, "Mapping keys must not use literal/folded style (design 3.1節)");
+		}
+	}
+	
+	/***************************************************************************
+	 * flowコンテキスト内の1ノード(スカラー・エイリアス・ネストしたflow
+	 * コレクション)を出力する
+	 * 
+	 * YAML文法上、flowコレクションの子要素はflowスカラー(plain/quoted)か
+	 * ネストしたflowコレクションのみであり、ブロックスカラー
+	 * (literal/folded)は出現し得ない(`parseFlowNodeImpl`もこの2種類しか
+	 * 生成しない)。ネストしたsequence/mappingは、格納されている`style`の
+	 * 値に関わらず常にflowスタイルとして出力する(flow文脈内にblock
+	 * スタイルの子を置くことはYAML文法上不可能なため、位置がスタイルより
+	 * 優先される)。本関数自体は`value`自身のleading/trailingコメントを
+	 * 出力しない。呼び出し元(`putYamlFlowSequenceImpl`/
+	 * `putYamlFlowMappingImpl`/`putYamlBlockChildImpl`)が各要素の前後で
+	 * `putYamlCommentLinesImpl`/`putYamlTrailingCommentImpl`を呼び出す
+	 * 構成になっている(T23)。アンカー(`&name`)・タグ(`!tag`)の出力は
+	 * T24の統合層で全ノード共通の処理として追加する予定であり、本関数の
+	 * 時点ではまだ対応しない(3.5節の要求に対する既知の未実装事項)。
+	 * Params:
+	 *      dst            = 出力先
+	 *      value          = 出力対象
+	 *      indent         = インデント文字列
+	 *      newline        = 改行文字列
+	 *      indentLevel    = 現在のインデントレベル
+	 *      escapeNonAscii = ASCII範囲外をエスケープするか（既定: `false`。T24）
+	 */
+	void putYamlFlowNodeImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue) value,
+		in char[] indent, in char[] newline, size_t indentLevel, bool escapeNonAscii = false) const @safe
+	{
+		final switch (value.type)
+		{
+		case YamlType.undefined:
+			break; // 無視(T40のシリアライズ側スキップマーカー用途を想定)
+		case YamlType.alias_:
+			put(dst, "*");
+			put(dst, value.asAlias.value[]);
+			break;
+		case YamlType.string:
+			putYamlStringImpl(dst, value.asString, indent, newline, indentLevel, escapeNonAscii);
+			break;
+		case YamlType.integer:
+			putYamlIntegerImpl(dst, value.asInteger);
+			break;
+		case YamlType.uinteger:
+			putYamlUIntegerImpl(dst, value.asUInteger);
+			break;
+		case YamlType.floating:
+			putYamlFloatingPointImpl(dst, value.asFloatingPoint);
+			break;
+		case YamlType.boolean:
+			putYamlBooleanImpl(dst, value.asBoolean);
+			break;
+		case YamlType.nullfied:
+			putYamlNullImpl(dst, value.asNull);
+			break;
+		case YamlType.sequence:
+			putYamlFlowSequenceImpl(dst, value.asSequence, indent, newline, indentLevel, escapeNonAscii);
+			break;
+		case YamlType.mapping:
+			putYamlFlowMappingImpl(dst, value.asMapping, indent, newline, indentLevel, escapeNonAscii);
+			break;
+		}
+	}
+	
+	/***************************************************************************
+	 * flowシーケンス(`[...]`)を出力する
+	 * 
+	 * `singleLine`が`true`の場合は`[a, b, c]`のように1行で出力し、`false`の
+	 * 場合は要素ごとに改行して`indentLevel + 1`でインデントする。
+	 * いずれも`trailingComma`が`true`なら末尾要素の後にも`,`を出力する。
+	 * 空シーケンスは常に`[]`と出力する(この2つのフラグに関わらず)。
+	 * `singleLine == false`の場合のみ、各要素のleading/trailingコメントと
+	 * 末尾のぶら下がりコメント(`trailingComments`)を出力する(T23)。
+	 * `singleLine == true`は改行を含まない1行出力である以上、要素間に
+	 * コメント行を挟むことは構文上できないため、コメントは意図的に
+	 * 出力しない(パーサも改行を検出した時点で`singleLine`を`false`に
+	 * 倒すため、この2つが両立するデータはパース結果としては生じない)。
+	 * Params:
+	 *      dst            = 出力先
+	 *      seq            = 出力対象
+	 *      indent         = インデント文字列
+	 *      newline        = 改行文字列
+	 *      indentLevel    = 現在のインデントレベル
+	 *      escapeNonAscii = ASCII範囲外をエスケープするか（既定: `false`。T24）
+	 */
+	void putYamlFlowSequenceImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlSequence) seq,
+		in char[] indent, in char[] newline, size_t indentLevel, bool escapeNonAscii = false) const @safe
+	{
+		if (seq.value.length == 0)
+		{
+			put(dst, "[]");
+			return;
+		}
+		put(dst, "[");
+		if (seq.singleLine)
+		{
+			foreach (i, ref elem; seq.value)
+			{
+				if (i > 0)
+					put(dst, ", ");
+				putYamlFlowNodeImpl(dst, elem, indent, newline, indentLevel, escapeNonAscii);
+			}
+			if (seq.trailingComma)
+				put(dst, ",");
+		}
+		else
+		{
+			put(dst, newline);
+			foreach (i, ref elem; seq.value)
+			{
+				putYamlCommentLinesImpl(dst, elem._comments, indent, newline, indentLevel + 1);
+				put(dst, indent.repeat(indentLevel + 1));
+				putYamlFlowNodeImpl(dst, elem, indent, newline, indentLevel + 1, escapeNonAscii);
+				if (i + 1 != seq.value.length || seq.trailingComma)
+					put(dst, ",");
+				putYamlTrailingCommentImpl(dst, elem._comments);
+				put(dst, newline);
+			}
+			putYamlCommentLinesImpl(dst, seq.trailingComments, indent, newline, indentLevel + 1);
+			put(dst, indent.repeat(indentLevel));
+		}
+		put(dst, "]");
+	}
+	
+	/***************************************************************************
+	 * flowマッピング(`{...}`)を出力する
+	 * 
+	 * `singleLine`が`true`の場合は`{a: 1, b: 2}`のように1行で出力し、
+	 * `false`の場合はエントリごとに改行して`indentLevel + 1`でインデントする。
+	 * いずれも`trailingComma`が`true`なら末尾エントリの後にも`,`を出力する。
+	 * 空マッピングは常に`{}`と出力する(この2つのフラグに関わらず)。値の型が
+	 * `YamlType.undefined`のエントリは出力をスキップする(T40のシリアライズ側
+	 * スキップマーカー用途を想定。JSON5の`_putPrettyStringJsonObjectImpl`と
+	 * 同じ方針)。`singleLine == false`の場合のみ、各エントリのleading/
+	 * trailingコメントと末尾のぶら下がりコメント(`trailingComments`)を
+	 * 出力する(T23)。理由は`putYamlFlowSequenceImpl`と同じ(1行出力とは
+	 * 両立し得ないため)。
+	 * Params:
+	 *      dst            = 出力先
+	 *      mapping        = 出力対象
+	 *      indent         = インデント文字列
+	 *      newline        = 改行文字列
+	 *      indentLevel    = 現在のインデントレベル
+	 *      escapeNonAscii = ASCII範囲外をエスケープするか（既定: `false`。T24）
+	 */
+	void putYamlFlowMappingImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlMapping) mapping,
+		in char[] indent, in char[] newline, size_t indentLevel, bool escapeNonAscii = false) const @safe
+	{
+		if (mapping.value.length == 0)
+		{
+			put(dst, "{}");
+			return;
+		}
+		put(dst, "{");
+		if (mapping.singleLine)
+		{
+			bool first = true;
+			foreach (ref itm; mapping.value.byKeyValue)
+			{
+				if (itm.value.type == YamlType.undefined)
+					continue;
+				if (!first)
+					put(dst, ", ");
+				first = false;
+				putYamlKeyImpl(dst, itm.key, escapeNonAscii);
+				put(dst, ": ");
+				putYamlFlowNodeImpl(dst, itm.value, indent, newline, indentLevel, escapeNonAscii);
+			}
+			if (mapping.trailingComma)
+				put(dst, ",");
+		}
+		else
+		{
+			put(dst, newline);
+			immutable n = mapping.value.length;
+			foreach (i, ref itm; mapping.value.byKeyValue)
+			{
+				if (itm.value.type == YamlType.undefined)
+					continue;
+				putYamlCommentLinesImpl(dst, itm.value._comments, indent, newline, indentLevel + 1);
+				put(dst, indent.repeat(indentLevel + 1));
+				putYamlKeyImpl(dst, itm.key, escapeNonAscii);
+				put(dst, ": ");
+				putYamlFlowNodeImpl(dst, itm.value, indent, newline, indentLevel + 1, escapeNonAscii);
+				if (i + 1 != n || mapping.trailingComma)
+					put(dst, ",");
+				putYamlTrailingCommentImpl(dst, itm.value._comments);
+				put(dst, newline);
+			}
+			putYamlCommentLinesImpl(dst, mapping.trailingComments, indent, newline, indentLevel + 1);
+			put(dst, indent.repeat(indentLevel));
+		}
+		put(dst, "}");
+	}
+	
+	// ==========================================================================
+	// MARK: - - Stringify (block collection)
+	// ==========================================================================
+	// T22: blockコレクション出力（インデント計算・ネスト）
+	
+	/***************************************************************************
+	 * 値がblock文脈で「改行してネスト表示すべき」コレクションかどうかを判定する
+	 * 
+	 * 以下のいずれかに該当する場合は`false`（＝プレフィックス`- `/`key: `と
+	 * 同一行にインライン出力すべき）を返す:
+	 * - スカラー・エイリアス・undefinedである
+	 * - コレクションだが`style`がflowである（flow文脈の子は常にflowのまま
+	 *   出力する3.5節の方針と対になる、block文脈での対応する判定）
+	 * - コレクションだが要素数が0である（空コレクションはblock記法では
+	 *   表現できない仕様上の制約のため、常にflowの`[]`/`{}`で表現する）
+	 * Params:
+	 *      value = 判定対象
+	 * Returns:
+	 *      改行してネスト表示すべきなら`true`
+	 */
+	bool isBlockNestedCollectionImpl(ref const(YamlValue) value) const pure nothrow @nogc @safe
+	{
+		if (value.type == YamlType.sequence)
+			return value.asSequence.style == CollectionStyle.block && value.asSequence.value.length > 0;
+		if (value.type == YamlType.mapping)
+			return value.asMapping.style == CollectionStyle.block && value.asMapping.value.length > 0;
+		return false;
+	}
+	
+	/***************************************************************************
+	 * blockシーケンス項目・blockマッピングエントリに共通する「値部分」を出力する
+	 * 
+	 * `isBlockNestedCollectionImpl`が`true`の場合は改行し、続けて`value`自身の
+	 * leadingコメントを`indentLevel + 1`の位置に出力してから、
+	 * `indentLevel + 1`でネストしたblockコレクションとして出力する
+	 * （`-`/`key:`自身の行には値を何も残さない。行末に不要な空白を
+	 * 残さないための意図的な分岐）。leadingコメントをここで（ネスト本体の
+	 * 直前に）出力するのは、値自身の出力が実質的にここから始まるためで
+	 * ある（`-`/`key:`の行はあくまで親側のプレフィックスであり、値
+	 * 自身の出力ではない）。
+	 * そうでない場合はプレフィックス（`-`/`key:`）と同一行に半角スペース1つを
+	 * 挟んでインライン出力する（スカラーはT20の各`putYamlXxxImpl`、flow/
+	 * 空コレクション・エイリアスはT21の`putYamlFlowNodeImpl`をそのまま再利用する）。
+	 * この場合、`value`自身のleadingコメントは値の出力が`-`/`key:`と
+	 * 同一行から始まる以上、`-`/`key:`行より前にしか置けないため、
+	 * この関数を呼び出す前に呼び出し元（`putYamlBlockSequenceImpl`/
+	 * `putYamlBlockMappingImpl`）が出力済みである前提とする。インライン
+	 * 出力した場合のみ、続けて`value`自身の末尾コメント
+	 * （`putYamlTrailingCommentImpl`）を出力する（T23。ネスト側の分岐では
+	 * `-`/`key:`の行に他の内容が残らないため、末尾コメントを出す余地が
+	 * そもそも無い）。アンカー・タグの出力はT20/T21と同じ方針でT24の
+	 * 統合層に先送りする（3.5節対応は本関数の時点では未実装）。
+	 * Params:
+	 *      dst            = 出力先
+	 *      value          = 出力対象
+	 *      indent         = インデント文字列
+	 *      newline        = 改行文字列
+	 *      indentLevel    = プレフィックス（`-`/`key:`）自身のインデントレベル
+	 *      escapeNonAscii = ASCII範囲外をエスケープするか（既定: `false`。T24）
+	 */
+	void putYamlBlockChildImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue) value,
+		in char[] indent, in char[] newline, size_t indentLevel, bool escapeNonAscii = false) const @safe
+	{
+		if (isBlockNestedCollectionImpl(value))
+		{
+			put(dst, newline);
+			putYamlCommentLinesImpl(dst, value._comments, indent, newline, indentLevel + 1);
+			final switch (value.type)
+			{
+			case YamlType.sequence:
+				putYamlBlockSequenceImpl(dst, value.asSequence, indent, newline, indentLevel + 1, escapeNonAscii);
+				break;
+			case YamlType.mapping:
+				putYamlBlockMappingImpl(dst, value.asMapping, indent, newline, indentLevel + 1, escapeNonAscii);
+				break;
+			case YamlType.undefined:
+			case YamlType.alias_:
+			case YamlType.string:
+			case YamlType.integer:
+			case YamlType.uinteger:
+			case YamlType.floating:
+			case YamlType.boolean:
+			case YamlType.nullfied:
+				assert(0, "isBlockNestedCollectionImpl guarantees sequence/mapping here");
+			}
+		}
+		else
+		{
+			put(dst, " ");
+			putYamlFlowNodeImpl(dst, value, indent, newline, indentLevel, escapeNonAscii);
+			putYamlTrailingCommentImpl(dst, value._comments);
+			put(dst, newline);
+		}
+	}
+	
+	/***************************************************************************
+	 * blockシーケンス（`- item`）を出力する
+	 * 
+	 * 各項目は`indentLevel`の位置に`-`を出力し、値部分は`putYamlBlockChildImpl`に
+	 * 委ねる。項目のleadingコメントの出力位置は、値がインライン出力される
+	 * 場合（スカラー・flow・空コレクション・エイリアス）は`indentLevel`の
+	 * 位置に`-`より前として出力し、値がネストしたblockコレクションとして
+	 * 改行して出力される場合は`putYamlBlockChildImpl`側で改行直後・
+	 * ネスト本体より前（`indentLevel + 1`の位置）に出力する。これは、
+	 * leadingコメントが常に「値自身の出力が始まる直前の行」に位置する
+	 * べきという方針に基づく（値の出力開始位置は、インラインなら`-`と
+	 * 同じ行、ネストなら次の行以降のネスト本体の先頭になるため）。
+	 * 全項目の後には`trailingComments`（ぶら下がりコメント）を
+	 * `indentLevel`の位置に出力する（T23）。空シーケンスは
+	 * 呼び出し元（`putYamlBlockChildImpl`/`putYamlBlockNodeImpl`）が
+	 * `isBlockNestedCollectionImpl`で弾くため、本関数が空シーケンスを
+	 * 受け取ることはない前提とする。
+	 * Params:
+	 *      dst            = 出力先
+	 *      seq            = 出力対象（空でないこと）
+	 *      indent         = インデント文字列
+	 *      newline        = 改行文字列
+	 *      indentLevel    = 現在のインデントレベル
+	 *      escapeNonAscii = ASCII範囲外をエスケープするか（既定: `false`。T24）
+	 */
+	void putYamlBlockSequenceImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlSequence) seq,
+		in char[] indent, in char[] newline, size_t indentLevel, bool escapeNonAscii = false) const @safe
+	{
+		foreach (ref elem; seq.value)
+		{
+			if (!isBlockNestedCollectionImpl(elem))
+				putYamlCommentLinesImpl(dst, elem._comments, indent, newline, indentLevel);
+			put(dst, indent.repeat(indentLevel));
+			put(dst, "-");
+			putYamlBlockChildImpl(dst, elem, indent, newline, indentLevel, escapeNonAscii);
+		}
+		putYamlCommentLinesImpl(dst, seq.trailingComments, indent, newline, indentLevel);
+	}
+	
+	/***************************************************************************
+	 * blockマッピング（`key: value`）を出力する
+	 * 
+	 * 各エントリは`indentLevel`の位置にキーを出力し、値部分は
+	 * `putYamlBlockChildImpl`に委ねる。値の型が`YamlType.undefined`の
+	 * エントリは出力をスキップする（T21の`putYamlFlowMappingImpl`と同じ方針）。
+	 * エントリのleadingコメントの出力位置は`putYamlBlockSequenceImpl`と
+	 * 同じ方針（インラインなら`key:`より前を`indentLevel`、ネストなら
+	 * `putYamlBlockChildImpl`側で`indentLevel + 1`）。全エントリの後には
+	 * `trailingComments`（ぶら下がりコメント）を`indentLevel`の位置に
+	 * 出力する（T23）。空マッピングは呼び出し元が
+	 * `isBlockNestedCollectionImpl`で弾くため、本関数が空マッピングを
+	 * 受け取ることはない前提とする。
+	 * Params:
+	 *      dst            = 出力先
+	 *      mapping        = 出力対象（空でないこと）
+	 *      indent         = インデント文字列
+	 *      newline        = 改行文字列
+	 *      indentLevel    = 現在のインデントレベル
+	 *      escapeNonAscii = ASCII範囲外をエスケープするか（既定: `false`。T24）
+	 */
+	void putYamlBlockMappingImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue.YamlMapping) mapping,
+		in char[] indent, in char[] newline, size_t indentLevel, bool escapeNonAscii = false) const @safe
+	{
+		foreach (ref itm; mapping.value.byKeyValue)
+		{
+			if (itm.value.type == YamlType.undefined)
+				continue;
+			if (!isBlockNestedCollectionImpl(itm.value))
+				putYamlCommentLinesImpl(dst, itm.value._comments, indent, newline, indentLevel);
+			put(dst, indent.repeat(indentLevel));
+			putYamlKeyImpl(dst, itm.key, escapeNonAscii);
+			put(dst, ":");
+			putYamlBlockChildImpl(dst, itm.value, indent, newline, indentLevel, escapeNonAscii);
+		}
+		putYamlCommentLinesImpl(dst, mapping.trailingComments, indent, newline, indentLevel);
+	}
+	
+	/***************************************************************************
+	 * blockノード（スカラー・エイリアス・sequence・mapping）を1つ出力する
+	 * 
+	 * ドキュメントルート等、プレフィックス（`-`/`key:`）を伴わない位置で使う
+	 * トップレベルディスパッチャ。`isBlockNestedCollectionImpl`に応じて
+	 * block出力（`putYamlBlockSequenceImpl`/`putYamlBlockMappingImpl`）と
+	 * インライン出力（`putYamlFlowNodeImpl`。スカラー・flow・空コレクション・
+	 * エイリアス用）のいずれかへディスパッチする（T24の`toPrettyString`から
+	 * 呼ばれる想定）。
+	 * Params:
+	 *      dst            = 出力先
+	 *      value          = 出力対象
+	 *      indent         = インデント文字列
+	 *      newline        = 改行文字列
+	 *      indentLevel    = 現在のインデントレベル
+	 *      escapeNonAscii = ASCII範囲外をエスケープするか（既定: `false`。T24）
+	 */
+	void putYamlBlockNodeImpl(OutputRange)(ref OutputRange dst, ref const(YamlValue) value,
+		in char[] indent, in char[] newline, size_t indentLevel, bool escapeNonAscii = false) const @safe
+	{
+		if (isBlockNestedCollectionImpl(value))
+		{
+			final switch (value.type)
+			{
+			case YamlType.sequence:
+				putYamlBlockSequenceImpl(dst, value.asSequence, indent, newline, indentLevel, escapeNonAscii);
+				break;
+			case YamlType.mapping:
+				putYamlBlockMappingImpl(dst, value.asMapping, indent, newline, indentLevel, escapeNonAscii);
+				break;
+			case YamlType.undefined:
+			case YamlType.alias_:
+			case YamlType.string:
+			case YamlType.integer:
+			case YamlType.uinteger:
+			case YamlType.floating:
+			case YamlType.boolean:
+			case YamlType.nullfied:
+				assert(0, "isBlockNestedCollectionImpl guarantees sequence/mapping here");
+			}
+		}
+		else
+		{
+			putYamlFlowNodeImpl(dst, value, indent, newline, indentLevel, escapeNonAscii);
+		}
+	}
+	
 public:
 	// ==========================================================================
 	// MARK: - - Public API (T1Aで parse() を追加。将来T30/T40/T41/T24/T31が
@@ -4128,6 +5139,63 @@ public:
 		
 		return root;
 	}
+	
+	// ==========================================================================
+	// MARK: - - Stringify (public entry point)
+	// ==========================================================================
+	// T24: toPrettyString() 統合・YamlPrettyPrintOptions 設計
+	
+	/***************************************************************************
+	 * pretty-print整形オプション（design 2.3節。JSON5の
+	 * `JsonPrettyPrintOptions`に相当するが、JSON5がビットフラグ`enum`である
+	 * のに対しYAML版は`indent`/`newline`も一体化した`struct`とする。design
+	 * 2.3節が明示的にこの構成を指定している）
+	 * 
+	 * `defaultStyle`は現時点（T24）では`toPrettyString`自身からは参照
+	 * しない。既存ノードは（`parse()`由来であれ将来の`make()`由来であれ）
+	 * 常に自身の`style`フィールドを明示的に持つため（3.2節・T15/T16の
+	 * 既定値`CollectionStyle.block`が`CollectionStyle.init`と一致するように
+	 * 設計されている）、出力時に「未設定」を区別してこのフィールドで
+	 * 補う必要が無いためである。T30（`make()`実装）が新規構築時の既定
+	 * スタイル決定に利用することを想定して先行してフィールドのみ用意する。
+	 */
+	static struct YamlPrettyPrintOptions
+	{
+		/// インデント文字列（既定: スペース2つ）
+		string indent = "  ";
+		/// 改行文字列（既定: LF）
+		string newline = "\n";
+		/// ASCII範囲外をエスケープするか（既定: `false`）
+		bool escapeNonAscii = false;
+		/// 既定のコレクションスタイル（現時点では未使用。上記doc参照）
+		CollectionStyle defaultStyle = CollectionStyle.block;
+	}
+	
+	/***************************************************************************
+	 * YAML値をpretty-print形式で出力する（JSON5の`toPrettyString`に相当）
+	 * 
+	 * ルートノード自身のleading/trailingコメントも出力する
+	 * （`putYamlCommentLinesImpl`/`putYamlTrailingCommentImpl`をルート
+	 * レベルで適用する。T22/T23で構築した各`putYamlBlockXxxImpl`は
+	 * 「親から見た子」のコメントしか出力しないため、ルート自身の
+	 * コメントを出力できるのはこの最上位の`toPrettyString`だけである）。
+	 * ルートの値本体は`putYamlBlockNodeImpl`（T22）に委譲し、block/flow・
+	 * スカラー/コレクションの判別はそちらに任せる。末尾に改行は追加しない
+	 * （block系コレクションは各エントリ自身が末尾に改行を含むため結果的に
+	 * 改行で終わるが、スカラーがルートの場合は追加しない。JSON5の
+	 * `toPrettyString`と同じ方針）。
+	 * Params:
+	 *      dst     = 出力先
+	 *      value   = 出力対象
+	 *      options = 整形オプション（既定値: `YamlPrettyPrintOptions.init`）
+	 */
+	void toPrettyString(OutputRange)(ref OutputRange dst, ref const(YamlValue) value,
+		YamlPrettyPrintOptions options = YamlPrettyPrintOptions.init) const @safe
+	{
+		putYamlCommentLinesImpl(dst, value._comments, options.indent, options.newline, 0);
+		putYamlBlockNodeImpl(dst, value, options.indent, options.newline, 0, options.escapeNonAscii);
+		putYamlTrailingCommentImpl(dst, value._comments);
+	}
 }
 
 // ============================================================================
@@ -4137,6 +5205,7 @@ public:
 // 以下は T03 検証用の暫定エイリアス。正式な公開APIは T50 で確定させる。
 alias YamlBuilder  = YamlBuilderImpl!YamlDefaultAllocator;
 alias YamlValue    = YamlBuilder.YamlValue;
+alias YamlOptions  = YamlBuilder.YamlPrettyPrintOptions;
 
 // ============================================================================
 // MARK: - Unittests
@@ -4991,7 +6060,7 @@ alias YamlValue    = YamlBuilder.YamlValue;
 		case YamlBuilder.YamlType.floating:  assert(dst.asFloatingPoint.raw[] == raw); break;
 		case YamlBuilder.YamlType.boolean:   assert(dst.asBoolean.raw[] == raw); break;
 		case YamlBuilder.YamlType.string:    assert(dst.asString.raw[] == raw); break;
-		case YamlBuilder.YamlType.nullfied:  break; // YamlNullにはasNull()アクセサが無いためraw検証は省略
+		case YamlBuilder.YamlType.nullfied:  assert(dst.asNull.raw[] == raw); break;
 		case YamlBuilder.YamlType.undefined:
 		case YamlBuilder.YamlType.alias_:
 		case YamlBuilder.YamlType.sequence:
@@ -6374,3 +7443,1176 @@ alias YamlValue    = YamlBuilder.YamlValue;
 	assert(result3.getValue!int("d") == 3);
 }
 
+/// T20: putYamlBooleanImpl - rawテキスト優先、rawが無い場合は1.2 Core Schema既定表記
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		auto val = YamlValue.YamlBoolean(true);
+		val.raw = cast(YamlBuilder.String)"Yes";
+		auto app = appender!(char[])();
+		builder.putYamlBooleanImpl(app, val);
+		assert(app.data == "Yes");
+	}
+	{
+		auto val = YamlValue.YamlBoolean(true);
+		auto app = appender!(char[])();
+		builder.putYamlBooleanImpl(app, val);
+		assert(app.data == "true");
+	}
+	{
+		auto val = YamlValue.YamlBoolean(false);
+		auto app = appender!(char[])();
+		builder.putYamlBooleanImpl(app, val);
+		assert(app.data == "false");
+	}
+}
+
+/// T20: putYamlNullImpl - rawテキスト優先、rawが無い場合は1.2 Core Schema既定表記
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		auto val = YamlValue.YamlNull();
+		val.raw = cast(YamlBuilder.String)"~";
+		auto app = appender!(char[])();
+		builder.putYamlNullImpl(app, val);
+		assert(app.data == "~");
+	}
+	{
+		auto val = YamlValue.YamlNull();
+		auto app = appender!(char[])();
+		builder.putYamlNullImpl(app, val);
+		assert(app.data == "null");
+	}
+}
+
+/// T20: putYamlIntegerImpl - rawテキスト優先
+@safe unittest
+{
+	YamlBuilder builder;
+	auto val = YamlValue.YamlInteger(42);
+	val.raw = cast(YamlBuilder.String)"0x2A";
+	val.base = IntegerBase.hex; // rawがあればstyle/baseに関わらずrawを優先する
+	auto app = appender!(char[])();
+	builder.putYamlIntegerImpl(app, val);
+	assert(app.data == "0x2A");
+}
+
+/// T20: putYamlIntegerImpl - rawが無い場合は基数・符号指定に応じて再構成する
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		auto val = YamlValue.YamlInteger(42);
+		auto app = appender!(char[])();
+		builder.putYamlIntegerImpl(app, val);
+		assert(app.data == "42");
+	}
+	{
+		auto val = YamlValue.YamlInteger(42);
+		val.positiveSign = true;
+		auto app = appender!(char[])();
+		builder.putYamlIntegerImpl(app, val);
+		assert(app.data == "+42");
+	}
+	{
+		auto val = YamlValue.YamlInteger(-42);
+		auto app = appender!(char[])();
+		builder.putYamlIntegerImpl(app, val);
+		assert(app.data == "-42");
+	}
+	{
+		auto val = YamlValue.YamlInteger(26);
+		val.base = IntegerBase.hex;
+		auto app = appender!(char[])();
+		builder.putYamlIntegerImpl(app, val);
+		assert(app.data == "0x1a");
+	}
+	{
+		auto val = YamlValue.YamlInteger(-26);
+		val.base = IntegerBase.hex;
+		auto app = appender!(char[])();
+		builder.putYamlIntegerImpl(app, val);
+		assert(app.data == "-0x1a");
+	}
+	{
+		auto val = YamlValue.YamlInteger(15);
+		val.base = IntegerBase.octal;
+		auto app = appender!(char[])();
+		builder.putYamlIntegerImpl(app, val);
+		assert(app.data == "0o17");
+	}
+	{
+		auto val = YamlValue.YamlInteger(5);
+		val.base = IntegerBase.binary;
+		auto app = appender!(char[])();
+		builder.putYamlIntegerImpl(app, val);
+		assert(app.data == "0b101");
+	}
+	{
+		// long.minは絶対値変換(absULongImpl)がオーバーフローしないことを確認する
+		auto val = YamlValue.YamlInteger(long.min);
+		val.base = IntegerBase.hex;
+		auto app = appender!(char[])();
+		builder.putYamlIntegerImpl(app, val);
+		assert(app.data == "-0x8000000000000000");
+	}
+}
+
+/// T20: putYamlUIntegerImpl - rawテキスト優先、rawが無い場合は基数・符号指定に応じて再構成する
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		auto val = YamlValue.YamlUInteger(ulong.max);
+		val.raw = cast(YamlBuilder.String)"18446744073709551615";
+		auto app = appender!(char[])();
+		builder.putYamlUIntegerImpl(app, val);
+		assert(app.data == "18446744073709551615");
+	}
+	{
+		auto val = YamlValue.YamlUInteger(255);
+		val.base = IntegerBase.hex;
+		auto app = appender!(char[])();
+		builder.putYamlUIntegerImpl(app, val);
+		assert(app.data == "0xff");
+	}
+	{
+		auto val = YamlValue.YamlUInteger(255);
+		val.positiveSign = true;
+		auto app = appender!(char[])();
+		builder.putYamlUIntegerImpl(app, val);
+		assert(app.data == "+255");
+	}
+}
+
+/// T20: putYamlFloatingPointImpl - rawテキスト優先
+@safe unittest
+{
+	YamlBuilder builder;
+	auto val = YamlValue.YamlFloatingPoint(1.0);
+	val.raw = cast(YamlBuilder.String)"1_000.0";
+	auto app = appender!(char[])();
+	builder.putYamlFloatingPointImpl(app, val);
+	assert(app.data == "1_000.0");
+}
+
+/// T20: putYamlFloatingPointImpl - 無限大・NaNは1.2 Core Schema表記になる
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		auto val = YamlValue.YamlFloatingPoint(double.infinity);
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == ".inf");
+	}
+	{
+		auto val = YamlValue.YamlFloatingPoint(-double.infinity);
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == "-.inf");
+	}
+	{
+		auto val = YamlValue.YamlFloatingPoint(double.nan);
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == ".nan");
+	}
+}
+
+/// T20: putYamlFloatingPointImpl - rawが無い場合はフラグに応じて再構成する（有限値・precision無し）
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		auto val = YamlValue.YamlFloatingPoint(3.14);
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == "3.14");
+	}
+	{
+		// leadingDecimalPoint: 元が\".5\"のように先頭の0を省略していた場合を再現する
+		auto val = YamlValue.YamlFloatingPoint(0.5);
+		val.leadingDecimalPoint = true;
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == ".5");
+	}
+	{
+		// tailingDecimalPointが未指定（既定false）の場合は\"5.0\"のように0を補う
+		auto val = YamlValue.YamlFloatingPoint(5.0);
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == "5.0");
+	}
+	{
+		// tailingDecimalPoint: 元が\"5.\"のように末尾の0を省略していた場合を再現する
+		auto val = YamlValue.YamlFloatingPoint(5.0);
+		val.tailingDecimalPoint = true;
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == "5.");
+	}
+	{
+		auto val = YamlValue.YamlFloatingPoint(3.14);
+		val.positiveSign = true;
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == "+3.14");
+	}
+	{
+		auto val = YamlValue.YamlFloatingPoint(3.14159);
+		val.precision = 2;
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == "3.14");
+	}
+}
+
+/// T20: putYamlFloatingPointImpl - rawが無い場合はフラグに応じて再構成する（指数表記）
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		auto val = YamlValue.YamlFloatingPoint(12345.0);
+		val.withExponent = true;
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == "1.2345e+4");
+	}
+	{
+		// 実装メモの通り、JSON5参考実装のバグ（`.`欠落・fmt未使用）を
+		// 修正しているため、precision指定が正しく反映される
+		auto val = YamlValue.YamlFloatingPoint(12345.0);
+		val.withExponent = true;
+		val.precision = 3;
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == "1.234e+4");
+	}
+	{
+		auto val = YamlValue.YamlFloatingPoint(0.0001234);
+		val.withExponent = true;
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == "1.234e-4");
+	}
+	{
+		auto val = YamlValue.YamlFloatingPoint(12345.0);
+		val.withExponent = true;
+		val.positiveSign = true;
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, val);
+		assert(app.data == "+1.2345e+4");
+	}
+}
+
+/// T20: putYamlStringImpl - rawが非空であればstyleに関わらず無条件でrawを出力する（3.3節）
+@safe unittest
+{
+	YamlBuilder builder;
+	auto val = YamlValue.YamlString(cast(YamlBuilder.String)"ignored");
+	val.style = ScalarStyle.doubleQuoted; // raw優先ならこのstyleは無視されるはず
+	val.raw = cast(YamlBuilder.String)"RAW_WINS";
+	auto app = appender!(char[])();
+	builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+	assert(app.data == "RAW_WINS");
+}
+
+/// T20: putYamlStringImpl - プレーンスタイル（rawが無い場合）
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"hello");
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+		assert(app.data == "hello");
+	}
+	{
+		// 改行を含む内容はプレーンスカラーとして安全でないため、値を破壊しないよう
+		// ダブルクォートへ自動フォールバックする
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"a\nb");
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+		assert(app.data == "\"a\\nb\"");
+	}
+	{
+		// インジケータ文字(`-`)で始まる内容もダブルクォートへ自動フォールバックする
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"- item");
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+		assert(app.data == "\"- item\"");
+	}
+	{
+		// 空文字列はプレーンスカラーとしては暗黙nullと解釈されてしまうため
+		// ダブルクォートへ自動フォールバックする
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"");
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+		assert(app.data == "\"\"");
+	}
+}
+
+/// T20: putYamlStringImpl - シングルクォートスタイル（`'`は2つ重ねてエスケープする）
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"it's");
+		val.style = ScalarStyle.singleQuoted;
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+		assert(app.data == "'it''s'");
+	}
+	{
+		// シングルクォートでは改行を表現できないため、値を破壊しないよう
+		// ダブルクォートへ自動フォールバックする
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"a\nb");
+		val.style = ScalarStyle.singleQuoted;
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+		assert(app.data == "\"a\\nb\"");
+	}
+}
+
+/// T20: putYamlStringImpl - ダブルクォートスタイル（制御文字・`"`・`\`をエスケープする）
+@safe unittest
+{
+	YamlBuilder builder;
+	auto val = YamlValue.YamlString(cast(YamlBuilder.String)"a\"b\\c\td");
+	val.style = ScalarStyle.doubleQuoted;
+	auto app = appender!(char[])();
+	builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+	assert(app.data == "\"a\\\"b\\\\c\\td\"");
+}
+
+/// T20: putYamlStringImpl - literalブロックスカラー（clip/strip/keepの各chomping）
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		// clip: 末尾の改行はちょうど1つ保持される
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"line1\nline2\n");
+		val.style = ScalarStyle.literal;
+		val.chomping = ChompingIndicator.clip;
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+		assert(app.data == "|\n  line1\n  line2\n");
+	}
+	{
+		// strip: 値には末尾改行が無いが、出力テキスト上は次要素との区切りとして
+		// 物理的な改行が1つ必要になる
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"line1\nline2");
+		val.style = ScalarStyle.literal;
+		val.chomping = ChompingIndicator.strip;
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+		assert(app.data == "|-\n  line1\n  line2\n");
+	}
+	{
+		// keep: 末尾の複数改行がすべて保持される
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"line1\n\n\n");
+		val.style = ScalarStyle.literal;
+		val.chomping = ChompingIndicator.keep;
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+		assert(app.data == "|+\n  line1\n\n\n");
+	}
+	{
+		// 空のブロックスカラー: ヘッダ行のみが出力される
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"");
+		val.style = ScalarStyle.literal;
+		val.chomping = ChompingIndicator.strip;
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+		assert(app.data == "|-\n");
+	}
+	{
+		// indentLevelに応じてネストした深さでインデントされる
+		auto val = YamlValue.YamlString(cast(YamlBuilder.String)"line1\n");
+		val.style = ScalarStyle.literal;
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, val, "  ", "\n", 1);
+		assert(app.data == "|\n    line1\n");
+	}
+}
+
+/// T20: putYamlStringImpl - foldedブロックスカラー
+@safe unittest
+{
+	YamlBuilder builder;
+	auto val = YamlValue.YamlString(cast(YamlBuilder.String)"line1\n");
+	val.style = ScalarStyle.folded;
+	auto app = appender!(char[])();
+	builder.putYamlStringImpl(app, val, "  ", "\n", 0);
+	assert(app.data == ">\n  line1\n");
+}
+
+/// T20: 統合テスト - parse()の結果を各put*Implでstringifyすると元のテキストと一致する（rawテキスト優先方式）
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("i: 0x1A\nf: 3.14\nb: yes\nn: ~\ns: hello\n");
+	auto m = root.asMapping;
+	{
+		auto app = appender!(char[])();
+		builder.putYamlIntegerImpl(app, m["i"].asInteger);
+		assert(app.data == "0x1A");
+	}
+	{
+		auto app = appender!(char[])();
+		builder.putYamlFloatingPointImpl(app, m["f"].asFloatingPoint);
+		assert(app.data == "3.14");
+	}
+	{
+		auto app = appender!(char[])();
+		builder.putYamlBooleanImpl(app, m["b"].asBoolean);
+		assert(app.data == "yes");
+	}
+	{
+		auto app = appender!(char[])();
+		builder.putYamlNullImpl(app, m["n"].asNull);
+		assert(app.data == "~");
+	}
+	{
+		auto app = appender!(char[])();
+		builder.putYamlStringImpl(app, m["s"].asString, "  ", "\n", 0);
+		assert(app.data == "hello");
+	}
+}
+
+/// T21: putYamlKeyImpl - plain/シングルクォート/ダブルクォートの各スタイル
+@safe unittest
+{
+	YamlBuilder builder;
+	{
+		auto key = YamlValue.YamlKey(cast(YamlBuilder.String)"name");
+		auto app = appender!(char[])();
+		builder.putYamlKeyImpl(app, key);
+		assert(app.data == "name");
+	}
+	{
+		// 改行を含む安全でない内容はダブルクォートへフォールバックする
+		auto key = YamlValue.YamlKey(cast(YamlBuilder.String)"a\nb");
+		auto app = appender!(char[])();
+		builder.putYamlKeyImpl(app, key);
+		assert(app.data == "\"a\\nb\"");
+	}
+	{
+		auto key = YamlValue.YamlKey(cast(YamlBuilder.String)"it's");
+		key.style = ScalarStyle.singleQuoted;
+		auto app = appender!(char[])();
+		builder.putYamlKeyImpl(app, key);
+		assert(app.data == "'it''s'");
+	}
+	{
+		auto key = YamlValue.YamlKey(cast(YamlBuilder.String)"a b");
+		key.style = ScalarStyle.doubleQuoted;
+		auto app = appender!(char[])();
+		builder.putYamlKeyImpl(app, key);
+		assert(app.data == "\"a b\"");
+	}
+}
+
+/// T21: putYamlFlowNodeImpl - エイリアスノードは`*name`のみを出力する(3.5節)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("[&anchor 1, *anchor]");
+	auto s = root.asSequence;
+	auto app = appender!(char[])();
+	builder.putYamlFlowNodeImpl(app, s[1], "  ", "\n", 0);
+	assert(app.data == "*anchor");
+}
+
+/// T21: putYamlFlowSequenceImpl - 空シーケンス
+@safe unittest
+{
+	YamlBuilder builder;
+	YamlValue.YamlSequence seq;
+	auto app = appender!(char[])();
+	builder.putYamlFlowSequenceImpl(app, seq, "  ", "\n", 0);
+	assert(app.data == "[]");
+}
+
+// 注: 以下はYamlValue(val, builder)コンストラクタ(@system)を使うため@system unittestとする
+// (T03の既存テストと同じ理由・同じ方針。T30完了後にmake()経由の@safeテストを追加する)
+
+/// T21: putYamlFlowSequenceImpl - singleLine(ケツカンマ有無)
+@system unittest
+{
+	YamlBuilder builder;
+	{
+		auto v = YamlValue([1L, 2L, 3L], builder);
+		v.asSequence.singleLine = true;
+		auto app = appender!(char[])();
+		builder.putYamlFlowSequenceImpl(app, v.asSequence, "  ", "\n", 0);
+		assert(app.data == "[1, 2, 3]");
+	}
+	{
+		auto v = YamlValue([1L, 2L, 3L], builder);
+		v.asSequence.singleLine = true;
+		v.asSequence.trailingComma = true;
+		auto app = appender!(char[])();
+		builder.putYamlFlowSequenceImpl(app, v.asSequence, "  ", "\n", 0);
+		assert(app.data == "[1, 2, 3,]");
+	}
+}
+
+/// T21: putYamlFlowSequenceImpl - 複数行(singleLine=false)
+@system unittest
+{
+	YamlBuilder builder;
+	auto v = YamlValue([1L, 2L], builder);
+	v.asSequence.singleLine = false;
+	auto app = appender!(char[])();
+	builder.putYamlFlowSequenceImpl(app, v.asSequence, "  ", "\n", 0);
+	assert(app.data == "[\n  1,\n  2\n]");
+}
+
+/// T21: putYamlFlowSequenceImpl - 複数行+ケツカンマ
+@system unittest
+{
+	YamlBuilder builder;
+	auto v = YamlValue([1L, 2L], builder);
+	v.asSequence.singleLine = false;
+	v.asSequence.trailingComma = true;
+	auto app = appender!(char[])();
+	builder.putYamlFlowSequenceImpl(app, v.asSequence, "  ", "\n", 0);
+	assert(app.data == "[\n  1,\n  2,\n]");
+}
+
+/// T21: putYamlFlowSequenceImpl - ネストしたflowシーケンス
+@system unittest
+{
+	YamlBuilder builder;
+	auto innerVal = YamlValue([2L, 3L], builder);
+	innerVal.asSequence.singleLine = true;
+	auto outerVal = YamlValue(1L, builder);
+	auto ary = builder.allocAry!YamlValue;
+	ary ~= outerVal;
+	ary ~= innerVal;
+	auto seq = YamlValue.YamlSequence(ary);
+	seq.singleLine = true;
+	auto app = appender!(char[])();
+	builder.putYamlFlowSequenceImpl(app, seq, "  ", "\n", 0);
+	assert(app.data == "[1, [2, 3]]");
+}
+
+/// T21: putYamlFlowMappingImpl - 空マッピング
+@safe unittest
+{
+	YamlBuilder builder;
+	YamlValue.YamlMapping mapping;
+	auto app = appender!(char[])();
+	builder.putYamlFlowMappingImpl(app, mapping, "  ", "\n", 0);
+	assert(app.data == "{}");
+}
+
+// 注: 以下はDictionary!(YamlKey, YamlValue)を明示的な順序で構築するため、
+// キーの反復順序(挿入順)が保証された状態でテストできる
+// (D連想配列リテラルはハッシュ順のため、順序に依存するテストには使わない)
+
+/// T21: putYamlFlowMappingImpl - singleLine(ケツカンマ有無)
+@system unittest
+{
+	YamlBuilder builder;
+	{
+		auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+		dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"a"), YamlValue(1L, builder));
+		dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"b"), YamlValue(2L, builder));
+		auto mapping = YamlValue.YamlMapping(dic);
+		mapping.singleLine = true;
+		auto app = appender!(char[])();
+		builder.putYamlFlowMappingImpl(app, mapping, "  ", "\n", 0);
+		assert(app.data == "{a: 1, b: 2}");
+	}
+	{
+		auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+		dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"a"), YamlValue(1L, builder));
+		dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"b"), YamlValue(2L, builder));
+		auto mapping = YamlValue.YamlMapping(dic);
+		mapping.singleLine = true;
+		mapping.trailingComma = true;
+		auto app = appender!(char[])();
+		builder.putYamlFlowMappingImpl(app, mapping, "  ", "\n", 0);
+		assert(app.data == "{a: 1, b: 2,}");
+	}
+}
+
+/// T21: putYamlFlowMappingImpl - 複数行(singleLine=false)
+@system unittest
+{
+	YamlBuilder builder;
+	auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"a"), YamlValue(1L, builder));
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"b"), YamlValue(2L, builder));
+	auto mapping = YamlValue.YamlMapping(dic);
+	mapping.singleLine = false;
+	auto app = appender!(char[])();
+	builder.putYamlFlowMappingImpl(app, mapping, "  ", "\n", 0);
+	assert(app.data == "{\n  a: 1,\n  b: 2\n}");
+}
+
+/// T21: putYamlFlowMappingImpl - ネストしたflowシーケンスを値に持つ
+@system unittest
+{
+	YamlBuilder builder;
+	auto innerVal = YamlValue([1L, 2L], builder);
+	innerVal.asSequence.singleLine = true;
+	auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"a"), innerVal);
+	auto mapping = YamlValue.YamlMapping(dic);
+	mapping.singleLine = true;
+	auto app = appender!(char[])();
+	builder.putYamlFlowMappingImpl(app, mapping, "  ", "\n", 0);
+	assert(app.data == "{a: [1, 2]}");
+}
+
+/// T21: putYamlFlowMappingImpl - Type.undefinedの値を持つエントリは出力をスキップする
+@system unittest
+{
+	YamlBuilder builder;
+	auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"a"), YamlValue(1L, builder));
+	YamlValue undef;
+	assert(undef.type == YamlBuilder.YamlType.undefined);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"b"), undef);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"c"), YamlValue(3L, builder));
+	auto mapping = YamlValue.YamlMapping(dic);
+	mapping.singleLine = true;
+	auto app = appender!(char[])();
+	builder.putYamlFlowMappingImpl(app, mapping, "  ", "\n", 0);
+	assert(app.data == "{a: 1, c: 3}");
+}
+
+/// T21: 統合テスト - parse()したflowシーケンスをstringifyすると同じテキストが得られ、
+/// その結果を再度parse()しても同じ値が得られる(ラウンドトリップ)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("[1, 2, 3,]");
+	assert(root.asSequence.singleLine == true);
+	assert(root.asSequence.trailingComma == true);
+	auto app = appender!(char[])();
+	builder.putYamlFlowSequenceImpl(app, root.asSequence, "  ", "\n", 0);
+	assert(app.data == "[1, 2, 3,]");
+	
+	YamlBuilder builder2;
+	auto reparsed = builder2.parse(app.data);
+	assert(reparsed.getElement!int(0) == 1);
+	assert(reparsed.getElement!int(1) == 2);
+	assert(reparsed.getElement!int(2) == 3);
+}
+
+/// T21: 統合テスト - 複数行にまたがるflowシーケンス(singleLine=false)のラウンドトリップ
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("[\n  1,\n  2,\n  3\n]");
+	assert(root.asSequence.singleLine == false);
+	auto app = appender!(char[])();
+	builder.putYamlFlowSequenceImpl(app, root.asSequence, "  ", "\n", 0);
+	assert(app.data == "[\n  1,\n  2,\n  3\n]");
+	
+	YamlBuilder builder2;
+	auto reparsed = builder2.parse(app.data);
+	assert(reparsed.getElement!int(0) == 1);
+	assert(reparsed.getElement!int(1) == 2);
+	assert(reparsed.getElement!int(2) == 3);
+}
+
+/// T21: 統合テスト - parse()したflowマッピングをstringifyすると同じテキストが得られる
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("{a: 1, b: 2}");
+	assert(root.asMapping.singleLine == true);
+	auto app = appender!(char[])();
+	builder.putYamlFlowMappingImpl(app, root.asMapping, "  ", "\n", 0);
+	assert(app.data == "{a: 1, b: 2}");
+	
+	YamlBuilder builder2;
+	auto reparsed = builder2.parse(app.data);
+	assert(reparsed.getValue!int("a") == 1);
+	assert(reparsed.getValue!int("b") == 2);
+}
+
+/// T21: 統合テスト - ネストしたflowコレクション(シーケンス内マッピング)のラウンドトリップ
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("[{a: 1}, {b: 2}]");
+	auto app = appender!(char[])();
+	builder.putYamlFlowSequenceImpl(app, root.asSequence, "  ", "\n", 0);
+	assert(app.data == "[{a: 1}, {b: 2}]");
+	
+	YamlBuilder builder2;
+	auto reparsed = builder2.parse(app.data);
+	assert(reparsed.asSequence[0].getValue!int("a") == 1);
+	assert(reparsed.asSequence[1].getValue!int("b") == 2);
+}
+
+/// T22: putYamlBlockSequenceImpl - フラットなシーケンス
+@system unittest
+{
+	YamlBuilder builder;
+	auto v = YamlValue([1L, 2L, 3L], builder);
+	v.asSequence.style = CollectionStyle.block;
+	auto app = appender!(char[])();
+	builder.putYamlBlockSequenceImpl(app, v.asSequence, "  ", "\n", 0);
+	assert(app.data == "- 1\n- 2\n- 3\n");
+}
+
+/// T22: putYamlBlockMappingImpl - フラットなマッピング
+@system unittest
+{
+	YamlBuilder builder;
+	auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"a"), YamlValue(1L, builder));
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"b"), YamlValue(2L, builder));
+	auto mapping = YamlValue.YamlMapping(dic);
+	mapping.style = CollectionStyle.block;
+	auto app = appender!(char[])();
+	builder.putYamlBlockMappingImpl(app, mapping, "  ", "\n", 0);
+	assert(app.data == "a: 1\nb: 2\n");
+}
+
+/// T22: putYamlBlockMappingImpl - ネストしたblockマッピングを値に持つ場合、
+/// 改行して`indentLevel + 1`でインデントする
+@system unittest
+{
+	YamlBuilder builder;
+	auto innerDic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	innerDic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"x"), YamlValue(1L, builder));
+	innerDic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"y"), YamlValue(2L, builder));
+	auto innerMapping = YamlValue.YamlMapping(innerDic);
+	auto inner = YamlValue(innerMapping, builder);
+	inner.asMapping.style = CollectionStyle.block;
+	
+	auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"a"), inner);
+	auto mapping = YamlValue.YamlMapping(dic);
+	mapping.style = CollectionStyle.block;
+	
+	auto app = appender!(char[])();
+	builder.putYamlBlockMappingImpl(app, mapping, "  ", "\n", 0);
+	assert(app.data == "a:\n  x: 1\n  y: 2\n");
+}
+
+/// T22: putYamlBlockMappingImpl - ネストしたblockシーケンスを値に持つ場合、
+/// 改行して`indentLevel + 1`でインデントする(design Y1: 同一インデントも許容
+/// されるが、出力は常に一段深いインデントに統一する簡略化方針)
+@system unittest
+{
+	YamlBuilder builder;
+	auto innerSeq = YamlValue([1L, 2L], builder);
+	innerSeq.asSequence.style = CollectionStyle.block;
+	
+	auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"items"), innerSeq);
+	auto mapping = YamlValue.YamlMapping(dic);
+	mapping.style = CollectionStyle.block;
+	
+	auto app = appender!(char[])();
+	builder.putYamlBlockMappingImpl(app, mapping, "  ", "\n", 0);
+	assert(app.data == "items:\n  - 1\n  - 2\n");
+}
+
+/// T22: putYamlBlockSequenceImpl - 項目がblockマッピングの場合、`-`の次の行から
+/// 一段深いインデントで各キーを出力する(先頭キーをダッシュに続けてインライン
+/// 出力する慣用スタイルは意図的に採用しない。実装メモ参照)
+@system unittest
+{
+	YamlBuilder builder;
+	auto innerDic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	innerDic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"name"), YamlValue("Alice", builder));
+	innerDic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"age"), YamlValue(30L, builder));
+	auto innerMapping = YamlValue.YamlMapping(innerDic);
+	auto inner = YamlValue(innerMapping, builder);
+	inner.asMapping.style = CollectionStyle.block;
+	
+	auto ary = builder.allocAry!YamlValue;
+	ary ~= inner;
+	auto seq = YamlValue.YamlSequence(ary);
+	seq.style = CollectionStyle.block;
+	
+	auto app = appender!(char[])();
+	builder.putYamlBlockSequenceImpl(app, seq, "  ", "\n", 0);
+	assert(app.data == "-\n  name: Alice\n  age: 30\n");
+}
+
+/// T22: putYamlBlockMappingImpl - flowスタイルのコレクションを値に持つ場合は
+/// プレフィックスと同一行にインライン出力する
+@system unittest
+{
+	YamlBuilder builder;
+	auto innerSeq = YamlValue([1L, 2L, 3L], builder);
+	innerSeq.asSequence.style = CollectionStyle.flow;
+	innerSeq.asSequence.singleLine = true;
+	
+	auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"items"), innerSeq);
+	auto mapping = YamlValue.YamlMapping(dic);
+	mapping.style = CollectionStyle.block;
+	
+	auto app = appender!(char[])();
+	builder.putYamlBlockMappingImpl(app, mapping, "  ", "\n", 0);
+	assert(app.data == "items: [1, 2, 3]\n");
+}
+
+/// T22: putYamlBlockMappingImpl - 空のblockスタイルコレクションはflowの`[]`/`{}`で
+/// インライン出力する(block記法では空コレクションを表現できないため)
+@system unittest
+{
+	YamlBuilder builder;
+	YamlValue.YamlSequence emptySeq;
+	emptySeq.style = CollectionStyle.block;
+	auto emptyVal = YamlValue(emptySeq, builder);
+	
+	auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"items"), emptyVal);
+	auto mapping = YamlValue.YamlMapping(dic);
+	mapping.style = CollectionStyle.block;
+	
+	auto app = appender!(char[])();
+	builder.putYamlBlockMappingImpl(app, mapping, "  ", "\n", 0);
+	assert(app.data == "items: []\n");
+}
+
+/// T22: putYamlBlockMappingImpl - Type.undefinedの値を持つエントリは出力をスキップする
+@system unittest
+{
+	YamlBuilder builder;
+	auto dic = builder.allocDic!(YamlBuilder.YamlKey, YamlValue);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"a"), YamlValue(1L, builder));
+	YamlValue undef;
+	assert(undef.type == YamlBuilder.YamlType.undefined);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"b"), undef);
+	dic.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"c"), YamlValue(3L, builder));
+	auto mapping = YamlValue.YamlMapping(dic);
+	mapping.style = CollectionStyle.block;
+	auto app = appender!(char[])();
+	builder.putYamlBlockMappingImpl(app, mapping, "  ", "\n", 0);
+	assert(app.data == "a: 1\nc: 3\n");
+}
+
+/// T22: putYamlBlockNodeImpl - トップレベルディスパッチャ(スカラーはそのままインライン出力)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("hello");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "hello");
+}
+
+/// T22: putYamlBlockNodeImpl - トップレベルがblockマッピングの場合、先頭に
+/// 余分な改行を挟まずそのままキーの列挙から始まる
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: 1\nb: 2\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "a: 1\nb: 2\n");
+}
+
+/// T22: 統合テスト - parse()したネスト構造(マッピングの値がマッピング)を
+/// putYamlBlockNodeImplでstringifyすると同じ木構造にラウンドトリップできる
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: 1\nb:\n  c: 2\n  d: 3\ne: 4\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "a: 1\nb:\n  c: 2\n  d: 3\ne: 4\n");
+	
+	YamlBuilder builder2;
+	auto reparsed = builder2.parse(app.data);
+	assert(reparsed.getValue!int("a") == 1);
+	assert(reparsed.getValue!int("e") == 4);
+	assert(reparsed.asMapping["b"].getValue!int("c") == 2);
+	assert(reparsed.asMapping["b"].getValue!int("d") == 3);
+}
+
+/// T22: 統合テスト - parse()したネスト構造(シーケンスの値としてのマッピングの
+/// リスト)をputYamlBlockNodeImplでstringifyしてもラウンドトリップできる
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("- name: Alice\n  age: 30\n- name: Bob\n  age: 25\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	
+	YamlBuilder builder2;
+	auto reparsed = builder2.parse(app.data);
+	assert(reparsed.asSequence[0].getValue!string("name") == "Alice");
+	assert(reparsed.asSequence[0].getValue!int("age") == 30);
+	assert(reparsed.asSequence[1].getValue!string("name") == "Bob");
+	assert(reparsed.asSequence[1].getValue!int("age") == 25);
+}
+
+/// T22: 統合テスト - blockとflowが混在するマッピング(値がflowシーケンス)の
+/// ラウンドトリップ
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("name: test\nvalues: [1, 2, 3]\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "name: test\nvalues: [1, 2, 3]\n");
+	
+	YamlBuilder builder2;
+	auto reparsed = builder2.parse(app.data);
+	assert(reparsed.getValue!string("name") == "test");
+	assert(reparsed.asMapping["values"].getElement!int(0) == 1);
+	assert(reparsed.asMapping["values"].getElement!int(2) == 3);
+}
+
+/// T23: putYamlCommentLinesImpl - 複数行のleadingコメントをそれぞれ独立した行として出力する
+@system unittest
+{
+	YamlBuilder builder;
+	auto v = YamlValue(1L, builder);
+	v.addLineComment(" first");
+	v.addLineComment(" second");
+	auto app = appender!(char[])();
+	builder.putYamlCommentLinesImpl(app, v._comments, "  ", "\n", 1);
+	assert(app.data == "  # first\n  # second\n");
+}
+
+/// T23: putYamlTrailingCommentImpl - 末尾がTrailingCommentの場合のみ出力し、
+/// 空白1つ+`#`+本文の形で出力する
+@system unittest
+{
+	YamlBuilder builder;
+	auto v = YamlValue(1L, builder);
+	v.addLineComment(" leading");
+	v.addTrailingComment(" trailing");
+	auto app = appender!(char[])();
+	builder.putYamlTrailingCommentImpl(app, v._comments);
+	assert(app.data == " # trailing");
+}
+
+/// T23: putYamlTrailingCommentImpl - leadingコメントしか無い場合は何も出力しない
+/// (TrailingCommentは配列の最後尾にしか現れないため)
+@system unittest
+{
+	YamlBuilder builder;
+	auto v = YamlValue(2L, builder);
+	v.addLineComment(" leading only");
+	auto app = appender!(char[])();
+	builder.putYamlTrailingCommentImpl(app, v._comments);
+	assert(app.data.length == 0);
+}
+
+/// T23: 統合テスト - blockマッピングでキー行の前にあるコメントは、次のエントリの
+/// 値のleadingコメントとしてラウンドトリップする
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: 1\n# comment about b\nb: 2\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "a: 1\n# comment about b\nb: 2\n");
+}
+
+/// T23: 統合テスト - スカラー値と同一行の末尾コメントがラウンドトリップする
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: 1 # note\nb: 2\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "a: 1 # note\nb: 2\n");
+}
+
+/// T23: 統合テスト - blockシーケンス末尾のぶら下がりコメントがラウンドトリップする
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("- 1\n- 2\n# trailing note\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "- 1\n- 2\n# trailing note\n");
+}
+
+/// T23: 統合テスト - blockマッピング末尾のぶら下がりコメントがラウンドトリップする
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: 1\nb: 2\n# end note\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "a: 1\nb: 2\n# end note\n");
+}
+
+/// T23: 統合テスト - ネストしたblockマッピング自身のleadingコメント(`key:`の
+/// 次の行、ネスト本体の先頭)がラウンドトリップする。このコメントは
+/// パーサ上「ネストした値自身」に付与されるため、`key:`行より前ではなく
+/// ネスト本体の直前(indentLevel+1)に出力する必要がある(putYamlBlockChildImpl
+/// 参照)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a:\n  # nested comment\n  x: 1\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "a:\n  # nested comment\n  x: 1\n");
+}
+
+/// T23: 統合テスト - シーケンス項目自身がネストしたblockマッピングの場合も、
+/// 同様に`-`の次の行・ネスト本体の先頭にleadingコメントが出力される
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("-\n  # note\n  y: 2\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "-\n  # note\n  y: 2\n");
+}
+
+/// T23: 統合テスト - マッピング値であるblockシーケンス自身のleadingコメントも
+/// 同じ方針でラウンドトリップする
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("items:\n  # c\n  - 1\n  - 2\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "items:\n  # c\n  - 1\n  - 2\n");
+}
+
+/// T23: 統合テスト - flowコレクション(複数行)内で要素の前に単独行として
+/// 置かれたコメントがラウンドトリップする。flow文脈のコメントは常に
+/// 「次のトークンへのleadingコメント」として扱われる(要素の直後・同一行の
+/// `# comment`であっても、パーサはそれを次要素へのleadingコメントとして
+/// 記録する。design上の既知の仕様であり、T23はこの構造をそのまま
+/// 出力するのみで、同一行末コメントとしての区別は行わない)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: [\n  1,\n  # note\n  2,\n]\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "a: [\n  1,\n  # note\n  2,\n]\n");
+}
+
+/// T23: 統合テスト - flowシーケンス末尾(閉じ角括弧の前)のぶら下がりコメントが
+/// ラウンドトリップする
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: [\n  1,\n  2,\n  # end\n]\n");
+	auto app = appender!(char[])();
+	builder.putYamlBlockNodeImpl(app, root, "  ", "\n", 0);
+	assert(app.data == "a: [\n  1,\n  2,\n  # end\n]\n");
+}
+
+/// T24: toPrettyString() - 既定オプションでのラウンドトリップ（block構造の基本形）
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: 1\nb:\n  x: 2\n  y: 3\nc:\n  - 1\n  - 2\n");
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, root);
+	assert(app.data == "a: 1\nb:\n  x: 2\n  y: 3\nc:\n  - 1\n  - 2\n");
+}
+
+/// T24: toPrettyString() - ルート自身のleadingコメント（ドキュメント先頭の
+/// コメント）がラウンドトリップする。`putYamlBlockNodeImpl`単体では
+/// ルート自身のコメントを出力できない（子のコメントしか扱わないため）ため、
+/// `toPrettyString`が最上位でこれを補う必要があることを確認する
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("# top level comment\na: 1\nb: 2\n");
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, root);
+	assert(app.data == "# top level comment\na: 1\nb: 2\n");
+}
+
+/// T24: toPrettyString() - ルートがスカラーの場合のleading/trailingコメント
+/// （改行を追加しないことも合わせて確認: 元の入力に末尾改行が無ければ
+/// 出力にも付与しない）
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("# about x\n1 # trailing note");
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, root);
+	assert(app.data == "# about x\n1 # trailing note");
+}
+
+/// T24: toPrettyString() - YamlPrettyPrintOptions.indentでインデント幅を
+/// カスタマイズできる
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a:\n  x: 1\n  y: 2\n");
+	auto app = appender!(char[])();
+	YamlOptions opt;
+	opt.indent = "    ";
+	builder.toPrettyString(app, root, opt);
+	assert(app.data == "a:\n    x: 1\n    y: 2\n");
+}
+
+/// T24: toPrettyString() - YamlPrettyPrintOptions.newlineで改行コードを
+/// カスタマイズできる(CRLF)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: 1\nb: 2\n");
+	auto app = appender!(char[])();
+	YamlOptions opt;
+	opt.newline = "\r\n";
+	builder.toPrettyString(app, root, opt);
+	assert(app.data == "a: 1\r\nb: 2\r\n");
+}
+
+/// T24: toPrettyString() - YamlPrettyPrintOptions.escapeNonAsciiが`true`の
+/// 場合、rawを持たないダブルクォート文字列のASCII範囲外文字が`\uXXXX`で
+/// エスケープされる(rawを持つ値は3.3節のraw優先方針により影響を受けない
+/// ため、ここでは低レベルAPIで直接構築した値を使う)
+@system unittest
+{
+	YamlBuilder builder;
+	auto v = YamlValue(cast(string)"caf\u00e9", builder);
+	v.asString.style = ScalarStyle.doubleQuoted;
+	
+	auto app1 = appender!(char[])();
+	YamlOptions opt1;
+	opt1.escapeNonAscii = true;
+	builder.toPrettyString(app1, v, opt1);
+	assert(app1.data == "\"caf\\u00E9\"");
+	
+	auto app2 = appender!(char[])();
+	YamlOptions opt2;
+	opt2.escapeNonAscii = false;
+	builder.toPrettyString(app2, v, opt2);
+	assert(app2.data == "\"caf\u00e9\"");
+}
+
+/// T24: toPrettyString() - 複数のコメント種別(leading/trailing/dangling)と
+/// block/flowが混在する、より現実的な入力全体のラウンドトリップ
+@safe unittest
+{
+	YamlBuilder builder;
+	auto src = "name: test\nb:\n  x: 1 # x comment\n  y: [1, 2, 3]\n" ~
+		"items:\n  - a\n  - b\n# footer\n";
+	auto root = builder.parse(src);
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, root);
+	assert(app.data == src);
+	
+	YamlBuilder builder2;
+	auto reparsed = builder2.parse(app.data);
+	assert(reparsed.getValue!string("name") == "test");
+	assert(reparsed.asMapping["b"].getValue!int("x") == 1);
+	assert(reparsed.asMapping["b"].asMapping["y"].getElement!int(1) == 2);
+	assert(reparsed.asMapping["items"].getElement!string(0) == "a");
+}
