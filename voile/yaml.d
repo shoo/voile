@@ -1484,12 +1484,12 @@ public:
 	
 private:
 	// ==========================================================================
-	// MARK: - - Builder Factory (T30 で本実装。dispose()に加え、T18が依存するため
-	// deepCopy()/copyStr()のみ前倒しで実装済み。make()/undefinedValue()/
-	// emptyArray()/emptyObject()はT30で実装する)
+	// MARK: - - Builder Factory (internal helpers)
 	// ==========================================================================
-	// 以下は全てライブラリ利用者が直接呼び出すことを想定しない内部実装。
-	// 公開APIは Export Types セクション（自由関数群）を経由して提供する。
+	// dispose()/copyStr()/copyComment() はいずれもライブラリ利用者が直接
+	// 呼び出すことを想定しない内部ヘルパーのため private のまま据え置く。
+	// make()/undefinedValue()/emptyArray()/emptyObject()/deepCopy()（design
+	// 2.1節 R2 に対応する公開API）はこの下の public: セクションに実装する（T30）。
 	
 	/***************************************************************************
 	 * Dispose the given YamlValue
@@ -1521,12 +1521,67 @@ private:
 			(ref const(YamlValue.TrailingComment) tc) => YamlValue.Comment(YamlValue.TrailingComment(copyStr(tc.value))));
 	}
 	
+public:
+	// ==========================================================================
+	// MARK: - - Builder Factory
+	// ==========================================================================
+	// design 2.1節 R2「ビルド（値の組み立て）」に対応する公開API群（T30）。
+	// JSON5の make()/undefinedValue()/emptyArray()/emptyObject()/deepCopy() と
+	// 同名・同方針とする（design 2.2節）。
+	
 	/***************************************************************************
-	 * ノードの深いコピーを作成する（T30予定だが、T18のエイリアス解決
-	 * （3.5節: `*name`出現時に`YamlAlias(name, 該当ノードのdeepCopy)`を生成する）
-	 * が依存するため前倒しで実装する。JSON5の`deepCopy()`とほぼ同じ構成に、
-	 * YAML固有の`_anchor`/`_tag`フィールドおよび`YamlAlias`型・
-	 * `trailingComments`（3.7節）の複製を追加したもの）
+	 * 与えられた値からYamlValueを構築する
+	 * 
+	 * 対応する型は`YamlValueImpl.opAssign`が受理するもの全て（文字列・整数・
+	 * 浮動小数点・真偽値・null・配列・連想配列・各`Yaml*`構造体そのもの）。
+	 * Params:
+	 *      v = 構築元の値
+	 * Returns:
+	 *      構築された`YamlValue`
+	 */
+	YamlValue make(T)(T v) @trusted
+	{
+		return YamlValue(v, this);
+	}
+	
+	/***************************************************************************
+	 * 未定義値（`YamlType.undefined`）を作成する
+	 * 
+	 * マッピングのエントリにこの値を割り当てると、そのエントリはstringify時に
+	 * 出力されない（T20実装メモ「`Type.undefined`のマッピングエントリは
+	 * スキップする」を参照）。
+	 */
+	YamlValue undefinedValue() pure nothrow @trusted
+	{
+		return YamlValue(this);
+	}
+	
+	/***************************************************************************
+	 * 空のシーケンスを作成する（block styleが既定）
+	 */
+	YamlValue emptyArray() pure nothrow @trusted
+	{
+		return YamlValue(YamlValue.YamlSequence.init, this);
+	}
+	
+	/***************************************************************************
+	 * 空のマッピングを作成する（block styleが既定）
+	 */
+	YamlValue emptyObject() pure nothrow @trusted
+	{
+		return YamlValue(YamlValue.YamlMapping.init, this);
+	}
+	
+	/***************************************************************************
+	 * ノードの深いコピーを作成する
+	 * 
+	 * T18のエイリアス解決（3.5節: `*name`出現時に`YamlAlias(name, 該当ノードの
+	 * deepCopy)`を生成する）が依存するため、実装自体はT18で前倒しに行っている
+	 * （本関数はT30でこの`public:`セクションへ移動し、`undefinedValue()`実装に
+	 * 伴って未定義値分岐を`YamlValue.init`直書きから`undefinedValue()`呼び出しに
+	 * 修正した）。JSON5の`deepCopy()`とほぼ同じ構成に、YAML固有の
+	 * `_anchor`/`_tag`フィールドおよび`YamlAlias`型・`trailingComments`
+	 * （3.7節）の複製を追加したもの。
 	 * 
 	 * コレクション（YamlSequence/YamlMapping）は内部の`Array`/`Dictionary`を
 	 * 新規に確保し直し、各要素を再帰的に複製する。スカラーの`String`フィールドは
@@ -1584,7 +1639,7 @@ private:
 				*resolvedCopy = deepCopy(*al.resolved);
 				return YamlValue(YamlValue.YamlAlias(copyStr(al.value), resolvedCopy), this);
 			},
-			(ref const(YamlValue.UndefinedValue) _) => YamlValue.init);
+			(ref const(YamlValue.UndefinedValue) _) => undefinedValue());
 		ret._comments = allocAry!(YamlValue.Comment);
 		foreach (ref c; src._comments[])
 			ret._comments ~= copyComment(c);
@@ -1595,6 +1650,7 @@ private:
 		return ret;
 	}
 	
+private:
 	// ==========================================================================
 	// MARK: - - Parser
 	// ==========================================================================
@@ -5196,6 +5252,265 @@ public:
 		putYamlBlockNodeImpl(dst, value, options.indent, options.newline, 0, options.escapeNonAscii);
 		putYamlTrailingCommentImpl(dst, value._comments);
 	}
+	
+private:
+	// ==========================================================================
+	// MARK: - - Update
+	// ==========================================================================
+	// T31: update()実装（design 3.6節）。JSON5の
+	// `update(T)(ref JsonValue dst, in T src)`と同じ契約（フォーマットを
+	// 可能な限り保持したまま値だけ更新する）を踏襲する。YAML固有の追加方針
+	// として、(1)数値/文字列を更新する際は`raw`フィールドを必ずクリアする、
+	// (2)`dst`が`YamlAlias`の場合はエイリアスを解除して具体値に置き換える、
+	// の2点を反映する。集約型(struct)・Tuple・SumTypeへの対応は
+	// design 4.2節T40/T41「JSON5のserialize()/deserialize()/_updateValueを
+	// ほぼそのまま移植する」に従い、Serializerが実装されるT40/T41で追加する
+	// （アグリゲート分岐は`serialize()`に強く依存するため、Serializerが
+	// 存在しない現時点では実装できない。T10実装メモにも記載の通り、この
+	// ような理由でスコープ外にする判断はdesignドキュメントの記述に忠実に
+	// 従う）。
+	
+	/***************************************************************************
+	 * 更新用の新規値を作る
+	 * 
+	 * `src`が`YamlValueImpl`（既に構築済みのノード。配列/マッピングの要素と
+	 * して渡ってくる）であれば`deepCopy()`で独立した複製を作る。それ以外の
+	 * ネイティブなD言語の型であれば`make()`で新規構築する。前者を`make()`
+	 * （単純代入）で済ませてしまうと、複製元と要素配列/連想配列のストレージを
+	 * 共有してしまい独立性が壊れるため、区別が必要
+	 * （T30実装メモ「.ptrを@safeコード中で直接比較すると失敗する」の
+	 * 独立性検証と同種の懸念）。
+	 */
+	YamlValue cloneForUpdateImpl(T)(auto ref T src) @trusted
+	{
+		static if (is(Unqual!T == YamlValue))
+			return deepCopy(src);
+		else
+			return make(src);
+	}
+	
+	/***************************************************************************
+	 * `dst`のノード自体（`_comments`/`_anchor`/`_tag`/既存の`_builder`）は
+	 * 保持したまま、値の実体（`_instance`）だけを`src`から新規構築した値で
+	 * 丸ごと置き換える。`updateValueImpl`のmatchで型が一致しなかった場合
+	 * （`dst`が未定義値・エイリアス・別のスカラー/コレクション型だった
+	 * 場合を含む）のフォールバックとして使う。
+	 */
+	void replaceValueImpl(T)(ref YamlValue dst, auto ref T src) @trusted
+	{
+		auto tmp = cloneForUpdateImpl(src);
+		dst._instance = tmp._instance;
+		if (dst._builder is null)
+			dst._builder = tmp._builder;
+	}
+	
+	/***************************************************************************
+	 * `dst`を`src`の値で更新する（`update()`の実装本体）
+	 * 
+	 * `dst`の現在の型が`src`に対応する型であれば、その値（`.value`）のみを
+	 * 書き換え、スカラー型では`raw`もあわせてクリアする（design 3.6節の
+	 * rawクリア方針）。対応しない型であれば`replaceValueImpl`により
+	 * `_instance`ごと新規に構築し直す。`dst`が`YamlAlias`だった場合も
+	 * このmatch機構により自然に「型不一致」として扱われ`_instance`が
+	 * 具体値で置き換えられるため、design 3.6節が要求する「エイリアスを
+	 * 解除して具体値に置き換える」動作を特別な分岐無しに満たす
+	 * （アンカー定義側や`_comments`/`_anchor`/`_tag`自体は`dst`のものを
+	 * 保持するため変化しない）。
+	 * 
+	 * `src`が`YamlValueImpl`の場合は、`dereference()`でエイリアス連鎖を
+	 * 辿った上でその中身の型に応じて再帰的に自分自身へ委譲する。この際、
+	 * `src`側の書式情報（`raw`/`style`/`base`等）は使わず値のみを使う
+	 * （前述の通りformatは`dst`側のものを優先して保持する方針のため）。
+	 * 配列・連想配列（`Dictionary!(YamlKey, YamlValueImpl)`を含む）は
+	 * 要素/キー単位で再帰的に同じ処理を適用し、`dst`側に既存のキー/
+	 * インデックスがあれば更新、無ければ`cloneForUpdateImpl`で新規追加する。
+	 * `src`に存在しない`dst`側のキーは削除される（JSON5の`_updateValue`と
+	 * 同じ「srcの完全なキー集合に同期する」方針）。
+	 */
+	void updateValueImpl(T)(ref YamlValue dst, auto ref T src) @trusted
+	{
+		alias U = Unqual!T;
+		static if (is(U == YamlValue))
+		{
+			src.dereference()._instance.match!(
+				(ref const(YamlValue.UndefinedValue) _) { dst._instance = YamlValue.UndefinedValue.init; },
+				(ref const(YamlValue.YamlAlias) _)
+				{
+					// dereference()済みのためここには到達しないはずだが、
+					// SumType.matchの網羅性チェックのためハンドラが必要
+					assert(0, "unreachable: dereference() must resolve YamlAlias");
+				},
+				(ref const(YamlValue.YamlString) s)        { updateValueImpl(dst, cast(string)s.value[]); },
+				(ref const(YamlValue.YamlInteger) s)       { updateValueImpl(dst, s.value); },
+				(ref const(YamlValue.YamlUInteger) s)      { updateValueImpl(dst, s.value); },
+				(ref const(YamlValue.YamlFloatingPoint) s) { updateValueImpl(dst, s.value); },
+				(ref const(YamlValue.YamlBoolean) s)       { updateValueImpl(dst, s.value); },
+				(ref const(YamlValue.YamlNull) s)          { updateValueImpl(dst, null); },
+				(ref const(YamlValue.YamlSequence) s)      { updateValueImpl(dst, s.value); },
+				(ref const(YamlValue.YamlMapping) s)       { updateValueImpl(dst, s.value); });
+		}
+		else static if (is(U == string))
+		{
+			dst._instance.match!(
+				(ref YamlValue.YamlString v) { v.value = allocStr(src); v.raw = String.init; },
+				(_) { replaceValueImpl(dst, src); });
+		}
+		else static if (isSomeString!U)
+		{
+			import std.utf: toUTF8;
+			updateValueImpl(dst, src.toUTF8());
+		}
+		else static if (isIntegral!U && isSigned!U)
+		{
+			dst._instance.match!(
+				(ref YamlValue.YamlInteger v) { v.value = src; v.raw = String.init; },
+				(_) { replaceValueImpl(dst, src); });
+		}
+		else static if (isIntegral!U && isUnsigned!U)
+		{
+			dst._instance.match!(
+				(ref YamlValue.YamlUInteger v) { v.value = src; v.raw = String.init; },
+				(_) { replaceValueImpl(dst, src); });
+		}
+		else static if (isFloatingPoint!U)
+		{
+			dst._instance.match!(
+				(ref YamlValue.YamlFloatingPoint v) { v.value = src; v.raw = String.init; },
+				(_) { replaceValueImpl(dst, src); });
+		}
+		else static if (isBoolean!U)
+		{
+			dst._instance.match!(
+				(ref YamlValue.YamlBoolean v) { v.value = src; v.raw = String.init; },
+				(_) { replaceValueImpl(dst, src); });
+		}
+		else static if (is(U == typeof(null)))
+		{
+			dst._instance.match!(
+				(ref YamlValue.YamlNull v) { v.raw = String.init; },
+				(_) { replaceValueImpl(dst, null); });
+		}
+		else static if (isArray!U)
+		{
+			dst._instance.match!(
+				(ref YamlValue.YamlSequence seq)
+				{
+					immutable newLen = src.length;
+					if (newLen < seq.value.length)
+						seq.value.length = newLen;
+					foreach (i, ref e; src)
+					{
+						if (i < seq.value.length)
+							updateValueImpl(seq.value[i], e);
+						else
+							seq.value ~= cloneForUpdateImpl(e);
+					}
+				},
+				(_)
+				{
+					auto ary = allocAry!YamlValue;
+					foreach (ref e; src)
+						ary ~= cloneForUpdateImpl(e);
+					replaceValueImpl(dst, YamlValue.YamlSequence(ary));
+				});
+		}
+		else static if ((isAssociativeArray!U && is(KeyType!U == string))
+			|| is(U == Dictionary!(YamlKey, YamlValue)))
+		{
+			dst._instance.match!(
+				(ref YamlValue.YamlMapping m)
+				{
+					auto tmp = allocDic!(YamlKey, YamlValue);
+					static if (is(U == Dictionary!(YamlKey, YamlValue)))
+					{
+						foreach (ref srcItm; src.byKeyValue)
+						{
+							if (auto pv = m.value.opIn(srcItm.key))
+							{
+								updateValueImpl(*pv, srcItm.value);
+								tmp.append(srcItm.key, *pv);
+							}
+							else
+							{
+								tmp.append(srcItm.key, deepCopy(srcItm.value));
+							}
+						}
+					}
+					else
+					{
+						foreach (k, ref v; src)
+						{
+							auto key = YamlKey(cast(String)k);
+							if (auto pv = m.value.opIn(key))
+							{
+								updateValueImpl(*pv, v);
+								tmp.append(key, *pv);
+							}
+							else
+							{
+								tmp.append(key, cloneForUpdateImpl(v));
+							}
+						}
+					}
+					m.value = tmp;
+				},
+				(_)
+				{
+					auto tmp = allocDic!(YamlKey, YamlValue);
+					static if (is(U == Dictionary!(YamlKey, YamlValue)))
+					{
+						foreach (ref srcItm; src.byKeyValue)
+							tmp.append(srcItm.key, deepCopy(srcItm.value));
+					}
+					else
+					{
+						foreach (k, ref v; src)
+							tmp.append(YamlKey(cast(String)k), cloneForUpdateImpl(v));
+					}
+					replaceValueImpl(dst, YamlValue.YamlMapping(tmp));
+				});
+		}
+		else
+			static assert(0, "voile.yaml: update()は" ~ T.stringof ~ "型に対応していません" ~
+				"(struct/Tuple/SumTypeの対応はT40/T41でserialize()実装後に追加予定です)");
+	}
+	
+public:
+	// ==========================================================================
+	// MARK: - - Update (public entry point)
+	// ==========================================================================
+	
+	/***************************************************************************
+	 * `dst`を`src`の値でフォーマットを可能な限り保持したまま更新する
+	 * 
+	 * `dst`が現在保持している値と同じ種類（文字列/整数/浮動小数点/真偽値/
+	 * null/シーケンス/マッピング）であれば、コメント・アンカー・タグ・
+	 * （数値/文字列以外の）フォーマット情報は保持したまま値のみを書き換える。
+	 * 種類が異なる場合は値を新規に構築し直す
+	 * （コメント・アンカー・タグは`dst`のものを保持する）。
+	 * 
+	 * 数値・文字列を更新する際は元の`raw`テキストを必ずクリアする
+	 * （更新後の値と元のテキスト表記が乖離するのを防ぐため。design 3.6節）。
+	 * `dst`が`YamlAlias`（`*name`）だった場合はエイリアスを解除し、`dst`
+	 * 自体を更新後の具体値に置き換える（アンカー定義側は変化しない。
+	 * design 3.6節）。エイリアス参照そのものを維持したい場合は`update()`
+	 * ではなく`dst = builder.make(...)`などで明示的に再代入すること。
+	 * 
+	 * シーケンス/マッピングは要素/キー単位で再帰的に更新される。マッピングは
+	 * `src`に存在するキーの集合に同期し、`dst`側にのみ存在するキーは
+	 * 削除される。
+	 * 
+	 * 対応する`src`の型は`YamlValue`・文字列・整数・浮動小数点・真偽値・
+	 * `null`・配列・連想配列（キーは`string`）。集約型(struct)・Tuple・
+	 * SumTypeへの対応はT40/T41（Serializer/Deserializer）実装後に追加する。
+	 * Params:
+	 *      dst = 更新対象のノード
+	 *      src = 更新に使う値
+	 */
+	void update(T)(ref YamlValue dst, in T src) @safe
+	{
+		updateValueImpl(dst, src);
+	}
 }
 
 // ============================================================================
@@ -8615,4 +8930,375 @@ alias YamlOptions  = YamlBuilder.YamlPrettyPrintOptions;
 	assert(reparsed.asMapping["b"].getValue!int("x") == 1);
 	assert(reparsed.asMapping["b"].asMapping["y"].getElement!int(1) == 2);
 	assert(reparsed.asMapping["items"].getElement!string(0) == "a");
+}
+
+/// T30: make() - 基本的なスカラー型の構築(opAssignの各分岐をmake()経由で確認。
+/// make()自体は@trustedだが呼び出し側は@safeのまま使える)
+@safe unittest
+{
+	YamlBuilder builder;
+	
+	auto vs = builder.make("hello");
+	assert(vs.type == YamlBuilder.YamlType.string);
+	assert(vs.get!string == "hello");
+	
+	auto vi = builder.make(42);
+	assert(vi.type == YamlBuilder.YamlType.integer);
+	assert(vi.get!int == 42);
+	
+	auto vu = builder.make(42U);
+	assert(vu.type == YamlBuilder.YamlType.uinteger);
+	assert(vu.get!uint == 42);
+	
+	auto vf = builder.make(3.14);
+	assert(vf.type == YamlBuilder.YamlType.floating);
+	
+	auto vb = builder.make(true);
+	assert(vb.type == YamlBuilder.YamlType.boolean);
+	assert(vb.get!bool == true);
+	
+	auto vn = builder.make(null);
+	assert(vn.type == YamlBuilder.YamlType.nullfied);
+}
+
+/// T30: make() - 配列・連想配列の構築(要素としてmake()自身の結果をネストできる)
+@safe unittest
+{
+	YamlBuilder builder;
+	
+	auto va = builder.make([builder.make(1), builder.make(2), builder.make(3)]);
+	assert(va.type == YamlBuilder.YamlType.sequence);
+	assert(va.getElement!int(0) == 1);
+	assert(va.getElement!int(2) == 3);
+	
+	auto vm = builder.make(["a": builder.make(1), "b": builder.make(2)]);
+	assert(vm.type == YamlBuilder.YamlType.mapping);
+	assert(vm.getValue!int("a") == 1);
+	assert(vm.getValue!int("b") == 2);
+}
+
+/// T30: make() - Yaml*構造体そのものを渡した場合、rawを持たないフラグ
+/// (positiveSign/base等)もそのまま保持される
+@safe unittest
+{
+	YamlBuilder builder;
+	auto v = builder.make(YamlValue.YamlInteger(42, true, IntegerBase.hex));
+	assert(v.type == YamlBuilder.YamlType.integer);
+	assert(v.asInteger.value == 42);
+	assert(v.asInteger.positiveSign == true);
+	assert(v.asInteger.base == IntegerBase.hex);
+}
+
+/// T30: undefinedValue() - Type.undefinedを返す(デフォルト構築のYamlValueと同じtype)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto v = builder.undefinedValue();
+	assert(v.type == YamlBuilder.YamlType.undefined);
+	assert(v.type == YamlValue.init.type);
+}
+
+/// T30: emptyArray()/emptyObject() - 空のblockスタイルコレクションを返す
+@safe unittest
+{
+	YamlBuilder builder;
+	
+	auto ea = builder.emptyArray();
+	assert(ea.type == YamlBuilder.YamlType.sequence);
+	assert(ea.asSequence.value.length == 0);
+	assert(ea.asSequence.style == CollectionStyle.block);
+	
+	auto eo = builder.emptyObject();
+	assert(eo.type == YamlBuilder.YamlType.mapping);
+	assert(eo.asMapping.value.length == 0);
+	assert(eo.asMapping.style == CollectionStyle.block);
+}
+
+/// T30: emptyArray()/emptyObject() - 要素数0のためtoPrettyString()では常に
+/// flow形式("[]"/"{}")で出力される(block記法では空コレクションを表現できない
+/// 仕様上の制約のため。T22 isBlockNestedCollectionImplの判定を参照)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto ea = builder.emptyArray();
+	auto eo = builder.emptyObject();
+	
+	auto app1 = appender!(char[])();
+	builder.toPrettyString(app1, ea);
+	assert(app1.data == "[]");
+	
+	auto app2 = appender!(char[])();
+	builder.toPrettyString(app2, eo);
+	assert(app2.data == "{}");
+}
+
+/// T30: emptyObject()にappend()で組み立てたマッピングは、undefinedValue()を
+/// 値に持つエントリだけtoPrettyString()でスキップされる(T20実装メモの方針を
+/// make()/emptyObject()経由で確認。連想配列リテラルは走査順序が不定なため
+/// 使わず、Dictionary.append()で順序を明示的に制御する)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto v = builder.emptyObject();
+	v.asMapping.value.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"a"), builder.make(1));
+	v.asMapping.value.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"b"), builder.undefinedValue());
+	v.asMapping.value.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"c"), builder.make(3));
+	
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, v);
+	assert(app.data == "a: 1\nc: 3\n");
+}
+
+/// T30: deepCopy() - make()で構築したシーケンスの複製は独立したポインタを持ち、
+/// 複製先を変更しても複製元に影響しない(JSON5のdeepCopyテストと同じ確認方法)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto src = builder.make([builder.make(1), builder.make(2)]);
+	auto dst = builder.deepCopy(src);
+	assert(&dst.asSequence.value[0] !is &src.asSequence.value[0]);
+	assert(dst.getElement!int(0) == 1);
+	
+	dst.asSequence.value[0] = builder.make(100);
+	assert(dst.getElement!int(0) == 100);
+	assert(src.getElement!int(0) == 1);
+}
+
+/// T30: deepCopy() - make()で構築したマッピングの複製も同様に独立している
+@safe unittest
+{
+	YamlBuilder builder;
+	auto src = builder.make(["a": builder.make(1)]);
+	auto dst = builder.deepCopy(src);
+	assert(&dst.asMapping.value[0] !is &src.asMapping.value[0]);
+	assert(dst.getValue!int("a") == 1);
+}
+
+/// T30: deepCopy() - スカラー値のraw・アンカー・タグも複製される
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: &x !!int 42\n");
+	auto orig = root.asMapping["a"];
+	assert(orig.anchorName.get == "x");
+	assert(orig.tagName.get == "!!int");
+	assert(orig.asInteger.raw[] == "42");
+	
+	auto copied = builder.deepCopy(orig);
+	assert(copied.get!int == 42);
+	assert(copied.anchorName.get == "x");
+	assert(copied.tagName.get == "!!int");
+	assert(copied.asInteger.raw[] == "42");
+}
+
+/// T30: deepCopy() - undefinedValue()を複製してもtypeがundefinedのまま保たれ、
+/// `_builder`が正しく設定される(以前は未定義値分岐で`YamlValue.init`を直書き
+/// していたため`_builder`が未設定のままだったバグの回帰テスト)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto src = builder.undefinedValue();
+	auto dst = builder.deepCopy(src);
+	assert(dst.type == YamlBuilder.YamlType.undefined);
+	assert(dst._builder !is null);
+}
+
+/// T31: update() - 文字列を同じ型のまま更新すると、rawはクリアされるが
+/// style等の他のフォーマット情報は保持される(単純なクォート済み文字列は
+/// パーサーがrawを設定しない(value+styleのみで再現可能なため)ため、
+/// ここではmake()でrawを持つYamlStringを直接構築して検証する)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto dst = builder.make(YamlValue.YamlString(cast(YamlBuilder.String)"hello",
+		ScalarStyle.doubleQuoted, cast(YamlBuilder.String)"\"hello\""));
+	assert(dst.asString.raw[] == "\"hello\"");
+	assert(dst.asString.style == ScalarStyle.doubleQuoted);
+	
+	builder.update(dst, "world");
+	
+	assert(dst.get!string == "world");
+	assert(dst.asString.raw.length == 0);
+	assert(dst.asString.style == ScalarStyle.doubleQuoted);
+}
+
+/// T31: update() - 整数/符号なし整数/浮動小数点/真偽値/nullを同じ型のまま
+/// 更新すると、それぞれrawがクリアされる(design 3.6節のrawクリア方針)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("i: 0x2A\nu: 10\nf: 1.5\nb: yes\nn: ~\n");
+	assert(root.asMapping["i"].asInteger.raw.length > 0);
+	
+	builder.update(root.asMapping["i"], 100);
+	assert(root.asMapping["i"].get!int == 100);
+	assert(root.asMapping["i"].asInteger.raw.length == 0);
+	
+	builder.update(root.asMapping["u"], 200U);
+	assert(root.asMapping["u"].get!uint == 200);
+	assert(root.asMapping["u"].asUInteger.raw.length == 0);
+	
+	builder.update(root.asMapping["f"], 2.5);
+	assert(root.asMapping["f"].get!double == 2.5);
+	assert(root.asMapping["f"].asFloatingPoint.raw.length == 0);
+	
+	builder.update(root.asMapping["b"], false);
+	assert(root.asMapping["b"].get!bool == false);
+	assert(root.asMapping["b"].asBoolean.raw.length == 0);
+	
+	builder.update(root.asMapping["n"], null);
+	assert(root.asMapping["n"].type == YamlBuilder.YamlType.nullfied);
+	assert(root.asMapping["n"].asNull.raw.length == 0);
+}
+
+/// T31: update() - wstring等isSomeStringな型もstringへ変換されて更新される
+@safe unittest
+{
+	YamlBuilder builder;
+	auto dst = builder.make("x");
+	wstring w = "wide"w;
+	builder.update(dst, w);
+	assert(dst.get!string == "wide");
+}
+
+/// T31: update() - 値の型が異なる場合は再構築されるが、アンカー・コメントは
+/// dst側のものが保持される(design 3.6節「フォーマットを可能な限り保持する」)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("s: &anc 42 # note\n");
+	assert(root.asMapping["s"].type == YamlBuilder.YamlType.integer);
+	assert(root.asMapping["s"].anchorName.get == "anc");
+	assert(root.asMapping["s"].getCommentLength == 1);
+	
+	builder.update(root.asMapping["s"], "now a string");
+	
+	assert(root.asMapping["s"].type == YamlBuilder.YamlType.string);
+	assert(root.asMapping["s"].get!string == "now a string");
+	assert(root.asMapping["s"].anchorName.get == "anc");
+	assert(root.asMapping["s"].getCommentLength == 1);
+}
+
+/// T31: update() - 配列は伸長・切り詰めの両方に対応し、既存要素は
+/// (型が一致する限り)再帰的にin-place更新される
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.make([builder.make(1), builder.make(2), builder.make(3)]);
+	
+	builder.update(root, [10, 20, 30, 40]);
+	assert(root.asSequence.value.length == 4);
+	assert(root.getElement!int(0) == 10);
+	assert(root.getElement!int(3) == 40);
+	
+	builder.update(root, [1, 2]);
+	assert(root.asSequence.value.length == 2);
+	assert(root.getElement!int(0) == 1);
+	assert(root.getElement!int(1) == 2);
+}
+
+/// T31: update() - 連想配列は`src`のキー集合に同期する: 既存キーは更新、
+/// 新規キーは追加、`src`に存在しない既存キーは削除される
+@safe unittest
+{
+	YamlBuilder builder;
+	auto v = builder.emptyObject();
+	v.asMapping.value.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"a"), builder.make(1));
+	v.asMapping.value.append(YamlBuilder.YamlKey(cast(YamlBuilder.String)"b"), builder.make(2));
+	
+	builder.update(v, ["a": 100, "c": 3]);
+	
+	assert(v.asMapping.value.length == 2);
+	assert(v.getValue!int("a") == 100);
+	assert(v.getValue!int("c") == 3);
+	assert(v.asMapping.value.opIn(YamlBuilder.YamlKey(cast(YamlBuilder.String)"b")) is null);
+}
+
+/// T31: update() - srcにYamlValue(シーケンス)を直接渡した場合も再帰的に
+/// 更新され、複製されたsrc側とは独立している(deepCopy相当の独立性を持つ)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto dst = builder.make([builder.make(1), builder.make(2)]);
+	auto srcVal = builder.make([builder.make(10), builder.make(20), builder.make(30)]);
+	
+	builder.update(dst, srcVal);
+	
+	assert(dst.asSequence.value.length == 3);
+	assert(dst.getElement!int(0) == 10);
+	assert(dst.getElement!int(2) == 30);
+	
+	dst.asSequence.value[0] = builder.make(999);
+	assert(dst.getElement!int(0) == 999);
+	assert(srcVal.getElement!int(0) == 10);
+}
+
+/// T31: update() - srcにYamlValue(マッピング)を直接渡した場合も
+/// キー集合の同期を含めて再帰的に更新される
+@safe unittest
+{
+	YamlBuilder builder;
+	auto dst = builder.make(["a": builder.make(1)]);
+	auto srcVal = builder.make(["a": builder.make(100), "b": builder.make(2)]);
+	
+	builder.update(dst, srcVal);
+	
+	assert(dst.asMapping.value.length == 2);
+	assert(dst.getValue!int("a") == 100);
+	assert(dst.getValue!int("b") == 2);
+}
+
+/// T31: update() - dstがYamlAlias(`*name`)の場合はエイリアスを解除して
+/// 具体値に置き換える。アンカー定義側のノードは変化しない(design 3.6節)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("a: &x 1\nb: *x\n");
+	assert(root.asMapping["b"].type == YamlBuilder.YamlType.alias_);
+	
+	builder.update(root.asMapping["b"], "resolved now");
+	
+	assert(root.asMapping["b"].type == YamlBuilder.YamlType.string);
+	assert(root.asMapping["b"].get!string == "resolved now");
+	assert(root.asMapping["a"].get!int == 1);
+}
+
+/// T31: update() - dstが元々スカラーでも、srcが配列であれば型が
+/// 再構築されシーケンスになる
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("v: 1\n");
+	assert(root.asMapping["v"].type == YamlBuilder.YamlType.integer);
+	
+	builder.update(root.asMapping["v"], [1, 2, 3]);
+	
+	assert(root.asMapping["v"].type == YamlBuilder.YamlType.sequence);
+	assert(root.asMapping["v"].getElement!int(1) == 2);
+}
+
+/// T31: update() - 集約型(struct)はT40/T41(Serializer)実装後に対応予定のため
+/// 現時点ではコンパイルエラーになることを保証する回帰テスト(design 4.2節)
+@safe unittest
+{
+	struct Dummy { int x; }
+	YamlBuilder builder;
+	auto dst = builder.make(1);
+	assert(!__traits(compiles, builder.update(dst, Dummy(1))));
+}
+
+/// T31: update() - parse()結果に対する更新後もtoPrettyString()で
+/// コメント等のフォーマットを保持したままラウンドトリップできる
+/// (design 3.6節の契約「フォーマットを可能な限り保持したまま値だけ更新する」
+/// の統合テスト)
+@safe unittest
+{
+	YamlBuilder builder;
+	auto root = builder.parse("name: Alice # who\nage: 30\n");
+	
+	builder.update(root.asMapping["age"], 31);
+	
+	auto app = appender!(char[])();
+	builder.toPrettyString(app, root);
+	assert(app.data == "name: Alice # who\nage: 31\n");
 }
